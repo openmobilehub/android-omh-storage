@@ -54,7 +54,7 @@ To access Google APIs, generate a unique client_id for your app in the Google AP
 5. In the "Application Type" option, select "Android".
 6. Set your application package name.
    
-   **Note:** If you are running the sample app or following the steps in the `code-starter` branch, use `com.omh.android.storage.sample`.
+   **Note:** If you are running the sample app or following the steps in the `code-starter` branch, use `com.openmobilehub.android.storage.sample`.
 
 7. Update the Android Client ID's debug/release SHA-1 certificate fingerprint by running the following command in your terminal:
  

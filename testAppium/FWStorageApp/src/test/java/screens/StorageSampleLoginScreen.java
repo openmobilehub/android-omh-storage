@@ -40,18 +40,18 @@ public class StorageSampleLoginScreen extends BaseScreen {
      */
 
     // logged out elements
-    @AndroidFindBy(id="com.omh.android.storage.sample:id/toolbar")
+    @AndroidFindBy(id="com.openmobilehub.android.storage.sample:id/toolbar")
     private WebElement topActionBar;
 
     @AndroidFindBy(className="android.widget.TextView")
     private WebElement topActionBarTxt;
 
-    @AndroidFindBy(id="com.omh.android.storage.sample:id/btn_login")
+    @AndroidFindBy(id="com.openmobilehub.android.storage.sample:id/btn_login")
     private WebElement loginBtn;
 
     // Messages UI
 
-    @AndroidFindBy(id="com.omh.android.storage.sample:id/alertTitle")
+    @AndroidFindBy(id="com.openmobilehub.android.storage.sample:id/alertTitle")
     private WebElement alertTitle;
 
     @AndroidFindBy(id="android:id/message")

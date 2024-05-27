@@ -47,7 +47,7 @@ public class StorageSampleLoggedScreen extends BaseScreen {
     @AndroidFindBy(className="android.widget.TextView")
     private List<WebElement> androidTextViewList;
 
-    @AndroidFindBy(id="com.omh.android.storage.sample:id/sortByName")
+    @AndroidFindBy(id="com.openmobilehub.android.storage.sample:id/sortByName")
     private WebElement sortLbl;
 
     // Ellipsis more button
@@ -61,7 +61,7 @@ public class StorageSampleLoggedScreen extends BaseScreen {
     /*
      POPUP Create
      */
-    @AndroidFindBy(id="com.omh.android.storage.sample:id/alertTitle")
+    @AndroidFindBy(id="com.openmobilehub.android.storage.sample:id/alertTitle")
     private WebElement alertTitle;
 
     @AndroidFindBy(id="android:id/button2")
@@ -73,10 +73,10 @@ public class StorageSampleLoggedScreen extends BaseScreen {
     /*
     POPUP fields to complete
      */
-    @AndroidFindBy(id="com.omh.android.storage.sample:id/fileName")
+    @AndroidFindBy(id="com.openmobilehub.android.storage.sample:id/fileName")
     private WebElement fileNameTxtField;
 
-    @AndroidFindBy(id="com.omh.android.storage.sample:id/fileType")
+    @AndroidFindBy(id="com.openmobilehub.android.storage.sample:id/fileType")
     private WebElement fileTypeDownArrow;
 
     @AndroidFindBy(className="android.widget.CheckedTextView")
