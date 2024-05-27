@@ -47,7 +47,7 @@ class SingletonModule {
                     "https://www.googleapis.com/auth/drive",
                     "https://www.googleapis.com/auth/drive.file"
                 ),
-                clientId = BuildConfig.CLIENT_ID
+                clientId = BuildConfig.GOOGLEDRIVE_CLIENT_ID
             )
     }
 
