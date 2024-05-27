@@ -43,6 +43,11 @@ android {
 
 setupJacoco()
 
+tasks.named("jacocoCoverageVerification").configure { dependsOn("mergeDebugJniLibFolders") }
+tasks.named("jacocoCoverageVerification").configure { dependsOn("copyDebugJniLibsProjectAndLocalJars") }
+tasks.named("jacocoCoverageVerification").configure { dependsOn("copyDebugJniLibsProjectOnly") }
+tasks.named("jacocoCoverageVerification").configure { dependsOn("syncDebugLibJars") }
+
 dependencies {
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:${Versions.detekt}")
 }
@@ -59,10 +64,10 @@ artifacts {
     add("archives", androidSourcesJar)
 }
 
-val groupProperty = getPropertyOrFail("group")
-val versionProperty = getPropertyOrFail("version")
-val artifactId = getPropertyOrFail("artifactId")
-val mDescription = getPropertyOrFail("description")
+val groupProperty = getRequiredValueFromEnvOrProperties("group")
+val versionProperty = getRequiredValueFromEnvOrProperties("version")
+val artifactId = getRequiredValueFromEnvOrProperties("artifactId")
+val mDescription = getRequiredValueFromEnvOrProperties("description")
 
 group = groupProperty
 version = versionProperty

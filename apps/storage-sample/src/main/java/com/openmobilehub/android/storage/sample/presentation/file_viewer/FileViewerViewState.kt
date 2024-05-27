@@ -16,7 +16,7 @@
 
 package com.openmobilehub.android.storage.sample.presentation.file_viewer
 
-import com.omh.android.storage.api.domain.model.OmhFile
+import com.openmobilehub.android.storage.core.domain.model.OmhFile
 import com.openmobilehub.android.storage.sample.presentation.ViewState
 
 sealed class FileViewerViewState : ViewState {

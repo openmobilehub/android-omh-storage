@@ -18,6 +18,6 @@ dependencyResolutionManagement {
 rootProject.name = "omh-storage"
 
 include(":apps:storage-sample")
-include(":packages:storage-api")
-include(":packages:storage-api-drive-gms")
-include(":packages:storage-api-drive-nongms")
+include(":packages:core")
+include(":packages:plugin-google-gms")
+include(":packages:plugin-google-non-gms")

@@ -16,8 +16,8 @@
 
 package com.openmobilehub.android.storage.sample.util
 
-import com.omh.android.storage.api.domain.model.OmhFile
-import com.omh.android.storage.api.domain.model.OmhFileType
+import com.openmobilehub.android.storage.core.domain.model.OmhFile
+import com.openmobilehub.android.storage.core.domain.model.OmhFileType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job

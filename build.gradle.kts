@@ -3,6 +3,12 @@ plugins {
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin") version "2.0.1" apply false
 }
 
+val useLocalProjects by extra(getBooleanFromProperties("useLocalProjects", null))
+
+if (useLocalProjects) {
+    println("OMH Maps project running with useLocalProjects enabled")
+}
+
 subprojects {
     repositories {
         mavenCentral()

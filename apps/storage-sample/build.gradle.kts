@@ -4,53 +4,7 @@ plugins {
     `android-application`
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android") version "2.44" apply true
-    id("com.openmobilehub.android.omh-core")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
-}
-
-omhConfig {
-    bundle("singleBuild") {
-        storage() {
-            gmsService {
-                dependency = "com.openmobilehub.android:storage-api-drive-gms:1.0.7-beta"
-            }
-            nonGmsService {
-                dependency = "com.openmobilehub.android:storage-api-drive-nongms:1.0.8-beta"
-            }
-        }
-        auth {
-            gmsService {
-                dependency = "com.openmobilehub.android:auth-api-gms:1.0.1-beta"
-            }
-            nonGmsService {
-                dependency = "com.openmobilehub.android:auth-api-non-gms:1.0.1-beta"
-            }
-        }
-    }
-    bundle("gms") {
-        storage {
-            gmsService {
-                dependency = "com.openmobilehub.android:storage-api-drive-gms:1.0.7-beta"
-            }
-        }
-        auth {
-            gmsService {
-                dependency = "com.openmobilehub.android:auth-api-gms:1.0.1-beta"
-            }
-        }
-    }
-    bundle("nongms") {
-        storage {
-            nonGmsService {
-                dependency = "com.openmobilehub.android:storage-api-drive-nongms:1.0.8-beta"
-            }
-        }
-        auth {
-            nonGmsService {
-                dependency = "com.openmobilehub.android:auth-api-non-gms:1.0.1-beta"
-            }
-        }
-    }
 }
 
 @Suppress("UnstableApiUsage")
@@ -59,6 +13,26 @@ android {
 
     defaultConfig {
         applicationId = "com.openmobilehub.android.storage.sample"
+        buildConfigField(
+            type = "String",
+            name = "AUTH_NON_GMS_PATH",
+            value =  "\"com.omh.android.auth.nongms.presentation.OmhAuthFactoryImpl\""
+        )
+        buildConfigField(
+            type = "String",
+            name = "AUTH_GMS_PATH",
+            value = "\"com.omh.android.auth.gms.OmhAuthFactoryImpl\""
+        )
+        buildConfigField(
+            type = "String",
+            name = "STORAGE_GMS_PATH",
+            value = "\"com.openmobilehub.android.storage.plugin.google.gms.OmhGmsStorageFactoryImpl\""
+        )
+        buildConfigField(
+            type = "String",
+            name = "STORAGE_NON_GMS_PATH",
+            value = "\"com.openmobilehub.android.storage.plugin.google.nongms.OmhNonGmsStorageFactoryImpl\""
+        )
     }
 
     signingConfigs {
@@ -96,6 +70,8 @@ android {
     }
 }
 
+val useLocalProjects = project.rootProject.extra["useLocalProjects"] as Boolean
+
 dependencies {
     implementation(Libs.coreKtx)
     implementation(Libs.lifecycleKtx)
@@ -117,4 +93,17 @@ dependencies {
     kapt("com.google.dagger:hilt-compiler:2.44")
 
     testImplementation(Libs.junit)
+
+    implementation("com.openmobilehub.android:auth-api-gms:1.0.1-beta")
+    implementation("com.openmobilehub.android:auth-api-non-gms:1.0.1-beta")
+
+    // Use local implementation instead of dependencies
+    if (useLocalProjects) {
+        implementation(project(":packages:core"))
+        implementation(project(":packages:plugin-google-gms"))
+        implementation(project(":packages:plugin-google-non-gms"))
+    } else {
+        implementation("com.openmobilehub.android:storage-api-drive-nongms:1.0.8-beta")
+        implementation("com.openmobilehub.android:storage-api-drive-gms:1.0.7-beta")
+    }
 }

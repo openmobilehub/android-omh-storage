@@ -20,10 +20,10 @@ import android.content.Context
 import android.net.Uri
 import android.os.Environment
 import com.omh.android.auth.api.OmhAuthClient
-import com.omh.android.storage.api.OmhStorageClient
-import com.omh.android.storage.api.domain.model.OmhFile
-import com.omh.android.storage.api.domain.model.OmhFileType
-import com.omh.android.storage.api.domain.usecase.DownloadFileUseCaseResult
+import com.openmobilehub.android.storage.core.OmhStorageClient
+import com.openmobilehub.android.storage.core.domain.model.OmhFile
+import com.openmobilehub.android.storage.core.domain.model.OmhFileType
+import com.openmobilehub.android.storage.core.domain.usecase.DownloadFileUseCaseResult
 import com.openmobilehub.android.storage.sample.model.FileType
 import com.openmobilehub.android.storage.sample.presentation.BaseViewModel
 import com.openmobilehub.android.storage.sample.util.getNameWithExtension

@@ -25,8 +25,8 @@ import androidx.recyclerview.widget.DiffUtil.ItemCallback
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.omh.android.storage.api.domain.model.OmhFile
-import com.omh.android.storage.api.domain.model.OmhFileType
+import com.openmobilehub.android.storage.core.domain.model.OmhFile
+import com.openmobilehub.android.storage.core.domain.model.OmhFileType
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.FileGridAdapterBinding
 import com.openmobilehub.android.storage.sample.databinding.FileLinearAdapterBinding

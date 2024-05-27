@@ -19,8 +19,8 @@ package com.openmobilehub.android.storage.sample.di
 import android.content.Context
 import com.omh.android.auth.api.OmhAuthClient
 import com.omh.android.auth.api.OmhAuthProvider
-import com.omh.android.storage.api.OmhStorageClient
-import com.omh.android.storage.api.OmhStorageProvider
+import com.openmobilehub.android.storage.core.OmhStorageClient
+import com.openmobilehub.android.storage.core.OmhStorageProvider
 import com.openmobilehub.android.storage.sample.BuildConfig
 import dagger.Module
 import dagger.Provides
