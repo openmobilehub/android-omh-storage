@@ -1,0 +1,60 @@
+name: Build and Release to MavenLocal
+
+on:
+  workflow_call:
+    inputs:
+      input-cache-prefix:
+        description: "Input cache prefix"
+        type: string
+        required: false
+        default: ""
+      output-cache-prefix:
+        description: "Output cache prefix"
+        type: string
+        required: false
+        default: ""
+      gradle-command:
+        description: "Publish to MavenLocal command"
+        type: string
+        required: true
+
+jobs:
+  publish:
+    name: Publish plugins to MavenLocal
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: "zulu"
+          java-version: "17"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-read-only: false
+
+      - name: Setup secrets
+        run: bash ./.github/scripts/setup_secrets.sh "${{ secrets.GOOGLEDRIVE_CLIENT_ID}}"
+
+      - name: Set useMavenLocal flag
+        run: echo useMavenLocal=true >> local.properties
+
+      - name: Restore MavenLocal Cache
+        if: ${{ inputs.input-cache-prefix != '' }}
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ inputs.input-cache-prefix }}-${{ github.run_id }}
+
+      - name: Publish to MavenLocal
+        run: ./gradlew ${{ inputs.gradle-command }}
+
+      - name: Cache MavenLocal
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ inputs.output-cache-prefix }}-${{ github.run_id }}
