@@ -1,6 +1,6 @@
 plugins {
     `android-base-lib`
-    id("org.jetbrains.dokka") version "1.8.20"
+    id("org.jetbrains.dokka") version Versions.dokka
 }
 
 @Suppress("UnstableApiUsage")

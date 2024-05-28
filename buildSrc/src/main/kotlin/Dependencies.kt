@@ -1,10 +1,3 @@
-object BuildPlugins {
-    val android by lazy { "com.android.tools.build:gradle:${Versions.androidGradlePlugin}" }
-    val kotlin by lazy { "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}" }
-    val detekt by lazy { "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:${Versions.detekt}" }
-    val jacoco by lazy { "org.jacoco:org.jacoco.core:${Versions.jacoco}" }
-}
-
 object Libs {
     val reflection by lazy { "org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}" }
 
@@ -35,6 +28,7 @@ object Libs {
     // Android
     val androidAppCompat by lazy { "androidx.appcompat:appcompat:${Versions.androidAppCompat}" }
     val material by lazy { "com.google.android.material:material:${Versions.material}" }
+    val constraintlayout by lazy { "androidx.constraintlayout:constraintlayout:${Versions.constraintLayout}" }
 
     // Navigation
     val navigationFragmentKtx by lazy { "androidx.navigation:navigation-fragment-ktx:${Versions.navigationFragment}" }
@@ -55,4 +49,13 @@ object Libs {
 
     // Splash
     val splash by lazy { "androidx.core:core-splashscreen:${Versions.splash}" }
+
+    // Hilt
+    val hiltAndroid by lazy { "com.google.dagger:hilt-android:${Versions.hilt}" }
+    val hiltCompiler by lazy { "com.google.dagger:hilt-compiler:${Versions.hilt}" }
+
+    // Glide
+    val glide by lazy { "com.github.bumptech.glide:glide:${Versions.glide}" }
+    val glideCompiler by lazy { "com.github.bumptech.glide:compiler:${Versions.glide}" }
+
 }

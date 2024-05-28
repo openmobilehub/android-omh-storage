@@ -1,6 +1,6 @@
 plugins {
-    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
-    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin") version "2.0.1" apply false
+    id("io.github.gradle-nexus.publish-plugin") version Versions.nexusPublishPlugin
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin") version Versions.secretsGradlePlugin apply false
 }
 
 val useLocalProjects by extra(getBooleanFromProperties("useLocalProjects", null))

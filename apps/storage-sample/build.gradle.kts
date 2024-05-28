@@ -3,7 +3,7 @@ import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 plugins {
     `android-application`
     id("kotlin-kapt")
-    id("com.google.dagger.hilt.android") version "2.44" apply true
+    id("com.google.dagger.hilt.android") version Versions.hilt apply true
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
@@ -84,18 +84,17 @@ dependencies {
     implementation(Libs.splash)
     implementation(Libs.navigationFragmentKtx)
     implementation(Libs.navigationUIKtx)
-    implementation("com.github.bumptech.glide:glide:4.14.2")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    annotationProcessor("com.github.bumptech.glide:compiler:4.14.2")
+    implementation(Libs.glide)
+    implementation(Libs.constraintlayout)
+    annotationProcessor(Libs.glideCompiler)
 
-    // Hilt
-    implementation("com.google.dagger:hilt-android:2.44")
-    kapt("com.google.dagger:hilt-compiler:2.44")
+    implementation(Libs.hiltAndroid)
+    kapt(Libs.hiltCompiler)
 
     testImplementation(Libs.junit)
 
-    implementation("com.openmobilehub.android:auth-api-gms:1.0.1-beta")
-    implementation("com.openmobilehub.android:auth-api-non-gms:1.0.1-beta")
+    implementation(Libs.omhNonGmsAuthLibrary)
+    implementation(Libs.omhGmsAuthLibrary)
 
     // Use local implementation instead of dependencies
     if (useLocalProjects) {

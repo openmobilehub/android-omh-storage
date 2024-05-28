@@ -1,9 +1,10 @@
 object Versions {
     // Build Plugins
-    const val androidGradlePlugin = "7.4.1"
     const val kotlin = "1.8.20"
     const val detekt = "1.22.0"
-    const val jacoco = "0.8.6"
+    const val nexusPublishPlugin = "1.1.0"
+    const val secretsGradlePlugin = "2.0.1"
+    const val dokka = "1.9.20"
 
     // KTX
     const val coreKtx = "1.9.0"
@@ -28,6 +29,7 @@ object Versions {
     // Android
     const val androidAppCompat = "1.6.1"
     const val material = "1.8.0"
+    const val constraintLayout = "2.1.4"
 
     // Navigation
     const val navigationFragment = "2.5.3"
@@ -46,4 +48,10 @@ object Versions {
 
     // Splash
     const val splash = "1.0.1"
+
+    // Hilt
+    const val hilt = "2.44"
+
+    // Glide
+    const val glide = "4.14.2"
 }
