@@ -4,7 +4,7 @@ plugins {
     kotlin("android")
     id("jacoco")
     id("maven-publish")
-    id("signing")
+    id("signing").apply(false)
 }
 
 val useMavenLocal = project.rootProject.extra["useMavenLocal"] as Boolean
