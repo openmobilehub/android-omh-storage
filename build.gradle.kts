@@ -3,18 +3,52 @@ plugins {
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin") version Versions.secretsGradlePlugin apply false
 }
 
+tasks.register("publishCoreToMavenLocal") {
+    dependsOn(
+        ":packages:core:assembleRelease",
+        ":packages:core:publishToMavenLocal",
+    )
+}
+
+tasks.register("publishPluginsToMavenLocal") {
+    dependsOn(
+        ":packages:plugin-googledrive-gms:assembleRelease",
+        ":packages:pluginr-googledrive-gms:publishToMavenLocal",
+        ":packages:plugin-googledrive-non-gms:assembleRelease",
+        ":packages:plugin-googledrive-non-gms:publishToMavenLocal",
+    )
+}
+
+val useMavenLocal by extra(getBooleanFromProperties("useMavenLocal", null))
 val useLocalProjects by extra(getBooleanFromProperties("useLocalProjects", null))
 
 if (useLocalProjects) {
-    println("OMH Maps project running with useLocalProjects enabled")
+    println("OMH Storage project running with useLocalProjects enabled")
+}
+
+if (useMavenLocal) {
+    println(
+        "OMH Storage project running with useMavenLocal enabled${
+            if (useLocalProjects) ", but only publishing will be altered since dependencies are overriden by useLocalProjects"
+            else ""
+        } "
+    )
 }
 
 subprojects {
-    repositories {
-        mavenCentral()
-        google()
-        mavenLocal()
-        maven("https://s01.oss.sonatype.org/content/groups/staging/")
+    if (useMavenLocal) {
+        repositories {
+            mavenLocal()
+            gradlePluginPortal()
+            google()
+            maven("https://atlas.microsoft.com/sdk/android")
+        }
+    } else {
+        repositories {
+            mavenCentral()
+            google()
+            maven("https://s01.oss.sonatype.org/content/groups/staging/")
+        }
     }
 }
 
@@ -37,29 +71,48 @@ tasks {
     getByName("prepareKotlinBuildScriptModel").dependsOn(installPreCommitHook)
 }
 
-val ossrhUsername by extra(getValueFromEnvOrProperties("OSSRH_USERNAME"))
-val ossrhPassword by extra(getValueFromEnvOrProperties("OSSRH_PASSWORD"))
-val mStagingProfileId by extra(getValueFromEnvOrProperties("SONATYPE_STAGING_PROFILE_ID"))
-val signingKeyId by extra(getValueFromEnvOrProperties("SIGNING_KEY_ID"))
-val signingPassword by extra(getValueFromEnvOrProperties("SIGNING_PASSWORD"))
-val signingKey by extra(getValueFromEnvOrProperties("SIGNING_KEY"))
 
-// Set up Sonatype repository
-nexusPublishing {
-    repositories {
-        sonatype {
-            stagingProfileId.set(mStagingProfileId.toString())
-            username.set(ossrhUsername.toString())
-            password.set(ossrhPassword.toString())
-            // Add these lines if using new Sonatype infra
-            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+val publishToReleaseRepository =
+    getValueFromEnvOrProperties("publishingSonatypeRepository")?.toString() == "release"
+
+if (!useMavenLocal) {
+    println(
+        "OMH Storage project configured to publish to Sonatype "
+                + (if (publishToReleaseRepository) "release" else "snapshot")
+                + " repository"
+    )
+
+    if (!publishToReleaseRepository) {
+        subprojects {
+            version = "$version-SNAPSHOT" // required for publishing to the snapshot repository
         }
     }
-}
 
-fun getValueFromEnvOrProperties(name: String): Any? {
-    val localProperties =
-        com.android.build.gradle.internal.cxx.configure.gradleLocalProperties(rootDir)
-    return System.getenv(name) ?: localProperties[name]
+    val ossrhUsername = getValueFromEnvOrProperties("OSSRH_USERNAME")
+    val ossrhPassword  = getValueFromEnvOrProperties("OSSRH_PASSWORD")
+    val mStagingProfileId = getValueFromEnvOrProperties("SONATYPE_STAGING_PROFILE_ID")
+    val signingKeyId by extra(getValueFromEnvOrProperties("SIGNING_KEY_ID"))
+    val signingPassword by extra(getValueFromEnvOrProperties("SIGNING_PASSWORD"))
+    val signingKey by extra(getValueFromEnvOrProperties("SIGNING_KEY"))
+
+    // Set up Sonatype repository
+    afterEvaluate {
+        nexusPublishing {
+            // fix for nexus publishing plugin not picking up the correct version of the published
+            // subproject, since this is happening in the root project;
+            // see https://github.com/gradle-nexus/publish-plugin/issues/105
+            useStaging.set(provider { publishToReleaseRepository })
+
+            repositories {
+                sonatype {
+                    stagingProfileId.set(mStagingProfileId.toString())
+                    username.set(ossrhUsername.toString())
+                    password.set(ossrhPassword.toString())
+                    // Add these lines if using new Sonatype infra
+                    nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+                    snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+                }
+            }
+        }
+    }
 }

@@ -7,6 +7,12 @@ plugins {
     id("signing")
 }
 
+val useMavenLocal = project.rootProject.extra["useMavenLocal"] as Boolean
+
+if (!useMavenLocal) {
+    apply<SigningPlugin>()
+}
+
 detekt {
     autoCorrect = properties.get("autoCorrect")?.toString()?.toBoolean() ?: false
 }
@@ -54,41 +60,17 @@ dependencies {
 
 // Publishing block
 
-val androidSourcesJar by tasks.registering(Jar::class) {
-    archiveClassifier.set("sources")
-    from("src/main/java")
-    from("src/main/kotlin")
-}
-
-artifacts {
-    add("archives", androidSourcesJar)
-}
-
 val groupProperty = getRequiredValueFromEnvOrProperties("group")
 val versionProperty = getRequiredValueFromEnvOrProperties("version")
 val artifactId = getRequiredValueFromEnvOrProperties("artifactId")
 val mDescription = getRequiredValueFromEnvOrProperties("description")
 
-group = groupProperty
-version = versionProperty
-
-afterEvaluate {
+android {
     publishing {
-        publications {
-            register("release", MavenPublication::class.java) {
-                setupPublication()
-            }
+        singleVariant("release") {
+            withSourcesJar()
         }
     }
-}
-
-signing {
-    useInMemoryPgpKeys(
-        rootProject.ext["signingKeyId"].toString(),
-        rootProject.ext["signingKey"].toString(),
-        rootProject.ext["signingPassword"].toString(),
-    )
-    sign(publishing.publications)
 }
 
 fun MavenPublication.setupPublication() {
@@ -102,16 +84,14 @@ fun MavenPublication.setupPublication() {
         from(project.components["java"])
     }
 
-    artifact(androidSourcesJar)
-
     pom {
         name.set(artifactId)
         description.set(mDescription)
-        url.set("https://github.com/openmobilehub/omh-storage")
+        url.set("https://github.com/openmobilehub/android-omh-storage")
         licenses {
             license {
                 name.set("Apache-2.0 License")
-                url.set("https://github.com/openmobilehub/omh-storage/blob/main/LICENSE")
+                url.set("https://github.com/openmobilehub/android-omh-storage/blob/main/LICENSE")
             }
         }
 
@@ -125,10 +105,47 @@ fun MavenPublication.setupPublication() {
         // Version control info - if you're using GitHub, follow the
         // format as seen here
         scm {
-            connection.set("scm:git:github.com/openmobilehub/omh-storage.git")
-            developerConnection.set("scm:git:ssh://github.com/openmobilehub/omh-storage.git")
-            url.set("https://github.com/openmobilehub/omh-storage/tree/main")
+            connection.set("scm:git:github.com/openmobilehub/android-omh-storage.git")
+            developerConnection.set("scm:git:ssh://github.com/openmobilehub/android-omh-storage.git")
+            url.set("https://github.com/openmobilehub/android-omh-storage/tree/main")
         }
     }
 }
 
+if (useMavenLocal) {
+    publishing {
+        publications {
+            register<MavenPublication>("release") {
+                group = groupProperty
+                artifactId = artifactId
+                version = versionProperty
+
+                afterEvaluate {
+                    from(components["release"])
+                }
+            }
+        }
+    }
+} else {
+    group = groupProperty
+    version = versionProperty
+
+    afterEvaluate {
+        publishing {
+            publications {
+                register("release", MavenPublication::class.java) {
+                    setupPublication()
+                }
+            }
+        }
+    }
+
+    signing {
+        useInMemoryPgpKeys(
+            rootProject.ext["signingKeyId"].toString(),
+            rootProject.ext["signingKey"].toString(),
+            rootProject.ext["signingPassword"].toString(),
+        )
+        sign(publishing.publications)
+    }
+}
