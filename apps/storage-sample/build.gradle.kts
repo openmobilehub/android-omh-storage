@@ -26,12 +26,12 @@ android {
         buildConfigField(
             type = "String",
             name = "STORAGE_GMS_PATH",
-            value = "\"com.openmobilehub.android.storage.plugin.google.gms.OmhGmsStorageFactoryImpl\""
+            value = "\"com.openmobilehub.android.storage.plugin.googledrive.gms.OmhGmsStorageFactoryImpl\""
         )
         buildConfigField(
             type = "String",
             name = "STORAGE_NON_GMS_PATH",
-            value = "\"com.openmobilehub.android.storage.plugin.google.nongms.OmhNonGmsStorageFactoryImpl\""
+            value = "\"com.openmobilehub.android.storage.plugin.googledrive.nongms.OmhNonGmsStorageFactoryImpl\""
         )
     }
 
@@ -100,8 +100,8 @@ dependencies {
     // Use local implementation instead of dependencies
     if (useLocalProjects) {
         implementation(project(":packages:core"))
-        implementation(project(":packages:plugin-google-gms"))
-        implementation(project(":packages:plugin-google-non-gms"))
+        implementation(project(":packages:plugin-googledrive-gms"))
+        implementation(project(":packages:plugin-googledrive-non-gms"))
     } else {
         implementation("com.openmobilehub.android:storage-api-drive-nongms:1.0.8-beta")
         implementation("com.openmobilehub.android:storage-api-drive-gms:1.0.7-beta")

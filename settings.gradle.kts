@@ -19,5 +19,5 @@ rootProject.name = "omh-storage"
 
 include(":apps:storage-sample")
 include(":packages:core")
-include(":packages:plugin-google-gms")
-include(":packages:plugin-google-non-gms")
+include(":packages:plugin-googledrive-gms")
+include(":packages:plugin-googledrive-non-gms")
