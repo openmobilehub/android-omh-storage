@@ -13,7 +13,7 @@ tasks.register("publishCoreToMavenLocal") {
 tasks.register("publishPluginsToMavenLocal") {
     dependsOn(
         ":packages:plugin-googledrive-gms:assembleRelease",
-        ":packages:pluginr-googledrive-gms:publishToMavenLocal",
+        ":packages:plugin-googledrive-gms:publishToMavenLocal",
         ":packages:plugin-googledrive-non-gms:assembleRelease",
         ":packages:plugin-googledrive-non-gms:publishToMavenLocal",
     )
