@@ -1,22 +1,7 @@
 plugins {
     id("io.github.gradle-nexus.publish-plugin") version Versions.nexusPublishPlugin
-    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin") version Versions.secretsGradlePlugin apply false
-}
-
-tasks.register("publishCoreToMavenLocal") {
-    dependsOn(
-        ":packages:core:assembleRelease",
-        ":packages:core:publishToMavenLocal",
-    )
-}
-
-tasks.register("publishPluginsToMavenLocal") {
-    dependsOn(
-        ":packages:plugin-googledrive-gms:assembleRelease",
-        ":packages:plugin-googledrive-gms:publishToMavenLocal",
-        ":packages:plugin-googledrive-non-gms:assembleRelease",
-        ":packages:plugin-googledrive-non-gms:publishToMavenLocal",
-    )
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin") version
+            Versions.secretsGradlePlugin apply false
 }
 
 val useMavenLocal by extra(getBooleanFromProperties("useMavenLocal", null))
@@ -50,6 +35,22 @@ subprojects {
             maven("https://s01.oss.sonatype.org/content/groups/staging/")
         }
     }
+}
+
+tasks.register("publishCoreToMavenLocal") {
+    dependsOn(
+        ":packages:core:assembleRelease",
+        ":packages:core:publishToMavenLocal",
+    )
+}
+
+tasks.register("publishPluginsToMavenLocal") {
+    dependsOn(
+        ":packages:plugin-googledrive-gms:assembleRelease",
+        ":packages:plugin-googledrive-gms:publishToMavenLocal",
+        ":packages:plugin-googledrive-non-gms:assembleRelease",
+        ":packages:plugin-googledrive-non-gms:publishToMavenLocal",
+    )
 }
 
 tasks.register("installPrePushHook", Copy::class) {

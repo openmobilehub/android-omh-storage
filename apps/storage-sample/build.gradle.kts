@@ -36,24 +36,41 @@ android {
     }
 
     signingConfigs {
+        // It creates a signing config for release builds if the required properties are set.
+        // The if statement is necessary to avoid errors when the packages are built on CI.
+        // The alternative would be to pass all the environment variables for signing apk to the packages workflows.
         create("release") {
-            val localProperties = gradleLocalProperties(rootDir)
-            storeFile = file(localProperties["keypath"].toString())
-            storePassword = localProperties["keypass"].toString()
-            keyAlias = localProperties["keyalias"].toString()
-            keyPassword = localProperties["keypassword"].toString()
+            val storeFileName =
+                getValueFromEnvOrProperties("SAMPLE_APP_KEYSTORE_FILE_NAME", null)
+            val storePassword =
+                getValueFromEnvOrProperties("SAMPLE_APP_KEYSTORE_STORE_PASSWORD", null)
+            val keyAlias =
+                getValueFromEnvOrProperties("SAMPLE_APP_KEYSTORE_KEY_ALIAS", null)
+            val keyPassword =
+                getValueFromEnvOrProperties("SAMPLE_APP_KEYSTORE_KEY_PASSWORD", null)
+
+            @Suppress("ComplexCondition")
+            if (storeFileName != null && storePassword != null && keyAlias != null && keyPassword != null) {
+                this.storeFile = file(storeFileName)
+                this.storePassword = storePassword
+                this.keyAlias = keyAlias
+                this.keyPassword = keyPassword
+            }
         }
     }
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // If the signing config is set, it will be used for release builds.
+            if (signingConfigs["release"].storeFile != null) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
 
