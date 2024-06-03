@@ -43,7 +43,7 @@ import kotlin.test.assertTrue
 import com.google.api.services.drive.model.File as GoogleDriveFile
 
 @OptIn(ExperimentalCoroutinesApi::class)
-internal class GmsFileRepositoryImplTest {
+internal class GmsFileRepositoryTest {
 
     companion object {
         private const val FILE_PATH = "anyPath"
@@ -76,12 +76,12 @@ internal class GmsFileRepositoryImplTest {
     @MockK(relaxed = true)
     private lateinit var driveFilesUpdateRequest: Drive.Files.Update
 
-    private lateinit var fileRepositoryImpl: GmsFileRepositoryImpl
+    private lateinit var fileRepositoryImpl: GmsFileRepository
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        fileRepositoryImpl = GmsFileRepositoryImpl(apiService)
+        fileRepositoryImpl = GmsFileRepository(apiService)
         googleDriveFile.setUpMock()
 
         mockkStatic(MimeTypeMap::class)

@@ -22,8 +22,8 @@ import android.os.Environment
 import androidx.lifecycle.viewModelScope
 import com.omh.android.auth.api.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
-import com.openmobilehub.android.storage.core.domain.model.OmhFile
-import com.openmobilehub.android.storage.core.domain.model.OmhFileType
+import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhFileType
 import com.openmobilehub.android.storage.sample.model.FileType
 import com.openmobilehub.android.storage.sample.presentation.BaseViewModel
 import com.openmobilehub.android.storage.sample.util.getNameWithExtension

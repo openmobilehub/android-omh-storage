@@ -17,8 +17,7 @@
 package com.openmobilehub.android.storage.core
 
 import com.omh.android.auth.api.OmhAuthClient
-import com.openmobilehub.android.storage.core.domain.model.OmhFile
-import com.openmobilehub.android.storage.core.domain.repository.OmhFileRepository
+import com.openmobilehub.android.storage.core.model.OmhFile
 import java.io.ByteArrayOutputStream
 import java.io.File
 
@@ -31,8 +30,6 @@ abstract class OmhStorageClient protected constructor(
         fun build(authClient: OmhAuthClient): OmhStorageClient
     }
 
-    protected abstract fun getRepository(): OmhFileRepository
-
     /**
      * This method list files from an specific folder
      *
@@ -40,9 +37,7 @@ abstract class OmhStorageClient protected constructor(
      *
      * @return A list of OmhFiles
      */
-    suspend fun listFiles(parentId: String = "root"): List<OmhFile> {
-        return getRepository().getFilesList(parentId)
-    }
+    abstract suspend fun listFiles(parentId: String = "root"): List<OmhFile>
 
     /**
      * This method create files in an specific folder
@@ -53,13 +48,11 @@ abstract class OmhStorageClient protected constructor(
      *
      * @return An OmhFile with the information of the created file. Null in case the file was not created
      */
-    suspend fun createFile(
+    abstract suspend fun createFile(
         name: String,
         mimeType: String,
         parentId: String
-    ): OmhFile? {
-        return getRepository().createFile(name, mimeType, parentId)
-    }
+    ): OmhFile?
 
     /**
      * This method delete files with a given file id
@@ -68,9 +61,7 @@ abstract class OmhStorageClient protected constructor(
      *
      * @return true if the file was deleted, false otherwise
      */
-    suspend fun deleteFile(id: String): Boolean {
-        return getRepository().deleteFile(id)
-    }
+    abstract suspend fun deleteFile(id: String): Boolean
 
     /**
      * This method upload a file in an specific folder
@@ -80,12 +71,10 @@ abstract class OmhStorageClient protected constructor(
      *
      * @return An OmhFile with the information of the uploaded file. Null in case the file was not uploaded
      */
-    suspend fun uploadFile(
+    abstract suspend fun uploadFile(
         localFileToUpload: File,
         parentId: String?
-    ): OmhFile? {
-        return getRepository().uploadFile(localFileToUpload, parentId)
-    }
+    ): OmhFile?
 
     /**
      * This method download a file with a given mime type and a given id
@@ -95,9 +84,7 @@ abstract class OmhStorageClient protected constructor(
      *
      * @return A ByteArrayOutputStream with the content of the downloaded file
      */
-    suspend fun downloadFile(fileId: String, mimeType: String?): ByteArrayOutputStream {
-        return getRepository().downloadFile(fileId, mimeType)
-    }
+    abstract suspend fun downloadFile(fileId: String, mimeType: String?): ByteArrayOutputStream
 
     /**
      * This method update a remote file with the content of a local file
@@ -107,10 +94,8 @@ abstract class OmhStorageClient protected constructor(
      *
      * @return An OmhFile with the information of the updated file
      */
-    suspend fun updateFile(
+    abstract suspend fun updateFile(
         localFileToUpload: File,
         fileId: String
-    ): OmhFile? {
-        return getRepository().updateFile(localFileToUpload, fileId)
-    }
+    ): OmhFile?
 }

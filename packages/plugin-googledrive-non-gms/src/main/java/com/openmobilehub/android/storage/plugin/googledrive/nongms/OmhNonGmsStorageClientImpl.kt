@@ -20,28 +20,53 @@ import com.omh.android.auth.api.OmhAuthClient
 import com.omh.android.auth.api.OmhCredentials
 import com.omh.android.auth.api.models.OmhAuthStatusCodes
 import com.openmobilehub.android.storage.core.OmhStorageClient
-import com.openmobilehub.android.storage.core.domain.model.OmhStorageException
-import com.openmobilehub.android.storage.core.domain.repository.OmhFileRepository
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.NonGmsFileRepositoryImpl
+import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.NonGmsFileRepository
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit.GoogleStorageApiServiceProvider
+import java.io.ByteArrayOutputStream
+import java.io.File
 
 internal class OmhNonGmsStorageClientImpl private constructor(
-    authClient: OmhAuthClient
+    authClient: OmhAuthClient,
+    private val fileRepository: NonGmsFileRepository
 ) : OmhStorageClient(authClient) {
 
     internal class Builder : OmhStorageClient.Builder {
 
-        override fun build(authClient: OmhAuthClient): OmhStorageClient =
-            OmhNonGmsStorageClientImpl(authClient)
+        override fun build(authClient: OmhAuthClient): OmhStorageClient {
+            val omhCredentials = authClient.getCredentials() as? OmhCredentials
+                ?: throw OmhStorageException.InvalidCredentialsException(OmhAuthStatusCodes.SIGN_IN_FAILED)
+
+            val retrofitImpl = GoogleStorageApiServiceProvider.getInstance(omhCredentials)
+
+            val fileRepository = NonGmsFileRepository(retrofitImpl)
+
+            return OmhNonGmsStorageClientImpl(authClient, fileRepository)
+        }
     }
 
-    @Throws(OmhStorageException::class)
-    override fun getRepository(): OmhFileRepository {
-        val omhCredentials = authClient.getCredentials() as? OmhCredentials
-            ?: throw OmhStorageException.InvalidCredentialsException(OmhAuthStatusCodes.SIGN_IN_FAILED)
+    override suspend fun listFiles(parentId: String): List<OmhFile> {
+        return fileRepository.getFilesList(parentId)
+    }
 
-        val retrofitImpl = GoogleStorageApiServiceProvider.getInstance(omhCredentials)
+    override suspend fun createFile(name: String, mimeType: String, parentId: String): OmhFile? {
+        return fileRepository.createFile(name, mimeType, parentId)
+    }
 
-        return NonGmsFileRepositoryImpl(retrofitImpl)
+    override suspend fun deleteFile(id: String): Boolean {
+        return fileRepository.deleteFile(id)
+    }
+
+    override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhFile? {
+        return fileRepository.uploadFile(localFileToUpload, parentId)
+    }
+
+    override suspend fun downloadFile(fileId: String, mimeType: String?): ByteArrayOutputStream {
+        return fileRepository.downloadFile(fileId, mimeType)
+    }
+
+    override suspend fun updateFile(localFileToUpload: File, fileId: String): OmhFile? {
+        return fileRepository.updateFile(localFileToUpload, fileId)
     }
 }

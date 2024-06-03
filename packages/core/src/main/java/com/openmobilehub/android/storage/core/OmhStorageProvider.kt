@@ -21,7 +21,7 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.omh.android.auth.api.OmhAuthClient
 import com.omh.android.auth.api.models.OmhAuthStatusCodes
-import com.openmobilehub.android.storage.core.domain.model.OmhStorageException
+import com.openmobilehub.android.storage.core.model.OmhStorageException
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
 

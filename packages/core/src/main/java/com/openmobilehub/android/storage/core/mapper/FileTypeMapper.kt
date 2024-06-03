@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.core.data.mapper
+package com.openmobilehub.android.storage.core.mapper
 
-import com.openmobilehub.android.storage.core.domain.model.OmhFileType
+import com.openmobilehub.android.storage.core.model.OmhFileType
 
 internal object FileTypeMapper {
 

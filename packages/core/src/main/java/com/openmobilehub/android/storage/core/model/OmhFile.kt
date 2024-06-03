@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.core.domain.model
+package com.openmobilehub.android.storage.core.model
 
-import com.openmobilehub.android.storage.core.data.mapper.FileTypeMapper
+import com.openmobilehub.android.storage.core.mapper.FileTypeMapper
 
 data class OmhFile(
     val mimeType: String,

@@ -17,7 +17,7 @@
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository
 
 import android.webkit.MimeTypeMap
-import com.openmobilehub.android.storage.core.domain.model.OmhStorageException
+import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_FILE_MIME_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_FILE_NAME
@@ -51,7 +51,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
-internal class NonGmsFileRepositoryImplTest {
+internal class NonGmsFileRepositoryTest {
 
     companion object {
         private const val FILE_PATH = "anyPath"
@@ -69,12 +69,12 @@ internal class NonGmsFileRepositoryImplTest {
     @MockK(relaxed = true)
     private lateinit var responseBody: ResponseBody
 
-    private lateinit var fileRepositoryImpl: NonGmsFileRepositoryImpl
+    private lateinit var fileRepositoryImpl: NonGmsFileRepository
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        fileRepositoryImpl = NonGmsFileRepositoryImpl(retrofitImpl)
+        fileRepositoryImpl = NonGmsFileRepository(retrofitImpl)
 
         every { retrofitImpl.getGoogleStorageApiService() } returns googleStorageApiService
         mockkStatic(MimeTypeMap::class)

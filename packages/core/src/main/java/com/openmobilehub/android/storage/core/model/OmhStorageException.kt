@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.core.domain.model
+package com.openmobilehub.android.storage.core.model
 
 import com.omh.android.auth.api.models.OmhAuthStatusCodes
 

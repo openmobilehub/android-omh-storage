@@ -17,10 +17,9 @@
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository
 
 import android.webkit.MimeTypeMap
-import com.openmobilehub.android.storage.core.domain.model.OmhFile
-import com.openmobilehub.android.storage.core.domain.model.OmhStorageException
-import com.openmobilehub.android.storage.core.domain.model.OmhStorageStatusCodes
-import com.openmobilehub.android.storage.core.domain.repository.OmhFileRepository
+import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toFile
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toFileList
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.GoogleStorageApiService
@@ -37,9 +36,9 @@ import retrofit2.HttpException
 import java.io.ByteArrayOutputStream
 import java.io.File
 
-internal class NonGmsFileRepositoryImpl(
+internal class NonGmsFileRepository(
     private val retrofitImpl: GoogleStorageApiServiceProvider
-) : OmhFileRepository {
+) {
 
     companion object {
         private const val FILE_NAME_KEY = "name"
@@ -50,7 +49,7 @@ internal class NonGmsFileRepositoryImpl(
         private val JSON_MIME_TYPE = "application/json".toMediaTypeOrNull()
     }
 
-    override suspend fun getFilesList(parentId: String): List<OmhFile> {
+    suspend fun getFilesList(parentId: String): List<OmhFile> {
         val response = retrofitImpl
             .getGoogleStorageApiService()
             .getFilesList(
@@ -64,7 +63,7 @@ internal class NonGmsFileRepositoryImpl(
         }
     }
 
-    override suspend fun createFile(name: String, mimeType: String, parentId: String?): OmhFile? {
+    suspend fun createFile(name: String, mimeType: String, parentId: String?): OmhFile? {
         val parents = if (parentId.isNullOrBlank()) {
             emptyList()
         } else {
@@ -82,7 +81,7 @@ internal class NonGmsFileRepositoryImpl(
         }
     }
 
-    override suspend fun deleteFile(fileId: String): Boolean {
+    suspend fun deleteFile(fileId: String): Boolean {
         val response = retrofitImpl
             .getGoogleStorageApiService()
             .deleteFile(
@@ -92,7 +91,7 @@ internal class NonGmsFileRepositoryImpl(
         return response.isSuccessful
     }
 
-    override suspend fun uploadFile(
+    suspend fun uploadFile(
         localFileToUpload: File,
         parentId: String?
     ): OmhFile? {
@@ -130,7 +129,7 @@ internal class NonGmsFileRepositoryImpl(
         }
     }
 
-    override suspend fun downloadFile(fileId: String, mimeType: String?): ByteArrayOutputStream {
+    suspend fun downloadFile(fileId: String, mimeType: String?): ByteArrayOutputStream {
         val response = retrofitImpl
             .getGoogleStorageApiService()
             .downloadMediaFile(fileId = fileId, alt = MEDIA)
@@ -166,7 +165,7 @@ internal class NonGmsFileRepositoryImpl(
         }
     }
 
-    override suspend fun updateFile(
+    suspend fun updateFile(
         localFileToUpload: File,
         fileId: String
     ): OmhFile? {

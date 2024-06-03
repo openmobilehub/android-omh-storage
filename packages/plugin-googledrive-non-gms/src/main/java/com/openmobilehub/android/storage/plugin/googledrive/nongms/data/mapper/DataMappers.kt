@@ -16,7 +16,7 @@
 
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper
 
-import com.openmobilehub.android.storage.core.domain.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileListRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileRemoteResponse
 

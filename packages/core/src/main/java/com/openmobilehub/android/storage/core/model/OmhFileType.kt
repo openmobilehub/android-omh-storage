@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.core.domain.model
+package com.openmobilehub.android.storage.core.model
 
 enum class OmhFileType(
     val mimeType: String,

@@ -16,7 +16,7 @@
 
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles
 
-import com.openmobilehub.android.storage.core.domain.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhFile
 
 const val TEST_FILE_MIME_TYPE = "image/jpg"
 const val TEST_FILE_ID = "123"

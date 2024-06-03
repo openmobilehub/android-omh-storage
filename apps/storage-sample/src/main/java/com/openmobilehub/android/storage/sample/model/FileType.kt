@@ -16,6 +16,6 @@
 
 package com.openmobilehub.android.storage.sample.model
 
-import com.openmobilehub.android.storage.core.domain.model.OmhFileType
+import com.openmobilehub.android.storage.core.model.OmhFileType
 
 data class FileType(val name: String, val omhFileType: OmhFileType)

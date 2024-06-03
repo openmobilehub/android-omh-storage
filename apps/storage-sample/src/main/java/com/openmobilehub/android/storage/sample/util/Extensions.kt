@@ -16,8 +16,8 @@
 
 package com.openmobilehub.android.storage.sample.util
 
-import com.openmobilehub.android.storage.core.domain.model.OmhFile
-import com.openmobilehub.android.storage.core.domain.model.OmhFileType
+import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhFileType
 
 private val NON_SUPPORTED_MIME_TYPES_FOR_DOWNLOAD = listOf(
     OmhFileType.THIRD_PARTY_SHORTCUT,
