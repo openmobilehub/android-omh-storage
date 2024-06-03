@@ -19,11 +19,11 @@ package com.openmobilehub.android.storage.sample.presentation.file_viewer
 import android.content.Context
 import android.net.Uri
 import android.os.Environment
+import androidx.lifecycle.viewModelScope
 import com.omh.android.auth.api.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
-import com.openmobilehub.android.storage.core.domain.model.OmhFile
-import com.openmobilehub.android.storage.core.domain.model.OmhFileType
-import com.openmobilehub.android.storage.core.domain.usecase.DownloadFileUseCaseResult
+import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhFileType
 import com.openmobilehub.android.storage.sample.model.FileType
 import com.openmobilehub.android.storage.sample.presentation.BaseViewModel
 import com.openmobilehub.android.storage.sample.util.getNameWithExtension
@@ -31,10 +31,13 @@ import com.openmobilehub.android.storage.sample.util.isDownloadable
 import com.openmobilehub.android.storage.sample.util.normalizeFileName
 import com.openmobilehub.android.storage.sample.util.normalizedMimeType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.util.Stack
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class FileViewerViewModel @Inject constructor(
@@ -64,7 +67,7 @@ class FileViewerViewModel @Inject constructor(
 
     override fun getInitialState(): FileViewerViewState = FileViewerViewState.Initial
 
-    override suspend fun processEvent(event: FileViewerViewEvent) {
+    override fun processEvent(event: FileViewerViewEvent) {
         when (event) {
             FileViewerViewEvent.Initialize -> initializeEvent()
             is FileViewerViewEvent.RefreshFileList -> refreshFileListEvent()
@@ -89,27 +92,23 @@ class FileViewerViewModel @Inject constructor(
         setState(FileViewerViewState.Loading)
         val parentId = parentIdStack.peek()
 
-        val cancellable = omhStorageClient.listFiles(parentId)
-            .addOnSuccess { data ->
-                val files: List<OmhFile> = data
-                    .files
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val files = omhStorageClient.listFiles(parentId)
                     .sortedWith(
                         compareBy<OmhFile> { !it.isFolder() }
                             .thenBy { it.mimeType }
                             .thenBy { it.name }
                     )
-
                 setState(FileViewerViewState.Content(files))
-            }
-            .addOnFailure { exception ->
+            } catch (exception: Exception) {
                 errorDialogMessage.postValue(exception.message)
                 toastMessage.postValue(exception.message)
                 exception.printStackTrace()
 
                 setState(FileViewerViewState.Content(emptyList()))
             }
-            .execute()
-        cancellableCollector.addCancellable(cancellable)
+        }
     }
 
     private fun swapLayoutManagerEvent() {
@@ -152,13 +151,13 @@ class FileViewerViewModel @Inject constructor(
 
             val mimeTypeToSave = file.normalizedMimeType()
 
-            val cancellable = omhStorageClient.downloadFile(file.id, mimeTypeToSave)
-                .addOnSuccess { data ->
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val data = omhStorageClient.downloadFile(file.id, mimeTypeToSave)
                     val fileToSave = file.copy(
                         name = file.normalizeFileName(),
                         mimeType = mimeTypeToSave
                     )
-
                     try {
                         handleDownloadSuccess(data, fileToSave)
                         toastMessage.postValue("${file.name} was successfully downloaded")
@@ -168,16 +167,14 @@ class FileViewerViewModel @Inject constructor(
                         errorDialogMessage.postValue(exception.message)
                     }
                     refreshFileListEvent()
-                }
-                .addOnFailure { exception ->
+                } catch (exception: Exception) {
                     errorDialogMessage.postValue(exception.message)
                     toastMessage.postValue("ERROR: ${file.name} was NOT downloaded")
                     exception.printStackTrace()
 
                     refreshFileListEvent()
                 }
-                .execute()
-            cancellableCollector.addCancellable(cancellable)
+            }
         } ?: run {
             toastMessage.postValue("The file was NOT downloaded")
             refreshFileListEvent()
@@ -194,9 +191,11 @@ class FileViewerViewModel @Inject constructor(
         }
 
         val filePath = getFile(event.context, event.uri, event.fileName)
-        val cancellable = omhStorageClient.updateFile(filePath, fileId)
-            .addOnSuccess { result ->
-                val resultMessage = if (result.file == null) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val file = omhStorageClient.updateFile(filePath, fileId)
+
+                val resultMessage = if (file == null) {
                     "${event.fileName} was not updated"
                 } else {
                     "${event.fileName} was successfully updated"
@@ -205,36 +204,32 @@ class FileViewerViewModel @Inject constructor(
                 toastMessage.postValue(resultMessage)
 
                 refreshFileListEvent()
-            }
-            .addOnFailure { exception ->
+            } catch (exception: Exception) {
                 errorDialogMessage.postValue(exception.message)
                 toastMessage.postValue("ERROR: ${event.fileName} was not updated")
                 exception.printStackTrace()
 
                 refreshFileListEvent()
             }
-            .execute()
-
-        cancellableCollector.addCancellable(cancellable)
+        }
     }
 
     private fun createFileEvent(event: FileViewerViewEvent.CreateFile) {
         setState(FileViewerViewState.Loading)
         val parentId = parentIdStack.peek()
 
-        val cancellable = omhStorageClient.createFile(event.name, event.mimeType, parentId)
-            .addOnSuccess {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                omhStorageClient.createFile(event.name, event.mimeType, parentId)
                 refreshFileListEvent()
-            }
-            .addOnFailure { exception ->
+            } catch (exception: Exception) {
                 errorDialogMessage.postValue(exception.message)
                 toastMessage.postValue(exception.message)
                 exception.printStackTrace()
 
                 refreshFileListEvent()
             }
-            .execute()
-        cancellableCollector.addCancellable(cancellable)
+        }
     }
 
     private fun uploadFile(event: FileViewerViewEvent.UploadFile) {
@@ -243,9 +238,11 @@ class FileViewerViewModel @Inject constructor(
         val parentId = parentIdStack.peek()
         val filePath = getFile(event.context, event.uri, event.fileName)
 
-        val cancellable = omhStorageClient.uploadFile(filePath, parentId)
-            .addOnSuccess { result ->
-                val resultMessage = if (result.file == null) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val file = omhStorageClient.uploadFile(filePath, parentId)
+
+                val resultMessage = if (file == null) {
                     "${event.fileName} was NOT uploaded"
                 } else {
                     "${event.fileName} was successfully uploaded"
@@ -254,17 +251,14 @@ class FileViewerViewModel @Inject constructor(
                 toastMessage.postValue(resultMessage)
 
                 refreshFileListEvent()
-            }
-            .addOnFailure { exception ->
+            } catch (exception: Exception) {
                 errorDialogMessage.postValue(exception.message)
                 toastMessage.postValue("ERROR: ${event.fileName} was NOT uploaded")
                 exception.printStackTrace()
 
                 refreshFileListEvent()
             }
-            .execute()
-
-        cancellableCollector.addCancellable(cancellable)
+        }
     }
 
     private fun getFile(context: Context, uri: Uri, fileName: String): File {
@@ -284,21 +278,19 @@ class FileViewerViewModel @Inject constructor(
 
         val file = event.file
 
-        val cancellable = omhStorageClient.deleteFile(file.id)
-            .addOnSuccess { data ->
-                handleDeleteSuccess(data.isSuccess, file)
-
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val isSuccess = omhStorageClient.deleteFile(file.id)
+                handleDeleteSuccess(isSuccess, file)
                 refreshFileListEvent()
-            }
-            .addOnFailure { exception ->
+            } catch (exception: Exception) {
                 errorDialogMessage.postValue(exception.message)
                 toastMessage.postValue("ERROR: ${file.name} was NOT deleted")
                 exception.printStackTrace()
 
                 refreshFileListEvent()
             }
-            .execute()
-        cancellableCollector.addCancellable(cancellable)
+        }
     }
 
     private fun handleDeleteSuccess(isSuccessful: Boolean, file: OmhFile) {
@@ -326,10 +318,9 @@ class FileViewerViewModel @Inject constructor(
     }
 
     private fun handleDownloadSuccess(
-        result: DownloadFileUseCaseResult,
+        bytes: ByteArrayOutputStream,
         file: OmhFile
     ) {
-        val bytes = result.outputStream
         val downloadFolder = Environment
             .getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_DOWNLOADS
@@ -340,11 +331,6 @@ class FileViewerViewModel @Inject constructor(
         bytes.use { byteArrayOutputStream ->
             byteArrayOutputStream.writeTo(fileOutputStream)
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        cancellableCollector.clear()
     }
 
     fun getFileName(documentFileName: String?): String = documentFileName ?: DEFAULT_FILE_NAME

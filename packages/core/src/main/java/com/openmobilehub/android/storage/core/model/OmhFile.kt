@@ -14,8 +14,22 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.sample.model
+package com.openmobilehub.android.storage.core.model
 
-import com.openmobilehub.android.storage.core.model.OmhFileType
+import com.openmobilehub.android.storage.core.mapper.FileTypeMapper
 
-data class FileType(val name: String, val omhFileType: OmhFileType)
+data class OmhFile(
+    val mimeType: String,
+    val id: String,
+    val name: String,
+    val modifiedTime: String,
+    val parentId: String
+) {
+    val fileType by lazy { FileTypeMapper.getFileTypeWithMime(mimeType) }
+
+    fun isFolder() = fileType == OmhFileType.FOLDER
+
+    fun isFile() = !isFolder()
+
+    fun getExtension(): String? = fileType.extension
+}

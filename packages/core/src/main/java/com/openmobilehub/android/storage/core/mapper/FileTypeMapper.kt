@@ -14,8 +14,20 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.sample.model
+package com.openmobilehub.android.storage.core.mapper
 
 import com.openmobilehub.android.storage.core.model.OmhFileType
 
-data class FileType(val name: String, val omhFileType: OmhFileType)
+internal object FileTypeMapper {
+
+    private val MAP_FILE_TYPES: Map<String, OmhFileType> =
+        OmhFileType.values().associateBy { fileType -> fileType.mimeType }
+
+    fun getFileTypeWithMime(mimeType: String): OmhFileType {
+        return if (MAP_FILE_TYPES.containsKey(mimeType)) {
+            MAP_FILE_TYPES[mimeType] ?: OmhFileType.OTHER
+        } else {
+            OmhFileType.OTHER
+        }
+    }
+}

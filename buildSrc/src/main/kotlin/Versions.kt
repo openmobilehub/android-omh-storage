@@ -54,4 +54,7 @@ object Versions {
 
     // Glide
     const val glide = "4.14.2"
+
+    // Json
+    const val json = "20240303"
 }

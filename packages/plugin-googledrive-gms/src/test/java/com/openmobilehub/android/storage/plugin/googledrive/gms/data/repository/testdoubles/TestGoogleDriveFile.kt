@@ -14,8 +14,16 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.sample.model
+package com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles
 
-import com.openmobilehub.android.storage.core.model.OmhFileType
+import com.google.api.client.util.DateTime
+import com.google.api.services.drive.model.File
+import io.mockk.every
 
-data class FileType(val name: String, val omhFileType: OmhFileType)
+fun File.setUpMock() {
+    every { mimeType } returns TEST_FILE_MIME_TYPE
+    every { id } returns TEST_FILE_ID
+    every { name } returns TEST_FILE_NAME
+    every { parents } returns listOf(TEST_FILE_PARENT_ID)
+    every { modifiedTime } returns DateTime(TEST_FILE_MODIFIED_TIME)
+}

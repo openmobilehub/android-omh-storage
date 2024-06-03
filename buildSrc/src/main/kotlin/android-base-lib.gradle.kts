@@ -14,7 +14,7 @@ if (!useMavenLocal) {
 }
 
 detekt {
-    autoCorrect = properties.get("autoCorrect")?.toString()?.toBoolean() ?: false
+    autoCorrect = properties.get("autoCorrect")?.toString()?.toBoolean() ?: true
 }
 
 android {

@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.sample.model
+package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body
 
-import com.openmobilehub.android.storage.core.model.OmhFileType
+import androidx.annotation.Keep
 
-data class FileType(val name: String, val omhFileType: OmhFileType)
+@Keep
+internal data class CreateFileRequestBody(
+    val mimeType: String,
+    val name: String,
+    val parents: List<String> = emptyList()
+)

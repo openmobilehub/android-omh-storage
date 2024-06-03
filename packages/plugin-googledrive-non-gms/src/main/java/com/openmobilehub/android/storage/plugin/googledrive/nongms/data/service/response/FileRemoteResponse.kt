@@ -14,8 +14,18 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.sample.model
+package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response
 
-import com.openmobilehub.android.storage.core.model.OmhFileType
+import androidx.annotation.Keep
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
 
-data class FileType(val name: String, val omhFileType: OmhFileType)
+@Keep
+@JsonIgnoreProperties(ignoreUnknown = true)
+internal data class FileRemoteResponse(
+    @JsonProperty("mimeType") val mimeType: String?,
+    @JsonProperty("id") val id: String?,
+    @JsonProperty("name") val name: String?,
+    @JsonProperty("modifiedTime") val modifiedTime: String?,
+    @JsonProperty("parents") val parents: List<String>?
+)

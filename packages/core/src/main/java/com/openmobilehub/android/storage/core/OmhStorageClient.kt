@@ -17,28 +17,8 @@
 package com.openmobilehub.android.storage.core
 
 import com.omh.android.auth.api.OmhAuthClient
-import com.omh.android.auth.api.async.OmhTask
-import com.openmobilehub.android.storage.core.async.OmhStorageTaskImpl
-import com.openmobilehub.android.storage.core.domain.repository.OmhFileRepository
-import com.openmobilehub.android.storage.core.domain.usecase.CreateFileUseCase
-import com.openmobilehub.android.storage.core.domain.usecase.CreateFileUseCaseParams
-import com.openmobilehub.android.storage.core.domain.usecase.CreateFileUseCaseResult
-import com.openmobilehub.android.storage.core.domain.usecase.DeleteFileUseCase
-import com.openmobilehub.android.storage.core.domain.usecase.DeleteFileUseCaseParams
-import com.openmobilehub.android.storage.core.domain.usecase.DeleteFileUseCaseResult
-import com.openmobilehub.android.storage.core.domain.usecase.DownloadFileUseCase
-import com.openmobilehub.android.storage.core.domain.usecase.DownloadFileUseCaseParams
-import com.openmobilehub.android.storage.core.domain.usecase.DownloadFileUseCaseResult
-import com.openmobilehub.android.storage.core.domain.usecase.GetFilesListUseCase
-import com.openmobilehub.android.storage.core.domain.usecase.GetFilesListUseCaseParams
-import com.openmobilehub.android.storage.core.domain.usecase.GetFilesListUseCaseResult
-import com.openmobilehub.android.storage.core.domain.usecase.OmhResult
-import com.openmobilehub.android.storage.core.domain.usecase.UpdateFileUseCase
-import com.openmobilehub.android.storage.core.domain.usecase.UpdateFileUseCaseParams
-import com.openmobilehub.android.storage.core.domain.usecase.UpdateFileUseCaseResult
-import com.openmobilehub.android.storage.core.domain.usecase.UploadFileUseCase
-import com.openmobilehub.android.storage.core.domain.usecase.UploadFileUseCaseParams
-import com.openmobilehub.android.storage.core.domain.usecase.UploadFileUseCaseResult
+import com.openmobilehub.android.storage.core.model.OmhFile
+import java.io.ByteArrayOutputStream
 import java.io.File
 
 abstract class OmhStorageClient protected constructor(
@@ -50,23 +30,14 @@ abstract class OmhStorageClient protected constructor(
         fun build(authClient: OmhAuthClient): OmhStorageClient
     }
 
-    protected abstract fun getRepository(): OmhFileRepository
-
     /**
      * This method list files from an specific folder
      *
      * @param parentId The id of the folder you want to get the list of files
      *
-     * @return An OmhTask with the result of the operation
+     * @return A list of OmhFiles
      */
-    fun listFiles(parentId: String): OmhTask<GetFilesListUseCaseResult> {
-        val getFilesListUseCase = GetFilesListUseCase(getRepository())
-        return OmhStorageTaskImpl {
-            val parameters = GetFilesListUseCaseParams(parentId)
-            val result: OmhResult<GetFilesListUseCaseResult> = getFilesListUseCase(parameters)
-            result
-        }
-    }
+    abstract suspend fun listFiles(parentId: String = "root"): List<OmhFile>
 
     /**
      * This method create files in an specific folder
@@ -75,38 +46,22 @@ abstract class OmhStorageClient protected constructor(
      * @param mimeType The mimeType of the file to be created
      * @param parentId The id of the folder where the file will be created
      *
-     * @return An OmhTask with the result of the operation
+     * @return An OmhFile with the information of the created file. Null in case the file was not created
      */
-    fun createFile(
+    abstract suspend fun createFile(
         name: String,
         mimeType: String,
         parentId: String
-    ): OmhTask<CreateFileUseCaseResult> {
-        val createFileUseCase = CreateFileUseCase(getRepository())
-        return OmhStorageTaskImpl {
-            val parameters = CreateFileUseCaseParams(name, mimeType, parentId)
-            val result: OmhResult<CreateFileUseCaseResult> = createFileUseCase(parameters)
-            result
-        }
-    }
+    ): OmhFile?
 
     /**
      * This method delete files with a given file id
      *
      * @param id The id of the desired file to delete
      *
-     * @return An OmhTask with the result of the operation
+     * @return true if the file was deleted, false otherwise
      */
-    fun deleteFile(id: String): OmhTask<DeleteFileUseCaseResult> {
-        val deleteFileUseCase =
-            DeleteFileUseCase(getRepository())
-        return OmhStorageTaskImpl {
-            val parameters =
-                DeleteFileUseCaseParams(id)
-            val result: OmhResult<DeleteFileUseCaseResult> = deleteFileUseCase(parameters)
-            result
-        }
-    }
+    abstract suspend fun deleteFile(id: String): Boolean
 
     /**
      * This method upload a file in an specific folder
@@ -114,19 +69,12 @@ abstract class OmhStorageClient protected constructor(
      * @param localFileToUpload The file to be uploaded
      * @param parentId The id of the folder where the file will be uploaded
      *
-     * @return An OmhTask with the result of the operation
+     * @return An OmhFile with the information of the uploaded file. Null in case the file was not uploaded
      */
-    fun uploadFile(
+    abstract suspend fun uploadFile(
         localFileToUpload: File,
         parentId: String?
-    ): OmhTask<UploadFileUseCaseResult> {
-        val uploadFileUseCase = UploadFileUseCase(getRepository())
-        return OmhStorageTaskImpl {
-            val parameters = UploadFileUseCaseParams(localFileToUpload, parentId)
-            val result: OmhResult<UploadFileUseCaseResult> = uploadFileUseCase(parameters)
-            result
-        }
-    }
+    ): OmhFile?
 
     /**
      * This method download a file with a given mime type and a given id
@@ -134,16 +82,9 @@ abstract class OmhStorageClient protected constructor(
      * @param fileId The id fo the file to be downloaded
      * @param mimeType The mimeType of the file to be downloaded
      *
-     * @return An OmhTask with the result of the operation
+     * @return A ByteArrayOutputStream with the content of the downloaded file
      */
-    fun downloadFile(fileId: String, mimeType: String?): OmhTask<DownloadFileUseCaseResult> {
-        val downloadFileUseCase = DownloadFileUseCase(getRepository())
-        return OmhStorageTaskImpl {
-            val parameters = DownloadFileUseCaseParams(fileId, mimeType)
-            val result: OmhResult<DownloadFileUseCaseResult> = downloadFileUseCase(parameters)
-            result
-        }
-    }
+    abstract suspend fun downloadFile(fileId: String, mimeType: String?): ByteArrayOutputStream
 
     /**
      * This method update a remote file with the content of a local file
@@ -151,17 +92,10 @@ abstract class OmhStorageClient protected constructor(
      * @param localFileToUpload The local file to be uploaded
      * @param fileId The id of the desired file to be updated
      *
-     * @return An OmhTask with the result of the operation
+     * @return An OmhFile with the information of the updated file
      */
-    fun updateFile(
+    abstract suspend fun updateFile(
         localFileToUpload: File,
         fileId: String
-    ): OmhTask<UpdateFileUseCaseResult> {
-        val updateFileUseCase = UpdateFileUseCase(getRepository())
-        return OmhStorageTaskImpl {
-            val parameters = UpdateFileUseCaseParams(localFileToUpload, fileId)
-            val result: OmhResult<UpdateFileUseCaseResult> = updateFileUseCase(parameters)
-            result
-        }
-    }
+    ): OmhFile?
 }

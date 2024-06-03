@@ -41,7 +41,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.openmobilehub.android.storage.core.domain.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.DialogCreateFileBinding
 import com.openmobilehub.android.storage.sample.databinding.DialogUploadFileBinding
