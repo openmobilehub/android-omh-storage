@@ -30,7 +30,7 @@ class LoginViewModel @Inject constructor(
 
     override fun getInitialState(): LoginViewState = LoginViewState.Initial
 
-    override suspend fun processEvent(event: LoginViewEvent) {
+    override fun processEvent(event: LoginViewEvent) {
         when (event) {
             LoginViewEvent.Initialize -> initializeEvent()
             LoginViewEvent.LoginClicked -> loginClickedEvent()

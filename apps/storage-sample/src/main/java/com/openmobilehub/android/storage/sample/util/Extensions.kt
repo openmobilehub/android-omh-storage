@@ -18,26 +18,6 @@ package com.openmobilehub.android.storage.sample.util
 
 import com.openmobilehub.android.storage.core.domain.model.OmhFile
 import com.openmobilehub.android.storage.core.domain.model.OmhFileType
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
-
-fun CoroutineScope.launchSafe(
-    context: CoroutineContext = EmptyCoroutineContext,
-    start: CoroutineStart = CoroutineStart.DEFAULT,
-    block: suspend CoroutineScope.() -> Unit
-): Job {
-    return this.launch(context, start) {
-        try {
-            block()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-}
 
 private val NON_SUPPORTED_MIME_TYPES_FOR_DOWNLOAD = listOf(
     OmhFileType.THIRD_PARTY_SHORTCUT,

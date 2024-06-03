@@ -22,10 +22,9 @@ import com.omh.android.auth.api.models.OmhAuthStatusCodes
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.domain.model.OmhStorageException
 import com.openmobilehub.android.storage.core.domain.repository.OmhFileRepository
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.GoogleDriveApiProvider
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.GoogleDriveApiService
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.GmsFileRepositoryImpl
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.source.GmsFileRemoteDataSourceImpl
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.service.GoogleDriveApiProvider
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.service.GoogleDriveApiService
 
 internal class OmhGmsStorageClientImpl private constructor(
     authClient: OmhAuthClient
@@ -46,8 +45,6 @@ internal class OmhGmsStorageClientImpl private constructor(
 
         val apiService = GoogleDriveApiService(apiProvider)
 
-        val dataSource = GmsFileRemoteDataSourceImpl(apiService)
-
-        return GmsFileRepositoryImpl(dataSource)
+        return GmsFileRepositoryImpl(apiService)
     }
 }

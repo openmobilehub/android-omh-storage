@@ -16,27 +16,122 @@
 
 package com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository
 
-import com.openmobilehub.android.storage.core.data.source.OmhFileRemoteDataSource
+import android.webkit.MimeTypeMap
+import com.google.api.client.http.FileContent
+import com.google.api.client.http.HttpResponseException
+import com.google.api.services.drive.model.FileList
+import com.openmobilehub.android.storage.core.domain.model.OmhFile
+import com.openmobilehub.android.storage.core.domain.model.OmhStorageException
+import com.openmobilehub.android.storage.core.domain.model.OmhStorageStatusCodes
 import com.openmobilehub.android.storage.core.domain.repository.OmhFileRepository
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhFile
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.service.GoogleDriveApiService
+import java.io.ByteArrayOutputStream
 import java.io.File
+import com.google.api.services.drive.model.File as GoogleDriveFile
 
 internal class GmsFileRepositoryImpl(
-    private val dataSource: OmhFileRemoteDataSource
+    private val apiService: GoogleDriveApiService
 ) : OmhFileRepository {
+    companion object {
+        private const val ANY_MIME_TYPE = "*/*"
+    }
 
-    override fun getFilesList(parentId: String) = dataSource.getFilesList(parentId)
+    override suspend fun getFilesList(parentId: String): List<OmhFile> {
+        val googleJsonFileList: FileList = apiService.getFilesList(parentId).execute()
+        val googleFileList: List<GoogleDriveFile> = googleJsonFileList.files.toList()
+        return googleFileList.mapNotNull { googleFile -> googleFile.toOmhFile() }
+    }
 
-    override fun createFile(name: String, mimeType: String, parentId: String?) =
-        dataSource.createFile(name, mimeType, parentId)
+    override suspend fun createFile(name: String, mimeType: String, parentId: String?): OmhFile? {
+        val fileToBeCreated = GoogleDriveFile().apply {
+            this.name = name
+            this.mimeType = mimeType
+            if (parentId != null) {
+                this.parents = listOf(parentId)
+            }
+        }
 
-    override fun deleteFile(fileId: String) = dataSource.deleteFile(fileId)
+        val responseFile: GoogleDriveFile = apiService.createFile(fileToBeCreated).execute()
 
-    override fun uploadFile(localFileToUpload: File, parentId: String?) =
-        dataSource.uploadFile(localFileToUpload, parentId)
+        return responseFile.toOmhFile()
+    }
 
-    override fun downloadFile(fileId: String, mimeType: String?) =
-        dataSource.downloadFile(fileId, mimeType)
+    @SuppressWarnings("TooGenericExceptionCaught", "SwallowedException")
+    override suspend fun deleteFile(fileId: String): Boolean {
+        return try {
+            apiService.deleteFile(fileId).execute()
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
 
-    override fun updateFile(localFileToUpload: File, fileId: String) =
-        dataSource.updateFile(localFileToUpload, fileId)
+    override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhFile? {
+        val localMimeType = getStringMimeTypeFromLocalFile(localFileToUpload)
+
+        val file = GoogleDriveFile().apply {
+            name = localFileToUpload.name
+            mimeType = localMimeType
+            parents = if (parentId.isNullOrBlank()) {
+                emptyList()
+            } else {
+                listOf(parentId)
+            }
+        }
+
+        val mediaContent = FileContent(localMimeType, localFileToUpload)
+
+        val response: GoogleDriveFile = apiService.uploadFile(file, mediaContent).execute()
+
+        return response.toOmhFile()
+    }
+
+    private fun getStringMimeTypeFromLocalFile(file: File) = MimeTypeMap
+        .getSingleton()
+        .getMimeTypeFromExtension(file.extension)
+        ?: ANY_MIME_TYPE
+
+    @SuppressWarnings("SwallowedException")
+    override suspend fun downloadFile(fileId: String, mimeType: String?): ByteArrayOutputStream {
+        val outputStream = ByteArrayOutputStream()
+
+        try {
+            apiService.downloadFile(fileId).executeMediaAndDownloadTo(outputStream)
+        } catch (exception: HttpResponseException) {
+            with(outputStream) {
+                flush()
+                reset()
+            }
+
+            if (mimeType.isNullOrBlank()) {
+                throw OmhStorageException.DownloadException(
+                    OmhStorageStatusCodes.DOWNLOAD_ERROR,
+                    exception
+                )
+            }
+
+            apiService
+                .downloadGoogleDoc(fileId, mimeType)
+                .executeMediaAndDownloadTo(outputStream)
+        }
+
+        return outputStream
+    }
+
+    override suspend fun updateFile(localFileToUpload: File, fileId: String): OmhFile? {
+        val localMimeType = getStringMimeTypeFromLocalFile(localFileToUpload)
+
+        val file = GoogleDriveFile().apply {
+            name = localFileToUpload.name
+            mimeType = localMimeType
+        }
+
+        val mediaContent = FileContent(localMimeType, localFileToUpload)
+
+        val response: GoogleDriveFile =
+            apiService.updateFile(fileId, file, mediaContent).execute()
+
+        return response.toOmhFile()
+    }
 }

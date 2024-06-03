@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.retrofit
+package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit
 
 import com.omh.android.auth.api.OmhCredentials
 import okhttp3.Authenticator
@@ -29,8 +29,8 @@ internal class StorageAuthenticator(private val credentials: OmhCredentials) : A
         return response.request
             .newBuilder()
             .header(
-                name = GoogleRetrofitImpl.HEADER_AUTHORIZATION_NAME,
-                value = GoogleRetrofitImpl.BEARER.format(refreshedToken)
+                name = GoogleStorageApiServiceProvider.HEADER_AUTHORIZATION_NAME,
+                value = GoogleStorageApiServiceProvider.BEARER.format(refreshedToken)
             )
             .build()
     }

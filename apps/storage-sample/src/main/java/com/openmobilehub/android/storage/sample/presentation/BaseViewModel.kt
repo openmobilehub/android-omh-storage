@@ -19,11 +19,9 @@ package com.openmobilehub.android.storage.sample.presentation
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.omh.android.auth.api.async.CancellableCollector
 import com.openmobilehub.android.storage.sample.util.LOG_MESSAGE_EVENT
 import com.openmobilehub.android.storage.sample.util.TAG_VIEW_UPDATE
-import com.openmobilehub.android.storage.sample.util.launchSafe
 
 abstract class BaseViewModel<State : ViewState, Event : ViewEvent> : ViewModel() {
 
@@ -45,13 +43,11 @@ abstract class BaseViewModel<State : ViewState, Event : ViewEvent> : ViewModel()
     fun getCurrentState() = state.value ?: getInitialState()
 
     fun dispatchEvent(event: Event) {
-        viewModelScope.launchSafe {
-            Log.i(TAG_VIEW_UPDATE, "$LOG_MESSAGE_EVENT${event.getEventName()}")
-            processEvent(event)
-        }
+        Log.i(TAG_VIEW_UPDATE, "$LOG_MESSAGE_EVENT${event.getEventName()}")
+        processEvent(event)
     }
 
-    protected abstract suspend fun processEvent(event: Event)
+    protected abstract fun processEvent(event: Event)
 
     protected fun setState(state: State) {
         this.state.postValue(state)

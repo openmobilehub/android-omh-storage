@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.source.mapper
+package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper
 
 import com.openmobilehub.android.storage.core.domain.model.OmhFile
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.source.response.FileListRemoteResponse
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.source.response.FileRemoteResponse
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileListRemoteResponse
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileRemoteResponse
 
 @SuppressWarnings("ComplexCondition")
 internal fun FileRemoteResponse.toFile(): OmhFile? {

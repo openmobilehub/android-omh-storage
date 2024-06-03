@@ -1,4 +1,4 @@
-package com.openmobilehub.android.storage.plugin.googledrive.gms.data.source.mapper
+package com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper
 
 import com.google.api.services.drive.model.File
 import com.openmobilehub.android.storage.core.domain.model.OmhFile

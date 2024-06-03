@@ -44,6 +44,8 @@ dependencies {
     implementation(Libs.avoidGuavaConflict)
 
     // Test dependencies
+    testImplementation(kotlin("test"))
     testImplementation(Libs.junit)
     testImplementation(Libs.mockk)
+    testImplementation(Libs.coroutineTesting)
 }

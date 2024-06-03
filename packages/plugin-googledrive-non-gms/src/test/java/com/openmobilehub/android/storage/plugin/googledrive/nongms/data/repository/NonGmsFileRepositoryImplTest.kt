@@ -16,44 +16,70 @@
 
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository
 
-import com.openmobilehub.android.storage.core.data.source.OmhFileRemoteDataSource
-import com.openmobilehub.android.storage.core.domain.model.OmhFile
+import android.webkit.MimeTypeMap
 import com.openmobilehub.android.storage.core.domain.model.OmhStorageException
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_FILE_ID
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_FILE_MIME_TYPE
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_FILE_NAME
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_FILE_PARENT_ID
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testFileListRemote
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testFileRemote
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testOmhFile
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.GoogleStorageApiService
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit.GoogleStorageApiServiceProvider
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.toByteArrayOutputStream
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
-import io.mockk.verify
-import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertFalse
-import junit.framework.TestCase.assertNull
-import junit.framework.TestCase.assertTrue
+import io.mockk.mockkStatic
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
+import okhttp3.ResponseBody
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import retrofit2.Response
 import java.io.ByteArrayOutputStream
 import java.io.File
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
+@OptIn(ExperimentalCoroutinesApi::class)
 internal class NonGmsFileRepositoryImplTest {
 
     companion object {
-        private const val NAME = "file.txt"
-        private const val MIME_TYPE = "text/plain"
-        private const val PARENT_ID = "510"
-        private const val FILE_ID = "123"
         private const val FILE_PATH = "anyPath"
     }
 
     @MockK(relaxed = true)
-    private lateinit var dataSource: OmhFileRemoteDataSource
+    private lateinit var retrofitImpl: GoogleStorageApiServiceProvider
+
+    @MockK(relaxed = true)
+    private lateinit var googleStorageApiService: GoogleStorageApiService
+
+    @MockK(relaxed = true)
+    private lateinit var mimeTypeMap: MimeTypeMap
+
+    @MockK(relaxed = true)
+    private lateinit var responseBody: ResponseBody
 
     private lateinit var fileRepositoryImpl: NonGmsFileRepositoryImpl
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        fileRepositoryImpl = NonGmsFileRepositoryImpl(dataSource)
+        fileRepositoryImpl = NonGmsFileRepositoryImpl(retrofitImpl)
+
+        every { retrofitImpl.getGoogleStorageApiService() } returns googleStorageApiService
+        mockkStatic(MimeTypeMap::class)
+        every { MimeTypeMap.getSingleton() } returns mimeTypeMap
+        every { mimeTypeMap.getMimeTypeFromExtension(any()) } returns TEST_FILE_MIME_TYPE
     }
 
     @After
@@ -62,144 +88,203 @@ internal class NonGmsFileRepositoryImplTest {
     }
 
     @Test
-    fun `given a parentId, when getFileList is success, then a list of OmhFiles is returned`() {
-        val expectedResult: List<OmhFile> = mockk()
+    fun `given a parentId, when getFilesList is success, then a list of OmhFiles is returned`() =
+        runTest {
+            coEvery { googleStorageApiService.getFilesList(any()) } returns Response.success(
+                testFileListRemote
+            )
 
-        every { dataSource.getFilesList(any()) } returns expectedResult
+            val result = fileRepositoryImpl.getFilesList(TEST_FILE_PARENT_ID)
 
-        val result = fileRepositoryImpl.getFilesList(PARENT_ID)
-
-        assertEquals(expectedResult, result)
-        verify { dataSource.getFilesList(PARENT_ID) }
-    }
-
-    @Test
-    fun `given the information of a new file, when createFile is success, then a OmhFile is returned`() {
-        val expectedFile: OmhFile = mockk()
-
-        every { dataSource.createFile(any(), any(), any()) } returns expectedFile
-
-        val result = fileRepositoryImpl.createFile(NAME, MIME_TYPE, PARENT_ID)
-
-        assertEquals(expectedFile, result)
-        verify { dataSource.createFile(NAME, MIME_TYPE, PARENT_ID) }
-    }
+            assertEquals(listOf(testOmhFile), result)
+            coVerify { googleStorageApiService.getFilesList(any()) }
+        }
 
     @Test
-    fun `given a fileId, when deleteFile is success, then true is returned`() {
-        every { dataSource.deleteFile(any()) } returns true
+    fun `given the information of a new file, when createFile is success, then a OmhFile is returned`() =
+        runTest {
+            coEvery { googleStorageApiService.createFile(any(), any()) } returns Response.success(
+                testFileRemote
+            )
 
-        val result = fileRepositoryImpl.deleteFile(FILE_ID)
+            val result = fileRepositoryImpl.createFile(
+                TEST_FILE_NAME,
+                TEST_FILE_MIME_TYPE,
+                TEST_FILE_PARENT_ID
+            )
+
+            assertEquals(testOmhFile, result)
+            coVerify { googleStorageApiService.createFile(any(), any()) }
+        }
+
+    @Test
+    fun `given a fileId, when deleteFile is success, then true is returned`() = runTest {
+        coEvery { googleStorageApiService.deleteFile(any()) } returns Response.success(responseBody)
+
+        val result = fileRepositoryImpl.deleteFile(TEST_FILE_ID)
 
         assertTrue(result)
-        verify { dataSource.deleteFile(FILE_ID) }
+        coVerify { googleStorageApiService.deleteFile(TEST_FILE_ID) }
     }
 
     @Test
-    fun `given a File and a parentId, when uploadFile is success, then a OmhFile is returned`() {
-        val localFileUpload = File(FILE_PATH)
-        val expectedFile: OmhFile = mockk()
+    fun `given a File and a parentId, when uploadFile is success, then a OmhFile is returned`() =
+        runTest {
+            val localFileUpload: File = mockk()
+            every { localFileUpload.name } returns TEST_FILE_NAME
+            every { localFileUpload.path } returns FILE_PATH
+            coEvery { googleStorageApiService.uploadFile(any(), any()) } returns Response.success(
+                testFileRemote
+            )
 
-        every { dataSource.uploadFile(any(), any()) } returns expectedFile
+            val result = fileRepositoryImpl.uploadFile(localFileUpload, TEST_FILE_PARENT_ID)
 
-        val result = fileRepositoryImpl.uploadFile(localFileUpload, PARENT_ID)
-
-        assertEquals(expectedFile, result)
-        verify { dataSource.uploadFile(localFileUpload, PARENT_ID) }
-    }
-
-    @Test
-    fun `given a file id and a mime type, when downloadFile is success, then a ByteArrayOutputStream is returned`() {
-        val expectedFile: ByteArrayOutputStream = mockk()
-
-        every { dataSource.downloadFile(any(), any()) } returns expectedFile
-
-        val result = fileRepositoryImpl.downloadFile(FILE_ID, MIME_TYPE)
-
-        assertEquals(expectedFile, result)
-        verify { dataSource.downloadFile(FILE_ID, MIME_TYPE) }
-    }
+            assertEquals(testOmhFile, result)
+            coVerify { googleStorageApiService.uploadFile(any(), any()) }
+        }
 
     @Test
-    fun `given a File and a file id, when updateFile is success, then a OmhFile is returned`() {
-        val localFileUpload = File(FILE_PATH)
-        val expectedFile: OmhFile = mockk()
+    fun `given a file id and a mime type, when downloadFile is success, then a ByteArrayOutputStream is returned`() =
+        runTest {
+            val expectedResult = ByteArrayOutputStream()
+            mockkStatic(ResponseBody?::toByteArrayOutputStream)
+            every { responseBody.toByteArrayOutputStream() } returns expectedResult
+            coEvery {
+                googleStorageApiService.downloadMediaFile(
+                    any(),
+                    any()
+                )
+            } returns Response.success(
+                responseBody
+            )
 
-        every { dataSource.updateFile(any(), any()) } returns expectedFile
+            val result = fileRepositoryImpl.downloadFile(TEST_FILE_ID, TEST_FILE_MIME_TYPE)
 
-        val result = fileRepositoryImpl.updateFile(localFileUpload, FILE_ID)
-
-        assertEquals(expectedFile, result)
-        verify { dataSource.updateFile(localFileUpload, FILE_ID) }
-    }
-
-    @Test
-    fun `given a parentId, when getFileList fails, then returns an empty list`() {
-        every { dataSource.getFilesList(any()) } returns emptyList()
-
-        val result = fileRepositoryImpl.getFilesList(PARENT_ID)
-
-        assertTrue(result.isEmpty())
-        verify { dataSource.getFilesList(PARENT_ID) }
-    }
+            assertEquals(expectedResult, result)
+            coVerify { googleStorageApiService.downloadMediaFile(any(), any()) }
+        }
 
     @Test
-    fun `given a name, mimeType and a parentId, when createFile fails, then returns null`() {
-        every { dataSource.createFile(any(), any(), any()) } returns null
+    fun `given a File and a file id, when updateFile is success, then a OmhFile is returned`() =
+        runTest {
+            coEvery { googleStorageApiService.updateFile(any(), any()) } returns Response.success(
+                testFileRemote
+            )
+            coEvery {
+                googleStorageApiService.updateMetaData(
+                    any(),
+                    any()
+                )
+            } returns Response.success(
+                testFileRemote
+            )
 
-        val result = fileRepositoryImpl.createFile(NAME, MIME_TYPE, PARENT_ID)
+            val result = fileRepositoryImpl.updateFile(File(FILE_PATH), TEST_FILE_ID)
 
-        assertNull(result)
-        verify { dataSource.createFile(NAME, MIME_TYPE, PARENT_ID) }
-    }
+            assertEquals(testOmhFile, result)
+            coVerify { googleStorageApiService.updateFile(any(), any()) }
+        }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given a parentId, when getFileList fails, then throws an api exception`() =
+        runTest {
+            coEvery { googleStorageApiService.getFilesList(any()) } returns Response.error(
+                500,
+                responseBody
+            )
+
+            fileRepositoryImpl.getFilesList(TEST_FILE_PARENT_ID)
+        }
 
     @Test
-    fun `given a fileId, when deleteFile fails, then false is returned`() {
-        every { dataSource.deleteFile(any()) } returns false
+    fun `given a name, mimeType and a parentId, when createFile fails, then returns null`() =
+        runTest {
+            coEvery { googleStorageApiService.createFile(any(), any()) } returns Response.error(
+                500,
+                responseBody
+            )
+            val result = fileRepositoryImpl.createFile(
+                TEST_FILE_NAME,
+                TEST_FILE_MIME_TYPE,
+                TEST_FILE_PARENT_ID
+            )
 
-        val result = fileRepositoryImpl.deleteFile(FILE_ID)
+            assertNull(result)
+            coVerify { googleStorageApiService.createFile(any(), any()) }
+        }
+
+    @Test
+    fun `given a fileId, when deleteFile fails, then false is returned`() = runTest {
+        coEvery { googleStorageApiService.deleteFile(any()) } returns Response.error(
+            500,
+            responseBody
+        )
+
+        val result = fileRepositoryImpl.deleteFile(TEST_FILE_ID)
 
         assertFalse(result)
-        verify { dataSource.deleteFile(FILE_ID) }
+        coVerify { googleStorageApiService.deleteFile(TEST_FILE_ID) }
     }
 
     @Test
-    fun `given a File and a parentId, when uploadFile fails, then null is returned`() {
-        val localFileUpload = File(FILE_PATH)
+    fun `given a File and a parentId, when uploadFile fails, then null is returned`() = runTest {
+        coEvery { googleStorageApiService.uploadFile(any(), any()) } returns Response.error(
+            500,
+            responseBody
+        )
 
-        every { dataSource.uploadFile(any(), any()) } returns null
-
-        val result = fileRepositoryImpl.uploadFile(localFileUpload, PARENT_ID)
+        val result = fileRepositoryImpl.uploadFile(File(FILE_PATH), TEST_FILE_PARENT_ID)
 
         assertNull(result)
-        verify { dataSource.uploadFile(localFileUpload, PARENT_ID) }
+        coVerify { googleStorageApiService.uploadFile(any(), any()) }
     }
 
     @Test(expected = OmhStorageException.DownloadException::class)
-    fun `given a null mimeType, when downloadFile fails, then a DownloadException is thrown`() {
-        val expectedFile: OmhStorageException.DownloadException = mockk()
+    fun `given a null mimeType, when downloadFile fails, then a DownloadException is thrown`() =
+        runTest {
+            coEvery {
+                googleStorageApiService.downloadMediaFile(
+                    any(),
+                    any()
+                )
+            } returns Response.error(
+                500,
+                responseBody
+            )
 
-        every { dataSource.downloadFile(any(), any()) } throws expectedFile
-
-        fileRepositoryImpl.downloadFile(FILE_ID, MIME_TYPE)
-    }
+            fileRepositoryImpl.downloadFile(TEST_FILE_ID, null)
+        }
 
     @Test(expected = OmhStorageException.DownloadException::class)
-    fun `given a fileId and mimeType, when downloadFile fails, then a DownloadException is thrown`() {
-        val expectedFile: OmhStorageException.DownloadException = mockk()
+    fun `given a fileId and mimeType, when downloadFile fails, then a DownloadException is thrown`() =
+        runTest {
+            coEvery {
+                googleStorageApiService.downloadMediaFile(
+                    any(),
+                    any()
+                )
+            } returns Response.error(
+                500,
+                responseBody
+            )
 
-        every { dataSource.downloadFile(any(), any()) } throws expectedFile
-
-        fileRepositoryImpl.downloadFile(FILE_ID, MIME_TYPE)
-    }
+            fileRepositoryImpl.downloadFile(TEST_FILE_ID, null)
+        }
 
     @Test(expected = OmhStorageException.UpdateException::class)
-    fun `given a File and a file id, when updateFile fails, then a UpdateException is thrown`() {
-        val localFileUpload = File(FILE_PATH)
-        val expectedFile: OmhStorageException.UpdateException = mockk()
+    fun `given a File and a file id, when updateFile fails, then a UpdateException is thrown`() =
+        runTest {
+            val localFileUpload = File(FILE_PATH)
+            coEvery {
+                googleStorageApiService.updateFile(
+                    any(),
+                    any()
+                )
+            } returns Response.error(
+                500,
+                responseBody
+            )
 
-        every { dataSource.updateFile(any(), any()) } throws expectedFile
-
-        fileRepositoryImpl.updateFile(localFileUpload, FILE_ID)
-    }
+            fileRepositoryImpl.updateFile(localFileUpload, TEST_FILE_ID)
+        }
 }

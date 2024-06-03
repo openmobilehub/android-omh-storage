@@ -23,8 +23,7 @@ import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.domain.model.OmhStorageException
 import com.openmobilehub.android.storage.core.domain.repository.OmhFileRepository
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.NonGmsFileRepositoryImpl
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.retrofit.GoogleRetrofitImpl
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.source.NonGmsFileRemoteDataSourceImpl
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit.GoogleStorageApiServiceProvider
 
 internal class OmhNonGmsStorageClientImpl private constructor(
     authClient: OmhAuthClient
@@ -41,10 +40,8 @@ internal class OmhNonGmsStorageClientImpl private constructor(
         val omhCredentials = authClient.getCredentials() as? OmhCredentials
             ?: throw OmhStorageException.InvalidCredentialsException(OmhAuthStatusCodes.SIGN_IN_FAILED)
 
-        val retrofitImpl = GoogleRetrofitImpl.getInstance(omhCredentials)
+        val retrofitImpl = GoogleStorageApiServiceProvider.getInstance(omhCredentials)
 
-        val dataSource = NonGmsFileRemoteDataSourceImpl(retrofitImpl)
-
-        return NonGmsFileRepositoryImpl(dataSource)
+        return NonGmsFileRepositoryImpl(retrofitImpl)
     }
 }

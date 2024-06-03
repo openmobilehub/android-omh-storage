@@ -12,6 +12,10 @@ android {
             value = getRequiredValueFromEnvOrProperties("googleStorageUrl")
         )
     }
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 val useLocalProjects = project.rootProject.extra["useLocalProjects"] as Boolean
@@ -30,6 +34,9 @@ dependencies {
     implementation(Libs.okHttpLoggingInterceptor)
 
     // Test dependencies
+    testImplementation(kotlin("test"))
     testImplementation(Libs.junit)
     testImplementation(Libs.mockk)
+    testImplementation(Libs.coroutineTesting)
+    testImplementation(Libs.json)
 }

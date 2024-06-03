@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.gms.data
+package com.openmobilehub.android.storage.plugin.googledrive.gms.data.service
 
 import com.google.api.client.http.FileContent
 import com.google.api.services.drive.Drive

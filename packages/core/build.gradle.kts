@@ -3,7 +3,6 @@ plugins {
     id("org.jetbrains.dokka") version Versions.dokka
 }
 
-@Suppress("UnstableApiUsage")
 android {
     namespace = "com.openmobilehub.android.storage.core"
 }

@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.nongms.data
+package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service
 
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.source.body.CreateFileRequestBody
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.source.response.FileListRemoteResponse
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.source.response.FileRemoteResponse
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body.CreateFileRequestBody
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileListRemoteResponse
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileRemoteResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
-import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -56,50 +56,50 @@ internal interface GoogleStorageApiService {
     }
 
     @GET(FILES_PARTICLE)
-    fun getFilesList(
+    suspend fun getFilesList(
         @Query(QUERY_Q) query: String,
         @Query(QUERY_FIELDS) fields: String = FIELDS_VALUE
-    ): Call<FileListRemoteResponse>
+    ): Response<FileListRemoteResponse>
 
     @POST(FILES_PARTICLE)
-    fun createFile(
+    suspend fun createFile(
         @Query(QUERY_FIELDS) query: String = QUERY_REQUESTED_FIELDS,
         @Body body: CreateFileRequestBody
-    ): Call<FileRemoteResponse>
+    ): Response<FileRemoteResponse>
 
     @DELETE("$FILES_PARTICLE/{$FILE_ID}")
-    fun deleteFile(
+    suspend fun deleteFile(
         @Path(FILE_ID) fileId: String
-    ): Call<ResponseBody>
+    ): Response<ResponseBody>
 
     @Multipart
     @POST(UPLOAD_FILES_PARTICLE)
-    fun uploadFile(
+    suspend fun uploadFile(
         @Part(META_DATA) metadata: RequestBody,
         @Part filePart: MultipartBody.Part
-    ): Call<FileRemoteResponse>
+    ): Response<FileRemoteResponse>
 
     @GET("$FILES_PARTICLE/{$FILE_ID}")
-    fun downloadMediaFile(
+    suspend fun downloadMediaFile(
         @Path(FILE_ID) fileId: String,
         @Query(QUERY_ALT) alt: String
-    ): Call<ResponseBody>
+    ): Response<ResponseBody>
 
     @GET("$FILES_PARTICLE/{$FILE_ID}/export")
-    fun exportDocEditor(
+    suspend fun exportDocEditor(
         @Path(FILE_ID) fileId: String,
         @Query(QUERY_MIME_TYPE) mimeType: String
-    ): Call<ResponseBody>
+    ): Response<ResponseBody>
 
     @PATCH("$UPLOAD_FILES_PARTICLE/{$FILE_ID}")
-    fun updateFile(
+    suspend fun updateFile(
         @Body filePart: RequestBody,
         @Path(FILE_ID) fileId: String
-    ): Call<FileRemoteResponse>
+    ): Response<FileRemoteResponse>
 
     @PATCH("$FILES_PARTICLE/{$FILE_ID}")
-    fun updateMetaData(
+    suspend fun updateMetaData(
         @Body filePart: RequestBody,
         @Path(FILE_ID) fileId: String
-    ): Call<FileRemoteResponse>
+    ): Response<FileRemoteResponse>
 }

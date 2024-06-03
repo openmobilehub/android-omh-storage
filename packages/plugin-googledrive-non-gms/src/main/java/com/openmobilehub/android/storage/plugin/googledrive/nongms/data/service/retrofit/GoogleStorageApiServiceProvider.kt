@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.retrofit
+package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit
 
 import com.omh.android.auth.api.OmhCredentials
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.BuildConfig
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.GoogleStorageApiService
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.GoogleStorageApiService
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
 
-internal class GoogleRetrofitImpl(private val omhCredentials: OmhCredentials) {
+internal class GoogleStorageApiServiceProvider(private val omhCredentials: OmhCredentials) {
 
     companion object {
         internal const val HEADER_AUTHORIZATION_NAME = "Authorization"
         internal const val BEARER = "Bearer %s"
 
-        private var instance: GoogleRetrofitImpl? = null
+        private var instance: GoogleStorageApiServiceProvider? = null
 
-        internal fun getInstance(omhCredentials: OmhCredentials): GoogleRetrofitImpl {
+        internal fun getInstance(omhCredentials: OmhCredentials): GoogleStorageApiServiceProvider {
             if (instance == null) {
-                instance = GoogleRetrofitImpl(omhCredentials)
+                instance = GoogleStorageApiServiceProvider(omhCredentials)
             }
 
             return instance!!

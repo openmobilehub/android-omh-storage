@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.source.response
+package com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles
 
-import androidx.annotation.Keep
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.google.api.client.util.DateTime
+import com.google.api.services.drive.model.File
+import io.mockk.every
 
-@Keep
-@JsonIgnoreProperties(ignoreUnknown = true)
-internal data class FileRemoteResponse(
-    @JsonProperty("mimeType") val mimeType: String?,
-    @JsonProperty("id") val id: String?,
-    @JsonProperty("name") val name: String?,
-    @JsonProperty("modifiedTime") val modifiedTime: String?,
-    @JsonProperty("parents") val parents: List<String>?
-)
+fun File.setUpMock() {
+    every { mimeType } returns TEST_FILE_MIME_TYPE
+    every { id } returns TEST_FILE_ID
+    every { name } returns TEST_FILE_NAME
+    every { parents } returns listOf(TEST_FILE_PARENT_ID)
+    every { modifiedTime } returns DateTime(TEST_FILE_MODIFIED_TIME)
+}

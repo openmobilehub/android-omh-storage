@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.source.body
+package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles
 
-import androidx.annotation.Keep
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileListRemoteResponse
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileRemoteResponse
 
-@Keep
-internal data class CreateFileRequestBody(
-    val mimeType: String,
-    val name: String,
-    val parents: List<String> = emptyList()
+internal val testFileRemote = FileRemoteResponse(
+    TEST_FILE_MIME_TYPE,
+    TEST_FILE_ID,
+    TEST_FILE_NAME,
+    TEST_FILE_MODIFIED_TIME,
+    listOf(TEST_FILE_PARENT_ID),
 )
+
+internal val testFileListRemote = FileListRemoteResponse(listOf(testFileRemote))

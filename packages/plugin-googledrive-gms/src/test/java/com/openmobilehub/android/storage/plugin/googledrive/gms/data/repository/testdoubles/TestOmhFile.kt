@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.source.response
+package com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles
 
-import androidx.annotation.Keep
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.openmobilehub.android.storage.core.domain.model.OmhFile
 
-@Keep
-@JsonIgnoreProperties(ignoreUnknown = true)
-internal data class FileListRemoteResponse(
-    @JsonProperty("files") val files: List<FileRemoteResponse?>?
+const val TEST_FILE_MIME_TYPE = "image/jpg"
+const val TEST_FILE_ID = "123"
+const val TEST_FILE_NAME = "fileName"
+const val TEST_FILE_MODIFIED_TIME = "2023-07-04T03:03:55.397Z"
+const val TEST_FILE_PARENT_ID = "parentId"
+
+val testOmhFile = OmhFile(
+    TEST_FILE_MIME_TYPE,
+    TEST_FILE_ID,
+    TEST_FILE_NAME,
+    TEST_FILE_MODIFIED_TIME,
+    TEST_FILE_PARENT_ID,
 )

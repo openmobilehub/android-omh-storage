@@ -29,7 +29,7 @@ interface OmhFileRepository {
      *
      * @return A list of OmhFiles
      */
-    fun getFilesList(parentId: String = "root"): List<OmhFile>
+    suspend fun getFilesList(parentId: String = "root"): List<OmhFile>
 
     /**
      * This method create files in an specific folder
@@ -40,7 +40,7 @@ interface OmhFileRepository {
      *
      * @return An OmhFile with the information of the created file. Null in case the file was not created
      */
-    fun createFile(name: String, mimeType: String, parentId: String?): OmhFile?
+    suspend fun createFile(name: String, mimeType: String, parentId: String?): OmhFile?
 
     /**
      * This method delete files with a given file id
@@ -49,7 +49,7 @@ interface OmhFileRepository {
      *
      * @return true if the file was deleted, false otherwise
      */
-    fun deleteFile(fileId: String): Boolean
+    suspend fun deleteFile(fileId: String): Boolean
 
     /**
      * This method upload a file in an specific folder
@@ -59,7 +59,7 @@ interface OmhFileRepository {
      *
      * @return An OmhFile with the information of the uploaded file. Null in case the file was not uploaded
      */
-    fun uploadFile(localFileToUpload: File, parentId: String?): OmhFile?
+    suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhFile?
 
     /**
      * This method download a file with a given mime type and a given id
@@ -69,7 +69,7 @@ interface OmhFileRepository {
      *
      * @return A ByteArrayOutputStream with the content of the downloaded file
      */
-    fun downloadFile(fileId: String, mimeType: String?): ByteArrayOutputStream
+    suspend fun downloadFile(fileId: String, mimeType: String?): ByteArrayOutputStream
 
     /**
      * This method update a remote file with the content of a local file
@@ -79,5 +79,5 @@ interface OmhFileRepository {
      *
      * @return An OmhFile with the information of the updated file
      */
-    fun updateFile(localFileToUpload: File, fileId: String): OmhFile?
+    suspend fun updateFile(localFileToUpload: File, fileId: String): OmhFile?
 }

@@ -58,4 +58,7 @@ object Libs {
     val glide by lazy { "com.github.bumptech.glide:glide:${Versions.glide}" }
     val glideCompiler by lazy { "com.github.bumptech.glide:compiler:${Versions.glide}" }
 
+    // Json
+    val json by lazy { "org.json:json:${Versions.json}" }
+
 }
