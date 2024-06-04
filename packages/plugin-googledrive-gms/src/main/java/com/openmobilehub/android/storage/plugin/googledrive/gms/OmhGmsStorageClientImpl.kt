@@ -16,9 +16,9 @@
 
 package com.openmobilehub.android.storage.plugin.googledrive.gms
 
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
-import com.omh.android.auth.api.OmhAuthClient
-import com.omh.android.auth.api.models.OmhAuthStatusCodes
+import com.openmobilehub.android.auth.core.OmhAuthClient
+import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
+import com.openmobilehub.android.auth.plugin.google.gms.GmsCredentials
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.core.model.OmhStorageException
@@ -36,8 +36,9 @@ internal class OmhGmsStorageClientImpl private constructor(
     internal class Builder : OmhStorageClient.Builder {
 
         override fun build(authClient: OmhAuthClient): OmhStorageClient {
-            val credentials = authClient.getCredentials() as? GoogleAccountCredential
-                ?: throw OmhStorageException.InvalidCredentialsException(OmhAuthStatusCodes.SIGN_IN_FAILED)
+            val credentials =
+                (authClient.getCredentials() as? GmsCredentials)?.googleAccountCredential
+                    ?: throw OmhStorageException.InvalidCredentialsException(OmhAuthStatusCodes.SIGN_IN_FAILED)
 
             val apiProvider = GoogleDriveApiProvider.getInstance(credentials)
             val apiService = GoogleDriveApiService(apiProvider)

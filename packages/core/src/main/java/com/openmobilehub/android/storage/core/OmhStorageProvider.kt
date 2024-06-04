@@ -19,8 +19,8 @@ package com.openmobilehub.android.storage.core
 import android.content.Context
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
-import com.omh.android.auth.api.OmhAuthClient
-import com.omh.android.auth.api.models.OmhAuthStatusCodes
+import com.openmobilehub.android.auth.core.OmhAuthClient
+import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance

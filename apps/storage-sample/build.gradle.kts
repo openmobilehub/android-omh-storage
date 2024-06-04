@@ -16,12 +16,12 @@ android {
         buildConfigField(
             type = "String",
             name = "AUTH_NON_GMS_PATH",
-            value =  "\"com.omh.android.auth.nongms.presentation.OmhAuthFactoryImpl\""
+            value = "\"com.openmobilehub.android.auth.plugin.google.nongms.presentation.OmhAuthFactoryImpl\""
         )
         buildConfigField(
             type = "String",
             name = "AUTH_GMS_PATH",
-            value = "\"com.omh.android.auth.gms.OmhAuthFactoryImpl\""
+            value = "\"com.openmobilehub.android.auth.plugin.google.gms.OmhAuthFactoryImpl\""
         )
         buildConfigField(
             type = "String",
@@ -103,7 +103,7 @@ dependencies {
     implementation(Libs.navigationUIKtx)
     implementation(Libs.glide)
     implementation(Libs.constraintlayout)
-    annotationProcessor(Libs.glideCompiler)
+    kapt(Libs.glideCompiler)
 
     implementation(Libs.hiltAndroid)
     kapt(Libs.hiltCompiler)

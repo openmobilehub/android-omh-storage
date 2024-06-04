@@ -19,7 +19,6 @@ package com.openmobilehub.android.storage.sample.presentation
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.omh.android.auth.api.async.CancellableCollector
 import com.openmobilehub.android.storage.sample.util.LOG_MESSAGE_EVENT
 import com.openmobilehub.android.storage.sample.util.TAG_VIEW_UPDATE
 
@@ -28,7 +27,6 @@ abstract class BaseViewModel<State : ViewState, Event : ViewEvent> : ViewModel()
     val state: MutableLiveData<State> = MutableLiveData()
     val toastMessage: MutableLiveData<String?> = MutableLiveData()
     val errorDialogMessage: MutableLiveData<String?> = MutableLiveData()
-    protected val cancellableCollector = CancellableCollector()
 
     init {
         setInitialState()
@@ -51,10 +49,5 @@ abstract class BaseViewModel<State : ViewState, Event : ViewEvent> : ViewModel()
 
     protected fun setState(state: State) {
         this.state.postValue(state)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        cancellableCollector.clear()
     }
 }

@@ -20,12 +20,13 @@ import android.content.Context
 import android.net.Uri
 import android.os.Environment
 import androidx.lifecycle.viewModelScope
-import com.omh.android.auth.api.OmhAuthClient
+import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.core.model.OmhFileType
 import com.openmobilehub.android.storage.sample.model.FileType
 import com.openmobilehub.android.storage.sample.presentation.BaseViewModel
+import com.openmobilehub.android.storage.sample.util.coSignOut
 import com.openmobilehub.android.storage.sample.util.getNameWithExtension
 import com.openmobilehub.android.storage.sample.util.isDownloadable
 import com.openmobilehub.android.storage.sample.util.normalizeFileName
@@ -304,12 +305,14 @@ class FileViewerViewModel @Inject constructor(
     }
 
     private fun signOut() {
-        val cancellable = authClient.signOut()
-            .addOnSuccess { setState(FileViewerViewState.SignOut) }
-            .addOnFailure { setState(FileViewerViewState.Finish) }
-            .execute()
-
-        cancellableCollector.addCancellable(cancellable)
+        viewModelScope.launch {
+            try {
+                authClient.coSignOut()
+                setState(FileViewerViewState.SignOut)
+            } catch (e: Exception) {
+                setState(FileViewerViewState.Finish)
+            }
+        }
     }
 
     private fun updateFileClickEvent(event: FileViewerViewEvent.UpdateFileClicked) {

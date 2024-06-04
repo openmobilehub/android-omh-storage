@@ -17,7 +17,7 @@
 package com.openmobilehub.android.storage.plugin.googledrive.nongms
 
 import androidx.annotation.Keep
-import com.omh.android.auth.api.OmhAuthClient
+import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.OmhStorageFactory
 

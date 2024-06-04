@@ -32,6 +32,9 @@ dependencies {
         api("com.openmobilehub.android:storage-api:1.0.5-beta")
     }
 
+    // Omh Auth
+    api(Libs.omhGmsAuthLibrary)
+
     // GMS
     implementation(Libs.googlePlayServicesAuth)
     implementation(Libs.googleJacksonClient)
@@ -42,6 +45,7 @@ dependencies {
         exclude("org.apache.httpcomponents")
     }
     implementation(Libs.avoidGuavaConflict)
+    implementation(Libs.httpClientGson)
 
     // Test dependencies
     testImplementation(kotlin("test"))

@@ -17,8 +17,8 @@
 package com.openmobilehub.android.storage.sample.di
 
 import android.content.Context
-import com.omh.android.auth.api.OmhAuthClient
-import com.omh.android.auth.api.OmhAuthProvider
+import com.openmobilehub.android.auth.core.OmhAuthClient
+import com.openmobilehub.android.auth.core.OmhAuthProvider
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.OmhStorageProvider
 import com.openmobilehub.android.storage.sample.BuildConfig
@@ -47,7 +47,7 @@ class SingletonModule {
                     "https://www.googleapis.com/auth/drive",
                     "https://www.googleapis.com/auth/drive.file"
                 ),
-                clientId = BuildConfig.GOOGLEDRIVE_CLIENT_ID
+                clientId = BuildConfig.GOOGLE_CLIENT_ID
             )
     }
 

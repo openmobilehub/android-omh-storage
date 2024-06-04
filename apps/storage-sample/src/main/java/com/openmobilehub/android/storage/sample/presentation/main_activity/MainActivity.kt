@@ -19,16 +19,20 @@ package com.openmobilehub.android.storage.sample.presentation.main_activity
 import android.os.Bundle
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
-import com.omh.android.auth.api.OmhAuthClient
+import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.ActivityBaseBinding
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.FileViewerFragment
+import com.openmobilehub.android.storage.sample.util.isUserLoggedIn
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 open class MainActivity : AppCompatActivity(), FileViewerFragment.FileViewerFragmentListener {
@@ -68,14 +72,19 @@ open class MainActivity : AppCompatActivity(), FileViewerFragment.FileViewerFrag
     }
 
     private fun setupGraph() {
-        val navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
-        val startDestId = if (authClient.getUser() != null) {
-            R.id.file_viewer_fragment
-        } else {
-            R.id.login_fragment
+        lifecycleScope.launch(Dispatchers.IO) {
+            val isUserLoggedIn = authClient.isUserLoggedIn()
+            launch(Dispatchers.Main) {
+                val navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
+                val startDestId = if (isUserLoggedIn) {
+                    R.id.file_viewer_fragment
+                } else {
+                    R.id.login_fragment
+                }
+                navGraph.setStartDestination(startDestId)
+                navController.graph = navGraph
+            }
         }
-        navGraph.setStartDestination(startDestId)
-        navController.graph = navGraph
     }
 
     override fun finishApplication() {
