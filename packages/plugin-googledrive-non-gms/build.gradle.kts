@@ -28,7 +28,7 @@ dependencies {
     }
 
     // Omh Auth
-    api(Libs.omhNonGmsAuthLibrary)
+    api(Libs.omhGoogleNonGmsAuthLibrary)
 
     // Retrofit setup
     implementation(Libs.retrofit)

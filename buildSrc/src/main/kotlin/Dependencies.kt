@@ -42,8 +42,8 @@ object Libs {
 
     // Auth
     val omhCoreAuthLibrary by lazy { "com.openmobilehub.android.auth:core:${Versions.omhAuth}" }
-    val omhNonGmsAuthLibrary by lazy { "com.openmobilehub.android.auth:plugin-google-non-gms:${Versions.omhAuth}" }
-    val omhGmsAuthLibrary by lazy { "com.openmobilehub.android.auth:plugin-google-gms:${Versions.omhAuth}" }
+    val omhGoogleNonGmsAuthLibrary by lazy { "com.openmobilehub.android.auth:plugin-google-non-gms:${Versions.omhAuth}" }
+    val omhGoogleGmsAuthLibrary by lazy { "com.openmobilehub.android.auth:plugin-google-gms:${Versions.omhAuth}" }
 
     // Play services
     val googlePlayBase by lazy { "com.google.android.gms:play-services-base:${Versions.googlePlayBase}" }

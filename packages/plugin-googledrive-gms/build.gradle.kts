@@ -33,7 +33,7 @@ dependencies {
     }
 
     // Omh Auth
-    api(Libs.omhGmsAuthLibrary)
+    api(Libs.omhGoogleGmsAuthLibrary)
 
     // GMS
     implementation(Libs.googlePlayServicesAuth)

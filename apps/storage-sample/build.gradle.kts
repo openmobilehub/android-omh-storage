@@ -1,5 +1,3 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
-
 plugins {
     `android-application`
     id("kotlin-kapt")
@@ -110,8 +108,8 @@ dependencies {
 
     testImplementation(Libs.junit)
 
-    implementation(Libs.omhNonGmsAuthLibrary)
-    implementation(Libs.omhGmsAuthLibrary)
+    implementation(Libs.omhGoogleNonGmsAuthLibrary)
+    implementation(Libs.omhGoogleGmsAuthLibrary)
 
     // Use local implementation instead of dependencies
     if (useLocalProjects) {
