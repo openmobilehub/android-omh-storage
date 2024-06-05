@@ -16,7 +16,7 @@
 
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit
 
-import com.omh.android.auth.api.OmhCredentials
+import com.openmobilehub.android.auth.core.OmhCredentials
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.BuildConfig
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.GoogleStorageApiService
 import okhttp3.Interceptor

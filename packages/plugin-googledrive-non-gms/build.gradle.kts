@@ -27,6 +27,9 @@ dependencies {
         api("com.openmobilehub.android:storage-api:1.0.5-beta")
     }
 
+    // Omh Auth
+    api(Libs.omhGoogleNonGmsAuthLibrary)
+
     // Retrofit setup
     implementation(Libs.retrofit)
     implementation(Libs.retrofitJacksonConverter)

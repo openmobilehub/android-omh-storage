@@ -41,8 +41,9 @@ object Libs {
     val coroutineTesting by lazy { "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.coroutines}" }
 
     // Auth
-    val omhNonGmsAuthLibrary by lazy { "com.openmobilehub.android:auth-api-non-gms:${Versions.omhAuth}" }
-    val omhGmsAuthLibrary by lazy { "com.openmobilehub.android:auth-api-gms:${Versions.omhAuth}" }
+    val omhCoreAuthLibrary by lazy { "com.openmobilehub.android.auth:core:${Versions.omhAuth}" }
+    val omhGoogleNonGmsAuthLibrary by lazy { "com.openmobilehub.android.auth:plugin-google-non-gms:${Versions.omhAuth}" }
+    val omhGoogleGmsAuthLibrary by lazy { "com.openmobilehub.android.auth:plugin-google-gms:${Versions.omhAuth}" }
 
     // Play services
     val googlePlayBase by lazy { "com.google.android.gms:play-services-base:${Versions.googlePlayBase}" }
@@ -61,4 +62,6 @@ object Libs {
     // Json
     val json by lazy { "org.json:json:${Versions.json}" }
 
+    // Gson
+    val httpClientGson by lazy { "com.google.http-client:google-http-client-gson:${Versions.httpClientGson}" }
 }

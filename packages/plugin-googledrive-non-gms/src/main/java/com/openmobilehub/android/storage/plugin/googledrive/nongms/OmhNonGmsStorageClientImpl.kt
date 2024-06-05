@@ -16,9 +16,9 @@
 
 package com.openmobilehub.android.storage.plugin.googledrive.nongms
 
-import com.omh.android.auth.api.OmhAuthClient
-import com.omh.android.auth.api.OmhCredentials
-import com.omh.android.auth.api.models.OmhAuthStatusCodes
+import com.openmobilehub.android.auth.core.OmhAuthClient
+import com.openmobilehub.android.auth.core.OmhCredentials
+import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.core.model.OmhStorageException

@@ -16,7 +16,7 @@
 
 package com.openmobilehub.android.storage.core.model
 
-import com.omh.android.auth.api.models.OmhAuthStatusCodes
+import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 
 sealed class OmhStorageException(private val statusCode: Int) : Exception() {
 

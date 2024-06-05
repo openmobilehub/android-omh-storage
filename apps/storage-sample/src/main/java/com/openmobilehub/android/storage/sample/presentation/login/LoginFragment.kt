@@ -16,6 +16,7 @@
 
 package com.openmobilehub.android.storage.sample.presentation.login
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -42,15 +43,10 @@ class LoginFragment : BaseFragment<LoginViewModel, LoginViewState, LoginViewEven
     private val loginLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result: ActivityResult ->
-        try {
-            result.data?.let { intent ->
-                viewModel.getAccountFromIntent(intent)
-                navigateTo(R.id.action_login_fragment_to_file_viewer_fragment)
-            }
-        } catch (exception: Exception) {
-            exception.message?.let { message ->
-                displayErrorDialog(message)
-            }
+        if (result.resultCode == Activity.RESULT_OK) {
+            navigateTo(R.id.action_login_fragment_to_file_viewer_fragment)
+        } else {
+            displayErrorDialog("Login failed. Result code: ${result.resultCode}.")
         }
     }
 
@@ -62,14 +58,6 @@ class LoginFragment : BaseFragment<LoginViewModel, LoginViewState, LoginViewEven
         binding = FragmentLoginBinding.inflate(layoutInflater)
 
         return binding.root
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        if (viewModel.isUserLogged()) {
-            navigateTo(R.id.action_login_fragment_to_file_viewer_fragment)
-        }
     }
 
     override fun buildState(state: LoginViewState) {

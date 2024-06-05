@@ -16,7 +16,7 @@
 
 package com.openmobilehub.android.storage.core
 
-import com.omh.android.auth.api.OmhAuthClient
+import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.model.OmhFile
 import java.io.ByteArrayOutputStream
 import java.io.File

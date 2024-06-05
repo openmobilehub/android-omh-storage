@@ -41,7 +41,7 @@ object Versions {
     const val mockk = "1.13.4"
 
     // Auth
-    const val omhAuth = "1.0.1-beta"
+    const val omhAuth = "2.0.0"
 
     // Play services
     const val googlePlayBase = "18.2.0"
@@ -57,4 +57,7 @@ object Versions {
 
     // Json
     const val json = "20240303"
+
+    // Gson
+    const val httpClientGson = "1.44.1"
 }

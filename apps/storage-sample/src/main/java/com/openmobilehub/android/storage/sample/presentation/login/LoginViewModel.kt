@@ -17,8 +17,7 @@
 package com.openmobilehub.android.storage.sample.presentation.login
 
 import android.content.Intent
-import com.omh.android.auth.api.OmhAuthClient
-import com.omh.android.auth.api.models.OmhUserProfile
+import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.sample.presentation.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -36,11 +35,6 @@ class LoginViewModel @Inject constructor(
             LoginViewEvent.LoginClicked -> loginClickedEvent()
         }
     }
-
-    fun getAccountFromIntent(data: Intent): OmhUserProfile =
-        omhAuthClient.getAccountFromIntent(data)
-
-    fun isUserLogged(): Boolean = omhAuthClient.getUser() != null
 
     fun getLoginIntent(): Intent = omhAuthClient.getLoginIntent()
 

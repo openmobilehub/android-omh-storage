@@ -16,8 +16,13 @@
 
 package com.openmobilehub.android.storage.sample.util
 
+import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.core.model.OmhFileType
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 private val NON_SUPPORTED_MIME_TYPES_FOR_DOWNLOAD = listOf(
     OmhFileType.THIRD_PARTY_SHORTCUT,
@@ -67,4 +72,27 @@ fun OmhFile.getNameWithExtension(): String = if (isFileNameWithExtension(name)) 
 private fun isFileNameWithExtension(fileName: String): Boolean {
     val lastDotIndex: Int = fileName.lastIndexOf('.')
     return lastDotIndex != -1 && lastDotIndex < fileName.length - 1
+}
+
+suspend fun OmhAuthClient.isUserLoggedIn(): Boolean = suspendCoroutine { continuation ->
+    getUser()
+        .addOnSuccess {
+            continuation.resume(true)
+        }
+        .addOnFailure {
+            continuation.resume(false)
+        }
+        .execute()
+}
+
+suspend fun OmhAuthClient.coSignOut() = suspendCancellableCoroutine { continuation ->
+    val cancellable = signOut()
+        .addOnSuccess {
+            continuation.resume(Unit)
+        }
+        .addOnFailure {
+            continuation.resumeWithException(it)
+        }
+        .execute()
+    continuation.invokeOnCancellation { cancellable.cancel() }
 }

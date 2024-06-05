@@ -11,7 +11,7 @@ dependencies {
     implementation(Libs.reflection)
 
     // Omh Auth
-    api(Libs.omhNonGmsAuthLibrary)
+    api(Libs.omhCoreAuthLibrary)
 
     // Coroutines
     implementation(Libs.coroutinesCore)
