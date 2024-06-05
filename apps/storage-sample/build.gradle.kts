@@ -11,6 +11,8 @@ android {
 
     defaultConfig {
         applicationId = "com.openmobilehub.android.storage.sample"
+        versionCode = 1
+        versionName = "1.0"
         buildConfigField(
             type = "String",
             name = "AUTH_NON_GMS_PATH",
