@@ -50,6 +50,10 @@ tasks.register("publishPluginsToMavenLocal") {
         ":packages:plugin-googledrive-gms:publishToMavenLocal",
         ":packages:plugin-googledrive-non-gms:assembleRelease",
         ":packages:plugin-googledrive-non-gms:publishToMavenLocal",
+        ":packages:plugin-onedrive:assembleRelease",
+        ":packages:plugin-onedrive:publishToMavenLocal",
+        ":packages:plugin-dropbox:assembleRelease",
+        ":packages:plugin-dropbox:publishToMavenLocal",
     )
 }
 

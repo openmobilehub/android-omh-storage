@@ -118,8 +118,12 @@ dependencies {
         implementation(project(":packages:core"))
         implementation(project(":packages:plugin-googledrive-gms"))
         implementation(project(":packages:plugin-googledrive-non-gms"))
+        implementation(project(":packages:plugin-onedrive"))
+        implementation(project(":packages:plugin-dropbox"))
     } else {
         implementation("com.openmobilehub.android:storage-api-drive-nongms:1.0.8-beta")
         implementation("com.openmobilehub.android:storage-api-drive-gms:1.0.7-beta")
+        implementation("com.openmobilehub.android:storage-api-onedrive:1.0.0-beta")
+        implementation("com.openmobilehub.android:storage-api-dropbox:1.0.0-beta")
     }
 }
