@@ -27,6 +27,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.ActivityBaseBinding
+import com.openmobilehub.android.storage.sample.di.OmhClientManager
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.FileViewerFragment
 import com.openmobilehub.android.storage.sample.util.isUserLoggedIn
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,7 +44,7 @@ open class MainActivity : AppCompatActivity(), FileViewerFragment.FileViewerFrag
     private lateinit var navController: NavController
 
     @Inject
-    lateinit var authClient: OmhAuthClient
+    lateinit var omhClientManager: OmhClientManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,7 +74,7 @@ open class MainActivity : AppCompatActivity(), FileViewerFragment.FileViewerFrag
 
     private fun setupGraph() {
         lifecycleScope.launch(Dispatchers.IO) {
-            val isUserLoggedIn = authClient.isUserLoggedIn()
+            val isUserLoggedIn = omhClientManager.getAuthClient().isUserLoggedIn()
             launch(Dispatchers.Main) {
                 val navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
                 val startDestId = if (isUserLoggedIn) {

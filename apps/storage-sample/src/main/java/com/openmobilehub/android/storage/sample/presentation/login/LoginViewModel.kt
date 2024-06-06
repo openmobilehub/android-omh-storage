@@ -18,14 +18,18 @@ package com.openmobilehub.android.storage.sample.presentation.login
 
 import android.content.Intent
 import com.openmobilehub.android.auth.core.OmhAuthClient
+import com.openmobilehub.android.storage.sample.di.OmhClientManager
 import com.openmobilehub.android.storage.sample.presentation.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val omhAuthClient: OmhAuthClient
+    private val omhClientManager: OmhClientManager
 ) : BaseViewModel<LoginViewState, LoginViewEvent>() {
+
+    private val omhAuthClient: OmhAuthClient
+        get() = omhClientManager.getAuthClient()
 
     override fun getInitialState(): LoginViewState = LoginViewState.Initial
 
