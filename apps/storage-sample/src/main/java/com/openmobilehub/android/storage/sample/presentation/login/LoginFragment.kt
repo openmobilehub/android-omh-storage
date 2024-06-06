@@ -68,7 +68,16 @@ class LoginFragment : BaseFragment<LoginViewModel, LoginViewState, LoginViewEven
     }
 
     private fun buildInitialState() {
-        binding.btnLogin.setOnClickListener { dispatchEvent(LoginViewEvent.LoginClicked) }
+        val buttons = listOf(
+            binding.btnLoginGoogle,
+            binding.btnLoginFacebook,
+            binding.btnLoginDropbox,
+            binding.btnLoginMicrosoft
+        )
+
+        buttons.forEach {
+            it.setOnClickListener { dispatchEvent(LoginViewEvent.LoginClicked) }
+        }
     }
 
     private fun startLogin() {

@@ -27,14 +27,50 @@
     app:navGraph="@navigation/nav_graph"
     tools:context="com.openmobilehub.android.storage.sample.presentation.login.LoginFragment">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_login"
+    <LinearLayout
+        android:id="@+id/button_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/login"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_login_google"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/login_google"
+
+            />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_login_facebook"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:enabled="false"
+            android:text="@string/login_facebook" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_login_dropbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:enabled="false"
+            android:text="@string/login_dropbox" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_login_microsoft"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:enabled="false"
+            android:text="@string/login_microsoft" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
