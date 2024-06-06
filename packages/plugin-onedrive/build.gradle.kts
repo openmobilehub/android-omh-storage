@@ -15,9 +15,6 @@ dependencies {
         api("com.openmobilehub.android:storage-api:1.0.5-beta")
     }
 
-    // Omh Auth
-    api(Libs.omhGoogleGmsAuthLibrary)
-
     // Test dependencies
     testImplementation(kotlin("test"))
     testImplementation(Libs.junit)
