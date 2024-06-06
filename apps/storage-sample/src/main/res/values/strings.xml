@@ -2,9 +2,9 @@
     <string name="app_name">OMH Storage demo</string>
 
     <string name="login_google">Login with Google</string>
-    <string name="login_facebook">Login with Facebook</string>
     <string name="login_dropbox">Login with Dropbox</string>
     <string name="login_microsoft">Login with Microsoft</string>
+    <string name="login_error">Login failed. Result code: %d</string>
     <string name="login_title">Login</string>
     <string name="file_viewer_title">File Viewer</string>
     <string name="loading">Loading…</string>

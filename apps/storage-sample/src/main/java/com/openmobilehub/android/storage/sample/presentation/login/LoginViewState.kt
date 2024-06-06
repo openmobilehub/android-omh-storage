@@ -16,6 +16,7 @@
 
 package com.openmobilehub.android.storage.sample.presentation.login
 
+import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
 import com.openmobilehub.android.storage.sample.presentation.ViewState
 
 sealed class LoginViewState : ViewState {
@@ -25,7 +26,7 @@ sealed class LoginViewState : ViewState {
         override fun getName() = "LoginViewState.Initial"
     }
 
-    object StartLogin : LoginViewState() {
+    data class StartLogin(val storageAuthProvider: StorageAuthProvider) : LoginViewState() {
 
         override fun getName() = "LoginViewState.StartLogin"
     }

@@ -18,33 +18,38 @@ package com.openmobilehub.android.storage.sample.presentation.login
 
 import android.content.Intent
 import com.openmobilehub.android.auth.core.OmhAuthClient
-import com.openmobilehub.android.storage.sample.di.OmhClientManager
+import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
+import com.openmobilehub.android.storage.sample.domain.repository.SessionRepository
 import com.openmobilehub.android.storage.sample.presentation.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import javax.inject.Provider
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val omhClientManager: OmhClientManager
+    private val sessionRepository: SessionRepository,
+    private val omhAuthClient: Provider<OmhAuthClient>
 ) : BaseViewModel<LoginViewState, LoginViewEvent>() {
-
-    private val omhAuthClient: OmhAuthClient
-        get() = omhClientManager.getAuthClient()
 
     override fun getInitialState(): LoginViewState = LoginViewState.Initial
 
     override fun processEvent(event: LoginViewEvent) {
         when (event) {
             LoginViewEvent.Initialize -> initializeEvent()
-            LoginViewEvent.LoginClicked -> loginClickedEvent()
+            LoginViewEvent.LoginWithDropboxClicked -> loginClickedEvent(StorageAuthProvider.DROPBOX)
+            LoginViewEvent.LoginWithGoogleClicked -> loginClickedEvent(StorageAuthProvider.GOOGLE)
+            LoginViewEvent.LoginWithMicrosoftClicked -> loginClickedEvent(StorageAuthProvider.MICROSOFT)
         }
     }
 
-    fun getLoginIntent(): Intent = omhAuthClient.getLoginIntent()
+    suspend fun getLoginIntent(provider: StorageAuthProvider): Intent {
+        sessionRepository.setStorageAuthProvider(provider)
+        return omhAuthClient.get().getLoginIntent()
+    }
 
     private fun initializeEvent() = Unit
 
-    private fun loginClickedEvent() {
-        setState(LoginViewState.StartLogin)
+    private fun loginClickedEvent(provider: StorageAuthProvider) {
+        setState(LoginViewState.StartLogin(provider))
     }
 }

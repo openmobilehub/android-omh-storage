@@ -26,12 +26,16 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.FragmentLoginBinding
+import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
 import com.openmobilehub.android.storage.sample.presentation.BaseFragment
 import com.openmobilehub.android.storage.sample.presentation.util.displayErrorDialog
 import com.openmobilehub.android.storage.sample.presentation.util.navigateTo
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class LoginFragment : BaseFragment<LoginViewModel, LoginViewState, LoginViewEvent>() {
@@ -46,7 +50,7 @@ class LoginFragment : BaseFragment<LoginViewModel, LoginViewState, LoginViewEven
         if (result.resultCode == Activity.RESULT_OK) {
             navigateTo(R.id.action_login_fragment_to_file_viewer_fragment)
         } else {
-            displayErrorDialog("Login failed. Result code: ${result.resultCode}.")
+            displayErrorDialog(getString(R.string.login_error, result.resultCode))
         }
     }
 
@@ -57,30 +61,25 @@ class LoginFragment : BaseFragment<LoginViewModel, LoginViewState, LoginViewEven
     ): View {
         binding = FragmentLoginBinding.inflate(layoutInflater)
 
+        binding.btnLoginGoogle.setOnClickListener { dispatchEvent(LoginViewEvent.LoginWithGoogleClicked) }
+        binding.btnLoginDropbox.setOnClickListener { dispatchEvent(LoginViewEvent.LoginWithDropboxClicked) }
+        binding.btnLoginMicrosoft.setOnClickListener { dispatchEvent(LoginViewEvent.LoginWithMicrosoftClicked) }
+
         return binding.root
     }
 
     override fun buildState(state: LoginViewState) {
         when (state) {
-            LoginViewState.Initial -> buildInitialState()
-            LoginViewState.StartLogin -> startLogin()
+            is LoginViewState.Initial -> {}
+            is LoginViewState.StartLogin -> startLogin(state.storageAuthProvider)
         }
     }
 
-    private fun buildInitialState() {
-        val buttons = listOf(
-            binding.btnLoginGoogle,
-            binding.btnLoginFacebook,
-            binding.btnLoginDropbox,
-            binding.btnLoginMicrosoft
-        )
-
-        buttons.forEach {
-            it.setOnClickListener { dispatchEvent(LoginViewEvent.LoginClicked) }
+    private fun startLogin(storageAuthProvider: StorageAuthProvider) {
+        lifecycleScope.launch(Dispatchers.Default) {
+            val intent = viewModel.getLoginIntent(storageAuthProvider)
+            loginLauncher.launch(intent)
         }
-    }
 
-    private fun startLogin() {
-        loginLauncher.launch(viewModel.getLoginIntent())
     }
 }

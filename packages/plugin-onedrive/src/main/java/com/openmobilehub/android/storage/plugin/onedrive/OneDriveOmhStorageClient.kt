@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.dropbox
+package com.openmobilehub.android.storage.plugin.onedrive
 
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
@@ -22,7 +22,7 @@ import com.openmobilehub.android.storage.core.model.OmhFile
 import java.io.ByteArrayOutputStream
 import java.io.File
 
-internal class OmhDropboxStorageClientImpl private constructor(
+internal class OneDriveOmhStorageClient private constructor(
     authClient: OmhAuthClient,
 ) : OmhStorageClient(authClient) {
 
@@ -30,7 +30,7 @@ internal class OmhDropboxStorageClientImpl private constructor(
 
         override fun build(authClient: OmhAuthClient): OmhStorageClient {
             // To be implemented
-            return OmhDropboxStorageClientImpl(authClient)
+            return OneDriveOmhStorageClient(authClient)
         }
     }
 

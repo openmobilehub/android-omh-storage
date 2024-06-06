@@ -24,8 +24,7 @@ import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.core.model.OmhFileType
-import com.openmobilehub.android.storage.sample.di.OmhClientManager
-import com.openmobilehub.android.storage.sample.model.FileType
+import com.openmobilehub.android.storage.sample.domain.model.FileType
 import com.openmobilehub.android.storage.sample.presentation.BaseViewModel
 import com.openmobilehub.android.storage.sample.util.coSignOut
 import com.openmobilehub.android.storage.sample.util.getNameWithExtension
@@ -43,15 +42,9 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class FileViewerViewModel @Inject constructor(
-    private val omhClientManager: OmhClientManager,
-) : BaseViewModel<FileViewerViewState, FileViewerViewEvent>() {
-
-
+    private val authClient: OmhAuthClient,
     private val omhStorageClient: OmhStorageClient
-        get() = omhClientManager.getStorageClient()
-
-    private val authClient: OmhAuthClient
-        get() = omhClientManager.getAuthClient()
+) : BaseViewModel<FileViewerViewState, FileViewerViewEvent>() {
 
     companion object {
         private const val ID_ROOT = "root"

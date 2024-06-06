@@ -20,9 +20,9 @@ import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.OmhStorageFactory
 
-internal class OmhDropboxStorageFactoryImpl : OmhStorageFactory {
+class DropboxOmhStorageFactory : OmhStorageFactory {
 
     override fun getStorageClient(
         authClient: OmhAuthClient
-    ): OmhStorageClient = OmhDropboxStorageClientImpl.Builder().build(authClient)
+    ): OmhStorageClient = DropboxOmhStorageClient.Builder().build(authClient)
 }

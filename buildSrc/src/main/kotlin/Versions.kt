@@ -60,4 +60,7 @@ object Versions {
 
     // Gson
     const val httpClientGson = "1.44.1"
+
+    // DataStore
+    const val dataStore = "1.1.1"
 }
