@@ -1,0 +1,21 @@
+name: Publish Onedrive Plugin
+
+on:
+  workflow_dispatch:
+    inputs:
+      destination-repository:
+        type: choice
+        required: true
+        description: Destination repository
+        options:
+          - snapshot
+          - release
+
+jobs:
+  publish:
+    name: Publish Onedrive Plugin
+    uses: ./.github/workflows/build_and_publish_to_maven_remotely.yml
+    with:
+      package-name: :packages:plugin-onedrive
+      destination-repository: ${{ github.event.inputs.destination-repository }}
+    secrets: inherit
