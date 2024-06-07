@@ -45,7 +45,7 @@ jobs:
           cache-read-only: false
 
       - name: Setup secrets
-        run: bash ./.github/scripts/setup_secrets.sh "${{ secrets.GOOGLE_CLIENT_ID}}"
+        run: bash ./.github/scripts/setup_secrets.sh "${{ secrets.GOOGLE_CLIENT_ID}}" "${{ secrets.DROPBOX_APP_KEY }}"
 
       - name: Set useMavenLocal flag
         run: echo useMavenLocal=true >> local.properties
@@ -80,7 +80,7 @@ jobs:
           cache-read-only: false
 
       - name: Setup secrets
-        run: bash ./.github/scripts/setup_secrets.sh "${{ secrets.GOOGLE_CLIENT_ID}}"
+        run: bash ./.github/scripts/setup_secrets.sh "${{ secrets.GOOGLE_CLIENT_ID}}" "${{ secrets.DROPBOX_APP_KEY }}"
 
       - name: Set useMavenLocal flag
         run: echo useMavenLocal=true >> local.properties

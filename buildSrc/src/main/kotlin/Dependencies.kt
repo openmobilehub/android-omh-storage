@@ -44,6 +44,8 @@ object Libs {
     val omhCoreAuthLibrary by lazy { "com.openmobilehub.android.auth:core:${Versions.omhAuth}" }
     val omhGoogleNonGmsAuthLibrary by lazy { "com.openmobilehub.android.auth:plugin-google-non-gms:${Versions.omhAuth}" }
     val omhGoogleGmsAuthLibrary by lazy { "com.openmobilehub.android.auth:plugin-google-gms:${Versions.omhAuth}" }
+    val omhDropboxAuthLibrary by lazy { "com.openmobilehub.android.auth:plugin-dropbox:${Versions.omhAuth}" }
+    val omhMicrosoftAuthLibrary by lazy { "com.openmobilehub.android.auth:plugin-microsoft:${Versions.omhAuth}" }
 
     // Play services
     val googlePlayBase by lazy { "com.google.android.gms:play-services-base:${Versions.googlePlayBase}" }
@@ -64,4 +66,7 @@ object Libs {
 
     // Gson
     val httpClientGson by lazy { "com.google.http-client:google-http-client-gson:${Versions.httpClientGson}" }
+
+    // Datastore
+    val dataStore by lazy { "androidx.datastore:datastore-preferences:${Versions.dataStore}" }
 }

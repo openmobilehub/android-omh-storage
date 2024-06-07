@@ -14,37 +14,35 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.gms
+package com.openmobilehub.android.storage.plugin.googledrive.nongms
 
 import com.openmobilehub.android.auth.core.OmhAuthClient
+import com.openmobilehub.android.auth.core.OmhCredentials
 import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
-import com.openmobilehub.android.auth.plugin.google.gms.GmsCredentials
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.core.model.OmhStorageException
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.GmsFileRepository
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.service.GoogleDriveApiProvider
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.service.GoogleDriveApiService
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.NonGmsFileRepository
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit.GoogleStorageApiServiceProvider
 import java.io.ByteArrayOutputStream
 import java.io.File
 
-internal class OmhGmsStorageClientImpl private constructor(
+internal class GoogleDriveNonGmsOmhStorageClient private constructor(
     authClient: OmhAuthClient,
-    private val fileRepository: GmsFileRepository,
+    private val fileRepository: NonGmsFileRepository
 ) : OmhStorageClient(authClient) {
 
     internal class Builder : OmhStorageClient.Builder {
 
         override fun build(authClient: OmhAuthClient): OmhStorageClient {
-            val credentials =
-                (authClient.getCredentials() as? GmsCredentials)?.googleAccountCredential
-                    ?: throw OmhStorageException.InvalidCredentialsException(OmhAuthStatusCodes.SIGN_IN_FAILED)
+            val omhCredentials = authClient.getCredentials() as? OmhCredentials
+                ?: throw OmhStorageException.InvalidCredentialsException(OmhAuthStatusCodes.SIGN_IN_FAILED)
 
-            val apiProvider = GoogleDriveApiProvider.getInstance(credentials)
-            val apiService = GoogleDriveApiService(apiProvider)
-            val repository = GmsFileRepository(apiService)
+            val retrofitImpl = GoogleStorageApiServiceProvider.getInstance(omhCredentials)
 
-            return OmhGmsStorageClientImpl(authClient, repository)
+            val fileRepository = NonGmsFileRepository(retrofitImpl)
+
+            return GoogleDriveNonGmsOmhStorageClient(authClient, fileRepository)
         }
     }
 

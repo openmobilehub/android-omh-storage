@@ -25,8 +25,18 @@ sealed class LoginViewEvent : ViewEvent {
         override fun getEventName() = "LoginViewEvent.Initialize"
     }
 
-    object LoginClicked : LoginViewEvent() {
+    object LoginWithGoogleClicked : LoginViewEvent() {
 
-        override fun getEventName() = "LoginViewEvent.LoginClicked"
+        override fun getEventName() = "LoginViewEvent.LoginWithGoogleClicked"
+    }
+
+    object LoginWithMicrosoftClicked : LoginViewEvent() {
+
+        override fun getEventName() = "LoginViewEvent.LoginWithMicrosoftClicked"
+    }
+
+    object LoginWithDropboxClicked : LoginViewEvent() {
+
+        override fun getEventName() = "LoginViewEvent.LoginWithDropboxClicked"
     }
 }

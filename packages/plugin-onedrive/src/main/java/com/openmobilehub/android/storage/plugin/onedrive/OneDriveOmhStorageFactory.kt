@@ -20,9 +20,9 @@ import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.OmhStorageFactory
 
-internal class OmhOnedriveStorageFactoryImpl : OmhStorageFactory {
+class OneDriveOmhStorageFactory : OmhStorageFactory {
 
     override fun getStorageClient(
         authClient: OmhAuthClient
-    ): OmhStorageClient = OmhOnedriveStorageClientImpl.Builder().build(authClient)
+    ): OmhStorageClient = OneDriveOmhStorageClient.Builder().build(authClient)
 }

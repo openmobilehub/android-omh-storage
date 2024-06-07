@@ -27,7 +27,7 @@
     <fragment
         android:id="@+id/login_fragment"
         android:name="com.openmobilehub.android.storage.sample.presentation.login.LoginFragment"
-        android:label="@string/login"
+        android:label="@string/login_title"
         tools:layout="@layout/fragment_login">
         <action
             android:id="@+id/action_login_fragment_to_file_viewer_fragment"

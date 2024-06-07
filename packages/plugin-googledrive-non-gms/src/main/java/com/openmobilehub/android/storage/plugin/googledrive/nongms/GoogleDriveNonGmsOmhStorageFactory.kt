@@ -22,9 +22,9 @@ import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.OmhStorageFactory
 
 @Keep
-internal class OmhNonGmsStorageFactoryImpl : OmhStorageFactory {
+class GoogleDriveNonGmsOmhStorageFactory : OmhStorageFactory {
 
     override fun getStorageClient(
         authClient: OmhAuthClient
-    ): OmhStorageClient = OmhNonGmsStorageClientImpl.Builder().build(authClient)
+    ): OmhStorageClient = GoogleDriveNonGmsOmhStorageClient.Builder().build(authClient)
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.sample.model
+package com.openmobilehub.android.storage.sample.domain.model
 
 import com.openmobilehub.android.storage.core.model.OmhFileType
 

@@ -13,26 +13,6 @@ android {
         applicationId = "com.openmobilehub.android.storage.sample"
         versionCode = 1
         versionName = "1.0"
-        buildConfigField(
-            type = "String",
-            name = "AUTH_NON_GMS_PATH",
-            value = "\"com.openmobilehub.android.auth.plugin.google.nongms.presentation.OmhAuthFactoryImpl\""
-        )
-        buildConfigField(
-            type = "String",
-            name = "AUTH_GMS_PATH",
-            value = "\"com.openmobilehub.android.auth.plugin.google.gms.OmhAuthFactoryImpl\""
-        )
-        buildConfigField(
-            type = "String",
-            name = "STORAGE_GMS_PATH",
-            value = "\"com.openmobilehub.android.storage.plugin.googledrive.gms.OmhGmsStorageFactoryImpl\""
-        )
-        buildConfigField(
-            type = "String",
-            name = "STORAGE_NON_GMS_PATH",
-            value = "\"com.openmobilehub.android.storage.plugin.googledrive.nongms.OmhNonGmsStorageFactoryImpl\""
-        )
     }
 
     signingConfigs {
@@ -103,15 +83,16 @@ dependencies {
     implementation(Libs.navigationUIKtx)
     implementation(Libs.glide)
     implementation(Libs.constraintlayout)
-    kapt(Libs.glideCompiler)
-
+    implementation(Libs.dataStore)
     implementation(Libs.hiltAndroid)
     kapt(Libs.hiltCompiler)
+    kapt(Libs.glideCompiler)
 
-    testImplementation(Libs.junit)
-
+    // Auth
     implementation(Libs.omhGoogleNonGmsAuthLibrary)
     implementation(Libs.omhGoogleGmsAuthLibrary)
+    implementation(Libs.omhDropboxAuthLibrary)
+    implementation(Libs.omhMicrosoftAuthLibrary)
 
     // Use local implementation instead of dependencies
     if (useLocalProjects) {
@@ -126,4 +107,6 @@ dependencies {
         implementation("com.openmobilehub.android:storage-api-onedrive:1.0.0-beta")
         implementation("com.openmobilehub.android:storage-api-dropbox:1.0.0-beta")
     }
+
+    testImplementation(Libs.junit)
 }

@@ -27,10 +27,12 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.ActivityBaseBinding
+import com.openmobilehub.android.storage.sample.domain.repository.SessionRepository
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.FileViewerFragment
 import com.openmobilehub.android.storage.sample.util.isUserLoggedIn
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import javax.inject.Provider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -43,7 +45,10 @@ open class MainActivity : AppCompatActivity(), FileViewerFragment.FileViewerFrag
     private lateinit var navController: NavController
 
     @Inject
-    lateinit var authClient: OmhAuthClient
+    lateinit var sessionRepository: SessionRepository
+
+    @Inject
+    lateinit var omhAuthClient: Provider<OmhAuthClient>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,7 +78,10 @@ open class MainActivity : AppCompatActivity(), FileViewerFragment.FileViewerFrag
 
     private fun setupGraph() {
         lifecycleScope.launch(Dispatchers.IO) {
-            val isUserLoggedIn = authClient.isUserLoggedIn()
+            // We need to initialise sessionRepository before accessing omhAuthClient so the correct
+            // storageAuthProvider can be used
+            sessionRepository.initialise()
+            val isUserLoggedIn = omhAuthClient.get().isUserLoggedIn()
             launch(Dispatchers.Main) {
                 val navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
                 val startDestId = if (isUserLoggedIn) {
