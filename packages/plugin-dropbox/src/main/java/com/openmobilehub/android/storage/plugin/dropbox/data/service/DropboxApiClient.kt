@@ -4,7 +4,7 @@ import com.dropbox.core.DbxRequestConfig
 import com.dropbox.core.v2.DbxClientV2
 import com.openmobilehub.android.storage.plugin.dropbox.BuildConfig
 
-class DropboxApiClient(internal val accessToken: String) {
+internal class DropboxApiClient private constructor(internal val accessToken: String) {
     companion object {
         private var instance: DropboxApiClient? = null
 

@@ -16,11 +16,13 @@
 
 package com.openmobilehub.android.storage.plugin.dropbox
 
+import android.webkit.MimeTypeMap
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.MetadataToOmhFile
 import com.openmobilehub.android.storage.plugin.dropbox.data.repository.DropboxFileRepository
 import com.openmobilehub.android.storage.plugin.dropbox.data.service.DropboxApiClient
 import com.openmobilehub.android.storage.plugin.dropbox.data.service.DropboxApiService
@@ -40,9 +42,10 @@ internal class DropboxOmhStorageClient private constructor(
                     OmhAuthStatusCodes.SIGN_IN_FAILED
                 )
 
-            val client = DropboxApiClient(accessToken)
+            val client = DropboxApiClient.getInstance(accessToken)
             val apiService = DropboxApiService(client)
-            val repository = DropboxFileRepository(apiService)
+            val metadataToOmhFile = MetadataToOmhFile(MimeTypeMap.getSingleton())
+            val repository = DropboxFileRepository(apiService, metadataToOmhFile)
 
             return DropboxOmhStorageClient(authClient, repository)
         }
