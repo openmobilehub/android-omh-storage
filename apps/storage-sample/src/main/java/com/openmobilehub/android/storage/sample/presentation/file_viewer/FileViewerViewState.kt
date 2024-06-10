@@ -18,6 +18,7 @@ package com.openmobilehub.android.storage.sample.presentation.file_viewer
 
 import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.sample.presentation.ViewState
+import java.io.ByteArrayOutputStream
 
 sealed class FileViewerViewState : ViewState {
 
@@ -46,9 +47,17 @@ sealed class FileViewerViewState : ViewState {
         override fun getName() = "FileViewerViewState.Finish"
     }
 
-    object CheckPermissions : FileViewerViewState() {
+    object CheckDownloadPermissions : FileViewerViewState() {
 
-        override fun getName() = "FileViewerViewState.CheckPermissions"
+        override fun getName() = "FileViewerViewState.CheckDownloadPermissions"
+    }
+
+    data class SaveFile(
+        val file: OmhFile,
+        val bytes: ByteArrayOutputStream
+    ) : FileViewerViewState() {
+
+        override fun getName() = "FileViewerViewState.SaveFile"
     }
 
     object SignOut : FileViewerViewState() {
