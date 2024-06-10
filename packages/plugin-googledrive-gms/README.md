@@ -2,12 +2,12 @@
   <a href="https://www.openmobilehub.com/">
     <img width="160px" src="https://www.openmobilehub.com/images/logo/omh_logo.png"/><br/>
   </a>
-  <h2 align="center">Android OMH Storage</h2>
+  <h2 align="center">Android OMH Storage - Google Drive (GMS/non-GMS)</h2>
 </p>
 
 <p align="center">
   <a href="https://central.sonatype.com/artifact/com.openmobilehub.android.storage/plugin-googledrive-gms"><img src="https://img.shields.io/maven-central/v/com.openmobilehub.android.storage/plugin-googledrive-gms" alt="NPM version"/></a>
-  <a href="https://github.com/openmobilehub/android-omh-storage/blob/main/LICENSE"><img src="https://img.shields.io/github/license/openmobilehub/android-omh-auth" alt="License"/></a>
+  <a href="https://github.com/openmobilehub/android-omh-storage/blob/main/LICENSE"><img src="https://img.shields.io/github/license/openmobilehub/android-omh-storage" alt="License"/></a>
 </p>
 
 <p align="center">
@@ -17,87 +17,71 @@
 
 ---
 
-# Module plugin-googledrive-gms
+## Prerequisites
 
-## Set up your Google Cloud project for applications with Google Services (Google Auth)
+Ensure you have the [`com.openmobilehub.android.storage:core:2.0.0`](https://www.openmobilehub.com/android-omh-storage/core) package installed before proceeding with the integration.
 
-To access Google APIs, generate a unique client_id for your app in the Google API Console. Add the
-client_id to your app's code and complete the required Cloud Console setup steps:
+## Installation
 
-### Steps
+To integrate the Google Drive OMH Storage provider into your Android project, follow these steps:
 
-1. [Go to the Google Cloud Console and open the project selector page](https://console.cloud.google.com/projectselector2).
-2. Click on "Create Project" to start creating a new Cloud project.
-3. [Go to the Credentials page](https://console.cloud.google.com/apis/credentials).
-4. On the Credentials page, click on "Create credentials" and choose "OAuth Client ID".
-5. In the "Application Type" option, select "Android".
-6. Set your application package name (Use "com.openmobilehub.android.auth.sample" if you are
-   following the starter-code)
-7. Update the debug/release SHA-1 certificate fingerprint for Android's Client ID.
-   Note: The debug build is automatically signed with the debug keystore. Obtain the certificate
-   fingerprint from it by following the guidelines in the official Google Developers
-   documentation: ["Using keytool on the certificate"](https://developers.google.com/android/guides/client-auth#using_keytool_on_the_certificate).
-8. In the [OAuth consent screen](https://console.cloud.google.com/apis/credentials/consent) add the
-   test users that you will be using for QA and development. Without this step you won't be able to
-   access the application while it's in testing mode.
-9. You're all set!
+### 1. Configure Maven Central repository
 
-## Add the Client ID to your app
+Ensure Maven Central is included as a repository in your root **build.gradle** file:
 
-You should not check your Client ID into your version control system, so it is recommended
-storing it in the `local.properties` file, which is located in the root directory of your project.
-For more information about the `local.properties` file,
-see [Gradle properties](https://developer.android.com/studio/build#properties-files) [files](https://developer.android.com/studio/build#properties-files).
-
-1. Open the `local.properties` in your project level directory, and then add the following code.
-   Replace `YOUR_GOOGLE_CLIENT_ID` with your API key. `GOOGLE_CLIENT_ID=YOUR_GOOGLE_CLIENT_ID`
-2. Save the
-   file and [sync your project with Gradle](https://developer.android.com/studio/build#sync-files).
-
-## Gradle configuration
-
-To incorporate the Google GMS and non-GMS plugin into your project, you have two options: directly
-include the Android OMH Client libraries dependencies or utilize the Android OMH Core Plugin.
-
-### Directly including the Google GMS and non-GMS dependencies
-
-If you want to incorporate Google plugin into your project without using the Android OMH Core
-plugin, you have to directly include the Google GMS and non-GMS plugins as a dependency. In
-the `build.gradle.kts`, add the following implementation statement to the `dependencies{}` section:
-
-```groovy
-implementation("com.openmobilehub.android.auth:plugin-google-gms:2.0.0")
-implementation("com.openmobilehub.android.auth:plugin-google-non-gms:2.0.0")
-```
-
-Save the file
-and [sync your project with Gradle](https://developer.android.com/studio/build#sync-files).
-
-### Using the Android OMH Core plugin
-
-Please see the advanced documentation on how to use
-the [Android OMH Core](https://www.openmobilehub.com/android-omh-auth/advanced-docs/core/docs/advanced/Plugins.md) Plugin.
-
-## Provide the Google OMH Auth Client
-
-In the `SingletonModule.kt` file in the `:auth-starter-sample` module add the following function to
-provide the Google OMH Auth Client:
-
-```kotlin
-@Provides
-fun providesGoogleAuthClient(@ApplicationContext context: Context): OmhAuthClient {
-    val omhAuthProvider = OmhAuthProvider.Builder()
-        .addNonGmsPath("com.openmobilehub.android.auth.plugin.google.nongms.presentation.OmhAuthFactoryImpl")
-        .addGmsPath("com.openmobilehub.android.auth.plugin.google.gms.OmhAuthFactoryImpl")
-        .build()
-
-    return omhAuthProvider.provideAuthClient(
-        scopes = listOf("openid", "email", "profile"),
-        clientId = BuildConfig.GOOGLE_CLIENT_ID,
-        context = context
-    )
+```gradle
+allprojects {
+  repositories {
+    mavenCentral()
+  }
 }
 ```
 
-> We'd recommend to store the client as a singleton with your preferred dependency injection library
-> as this will be your only gateway to the OMH Auth SDK and it doesn't change in runtime at all.
+### 2. Add Dependency for the Google Drive provider
+
+Add the dependency for the Google Drive provider to your project's **build.gradle** file:
+
+```gradle
+dependencies {
+  implementation("com.openmobilehub.android.storage:plugin-googledrive-gms:2.0.0")
+  implementation("com.openmobilehub.android.storage:plugin-googledrive-non-gms:2.0.0")
+}
+```
+
+## Configuration
+
+### Console App
+
+To access Google Drive APIs, follow these steps to obtain the **Client ID**:
+
+1. [Create a new app](https://developers.google.com/identity/protocols/oauth2/native-app#android) in [Google Cloud console](https://console.cloud.google.com/projectcreate).
+2. Create an OAuth 2.0 Client ID Android application and specify your app's [**Package Name**](https://developer.android.com/build/configure-app-module#set-application-id) and [**SHA1 Fingerprint**](https://support.google.com/cloud/answer/6158849?authuser=1#installedapplications&zippy=%2Cnative-applications%2Candroid).
+3. [Enable Google Drive API](https://support.google.com/googleapi/answer/6158841) in [Google Cloud Console](https://console.developers.google.com).
+
+### Secrets
+
+To securely configure the Google Drive provider, add the following entry to your project's **local.properties** file:
+
+```bash
+GOOGLE_CLIENT_ID=<YOUR_GOOGLE_CLIENT_ID>
+```
+
+## Usage
+
+### Initializing
+
+<!-- TODO: Document the initialization -->
+
+Before interacting with Google Drive, initialize the OMH Auth Client and OMH Storage Client with the necessary platform-specific configuration:
+
+```kotlin
+
+```
+
+### Other methods
+
+Interacting with the Google Drive provider follows the same pattern as other providers since they all implement the [`OmhStorageClient`]() interface. For a comprehensive list of available methods, refer to the [Quick Start](https://www.openmobilehub.com/react-native-omh-auth/docs/getting-started#sign-in) guide.
+
+## License
+
+- See [LICENSE](https://github.com/openmobilehub/android-omh-storage/blob/main/LICENSE)

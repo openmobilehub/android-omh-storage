@@ -7,7 +7,5 @@ _site/
 .bundle/
 vendor/
 
+*/
 _*.md
-*/*.md
-!_config.yml
-images/

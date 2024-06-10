@@ -1,5 +1,5 @@
 ---
-title: "Contributing"
+title: Contributing
 layout: default
 nav_exclude: true
 ---

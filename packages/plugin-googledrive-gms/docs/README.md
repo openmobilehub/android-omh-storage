@@ -1,7 +1,7 @@
 ---
-title: Home
-layout: home
-nav_order: 1
+title: Google Drive
+layout: default
+nav_order: 3
 ---
 
 {% include_relative _README_ORIGINAL.md %}
