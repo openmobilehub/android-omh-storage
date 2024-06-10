@@ -1,66 +1,19 @@
-title: OMH Auth advanced docs
+title: Android OMH Storage
 email: contact@openmobilehub.com
-description: >- # this means to ignore newlines until "baseurl:"
-  Advanced usage documentation for the OMH Auth library.
-baseurl: "/android-omh-auth/advanced-docs" # the subpath of your site, e.g. /blog
-url: "https://www.openmobilehub.com/" # the base hostname & protocol for your site, e.g. http://example.com
+description: Android OMH Storage Official Documentation
+baseurl: "/android-omh-storage"
+url: "https://www.openmobilehub.com/"
 github_username: openmobilehub
 
 theme: just-the-docs
 
 collections:
-  core:
-    permalink: "/:collection/:path/"
-    output: true
-
-  plugin-google-gms:
-    permalink: "/:collection/:path/"
-    output: true
-
-  plugin-google-non-gms:
-    permalink: "/:collection/:path/"
-    output: true
-
-  plugin-facebook:
-    permalink: "/:collection/:path/"
-    output: true
-
-  plugin-microsoft:
-    permalink: "/:collection/:path/"
-    output: true
-
-  plugin-dropbox:
+  plugins:
     permalink: "/:collection/:path/"
     output: true
 
 just_the_docs:
-  collections:
-    core:
-      name: Core
-      nav_fold: false
-      nav_order: 1
-
-    plugin-google-gms:
-      name: Plugin Google GMS
-      nav_fold: false
-      nav_order: 2
-
-    plugin-google-non-gms:
-      name: Plugin Google non-GMS
-      nav_fold: false
-      nav_order: 3
-
-    plugin-facebook:
-      name: Plugin Facebook
-      nav_fold: false
-      nav_order: 4
-
-    plugin-microsoft:
-      name: Plugin Microsoft
-      nav_fold: false
-      nav_order: 5
-
-    plugin-dropbox:
-      name: Plugin Dropbox
-      nav_fold: false
-      nav_order: 6
+  # collections:
+  #   plugins:
+  #     name: Plugins
+  #     nav_fold: false
