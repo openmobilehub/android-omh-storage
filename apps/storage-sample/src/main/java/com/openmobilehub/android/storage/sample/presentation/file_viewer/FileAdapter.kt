@@ -57,6 +57,7 @@ class FileAdapter(
         private const val URL_OTHER = "https://static.thenounproject.com/png/3482632-200.png"
 
         private fun getFileIconUrl(fileType: OmhFileType) = when (fileType) {
+            OmhFileType.OMH_FOLDER,
             OmhFileType.FOLDER -> URL_FOLDER
 
             OmhFileType.PDF -> URL_PDF

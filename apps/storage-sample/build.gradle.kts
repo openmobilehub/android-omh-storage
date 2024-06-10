@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     `android-application`
     id("kotlin-kapt")
@@ -13,6 +15,10 @@ android {
         applicationId = "com.openmobilehub.android.storage.sample"
         versionCode = 1
         versionName = "1.0"
+
+        val dropboxAppKey = getValueFromProperties("DROPBOX_APP_KEY")
+
+        resValue("string", "db_login_protocol_scheme", "db-${dropboxAppKey}")
     }
 
     signingConfigs {
@@ -109,4 +115,10 @@ dependencies {
     }
 
     testImplementation(Libs.junit)
+}
+
+fun getValueFromProperties(name: String): String {
+    val properties = gradleLocalProperties(rootDir)
+    val property = properties[name] as? String
+    return property ?: throw GradleException("Missing property $name , please add it to the local.properties file")
 }

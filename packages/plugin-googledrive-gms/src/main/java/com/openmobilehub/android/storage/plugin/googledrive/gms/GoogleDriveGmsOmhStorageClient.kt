@@ -48,6 +48,9 @@ internal class GoogleDriveGmsOmhStorageClient private constructor(
         }
     }
 
+    override val rootFolder: String
+        get() = GoogleDriveGmsConstants.ROOT_FOLDER
+
     override suspend fun listFiles(parentId: String): List<OmhFile> {
         return fileRepository.getFilesList(parentId)
     }

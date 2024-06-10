@@ -17,26 +17,42 @@
 package com.openmobilehub.android.storage.plugin.dropbox
 
 import com.openmobilehub.android.auth.core.OmhAuthClient
+import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.plugin.dropbox.data.repository.DropboxFileRepository
+import com.openmobilehub.android.storage.plugin.dropbox.data.service.DropboxApiClient
+import com.openmobilehub.android.storage.plugin.dropbox.data.service.DropboxApiService
 import java.io.ByteArrayOutputStream
 import java.io.File
 
 internal class DropboxOmhStorageClient private constructor(
     authClient: OmhAuthClient,
+    private val repository: DropboxFileRepository,
 ) : OmhStorageClient(authClient) {
 
     internal class Builder : OmhStorageClient.Builder {
 
         override fun build(authClient: OmhAuthClient): OmhStorageClient {
-            // To be implemented
-            return DropboxOmhStorageClient(authClient)
+            val accessToken = authClient.getCredentials().accessToken
+                ?: throw OmhStorageException.InvalidCredentialsException(
+                    OmhAuthStatusCodes.SIGN_IN_FAILED
+                )
+
+            val client = DropboxApiClient(accessToken)
+            val apiService = DropboxApiService(client)
+            val repository = DropboxFileRepository(apiService)
+
+            return DropboxOmhStorageClient(authClient, repository)
         }
     }
 
+    override val rootFolder: String
+        get() = DropboxConstants.ROOT_FOLDER
+
     override suspend fun listFiles(parentId: String): List<OmhFile> {
-        // To be implemented
-        return listOf()
+        return repository.getFilesList(parentId)
     }
 
     override suspend fun createFile(name: String, mimeType: String, parentId: String): OmhFile? {

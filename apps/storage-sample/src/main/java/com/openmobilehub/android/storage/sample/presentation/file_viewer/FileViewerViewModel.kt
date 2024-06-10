@@ -47,8 +47,6 @@ class FileViewerViewModel @Inject constructor(
 ) : BaseViewModel<FileViewerViewState, FileViewerViewEvent>() {
 
     companion object {
-        private const val ID_ROOT = "root"
-
         val listOfFileTypes = listOf(
             FileType("Folder", OmhFileType.FOLDER),
             FileType("Document", OmhFileType.DOCUMENT),
@@ -63,7 +61,7 @@ class FileViewerViewModel @Inject constructor(
     var isUpload = false
     var isGridLayoutManager = true
     var createFileSelectedType: OmhFileType? = null
-    private val parentIdStack = Stack<String>().apply { push(ID_ROOT) }
+    private val parentIdStack = Stack<String>().apply { push(omhStorageClient.rootFolder) }
     private var lastFileClicked: OmhFile? = null
 
     override fun getInitialState(): FileViewerViewState = FileViewerViewState.Initial
@@ -132,7 +130,7 @@ class FileViewerViewModel @Inject constructor(
     }
 
     private fun backPressedEvent() {
-        if (parentIdStack.peek() == ID_ROOT) {
+        if (parentIdStack.peek() == omhStorageClient.rootFolder) {
             setState(FileViewerViewState.Finish)
         } else {
             parentIdStack.pop()

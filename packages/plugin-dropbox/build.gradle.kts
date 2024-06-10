@@ -15,6 +15,9 @@ dependencies {
         api("com.openmobilehub.android:storage-api:1.0.5-beta")
     }
 
+    // Dropbox
+    implementation(Libs.dropboxCore)
+
     // Test dependencies
     testImplementation(kotlin("test"))
     testImplementation(Libs.junit)

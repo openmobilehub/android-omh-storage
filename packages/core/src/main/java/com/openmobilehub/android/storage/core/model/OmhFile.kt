@@ -27,7 +27,7 @@ data class OmhFile(
 ) {
     val fileType by lazy { FileTypeMapper.getFileTypeWithMime(mimeType) }
 
-    fun isFolder() = fileType == OmhFileType.FOLDER
+    fun isFolder() = fileType in setOf(OmhFileType.FOLDER, OmhFileType.OMH_FOLDER)
 
     fun isFile() = !isFolder()
 

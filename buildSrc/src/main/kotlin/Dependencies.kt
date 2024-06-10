@@ -25,6 +25,9 @@ object Libs {
     val googleDrive by lazy { "com.google.apis:google-api-services-drive:${Versions.googleDriveServices}" }
     val avoidGuavaConflict by lazy { "com.google.guava:listenablefuture:${Versions.avoidGuavaConflict}" }
 
+    // Dropbox
+    val dropboxCore by lazy { "com.dropbox.core:dropbox-core-sdk:${Versions.dropboxCore}" }
+
     // Android
     val androidAppCompat by lazy { "androidx.appcompat:appcompat:${Versions.androidAppCompat}" }
     val material by lazy { "com.google.android.material:material:${Versions.material}" }
