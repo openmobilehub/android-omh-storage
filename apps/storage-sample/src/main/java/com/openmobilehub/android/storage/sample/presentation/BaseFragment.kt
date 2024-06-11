@@ -34,12 +34,8 @@ abstract class BaseFragment<ViewModel : BaseViewModel<State, Event>, State : Vie
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
-            try {
-                Log.i(TAG_VIEW_UPDATE, "$LOG_MESSAGE_STATE${state.getName()}")
-                buildState(state)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+            Log.i(TAG_VIEW_UPDATE, "$LOG_MESSAGE_STATE${state.getName()}")
+            buildState(state)
         }
 
         viewModel.toastMessage.observe(viewLifecycleOwner) { message ->

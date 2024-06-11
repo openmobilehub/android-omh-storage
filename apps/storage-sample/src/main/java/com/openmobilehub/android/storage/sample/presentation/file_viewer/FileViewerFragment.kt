@@ -36,7 +36,6 @@ import android.widget.ArrayAdapter
 import androidx.activity.addCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.DeprecatedSinceApi
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -54,7 +53,6 @@ import com.openmobilehub.android.storage.sample.databinding.DialogUploadFileBind
 import com.openmobilehub.android.storage.sample.databinding.FragmentFileViewerBinding
 import com.openmobilehub.android.storage.sample.presentation.BaseFragment
 import com.openmobilehub.android.storage.sample.presentation.util.navigateTo
-import com.openmobilehub.android.storage.sample.util.getNameWithExtension
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -169,21 +167,32 @@ class FileViewerFragment :
     private fun saveFile(state: FileViewerViewState.SaveFile) {
         val (file, bytes) = state
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            saveToDownloads(bytes, file)
+        val downloadFolder = Environment.getExternalStoragePublicDirectory(
+            Environment.DIRECTORY_DOWNLOADS
+        )
+        val fileToSave = File(downloadFolder, file.name)
+
+        // On Android 10 and higher, apps can only write to files in Downloads they have created
+        // before, and to make them, they need to use MediaStore.
+        if (fileToSave.exists() && fileToSave.canWrite()
+            || Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
+        ) {
+            writeToFile(fileToSave, bytes)
         } else {
-            saveToDownloadsLegacy(bytes, file)
+            createInDownloads(file, bytes)
         }
+
+        dispatchEvent(FileViewerViewEvent.SaveFileResult(Result.success(file)))
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    private fun saveToDownloads(bytes: ByteArrayOutputStream, file: OmhFile) {
+    private fun createInDownloads(file: OmhFile, bytes: ByteArrayOutputStream) {
         val resolver = context?.contentResolver ?: return
 
         val downloadsCollection = MediaStore.Downloads.EXTERNAL_CONTENT_URI
 
         val fileDetails = ContentValues().apply {
-            put(MediaStore.Downloads.DISPLAY_NAME, file.getNameWithExtension())
+            put(MediaStore.Downloads.DISPLAY_NAME, file.name)
             put(MediaStore.Downloads.MIME_TYPE, file.mimeType)
             put(MediaStore.Downloads.IS_PENDING, 1)
         }
@@ -208,24 +217,16 @@ class FileViewerFragment :
         fileDetails.clear()
         fileDetails.put(MediaStore.Downloads.IS_PENDING, 0)
         resolver.update(fileContentUri, fileDetails, null, null)
-        dispatchEvent(FileViewerViewEvent.SaveFileResult(Result.success(file)))
     }
 
-    @DeprecatedSinceApi(Build.VERSION_CODES.Q)
-    private fun saveToDownloadsLegacy(bytes: ByteArrayOutputStream, file: OmhFile) {
-        val downloadFolder = Environment.getExternalStoragePublicDirectory(
-            Environment.DIRECTORY_DOWNLOADS
-        )
-        val fileToSave = File(downloadFolder, file.getNameWithExtension())
-        val fileOutputStream = FileOutputStream(fileToSave)
+
+    private fun writeToFile(file: File, bytes: ByteArrayOutputStream) {
+        val fileOutputStream = FileOutputStream(file)
 
         bytes.use { byteArrayOutputStream ->
             byteArrayOutputStream.writeTo(fileOutputStream)
         }
-
-        dispatchEvent(FileViewerViewEvent.SaveFileResult(Result.success(file)))
     }
-
 
     private fun showDownloadExceptionDialog() {
         context?.let { context ->
