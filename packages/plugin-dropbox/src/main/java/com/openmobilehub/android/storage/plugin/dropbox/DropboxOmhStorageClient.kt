@@ -17,6 +17,7 @@
 package com.openmobilehub.android.storage.plugin.dropbox
 
 import android.webkit.MimeTypeMap
+import androidx.annotation.VisibleForTesting
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 import com.openmobilehub.android.storage.core.OmhStorageClient
@@ -29,7 +30,7 @@ import com.openmobilehub.android.storage.plugin.dropbox.data.service.DropboxApiS
 import java.io.ByteArrayOutputStream
 import java.io.File
 
-internal class DropboxOmhStorageClient private constructor(
+internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
     authClient: OmhAuthClient,
     private val repository: DropboxFileRepository,
 ) : OmhStorageClient(authClient) {
