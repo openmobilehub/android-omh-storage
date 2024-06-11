@@ -25,6 +25,7 @@ object Versions {
     const val googleAndroidApiClient = "1.26.0"
     const val googleDriveServices = "v3-rev136-1.25.0"
     const val avoidGuavaConflict = "9999.0-empty-to-avoid-conflict-with-guava"
+    const val guava = "33.2.1-android"
 
     // Dropbox
     const val dropboxCore = "7.0.0"

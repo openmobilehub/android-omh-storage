@@ -92,6 +92,9 @@ dependencies {
     kapt(Libs.hiltCompiler)
     kapt(Libs.glideCompiler)
 
+    // Fixes crash on Android 23 while saving file to downloads
+    implementation(Libs.guava)
+
     // Auth
     implementation(Libs.omhGoogleNonGmsAuthLibrary)
     implementation(Libs.omhGoogleGmsAuthLibrary)

@@ -24,6 +24,7 @@ object Libs {
     val googleAndroidApiClient by lazy { "com.google.api-client:google-api-client-android:${Versions.googleAndroidApiClient}" }
     val googleDrive by lazy { "com.google.apis:google-api-services-drive:${Versions.googleDriveServices}" }
     val avoidGuavaConflict by lazy { "com.google.guava:listenablefuture:${Versions.avoidGuavaConflict}" }
+    val guava by lazy { "com.google.guava:guava:${Versions.guava}" }
 
     // Dropbox
     val dropboxCore by lazy { "com.dropbox.core:dropbox-core-sdk:${Versions.dropboxCore}" }

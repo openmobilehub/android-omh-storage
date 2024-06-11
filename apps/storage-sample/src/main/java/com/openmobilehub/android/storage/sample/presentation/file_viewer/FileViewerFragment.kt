@@ -17,10 +17,14 @@
 package com.openmobilehub.android.storage.sample.presentation.file_viewer
 
 import android.Manifest
+import android.content.ContentValues
 import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -32,6 +36,7 @@ import android.widget.ArrayAdapter
 import androidx.activity.addCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
@@ -49,6 +54,9 @@ import com.openmobilehub.android.storage.sample.databinding.FragmentFileViewerBi
 import com.openmobilehub.android.storage.sample.presentation.BaseFragment
 import com.openmobilehub.android.storage.sample.presentation.util.navigateTo
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
 
 @AndroidEntryPoint
 class FileViewerFragment :
@@ -68,9 +76,7 @@ class FileViewerFragment :
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<Array<String>>
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = FragmentFileViewerBinding.inflate(layoutInflater)
         return binding.root
@@ -87,10 +93,7 @@ class FileViewerFragment :
                 val positiveText = getString(R.string.text_upload)
 
                 showBeforeSubmitFileDialog(
-                    uri,
-                    titleText,
-                    positiveText,
-                    ::configureUploadFilePositiveButtonEvent
+                    uri, titleText, positiveText, ::configureUploadFilePositiveButtonEvent
                 )
             }
         }
@@ -103,10 +106,7 @@ class FileViewerFragment :
                 val positiveText = getString(R.string.text_update)
 
                 showBeforeSubmitFileDialog(
-                    uri,
-                    titleText,
-                    positiveText,
-                    ::configureUpdateFilePositiveButtonEvent
+                    uri, titleText, positiveText, ::configureUpdateFilePositiveButtonEvent
                 )
             }
         }
@@ -126,7 +126,7 @@ class FileViewerFragment :
             }
 
             if (deniedPermissions.isNotEmpty()) {
-                requestPermissions()
+                requestDownloadPermissions()
             }
         }
 
@@ -136,9 +136,7 @@ class FileViewerFragment :
     private fun setupToolbar() {
         val fragmentActivity: FragmentActivity = activity ?: return
         fragmentActivity.addMenuProvider(
-            FileViewerMenuProvider(),
-            viewLifecycleOwner,
-            Lifecycle.State.RESUMED
+            FileViewerMenuProvider(), viewLifecycleOwner, Lifecycle.State.RESUMED
         )
         fragmentActivity.onBackPressedDispatcher.addCallback {
             dispatchEvent(FileViewerViewEvent.BackPressed)
@@ -159,18 +157,83 @@ class FileViewerFragment :
         is FileViewerViewState.Content -> buildContentState(state)
         is FileViewerViewState.SwapLayoutManager -> buildSwapLayoutManagerState()
         FileViewerViewState.Finish -> buildFinishState()
-        FileViewerViewState.CheckPermissions -> requestPermissions()
+        FileViewerViewState.CheckDownloadPermissions -> requestDownloadPermissions()
         FileViewerViewState.SignOut -> buildSignOutState()
         is FileViewerViewState.ShowUpdateFilePicker -> launchUpdateFilePicker()
         FileViewerViewState.ShowDownloadExceptionDialog -> showDownloadExceptionDialog()
+        is FileViewerViewState.SaveFile -> saveFile(state)
+    }
+
+    private fun saveFile(state: FileViewerViewState.SaveFile) {
+        val (file, bytes) = state
+
+        val downloadFolder = Environment.getExternalStoragePublicDirectory(
+            Environment.DIRECTORY_DOWNLOADS
+        )
+        val fileToSave = File(downloadFolder, file.name)
+
+        // On Android 10 and higher, apps can only write to files in Downloads they have created
+        // before, and to make them, they need to use MediaStore.
+        if (fileToSave.exists() && fileToSave.canWrite()
+            || Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
+        ) {
+            writeToFile(fileToSave, bytes)
+        } else {
+            createInDownloads(file, bytes)
+        }
+
+        dispatchEvent(FileViewerViewEvent.SaveFileResult(Result.success(file)))
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun createInDownloads(file: OmhFile, bytes: ByteArrayOutputStream) {
+        val resolver = context?.contentResolver ?: return
+
+        val downloadsCollection = MediaStore.Downloads.EXTERNAL_CONTENT_URI
+
+        val fileDetails = ContentValues().apply {
+            put(MediaStore.Downloads.DISPLAY_NAME, file.name)
+            put(MediaStore.Downloads.MIME_TYPE, file.mimeType)
+            put(MediaStore.Downloads.IS_PENDING, 1)
+        }
+
+        val fileContentUri = resolver.insert(downloadsCollection, fileDetails) ?: run {
+            dispatchEvent(
+                FileViewerViewEvent.SaveFileResult(
+                    Result.failure(IllegalStateException("Insert to download collection failed"))
+                )
+            )
+            return
+        }
+        resolver.openOutputStream(fileContentUri, "w")?.use { output ->
+            output as FileOutputStream
+            output.channel.truncate(0)
+
+            bytes.use { byteArrayOutputStream ->
+                byteArrayOutputStream.writeTo(output)
+            }
+        }
+
+        fileDetails.clear()
+        fileDetails.put(MediaStore.Downloads.IS_PENDING, 0)
+        resolver.update(fileContentUri, fileDetails, null, null)
+    }
+
+
+    private fun writeToFile(file: File, bytes: ByteArrayOutputStream) {
+        val fileOutputStream = FileOutputStream(file)
+
+        bytes.use { byteArrayOutputStream ->
+            byteArrayOutputStream.writeTo(fileOutputStream)
+        }
     }
 
     private fun showDownloadExceptionDialog() {
         context?.let { context ->
-            val downloadExceptionDialogBuilder = AlertDialog.Builder(context)
-                .setTitle(getString(R.string.text_download_error_title))
-                .setMessage(getString(R.string.text_download_error_message))
-                .setPositiveButton(getString(R.string.text_accept)) { dialog, _ -> dialog.dismiss() }
+            val downloadExceptionDialogBuilder =
+                AlertDialog.Builder(context).setTitle(getString(R.string.text_download_error_title))
+                    .setMessage(getString(R.string.text_download_error_message))
+                    .setPositiveButton(getString(R.string.text_accept)) { dialog, _ -> dialog.dismiss() }
 
             val downloadExceptionDialog = downloadExceptionDialogBuilder.create().apply {
                 setCancelable(false)
@@ -268,14 +331,13 @@ class FileViewerFragment :
 
         context?.let { context ->
 
-            val createFileDialogBuilder = AlertDialog.Builder(context)
-                .setTitle(getString(R.string.text_create_file_title))
-                .setPositiveButton("Create") { dialog, _ ->
-                    configureCreateFilePositiveButtonEvent(dialogCreateFileView, dialog)
-                }
-                .setNegativeButton("Cancel") { dialog, _ ->
-                    dialog.cancel()
-                }
+            val createFileDialogBuilder =
+                AlertDialog.Builder(context).setTitle(getString(R.string.text_create_file_title))
+                    .setPositiveButton("Create") { dialog, _ ->
+                        configureCreateFilePositiveButtonEvent(dialogCreateFileView, dialog)
+                    }.setNegativeButton("Cancel") { dialog, _ ->
+                        dialog.cancel()
+                    }
 
             val createFileAlertDialog = createFileDialogBuilder.create().apply {
                 setCancelable(false)
@@ -287,8 +349,7 @@ class FileViewerFragment :
     }
 
     private fun configureCreateFilePositiveButtonEvent(
-        view: DialogCreateFileBinding,
-        dialog: DialogInterface
+        view: DialogCreateFileBinding, dialog: DialogInterface
     ) {
         val fileName = view.fileName.text.toString()
         val fileType = viewModel.createFileSelectedType?.mimeType
@@ -305,11 +366,9 @@ class FileViewerFragment :
 
         context?.let { context ->
 
-            val fileTypesSpinnerAdapter = ArrayAdapter(
-                context,
+            val fileTypesSpinnerAdapter = ArrayAdapter(context,
                 android.R.layout.simple_spinner_item,
-                fileTypes.map { fileType -> fileType.name }
-            ).apply {
+                fileTypes.map { fileType -> fileType.name }).apply {
                 setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             }
 
@@ -318,10 +377,7 @@ class FileViewerFragment :
                 onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
 
                     override fun onItemSelected(
-                        parent: AdapterView<*>?,
-                        view: View?,
-                        position: Int,
-                        id: Long
+                        parent: AdapterView<*>?, view: View?, position: Int, id: Long
                     ) {
                         val fileType = fileTypes[position]
                         viewModel.createFileSelectedType = fileType.omhFileType
@@ -351,12 +407,10 @@ class FileViewerFragment :
 
             dialogUploadFileView.fileName.text = fileName
 
-            val uploadFileDialogBuilder = AlertDialog.Builder(context)
-                .setTitle(titleText)
+            val uploadFileDialogBuilder = AlertDialog.Builder(context).setTitle(titleText)
                 .setPositiveButton(positiveTextButton) { dialog, _ ->
                     positiveAction(dialog, fileName, uri)
-                }
-                .setNegativeButton(getString(R.string.text_cancel)) { dialog, _ ->
+                }.setNegativeButton(getString(R.string.text_cancel)) { dialog, _ ->
                     dialog.cancel()
                 }
 
@@ -370,9 +424,7 @@ class FileViewerFragment :
     }
 
     private fun configureUploadFilePositiveButtonEvent(
-        dialog: DialogInterface,
-        fileName: String,
-        uri: Uri
+        dialog: DialogInterface, fileName: String, uri: Uri
     ) {
         context?.let { context ->
 
@@ -385,9 +437,7 @@ class FileViewerFragment :
     }
 
     private fun configureUpdateFilePositiveButtonEvent(
-        dialog: DialogInterface,
-        fileName: String,
-        uri: Uri
+        dialog: DialogInterface, fileName: String, uri: Uri
     ) {
         context?.let { context ->
 
@@ -396,19 +446,21 @@ class FileViewerFragment :
         }
     }
 
-    private fun requestPermissions() {
-        val permissionsToRequest: Array<String> = arrayOf(
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        )
+    private fun requestDownloadPermissions() {
+        val permissionsToRequest: Array<String> = emptyArray()
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            arrayOf(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+            )
+        } else emptyArray()
+
 
         context?.let { context ->
-
             val permissionsToAsk: Array<String> =
                 permissionsToRequest.filter { permission: String ->
                     ContextCompat.checkSelfPermission(
-                        context,
-                        permission
+                        context, permission
                     ) != PackageManager.PERMISSION_GRANTED
                 }.toTypedArray()
 
