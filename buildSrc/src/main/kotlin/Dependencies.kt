@@ -8,6 +8,9 @@ object Libs {
     val activityKtx by lazy { "androidx.activity:activity-ktx:${Versions.activityKtx}" }
     val fragmentKtx by lazy { "androidx.fragment:fragment-ktx:${Versions.fragmentKtx}" }
 
+    // Annotation
+    val androidxAnnotation by lazy { "androidx.annotation:annotation-jvm:${Versions.androidxAnnotation}" }
+
     // Retrofit
     val retrofit by lazy { "com.squareup.retrofit2:retrofit:${Versions.retrofit}" }
     val retrofitJacksonConverter by lazy { "com.squareup.retrofit2:converter-jackson:${Versions.retrofit}" }

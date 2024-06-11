@@ -12,6 +12,9 @@ object Versions {
     const val activityKtx = "1.6.1"
     const val fragmentKtx = "1.6.0"
 
+    // Annotation
+    const val androidxAnnotation = "1.8.0"
+
     // Retrofit
     const val retrofit = "2.9.0"
     const val okhttp = "4.10.0"

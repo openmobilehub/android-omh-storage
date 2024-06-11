@@ -17,7 +17,9 @@ dependencies {
 
     // Dropbox
     implementation(Libs.dropboxCore)
-    implementation("androidx.annotation:annotation-jvm:1.8.0")
+
+    // Annotation
+    implementation(Libs.androidxAnnotation)
 
     // Test dependencies
     testImplementation(kotlin("test"))
