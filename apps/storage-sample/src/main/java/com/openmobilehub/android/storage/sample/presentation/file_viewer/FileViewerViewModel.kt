@@ -18,7 +18,6 @@ package com.openmobilehub.android.storage.sample.presentation.file_viewer
 
 import android.content.Context
 import android.net.Uri
-import android.os.Environment
 import androidx.lifecycle.viewModelScope
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
@@ -27,14 +26,10 @@ import com.openmobilehub.android.storage.core.model.OmhFileType
 import com.openmobilehub.android.storage.sample.domain.model.FileType
 import com.openmobilehub.android.storage.sample.presentation.BaseViewModel
 import com.openmobilehub.android.storage.sample.util.coSignOut
-import com.openmobilehub.android.storage.sample.util.getNameWithExtension
 import com.openmobilehub.android.storage.sample.util.isDownloadable
-import com.openmobilehub.android.storage.sample.util.normalizeFileName
 import com.openmobilehub.android.storage.sample.util.normalizedMimeType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileOutputStream
 import java.util.Stack
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -70,17 +65,18 @@ class FileViewerViewModel @Inject constructor(
 
     override fun processEvent(event: FileViewerViewEvent) {
         when (event) {
-            FileViewerViewEvent.Initialize -> initializeEvent()
+            is FileViewerViewEvent.Initialize -> initializeEvent()
             is FileViewerViewEvent.RefreshFileList -> refreshFileListEvent()
             is FileViewerViewEvent.SwapLayoutManager -> swapLayoutManagerEvent()
             is FileViewerViewEvent.FileClicked -> fileClickedEvent(event)
-            FileViewerViewEvent.BackPressed -> backPressedEvent()
+            is FileViewerViewEvent.BackPressed -> backPressedEvent()
             is FileViewerViewEvent.CreateFile -> createFileEvent(event)
             is FileViewerViewEvent.DeleteFile -> deleteFileEvent(event)
             is FileViewerViewEvent.UploadFile -> uploadFile(event)
             is FileViewerViewEvent.UpdateFile -> updateFileEvent(event)
-            FileViewerViewEvent.SignOut -> signOut()
-            FileViewerViewEvent.DownloadFile -> downloadFileEvent()
+            is FileViewerViewEvent.SignOut -> signOut()
+            is FileViewerViewEvent.DownloadFile -> downloadFileEvent()
+            is FileViewerViewEvent.SaveFileResult -> saveFileResultEvent(event)
             is FileViewerViewEvent.UpdateFileClicked -> updateFileClickEvent(event)
         }
     }
@@ -127,7 +123,7 @@ class FileViewerViewModel @Inject constructor(
             refreshFileListEvent()
         } else {
             lastFileClicked = file
-            setState(FileViewerViewState.CheckPermissions)
+            setState(FileViewerViewState.CheckDownloadPermissions)
         }
     }
 
@@ -155,24 +151,11 @@ class FileViewerViewModel @Inject constructor(
             viewModelScope.launch(Dispatchers.IO) {
                 try {
                     val data = omhStorageClient.downloadFile(file.id, mimeTypeToSave)
-                    val fileToSave = file.copy(
-                        name = file.normalizeFileName(),
-                        mimeType = mimeTypeToSave
-                    )
-                    try {
-                        handleDownloadSuccess(data, fileToSave)
-                        toastMessage.postValue("${file.name} was successfully downloaded")
-                    } catch (exception: Exception) {
-                        exception.printStackTrace()
-                        setState(FileViewerViewState.ShowDownloadExceptionDialog)
-                        errorDialogMessage.postValue(exception.message)
-                    }
-                    refreshFileListEvent()
+                    setState(FileViewerViewState.SaveFile(file, data))
                 } catch (exception: Exception) {
                     errorDialogMessage.postValue(exception.message)
                     toastMessage.postValue("ERROR: ${file.name} was NOT downloaded")
                     exception.printStackTrace()
-
                     refreshFileListEvent()
                 }
             }
@@ -320,19 +303,14 @@ class FileViewerViewModel @Inject constructor(
         setState(FileViewerViewState.ShowUpdateFilePicker)
     }
 
-    private fun handleDownloadSuccess(
-        bytes: ByteArrayOutputStream,
-        file: OmhFile
-    ) {
-        val downloadFolder = Environment
-            .getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DOWNLOADS
-            )
-        val fileToSave = File(downloadFolder, file.getNameWithExtension())
-        val fileOutputStream = FileOutputStream(fileToSave)
-
-        bytes.use { byteArrayOutputStream ->
-            byteArrayOutputStream.writeTo(fileOutputStream)
+    private fun saveFileResultEvent(event: FileViewerViewEvent.SaveFileResult) {
+        event.result.run {
+            if (isSuccess) {
+                toastMessage.postValue("${getOrThrow().name} was successfully downloaded")
+                refreshFileListEvent()
+            } else {
+                setState(FileViewerViewState.ShowDownloadExceptionDialog)
+            }
         }
     }
 

@@ -48,6 +48,11 @@ sealed class FileViewerViewEvent : ViewEvent {
         override fun getEventName() = "FileViewerViewEvent.DownloadFile"
     }
 
+    data class SaveFileResult(val result: Result<OmhFile>) : FileViewerViewEvent() {
+
+        override fun getEventName() = "FileViewerViewEvent.SaveFileResult"
+    }
+
     object BackPressed : FileViewerViewEvent() {
 
         override fun getEventName() = "FileViewerViewEvent.BackPressed"
