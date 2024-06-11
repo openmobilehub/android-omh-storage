@@ -1,6 +1,8 @@
+Module plugin-dropbox
+
 <p align="center">
-  <a href="https://www.openmobilehub.com/">
-    <img width="160px" src="https://www.openmobilehub.com/images/logo/omh_logo.png"/><br/>
+  <a href="https://miniature-adventure-4gle9ye.pages.github.io/docs/">
+    <img width="500px" src="https://openmobilehub.org/wp-content/uploads/sites/13/2024/06/OpenMobileHub-horizontal-color.svg"/><br/>
   </a>
   <h2 align="center">Android OMH Storage - Dropbox</h2>
 </p>

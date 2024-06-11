@@ -15,7 +15,7 @@ Before integrating any OMH Storage provider into your Android project, ensure yo
 - **Gradle version**: 7.0 or higher
 - **Android API level**: 23 or higher
 
-Additionally, all providers depend on the [`com.openmobilehub.android.storage:core:2.0.0`](https://www.openmobilehub.com/android-omh-storage/core) package. Make sure to install it first before proceeding further!
+Additionally, all providers depend on the [`com.openmobilehub.android.storage:core:2.0.0`](https://miniature-adventure-4gle9ye.pages.github.io/docs/android-omh-storage/core) package. Make sure to install it first before proceeding further!
 
 ## Installation
 
@@ -53,14 +53,14 @@ dependencies {
 
 Each storage provider requires specific secrets for configuration. Please follow the individual provider configuration guides:
 
-- [Core](https://www.openmobilehub.com/android-omh-storage/core/#configuration)
-- [Google Drive](https://www.openmobilehub.com/android-omh-storage/plugin-googledrive-gms/#configuration)
-- [OneDrive](https://www.openmobilehub.com/android-omh-storage/plugin-onedrive/#configuration)
-- [Dropbox](https://www.openmobilehub.com/android-omh-storage/plugin-dropbox/#configuration)
+- [Core](https://miniature-adventure-4gle9ye.pages.github.io/docs/android-omh-storage/core/#configuration)
+- [Google Drive](https://miniature-adventure-4gle9ye.pages.github.io/docs/android-omh-storage/plugin-googledrive-gms/#configuration)
+- [OneDrive](https://miniature-adventure-4gle9ye.pages.github.io/docs/android-omh-storage/plugin-onedrive/#configuration)
+- [Dropbox](https://miniature-adventure-4gle9ye.pages.github.io/docs/android-omh-storage/plugin-dropbox/#configuration)
 
 ## Usage
 
-In this guide, we'll use the Google Drive storage provider as an example. You can choose any other provider since the exposed methods are identical across all providers. Each provider inherits from the [`OmhStorageClient`]() interface, ensuring consistent functionality. This uniformity means you won't need to learn new methods regardless of the provider you choose!
+In this guide, we'll use the Google Drive storage provider as an example. You can choose any other provider since the exposed methods are identical across all providers. Each provider inherits from the [`OmhStorageClient`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client) interface, ensuring consistent functionality. This uniformity means you won't need to learn new methods regardless of the provider you choose!
 
 ### Initializing
 
@@ -70,8 +70,8 @@ Before interacting with any provider, it's crucial to initialize the necessary c
 
 ```
 
-For a more in depth view on the available methods, access the [Reference API]().
+For a more in depth view on the available methods, access the [Reference API](https://miniature-adventure-4gle9ye.pages.github.io/api).
 
 ## Sample app
 
-Explore the [sample app](https://www.openmobilehub.com/android-omh-storage/contributing#sample-app) included in the repository to see the implementation of authentication with Google Drive and other providers. The sample app demonstrates the integration and usage of the various storage providers, providing a practical example to help you get started quickly.
+Explore the [sample app](https://miniature-adventure-4gle9ye.pages.github.io/docs/android-omh-storage/contributing#sample-app) included in the repository to see the implementation of authentication with Google Drive and other providers. The sample app demonstrates the integration and usage of the various storage providers, providing a practical example to help you get started quickly.

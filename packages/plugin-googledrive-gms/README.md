@@ -1,6 +1,8 @@
+Module plugin-googledrive-gms
+
 <p align="center">
-  <a href="https://www.openmobilehub.com/">
-    <img width="160px" src="https://www.openmobilehub.com/images/logo/omh_logo.png"/><br/>
+  <a href="https://miniature-adventure-4gle9ye.pages.github.io/docs/">
+    <img width="500px" src="https://openmobilehub.org/wp-content/uploads/sites/13/2024/06/OpenMobileHub-horizontal-color.svg"/><br/>
   </a>
   <h2 align="center">Android OMH Storage - Google Drive (GMS/non-GMS)</h2>
 </p>
@@ -19,7 +21,7 @@
 
 ## Prerequisites
 
-Ensure you have the [`com.openmobilehub.android.storage:core:2.0.0`](https://www.openmobilehub.com/android-omh-storage/core) package installed before proceeding with the integration.
+Ensure you have the [`com.openmobilehub.android.storage:core:2.0.0`](https://miniature-adventure-4gle9ye.pages.github.io/docs/android-omh-storage/core) package installed before proceeding with the integration.
 
 ## Installation
 
@@ -80,7 +82,7 @@ Before interacting with Google Drive, initialize the OMH Auth Client and OMH Sto
 
 ### Other methods
 
-Interacting with the Google Drive provider follows the same pattern as other providers since they all implement the [`OmhStorageClient`]() interface. For a comprehensive list of available methods, refer to the [Quick Start](https://www.openmobilehub.com/react-native-omh-auth/docs/getting-started#sign-in) guide.
+Interacting with the Google Drive provider follows the same pattern as other providers since they all implement the [`OmhStorageClient`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client) interface. For a comprehensive list of available methods, refer to the [Quick Start](https://miniature-adventure-4gle9ye.pages.github.io/docs/react-native-omh-auth/docs/getting-started#sign-in) guide.
 
 ## License
 

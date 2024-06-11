@@ -1,6 +1,6 @@
 <p align="center">
-  <a href="https://www.openmobilehub.com/">
-    <img width="160px" src="https://www.openmobilehub.com/images/logo/omh_logo.png"/><br/>
+  <a href="https://miniature-adventure-4gle9ye.pages.github.io/docs/">
+    <img width="500px" src="https://openmobilehub.org/wp-content/uploads/sites/13/2024/06/OpenMobileHub-horizontal-color.svg"/><br/>
   </a>
   <h2 align="center">Android OMH Storage</h2>
 </p>
@@ -31,10 +31,10 @@
 
 This is the main directory of the mono-repo for React Native OMH Auth. If you're searching for a particular package, please click on the corresponding package link below.
 
-- [Core](https://www.openmobilehub.com/android-omh-storage/core)
-- [Google Drive](https://www.openmobilehub.com/android-omh-storage/plugin-googledrive-gms)
-- [OneDrive](https://www.openmobilehub.com/android-omh-storage/plugin-onedrive)
-- [Dropbox](https://www.openmobilehub.com/android-omh-storage/plugin-dropbox)
+- [Core](https://miniature-adventure-4gle9ye.pages.github.io/docs/android-omh-storage/core)
+- [Google Drive](https://miniature-adventure-4gle9ye.pages.github.io/docs/android-omh-storage/plugin-googledrive-gms)
+- [OneDrive](https://miniature-adventure-4gle9ye.pages.github.io/docs/android-omh-storage/plugin-onedrive)
+- [Dropbox](https://miniature-adventure-4gle9ye.pages.github.io/docs/android-omh-storage/plugin-dropbox)
 
 ## Supported functionality
 
@@ -57,12 +57,12 @@ This is the main directory of the mono-repo for React Native OMH Auth. If you're
 
 ## Documentation
 
-- [Quick Start](https://www.openmobilehub.com/android-omh-storage/getting-started)
-- [Reference API](https://www.openmobilehub.com/android-omh-storage/api-docs)
+- [Quick Start](https://miniature-adventure-4gle9ye.pages.github.io/docs/android-omh-storage/getting-started)
+- [Reference API](https://miniature-adventure-4gle9ye.pages.github.io/api)
 
 ## Contributing
 
-- [Overview](https://www.openmobilehub.com/android-omh-storage/contributing)
+- [Overview](https://miniature-adventure-4gle9ye.pages.github.io/docs/android-omh-storage/contributing)
 - [Issues](https://github.com/openmobilehub/android-omh-storage/issues)
 - [PRs](https://github.com/openmobilehub/android-omh-storage/pulls)
 
