@@ -4,4 +4,6 @@ object DropboxConstants {
     // Public constants
     const val IMPLEMENTATION_PATH =
         "com.openmobilehub.android.storage.plugin.dropbox.DropboxOmhStorageFactory"
+
+    internal const val ROOT_FOLDER = ""
 }

@@ -16,8 +16,11 @@ android {
         versionCode = 1
         versionName = "1.0"
 
+        val dropboxAppKey = getValueFromEnvOrProperties("DROPBOX_APP_KEY")
         val microsoftClientId = getValueFromEnvOrProperties("MICROSOFT_CLIENT_ID")
         val microsoftSignatureHash = getValueFromEnvOrProperties("MICROSOFT_SIGNATURE_HASH")
+
+        resValue("string", "db_login_protocol_scheme", "db-${dropboxAppKey}")
 
         resValue("string", "microsoft_path", "/${microsoftSignatureHash}")
         file("./src/main/res/raw/ms_auth_config.json").writeText(
@@ -44,6 +47,7 @@ android {
 }
             """.trimIndent()
         )
+
     }
 
     signingConfigs {

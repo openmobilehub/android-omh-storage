@@ -31,6 +31,11 @@ abstract class OmhStorageClient protected constructor(
     }
 
     /**
+     * The root folder path of the storage service.
+     */
+    abstract val rootFolder: String
+
+    /**
      * This method list files from an specific folder
      *
      * @param parentId The id of the folder you want to get the list of files
