@@ -96,3 +96,15 @@ suspend fun OmhAuthClient.coSignOut() = suspendCancellableCoroutine { continuati
         .execute()
     continuation.invokeOnCancellation { cancellable.cancel() }
 }
+
+suspend fun OmhAuthClient.coInitialize() = suspendCancellableCoroutine { continuation ->
+    val cancellable = initialize()
+        .addOnSuccess {
+            continuation.resume(Unit)
+        }
+        .addOnFailure {
+            continuation.resumeWithException(it)
+        }
+        .execute()
+    continuation.invokeOnCancellation { cancellable.cancel() }
+}

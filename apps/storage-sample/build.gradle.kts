@@ -1,3 +1,5 @@
+import java.net.URLEncoder
+
 plugins {
     `android-application`
     id("kotlin-kapt")
@@ -13,6 +15,35 @@ android {
         applicationId = "com.openmobilehub.android.storage.sample"
         versionCode = 1
         versionName = "1.0"
+
+        val microsoftClientId = getValueFromEnvOrProperties("MICROSOFT_CLIENT_ID")
+        val microsoftSignatureHash = getValueFromEnvOrProperties("MICROSOFT_SIGNATURE_HASH")
+
+        resValue("string", "microsoft_path", "/${microsoftSignatureHash}")
+        file("./src/main/res/raw/ms_auth_config.json").writeText(
+            """
+{
+  "client_id": "$microsoftClientId",
+  "authorization_user_agent": "DEFAULT",
+  "redirect_uri": "msauth://com.openmobilehub.android.storage.sample.AndroidApplication/${
+                URLEncoder.encode(
+                    microsoftSignatureHash,
+                    "UTF-8"
+                )
+            }",
+  "authorities": [
+    {
+      "type": "AAD",
+      "audience": {
+        "type": "AzureADandPersonalMicrosoftAccount",
+        "tenant_id": "common"
+      }
+    }
+  ],
+  "account_mode": "SINGLE"
+}
+            """.trimIndent()
+        )
     }
 
     signingConfigs {
@@ -95,7 +126,7 @@ dependencies {
     implementation(Libs.omhGoogleNonGmsAuthLibrary)
     implementation(Libs.omhGoogleGmsAuthLibrary)
     implementation(Libs.omhDropboxAuthLibrary)
-    implementation(Libs.omhMicrosoftAuthLibrary)
+    api(Libs.omhMicrosoftAuthLibrary)
 
     // Use local implementation instead of dependencies
     if (useLocalProjects) {

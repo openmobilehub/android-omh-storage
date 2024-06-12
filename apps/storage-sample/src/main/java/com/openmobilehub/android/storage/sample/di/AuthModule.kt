@@ -72,7 +72,7 @@ class AuthModule {
         return MicrosoftAuthClient(
             configFileResourceId = R.raw.ms_auth_config,
             context = context,
-            scopes = arrayListOf("User.Read"),
+            scopes = arrayListOf("User.Read", "Files.Read.All"),
         )
     }
 }
