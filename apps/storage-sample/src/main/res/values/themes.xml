@@ -20,4 +20,10 @@
         <item name="windowSplashScreenAnimationDuration">1000</item>
         <item name="postSplashScreenTheme">@style/Theme.OMHStorage</item>
     </style>
+
+    <style name="Theme.Toolbar" parent="ThemeOverlay.MaterialComponents.Toolbar.Primary">
+        <item name="android:editTextColor">@color/white</item>
+        <item name="android:textColorHint">@color/black_200</item>
+    </style>
+
 </resources>

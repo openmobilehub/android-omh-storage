@@ -53,11 +53,11 @@ class FileViewerViewModel @Inject constructor(
         const val DEFAULT_FILE_NAME = "Untitled"
     }
 
-    var isUpload = false
     var isGridLayoutManager = true
     var createFileSelectedType: OmhFileType? = null
     private val parentIdStack = Stack<String>().apply { push(omhStorageClient.rootFolder) }
     private var lastFileClicked: OmhFile? = null
+    private var searchQuery: String? = null
 
     override fun getInitialState(): FileViewerViewState = FileViewerViewState.Initial
 
@@ -76,6 +76,7 @@ class FileViewerViewModel @Inject constructor(
             is FileViewerViewEvent.DownloadFile -> downloadFileEvent()
             is FileViewerViewEvent.SaveFileResult -> saveFileResultEvent(event)
             is FileViewerViewEvent.UpdateFileClicked -> updateFileClickEvent(event)
+            is FileViewerViewEvent.UpdateSearchQuery -> updateSearchQuery(event)
         }
     }
 
@@ -89,7 +90,13 @@ class FileViewerViewModel @Inject constructor(
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val files = omhStorageClient.listFiles(parentId)
+                val searchQuery = searchQuery
+                val list = if (searchQuery.isNullOrBlank()) {
+                    omhStorageClient.listFiles(parentId)
+                } else {
+                    omhStorageClient.search(searchQuery)
+                }
+                val files = list
                     .sortedWith(
                         compareBy<OmhFile> { !it.isFolder() }
                             .thenBy { it.mimeType }
@@ -299,6 +306,12 @@ class FileViewerViewModel @Inject constructor(
     private fun updateFileClickEvent(event: FileViewerViewEvent.UpdateFileClicked) {
         lastFileClicked = event.file
         setState(FileViewerViewState.ShowUpdateFilePicker)
+    }
+
+    private fun updateSearchQuery(event: FileViewerViewEvent.UpdateSearchQuery) {
+        searchQuery = event.query
+        // TODO dn: debounce
+        refreshFileListEvent()
     }
 
     private fun saveFileResultEvent(event: FileViewerViewEvent.SaveFileResult) {

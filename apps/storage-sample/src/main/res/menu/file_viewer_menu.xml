@@ -18,21 +18,30 @@
  */
 -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/swapGridOrLinear"
-        android:title="@string/text_swap_grid_linear" />
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/createFile"
-        android:title="@string/text_create_file_title" />
+            android:id="@+id/search"
+            android:title="@string/text_search"
+            android:icon="@drawable/ic_search"
+            app:actionViewClass="androidx.appcompat.widget.SearchView"
+            app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/uploadFile"
-        android:title="@string/text_upload_file_title" />
+            android:id="@+id/swapGridOrLinear"
+            android:title="@string/text_swap_grid_linear" />
 
     <item
-        android:id="@+id/signOut"
-        android:title="@string/text_sign_out" />
+            android:id="@+id/createFile"
+            android:title="@string/text_create_file_title" />
+
+    <item
+            android:id="@+id/uploadFile"
+            android:title="@string/text_upload_file_title" />
+
+    <item
+            android:id="@+id/signOut"
+            android:title="@string/text_sign_out" />
 
 </menu>

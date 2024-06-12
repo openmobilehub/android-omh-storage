@@ -25,6 +25,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -38,6 +39,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.documentfile.provider.DocumentFile
@@ -136,7 +138,19 @@ class FileViewerFragment :
     private fun setupToolbar() {
         val fragmentActivity: FragmentActivity = activity ?: return
         fragmentActivity.addMenuProvider(
-            FileViewerMenuProvider(), viewLifecycleOwner, Lifecycle.State.RESUMED
+            FileViewerMenuProvider(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    Log.d("Search", "Submit query: $query")
+                    dispatchEvent(FileViewerViewEvent.UpdateSearchQuery(query))
+                    return true
+                }
+
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    Log.d("Search", "Query changed: $newText")
+                    dispatchEvent(FileViewerViewEvent.UpdateSearchQuery(newText))
+                    return true
+                }
+            }), viewLifecycleOwner, Lifecycle.State.RESUMED
         )
         fragmentActivity.onBackPressedDispatcher.addCallback {
             dispatchEvent(FileViewerViewEvent.BackPressed)
@@ -476,9 +490,17 @@ class FileViewerFragment :
         navigateTo(R.id.action_file_viewer_fragment_to_login_fragment)
     }
 
-    inner class FileViewerMenuProvider : MenuProvider {
+    inner class FileViewerMenuProvider(
+        private val queryListener: SearchView.OnQueryTextListener
+    ) : MenuProvider {
         override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
             menuInflater.inflate(R.menu.file_viewer_menu, menu)
+
+            val searchView = menu.findItem(R.id.search).actionView as SearchView
+            searchView.maxWidth = Integer.MAX_VALUE
+            searchView.queryHint = resources.getString(R.string.text_search_hint)
+
+            searchView.setOnQueryTextListener(queryListener)
         }
 
         override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
