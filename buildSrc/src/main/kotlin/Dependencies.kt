@@ -8,6 +8,9 @@ object Libs {
     val activityKtx by lazy { "androidx.activity:activity-ktx:${Versions.activityKtx}" }
     val fragmentKtx by lazy { "androidx.fragment:fragment-ktx:${Versions.fragmentKtx}" }
 
+    // Annotation
+    val androidxAnnotation by lazy { "androidx.annotation:annotation-jvm:${Versions.androidxAnnotation}" }
+
     // Retrofit
     val retrofit by lazy { "com.squareup.retrofit2:retrofit:${Versions.retrofit}" }
     val retrofitJacksonConverter by lazy { "com.squareup.retrofit2:converter-jackson:${Versions.retrofit}" }
@@ -25,6 +28,9 @@ object Libs {
     val googleDrive by lazy { "com.google.apis:google-api-services-drive:${Versions.googleDriveServices}" }
     val avoidGuavaConflict by lazy { "com.google.guava:listenablefuture:${Versions.avoidGuavaConflict}" }
     val guava by lazy { "com.google.guava:guava:${Versions.guava}" }
+
+    // Dropbox
+    val dropboxCore by lazy { "com.dropbox.core:dropbox-core-sdk:${Versions.dropboxCore}" }
 
     // Android
     val androidAppCompat by lazy { "androidx.appcompat:appcompat:${Versions.androidAppCompat}" }

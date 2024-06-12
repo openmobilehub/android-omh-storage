@@ -34,6 +34,9 @@ internal class OneDriveOmhStorageClient private constructor(
         }
     }
 
+    override val rootFolder: String
+        get() = OneDriveConstants.ROOT_FOLDER // To be verified
+
     override suspend fun listFiles(parentId: String): List<OmhFile> {
         // To be implemented
         return listOf()

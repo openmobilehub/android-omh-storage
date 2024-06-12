@@ -12,6 +12,9 @@ object Versions {
     const val activityKtx = "1.6.1"
     const val fragmentKtx = "1.6.0"
 
+    // Annotation
+    const val androidxAnnotation = "1.8.0"
+
     // Retrofit
     const val retrofit = "2.9.0"
     const val okhttp = "4.10.0"
@@ -26,6 +29,9 @@ object Versions {
     const val googleDriveServices = "v3-rev136-1.25.0"
     const val avoidGuavaConflict = "9999.0-empty-to-avoid-conflict-with-guava"
     const val guava = "33.2.1-android"
+
+    // Dropbox
+    const val dropboxCore = "7.0.0"
 
     // Android
     const val androidAppCompat = "1.6.1"

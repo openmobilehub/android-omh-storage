@@ -13,6 +13,10 @@ android {
         applicationId = "com.openmobilehub.android.storage.sample"
         versionCode = 1
         versionName = "1.0"
+
+        val dropboxAppKey = getValueFromEnvOrProperties("DROPBOX_APP_KEY")
+
+        resValue("string", "db_login_protocol_scheme", "db-${dropboxAppKey}")
     }
 
     signingConfigs {

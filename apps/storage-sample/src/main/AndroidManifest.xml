@@ -7,6 +7,11 @@
     <uses-permission
             android:name="android.permission.WRITE_EXTERNAL_STORAGE"
             android:maxSdkVersion="28" />
+
+    <queries>
+        <package android:name="com.dropbox.android" />
+    </queries>
+    
     <application
         android:name="com.openmobilehub.android.storage.sample.AndroidApplication"
         android:allowBackup="true"
@@ -23,6 +28,26 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.dropbox.core.android.AuthActivity"
+            android:configChanges="orientation|keyboard"
+            android:exported="true"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <data android:scheme="@string/db_login_protocol_scheme" />
+
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+            <!-- Additional intent-filter required as a workaround for Apps using targetSdk=33 until the fix in the Dropbox app is available to all users. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
