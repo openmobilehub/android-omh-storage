@@ -53,6 +53,7 @@ tasks.named("jacocoCoverageVerification").configure { dependsOn("mergeDebugJniLi
 tasks.named("jacocoCoverageVerification").configure { dependsOn("copyDebugJniLibsProjectAndLocalJars") }
 tasks.named("jacocoCoverageVerification").configure { dependsOn("copyDebugJniLibsProjectOnly") }
 tasks.named("jacocoCoverageVerification").configure { dependsOn("syncDebugLibJars") }
+tasks.named("jacocoCoverageVerification").configure { dependsOn("bundleLibRuntimeToDirDebug") }
 
 dependencies {
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:${Versions.detekt}")
