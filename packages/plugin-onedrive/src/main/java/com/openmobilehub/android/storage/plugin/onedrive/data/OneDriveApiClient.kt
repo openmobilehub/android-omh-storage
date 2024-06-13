@@ -1,6 +1,8 @@
 package com.openmobilehub.android.storage.plugin.onedrive.data
 
 import com.microsoft.graph.serviceclient.GraphServiceClient
+import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
 
 class OneDriveApiClient(private val authProvider: OneDriveAuthProvider) {
     companion object {
@@ -18,9 +20,15 @@ class OneDriveApiClient(private val authProvider: OneDriveAuthProvider) {
         }
     }
 
-    internal val graphServiceClient by lazy { initOneDriveApiClient() }
+    internal val graphServiceClient = GraphServiceClient(authProvider)
     internal val driveId by lazy { getDriveId() }
 
-    private fun initOneDriveApiClient() = GraphServiceClient(authProvider)
-    private fun getDriveId() = graphServiceClient.me().drive().get().id
+    @Suppress("TooGenericExceptionCaught", "SwallowedException")
+    private fun getDriveId(): String {
+        try {
+            return graphServiceClient.me().drive().get().id
+        } catch (e: Exception) {
+            throw OmhStorageException.ApiException(OmhStorageStatusCodes.ROOT_FOLDER_ERROR)
+        }
+    }
 }

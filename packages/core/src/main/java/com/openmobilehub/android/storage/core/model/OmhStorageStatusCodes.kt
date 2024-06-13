@@ -22,6 +22,7 @@ object OmhStorageStatusCodes {
     const val DOWNLOAD_GOOGLE_WORKSPACE_ERROR = 2
     const val UPDATE_META_DATA = 3
     const val UPDATE_CONTENT_FILE = 4
+    const val ROOT_FOLDER_ERROR = 5
 
     @JvmStatic
     fun getStatusCodeString(code: Int): String {
@@ -30,6 +31,7 @@ object OmhStorageStatusCodes {
             DOWNLOAD_GOOGLE_WORKSPACE_ERROR -> "Download Google Workspace error."
             UPDATE_META_DATA -> "Update meta data error."
             UPDATE_CONTENT_FILE -> "Update content file error."
+            ROOT_FOLDER_ERROR -> "Root drive error."
             else -> "Unknown status code: $code"
         }
     }
