@@ -9,6 +9,7 @@
     <string name="file_viewer_title">File Viewer</string>
     <string name="loading">Loading…</string>
     <string name="empty_folder">This folder is empty</string>
+    <string name="empty_search">Couldn\'t find files matching the query</string>
     <string name="text_name">Name</string>
     <string name="text_swap_grid_linear">Swap Grid/Linear</string>
     <string name="text_create_file_title">Create File</string>

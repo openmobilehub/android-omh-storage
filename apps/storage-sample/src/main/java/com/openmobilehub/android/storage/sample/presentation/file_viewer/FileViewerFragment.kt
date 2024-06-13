@@ -25,7 +25,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -140,13 +139,13 @@ class FileViewerFragment :
         fragmentActivity.addMenuProvider(
             FileViewerMenuProvider(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?): Boolean {
-                    Log.d("Search", "Submit query: $query")
                     dispatchEvent(FileViewerViewEvent.UpdateSearchQuery(query))
+                    // Force refresh on onQueryTextSubmit, even if the query is the same
+                    dispatchEvent(FileViewerViewEvent.RefreshFileList)
                     return true
                 }
 
                 override fun onQueryTextChange(newText: String?): Boolean {
-                    Log.d("Search", "Query changed: $newText")
                     dispatchEvent(FileViewerViewEvent.UpdateSearchQuery(newText))
                     return true
                 }
@@ -270,7 +269,7 @@ class FileViewerFragment :
     }
 
     private fun buildContentState(state: FileViewerViewState.Content) {
-        val files = state.files
+        val (files, isSearching) = state
 
         val (emptyFolderVisibility, recyclerVisibility) = if (files.isEmpty()) {
             Pair(View.VISIBLE, View.GONE)
@@ -283,6 +282,9 @@ class FileViewerFragment :
         with(binding) {
             progressBar.visibility = View.GONE
             noContentLayout.visibility = emptyFolderVisibility
+            noContentText.text = resources.getString(
+                if (isSearching) R.string.empty_search else R.string.empty_folder
+            )
             topPanel.visibility = recyclerVisibility
             filesRecyclerView.visibility = recyclerVisibility
         }
