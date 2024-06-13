@@ -38,8 +38,8 @@ android {
     {
       "type": "AAD",
       "audience": {
-        "type": "AzureADandPersonalMicrosoftAccount",
-        "tenant_id": "common"
+        "type": "PersonalMicrosoftAccount",
+        "tenant_id": "consumers"
       }
     }
   ],
