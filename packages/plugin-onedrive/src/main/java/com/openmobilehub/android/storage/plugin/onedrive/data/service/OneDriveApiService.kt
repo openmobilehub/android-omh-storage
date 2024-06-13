@@ -1,16 +1,16 @@
 package com.openmobilehub.android.storage.plugin.onedrive.data.service
 
+import androidx.annotation.VisibleForTesting
 import com.microsoft.graph.models.DriveItem
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
 
 class OneDriveApiService(private val apiClient: OneDriveApiClient) {
-    private val driveId by lazy {
-        retrieveDriveId()
-    }
+    private val driveId by lazy { retrieveDriveId() }
 
     @Suppress("TooGenericExceptionCaught", "SwallowedException")
-    private fun retrieveDriveId(): String {
+    @VisibleForTesting
+    internal fun retrieveDriveId(): String {
         try {
             return apiClient.graphServiceClient.me().drive().get().id
         } catch (e: Exception) {
