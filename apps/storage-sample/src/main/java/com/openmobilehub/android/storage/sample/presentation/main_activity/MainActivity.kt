@@ -82,8 +82,10 @@ open class MainActivity : AppCompatActivity(), FileViewerFragment.FileViewerFrag
             // We need to initialise sessionRepository before accessing omhAuthClient so the correct
             // storageAuthProvider can be used
             sessionRepository.initialise()
-            val isUserLoggedIn = omhAuthClient.get().isUserLoggedIn()
-            omhAuthClient.get().coInitialize()
+            val isUserLoggedIn = omhAuthClient.get().run {
+                coInitialize()
+                isUserLoggedIn()
+            }
             launch(Dispatchers.Main) {
                 val navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
                 val startDestId = if (isUserLoggedIn) {

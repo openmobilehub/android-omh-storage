@@ -23,11 +23,8 @@ import com.openmobilehub.android.storage.sample.domain.repository.SessionReposit
 import com.openmobilehub.android.storage.sample.presentation.BaseViewModel
 import com.openmobilehub.android.storage.sample.util.coInitialize
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.suspendCancellableCoroutine
 import javax.inject.Inject
 import javax.inject.Provider
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
@@ -46,26 +43,16 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    private suspend fun initializeAsync(authClient: OmhAuthClient) {
-        return suspendCancellableCoroutine { continuation ->
-            try {
-                val task = authClient.initialize()
-                task.addOnSuccess {
-                    continuation.resume(Unit)
-                }.addOnFailure { exception ->
-                    continuation.resumeWithException(exception)
-                }
-            } catch (e: Exception) {
-                continuation.resumeWithException(e)
-            }
-        }
-    }
-
     suspend fun getLoginIntent(provider: StorageAuthProvider): Intent {
+        val previousProvider = sessionRepository.getStorageAuthProvider()
         sessionRepository.setStorageAuthProvider(provider)
-        // Ensure this call completes before moving to the next line
-        omhAuthClient.get().coInitialize()
-        return omhAuthClient.get().getLoginIntent()
+
+        return omhAuthClient.get().run {
+            if (previousProvider != provider) {
+                coInitialize()
+            }
+            getLoginIntent()
+        }
     }
 
     private fun initializeEvent() = Unit
