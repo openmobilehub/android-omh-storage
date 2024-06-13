@@ -15,6 +15,7 @@ android {
         applicationId = "com.openmobilehub.android.storage.sample"
         versionCode = 1
         versionName = "1.0"
+        minSdk = 26
 
         val dropboxAppKey = getValueFromEnvOrProperties("DROPBOX_APP_KEY")
         val microsoftClientId = getValueFromEnvOrProperties("MICROSOFT_CLIENT_ID")

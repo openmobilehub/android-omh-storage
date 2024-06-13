@@ -4,6 +4,9 @@ plugins {
 
 android {
     namespace = "com.openmobilehub.android.storage.plugin.onedrive"
+    defaultConfig {
+        minSdk = 26
+    }
 }
 
 val useLocalProjects = project.rootProject.extra["useLocalProjects"] as Boolean
