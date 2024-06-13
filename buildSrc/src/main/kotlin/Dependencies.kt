@@ -1,6 +1,9 @@
 object Libs {
     val reflection by lazy { "org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}" }
 
+    // Dokka
+    val dokka by lazy { "org.jetbrains.dokka:org.jetbrains.dokka.gradle.plugin:${Versions.dokka}" }
+
     // KTX
     val coreKtx by lazy { "androidx.core:core-ktx:${Versions.coreKtx}" }
     val lifecycleKtx by lazy { "androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycleKtx}" }

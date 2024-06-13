@@ -1,7 +1,21 @@
+import org.gradle.internal.Cast
+import org.jetbrains.dokka.DokkaConfiguration
+import org.jetbrains.dokka.gradle.DokkaTaskPartial
+import org.jetbrains.dokka.base.DokkaBase
+import org.jetbrains.dokka.base.DokkaBaseConfiguration
+import java.net.URL
+
 plugins {
     id("io.github.gradle-nexus.publish-plugin") version Versions.nexusPublishPlugin
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin") version
             Versions.secretsGradlePlugin apply false
+    id("org.jetbrains.dokka") version Versions.dokka
+}
+
+buildscript {
+    dependencies {
+        classpath("org.jetbrains.dokka:dokka-base:${Versions.dokka}")
+    }
 }
 
 val useMavenLocal by extra(getBooleanFromProperties("useMavenLocal", null))
@@ -21,6 +35,35 @@ if (useMavenLocal) {
 }
 
 subprojects {
+    apply(plugin = "org.jetbrains.dokka")
+
+    tasks.withType<DokkaTaskPartial>().configureEach {
+        suppressInheritedMembers.set(true)
+
+        dokkaSourceSets.configureEach {
+            documentedVisibilities.set(
+                setOf(
+                    DokkaConfiguration.Visibility.PUBLIC,
+                    DokkaConfiguration.Visibility.PROTECTED
+                )
+            )
+
+            sourceLink {
+                val exampleDir = "https://github.com/openmobilehub/android-omh-storage/tree/main"
+
+                localDirectory.set(rootProject.projectDir)
+                remoteUrl.set(URL(exampleDir))
+                remoteLineSuffix.set("#L")
+            }
+
+            // include the top-level README for that module
+            val readmeFile = project.file("README.md")
+            if (readmeFile.exists()) {
+                includes.from(readmeFile.path)
+            }
+        }
+    }
+
     if (useMavenLocal) {
         repositories {
             mavenLocal()
@@ -119,5 +162,34 @@ if (!useMavenLocal) {
                 }
             }
         }
+    }
+}
+
+apply("./plugin/docsTasks.gradle.kts") // applies all tasks related to docs
+val discoverImagesInProject =
+    Cast.uncheckedCast<(project: Project) -> (List<File>?)>(extra["discoverImagesInProject"])
+val dokkaDocsOutputDir = Cast.uncheckedCast<File>(extra["dokkaDocsOutputDir"])
+val copyMarkdownDocsTask = Cast.uncheckedCast<TaskProvider<Task>>(extra["copyMarkdownDocsTask"])
+
+tasks.register("cleanDokkaDocsOutputDirectory", Delete::class) {
+    group = "other"
+    description = "Deletes the Dokka HTML docs output directory in root project"
+    delete = setOf(dokkaDocsOutputDir)
+}
+
+tasks.dokkaHtmlMultiModule {
+    dependsOn("cleanDokkaDocsOutputDirectory")
+
+    moduleName.set("OMH Storage")
+    outputDirectory.set(dokkaDocsOutputDir)
+    includes.from("README.md")
+
+    // copy assets: images/**/* from the rootProject images directory & all subprojects' images directories
+    pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
+        footerMessage = "(c) 2024 Open Mobile Hub"
+        separateInheritedMembers = false
+        customAssets = (setOf(rootProject) union subprojects).mapNotNull { project ->
+            discoverImagesInProject!!(project)
+        }.flatten()
     }
 }
