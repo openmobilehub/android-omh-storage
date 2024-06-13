@@ -1,4 +1,4 @@
-package com.openmobilehub.android.storage.plugin.onedrive.data
+package com.openmobilehub.android.storage.plugin.onedrive.data.service
 
 import com.microsoft.kiota.RequestInformation
 import com.microsoft.kiota.authentication.AuthenticationProvider

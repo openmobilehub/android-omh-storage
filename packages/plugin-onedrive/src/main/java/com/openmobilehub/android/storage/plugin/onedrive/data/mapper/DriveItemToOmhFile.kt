@@ -1,4 +1,4 @@
-package com.openmobilehub.android.storage.plugin.onedrive.mapper
+package com.openmobilehub.android.storage.plugin.onedrive.data.mapper
 
 import android.webkit.MimeTypeMap
 import com.microsoft.graph.models.DriveItem
@@ -6,6 +6,8 @@ import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.core.model.OmhFileType
 import com.openmobilehub.android.storage.core.utils.getMimeTypeFromUrl
 import com.openmobilehub.android.storage.core.utils.removeWhitespaces
+import com.openmobilehub.android.storage.core.utils.toRFC3339String
+import java.util.Date
 
 class DriveItemToOmhFile(private val mimeTypeMap: MimeTypeMap) {
     operator fun invoke(driveItem: DriveItem): OmhFile {
@@ -19,12 +21,14 @@ class DriveItemToOmhFile(private val mimeTypeMap: MimeTypeMap) {
                 )
             }
 
+            val instant = lastModifiedDateTime.toInstant()
+            val lastModifiedDate = Date.from(instant)
+
             return OmhFile(
                 mimeType.orEmpty(),
                 id,
                 name,
-                // OffsetDateTime stringifies to the RFC3339 format
-                lastModifiedDateTime.toString(),
+                lastModifiedDate.toRFC3339String(),
                 parentReference.id.orEmpty()
             )
         }

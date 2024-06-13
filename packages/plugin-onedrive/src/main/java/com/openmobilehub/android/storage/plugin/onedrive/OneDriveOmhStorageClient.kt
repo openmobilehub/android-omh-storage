@@ -17,20 +17,21 @@
 package com.openmobilehub.android.storage.plugin.onedrive
 
 import android.webkit.MimeTypeMap
+import androidx.annotation.VisibleForTesting
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.core.model.OmhStorageException
-import com.openmobilehub.android.storage.plugin.onedrive.data.OneDriveApiClient
-import com.openmobilehub.android.storage.plugin.onedrive.data.OneDriveApiService
-import com.openmobilehub.android.storage.plugin.onedrive.data.OneDriveAuthProvider
-import com.openmobilehub.android.storage.plugin.onedrive.mapper.DriveItemToOmhFile
-import com.openmobilehub.android.storage.plugin.onedrive.repository.OneDriveFileRepository
+import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhFile
+import com.openmobilehub.android.storage.plugin.onedrive.data.repository.OneDriveFileRepository
+import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiClient
+import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiService
+import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveAuthProvider
 import java.io.ByteArrayOutputStream
 import java.io.File
 
-internal class OneDriveOmhStorageClient private constructor(
+internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
     authClient: OmhAuthClient,
     private val repository: OneDriveFileRepository
 ) : OmhStorageClient(authClient) {

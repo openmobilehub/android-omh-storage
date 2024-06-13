@@ -1,8 +1,8 @@
-package com.openmobilehub.android.storage.plugin.onedrive.repository
+package com.openmobilehub.android.storage.plugin.onedrive.data.repository
 
 import com.openmobilehub.android.storage.core.model.OmhFile
-import com.openmobilehub.android.storage.plugin.onedrive.data.OneDriveApiService
-import com.openmobilehub.android.storage.plugin.onedrive.mapper.DriveItemToOmhFile
+import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhFile
+import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiService
 
 class OneDriveFileRepository(
     private val apiService: OneDriveApiService,
