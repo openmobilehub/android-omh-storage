@@ -131,7 +131,7 @@ dependencies {
     implementation(Libs.omhGoogleNonGmsAuthLibrary)
     implementation(Libs.omhGoogleGmsAuthLibrary)
     implementation(Libs.omhDropboxAuthLibrary)
-    api(Libs.omhMicrosoftAuthLibrary)
+    implementation(Libs.omhMicrosoftAuthLibrary)
 
     // Use local implementation instead of dependencies
     if (useLocalProjects) {

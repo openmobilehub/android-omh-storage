@@ -55,7 +55,7 @@ class DriveItemToOmhFileTest {
     }
 
     @Test
-    fun `given a file metadata with specific properties, when mapped, then return the expected OmhFile`() {
+    fun `given a file with specific properties, when mapped, then return the expected OmhFile`() {
         // Arrange
         every { fileDriveItem.folder } returns null
         every { fileDriveItem.name } returns TEST_FILE_NAME
@@ -73,7 +73,7 @@ class DriveItemToOmhFileTest {
     }
 
     @Test
-    fun `given a folder metadata with specific properties, when mapped, then return the expected OmhFile`() {
+    fun `given a folder with specific properties, when mapped, then return the expected OmhFile`() {
         // Arrange
         every { folderDriveItem.file } returns null
         every { folderDriveItem.name } returns TEST_FOLDER_NAME

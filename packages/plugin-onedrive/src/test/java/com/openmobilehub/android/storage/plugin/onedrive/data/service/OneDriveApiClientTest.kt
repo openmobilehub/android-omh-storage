@@ -31,7 +31,7 @@ class OneDriveApiClientTest {
     }
 
     @Test
-    fun `given OneDriveApiClient, when called with the same access token, then return the same instance`() {
+    fun `given OneDriveApiClient, when called with the same auth provider, then return the same instance`() {
         // Act
         val client1 = OneDriveApiClient.getInstance(authProvider)
         val client2 = OneDriveApiClient.getInstance(authProvider)
@@ -41,7 +41,7 @@ class OneDriveApiClientTest {
     }
 
     @Test
-    fun `given OneDriveApiClient, when called with new access token, then return new instance with updated access token`() {
+    fun `given OneDriveApiClient, when called with new auth provider, then return new instance`() {
         // Arrange
         val newAuthProvider = mockk<OneDriveAuthProvider>(relaxed = true)
         every { newAuthProvider.accessToken } returns "newAccessToken"
