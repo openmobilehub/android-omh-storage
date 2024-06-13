@@ -16,6 +16,7 @@
 
 package com.openmobilehub.android.storage.plugin.onedrive
 
+import android.webkit.MimeTypeMap
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 import com.openmobilehub.android.storage.core.OmhStorageClient
@@ -24,6 +25,7 @@ import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.plugin.onedrive.data.OneDriveApiClient
 import com.openmobilehub.android.storage.plugin.onedrive.data.OneDriveApiService
 import com.openmobilehub.android.storage.plugin.onedrive.data.OneDriveAuthProvider
+import com.openmobilehub.android.storage.plugin.onedrive.mapper.DriveItemToOmhFile
 import com.openmobilehub.android.storage.plugin.onedrive.repository.OneDriveFileRepository
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -41,21 +43,21 @@ internal class OneDriveOmhStorageClient private constructor(
                     OmhAuthStatusCodes.SIGN_IN_FAILED
                 )
 
-            val authenticationProvider = OneDriveAuthProvider(accessToken)
-            val apiClient = OneDriveApiClient.getInstance(authenticationProvider)
+            val authProvider = OneDriveAuthProvider(accessToken)
+            val apiClient = OneDriveApiClient.getInstance(authProvider)
             val apiService = OneDriveApiService(apiClient)
-            val repository = OneDriveFileRepository(apiService)
+            val driveItemToOmhFile = DriveItemToOmhFile(MimeTypeMap.getSingleton())
+            val repository = OneDriveFileRepository(apiService, driveItemToOmhFile)
 
             return OneDriveOmhStorageClient(authClient, repository)
         }
     }
 
     override val rootFolder: String
-        get() = OneDriveConstants.ROOT_FOLDER // To be verified
+        get() = OneDriveConstants.ROOT_FOLDER
 
     override suspend fun listFiles(parentId: String): List<OmhFile> {
-        repository.getFilesList(parentId)
-        return listOf()
+        return repository.getFilesList(parentId)
     }
 
     override suspend fun createFile(name: String, mimeType: String, parentId: String): OmhFile? {

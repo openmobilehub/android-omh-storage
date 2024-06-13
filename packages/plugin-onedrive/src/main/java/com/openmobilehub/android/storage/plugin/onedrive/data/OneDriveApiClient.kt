@@ -1,5 +1,7 @@
 package com.openmobilehub.android.storage.plugin.onedrive.data
 
+import com.microsoft.graph.serviceclient.GraphServiceClient
+
 class OneDriveApiClient(private val authProvider: OneDriveAuthProvider) {
     companion object {
         private var instance: OneDriveApiClient? = null
@@ -16,7 +18,9 @@ class OneDriveApiClient(private val authProvider: OneDriveAuthProvider) {
         }
     }
 
-//    internal val oneDriveApiClient: GraphServiceClient by lazy { initOneDriveApiClient() }
+    internal val graphServiceClient by lazy { initOneDriveApiClient() }
+    internal val driveId by lazy { getDriveId() }
 
-//    private fun initOneDriveApiClient() = GraphServiceClient(authProvider)
+    private fun initOneDriveApiClient() = GraphServiceClient(authProvider)
+    private fun getDriveId() = graphServiceClient.me().drive().get().id
 }

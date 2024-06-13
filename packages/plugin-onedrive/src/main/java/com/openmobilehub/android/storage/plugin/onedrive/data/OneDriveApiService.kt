@@ -1,8 +1,10 @@
 package com.openmobilehub.android.storage.plugin.onedrive.data
 
-@Suppress("UnusedPrivateMember")
+import com.microsoft.graph.models.DriveItem
+
 class OneDriveApiService(private val apiClient: OneDriveApiClient) {
-    fun getFilesList(parentId: String) {
-        // To be implemented
+    fun getFilesList(parentId: String): MutableList<DriveItem> {
+        return apiClient.graphServiceClient.drives().byDriveId(apiClient.driveId).items()
+            .byDriveItemId(parentId).children().get().value
     }
 }
