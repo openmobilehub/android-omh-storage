@@ -6,7 +6,7 @@ nav_order: 2
 
 # Getting Started with Android OMH Storage
 
-Android OMH Storage is a project that integrates various cloud storage providers into Android applications. It offers a unified API to work with different authentication providers.
+Android OMH Storage is a project that integrates various cloud storage providers into Android applications. It offers a unified API to work with different storage providers.
 
 ## Prerequisites
 
@@ -74,4 +74,4 @@ For a more in depth view on the available methods, access the [Reference API](ht
 
 ## Sample app
 
-Explore the [sample app](https://miniature-adventure-4gle9ye.pages.github.io/docs/android-omh-storage/contributing#sample-app) included in the repository to see the implementation of authentication with Google Drive and other providers. The sample app demonstrates the integration and usage of the various storage providers, providing a practical example to help you get started quickly.
+Explore the [sample app](https://miniature-adventure-4gle9ye.pages.github.io/docs/android-omh-storage/contributing#sample-app) included in the repository to see the implementation of storage with Google Drive and other providers. The sample app demonstrates the integration and usage of the various storage providers, providing a practical example to help you get started quickly.

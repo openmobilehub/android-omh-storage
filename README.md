@@ -17,19 +17,19 @@
 
 ---
 
-**Android OMH Storage** streamlines the integration of various cloud storage providers into your Android application by offering a unified API for different authentication providers. It supports both Google Mobile Services (GMS) and non-GMS configurations, making it easy to incorporate Google Drive, OneDrive, Dropbox, and other supported third-party authentication providers.
+**Android OMH Storage** streamlines the integration of various cloud storage providers into your Android application by offering a unified API for different storage providers. It supports both Google Mobile Services (GMS) and non-GMS configurations, making it easy to incorporate Google Drive, OneDrive, Dropbox, and other supported third-party storage providers.
 
 ## Features
 
 - 📱 GMS and non-GMS support for all storage providers
 - 🖇️ Identical API across all providers
-- 📦 Native SDK provider integration
+- 📦 Official provider SDK integration
 - 🚀 Easy configuration and setup
 - 💨 Lightweight modules
 
 ## OMH Storage Modules
 
-This is the main directory of the mono-repo for React Native OMH Auth. If you're searching for a particular package, please click on the corresponding package link below.
+This is the main directory of the mono-repo for Android OMH Storage. If you're searching for a particular package, please click on the corresponding package link below.
 
 - [Core](https://miniature-adventure-4gle9ye.pages.github.io/docs/android-omh-storage/core)
 - [Google Drive](https://miniature-adventure-4gle9ye.pages.github.io/docs/android-omh-storage/plugin-googledrive-gms)
@@ -42,18 +42,18 @@ This is the main directory of the mono-repo for React Native OMH Auth. If you're
 - ⚠️ - partially supported
 - ❌ - not supported at the moment
 
-| Features        | Google Drive | OneDrive | Dropbox |
-| --------------- | ------------ | -------- | ------- |
-| File listing    | ✅           | ✅       | ✅      |
-| File searching  | ✅           | ✅       | ✅      |
-| File download   | ✅           | ✅       | ✅      |
-| File update     | ✅           | ✅       | ✅      |
-| File deletion   | ✅           | ✅       | ✅      |
-| File upload     | ✅           | ✅       | ✅      |
-| File creation   | ✅           | ✅       | ✅      |
-| File metadata   | ✅           | ✅       | ✅      |
-| File sharing    | ✅           | ⚠️       | ⚠️      |
-| File versioning | ✅           | ⚠️       | ⚠️      |
+| Features        | Google Drive GMS | Google Drive non-GMS | OneDrive | Dropbox |
+| --------------- | ---------------- | -------------------- | -------- | ------- |
+| File listing    | ✅               | ✅                   | ⚠️       | ⚠️      |
+| File creation   | ✅               | ✅                   | ⚠️       | ⚠️      |
+| File update     | ✅               | ✅                   | ⚠️       | ⚠️      |
+| File deletion   | ✅               | ✅                   | ⚠️       | ⚠️      |
+| File upload     | ✅               | ✅                   | ⚠️       | ⚠️      |
+| File download   | ✅               | ✅                   | ⚠️       | ⚠️      |
+| File searching  | ⚠️               | ⚠️                   | ⚠️       | ⚠️      |
+| File metadata   | ⚠️               | ⚠️                   | ⚠️       | ⚠️      |
+| File sharing    | ⚠️               | ⚠️                   | ⚠️       | ⚠️      |
+| File versioning | ⚠️               | ⚠️                   | ⚠️       | ⚠️      |
 
 ## Documentation
 

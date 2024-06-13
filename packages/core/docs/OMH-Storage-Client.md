@@ -1,5 +1,5 @@
 ---
-title: OMH Auth Client
+title: OMH Storage Client
 layout: default
 parent: Core
 ---
