@@ -65,7 +65,7 @@ class OneDriveApiService(private val apiClient: OneDriveApiClient) {
     }
 
     companion object {
-        private const val CHUNK_SIZE_IN_BYTES = 1024 * 1024
+        private const val CHUNK_SIZE_IN_BYTES = 1024 * 1024 // 1MB
         private const val MAX_ATTEMPTS = 5
     }
 }
