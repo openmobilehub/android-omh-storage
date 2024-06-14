@@ -53,6 +53,9 @@ object Versions {
     // Play services
     const val googlePlayBase = "18.2.0"
 
+    // MsGraph
+    const val msGraph = "6.13.0"
+
     // Splash
     const val splash = "1.0.1"
 

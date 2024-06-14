@@ -21,6 +21,7 @@ import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
 import com.openmobilehub.android.storage.sample.domain.repository.SessionRepository
 import com.openmobilehub.android.storage.sample.presentation.BaseViewModel
+import com.openmobilehub.android.storage.sample.util.coInitialize
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import javax.inject.Provider
@@ -43,8 +44,15 @@ class LoginViewModel @Inject constructor(
     }
 
     suspend fun getLoginIntent(provider: StorageAuthProvider): Intent {
+        val previousProvider = sessionRepository.getStorageAuthProvider()
         sessionRepository.setStorageAuthProvider(provider)
-        return omhAuthClient.get().getLoginIntent()
+
+        return omhAuthClient.get().run {
+            if (previousProvider != provider) {
+                coInitialize()
+            }
+            getLoginIntent()
+        }
     }
 
     private fun initializeEvent() = Unit

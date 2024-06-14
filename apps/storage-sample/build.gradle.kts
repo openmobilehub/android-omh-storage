@@ -1,3 +1,5 @@
+import java.net.URLEncoder
+
 plugins {
     `android-application`
     id("kotlin-kapt")
@@ -14,10 +16,40 @@ android {
         applicationId = "com.openmobilehub.android.storage.sample"
         versionCode = 1
         versionName = "1.0"
+        minSdk = 26
 
         val dropboxAppKey = getValueFromEnvOrProperties("DROPBOX_APP_KEY")
+        val microsoftClientId = getValueFromEnvOrProperties("MICROSOFT_CLIENT_ID")
+        val microsoftSignatureHash = getValueFromEnvOrProperties("MICROSOFT_SIGNATURE_HASH")
 
         resValue("string", "db_login_protocol_scheme", "db-${dropboxAppKey}")
+
+        resValue("string", "microsoft_path", "/${microsoftSignatureHash}")
+        file("./src/main/res/raw/ms_auth_config.json").writeText(
+            """
+{
+  "client_id": "$microsoftClientId",
+  "authorization_user_agent": "DEFAULT",
+  "redirect_uri": "msauth://com.openmobilehub.android.storage.sample.AndroidApplication/${
+                URLEncoder.encode(
+                    microsoftSignatureHash,
+                    "UTF-8"
+                )
+            }",
+  "authorities": [
+    {
+      "type": "AAD",
+      "audience": {
+        "type": "PersonalMicrosoftAccount",
+        "tenant_id": "consumers"
+      }
+    }
+  ],
+  "account_mode": "SINGLE"
+}
+            """.trimIndent()
+        )
+
     }
 
     signingConfigs {

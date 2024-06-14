@@ -16,30 +16,49 @@
 
 package com.openmobilehub.android.storage.plugin.onedrive
 
+import android.webkit.MimeTypeMap
+import androidx.annotation.VisibleForTesting
 import com.openmobilehub.android.auth.core.OmhAuthClient
+import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhFile
+import com.openmobilehub.android.storage.plugin.onedrive.data.repository.OneDriveFileRepository
+import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiClient
+import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiService
+import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveAuthProvider
 import java.io.ByteArrayOutputStream
 import java.io.File
 
-internal class OneDriveOmhStorageClient private constructor(
+internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
     authClient: OmhAuthClient,
+    private val repository: OneDriveFileRepository
 ) : OmhStorageClient(authClient) {
 
     internal class Builder : OmhStorageClient.Builder {
 
         override fun build(authClient: OmhAuthClient): OmhStorageClient {
-            // To be implemented
-            return OneDriveOmhStorageClient(authClient)
+            val accessToken = authClient.getCredentials().accessToken
+                ?: throw OmhStorageException.InvalidCredentialsException(
+                    OmhAuthStatusCodes.SIGN_IN_FAILED
+                )
+
+            val authProvider = OneDriveAuthProvider(accessToken)
+            val apiClient = OneDriveApiClient.getInstance(authProvider)
+            val apiService = OneDriveApiService(apiClient)
+            val driveItemToOmhFile = DriveItemToOmhFile(MimeTypeMap.getSingleton())
+            val repository = OneDriveFileRepository(apiService, driveItemToOmhFile)
+
+            return OneDriveOmhStorageClient(authClient, repository)
         }
     }
 
     override val rootFolder: String
-        get() = OneDriveConstants.ROOT_FOLDER // To be verified
+        get() = OneDriveConstants.ROOT_FOLDER
 
     override suspend fun listFiles(parentId: String): List<OmhFile> {
-        // To be implemented
-        return listOf()
+        return repository.getFilesList(parentId)
     }
 
     override suspend fun search(query: String): List<OmhFile> {
