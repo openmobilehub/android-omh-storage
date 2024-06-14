@@ -71,10 +71,26 @@ class FileViewerFragment :
 
     override val viewModel: FileViewerViewModel by viewModels()
     private lateinit var binding: FragmentFileViewerBinding
+
     private var filesAdapter: FileAdapter? = null
+
     private lateinit var filePickerUpload: ActivityResultLauncher<String>
     private lateinit var filePickerUpdate: ActivityResultLauncher<String>
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<Array<String>>
+
+    private val menuProvider = FileViewerMenuProvider(object : SearchView.OnQueryTextListener {
+        override fun onQueryTextSubmit(query: String?): Boolean {
+            dispatchEvent(FileViewerViewEvent.UpdateSearchQuery(query))
+            // Force refresh on onQueryTextSubmit, even if the query is the same
+            dispatchEvent(FileViewerViewEvent.RefreshFileList)
+            return true
+        }
+
+        override fun onQueryTextChange(newText: String?): Boolean {
+            dispatchEvent(FileViewerViewEvent.UpdateSearchQuery(newText))
+            return true
+        }
+    })
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -136,21 +152,7 @@ class FileViewerFragment :
 
     private fun setupToolbar() {
         val fragmentActivity: FragmentActivity = activity ?: return
-        fragmentActivity.addMenuProvider(
-            FileViewerMenuProvider(object : SearchView.OnQueryTextListener {
-                override fun onQueryTextSubmit(query: String?): Boolean {
-                    dispatchEvent(FileViewerViewEvent.UpdateSearchQuery(query))
-                    // Force refresh on onQueryTextSubmit, even if the query is the same
-                    dispatchEvent(FileViewerViewEvent.RefreshFileList)
-                    return true
-                }
-
-                override fun onQueryTextChange(newText: String?): Boolean {
-                    dispatchEvent(FileViewerViewEvent.UpdateSearchQuery(newText))
-                    return true
-                }
-            }), viewLifecycleOwner, Lifecycle.State.RESUMED
-        )
+        fragmentActivity.addMenuProvider(menuProvider, viewLifecycleOwner, Lifecycle.State.RESUMED)
         fragmentActivity.onBackPressedDispatcher.addCallback {
             dispatchEvent(FileViewerViewEvent.BackPressed)
         }
@@ -175,6 +177,7 @@ class FileViewerFragment :
         is FileViewerViewState.ShowUpdateFilePicker -> launchUpdateFilePicker()
         FileViewerViewState.ShowDownloadExceptionDialog -> showDownloadExceptionDialog()
         is FileViewerViewState.SaveFile -> saveFile(state)
+        FileViewerViewState.ClearSearch -> clearSearch()
     }
 
     private fun saveFile(state: FileViewerViewState.SaveFile) {
@@ -492,13 +495,23 @@ class FileViewerFragment :
         navigateTo(R.id.action_file_viewer_fragment_to_login_fragment)
     }
 
+    private fun clearSearch() {
+        menuProvider.searchView.apply {
+            setQuery("", false)
+            clearFocus()
+            isIconified = true
+        }
+    }
+
     inner class FileViewerMenuProvider(
         private val queryListener: SearchView.OnQueryTextListener
     ) : MenuProvider {
+
+        lateinit var searchView: SearchView
         override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
             menuInflater.inflate(R.menu.file_viewer_menu, menu)
 
-            val searchView = menu.findItem(R.id.search).actionView as SearchView
+            searchView = menu.findItem(R.id.search).actionView as SearchView
             searchView.maxWidth = Integer.MAX_VALUE
             searchView.queryHint = resources.getString(R.string.text_search_hint)
 

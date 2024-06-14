@@ -153,6 +153,7 @@ class FileViewerViewModel @Inject constructor(
         if (file.isFolder()) {
             val fileId = file.id
             searchQuery.value = ""
+            setState(FileViewerViewState.ClearSearch)
             parentId.push(fileId)
         } else {
             lastFileClicked = file

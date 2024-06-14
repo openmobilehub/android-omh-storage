@@ -74,4 +74,9 @@ sealed class FileViewerViewState : ViewState {
 
         override fun getName() = "FileViewerViewState.ShowDownloadExceptionDialog"
     }
+
+    object ClearSearch : FileViewerViewState() {
+
+        override fun getName() = "FileViewerViewState.ClearSearch"
+    }
 }
