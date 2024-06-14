@@ -54,7 +54,7 @@ internal class GoogleDriveNonGmsOmhStorageClient private constructor(
     }
 
     override suspend fun search(query: String): List<OmhFile> {
-        TODO("Not yet implemented")
+        return fileRepository.search(query)
     }
 
     override suspend fun createFile(name: String, mimeType: String, parentId: String): OmhFile? {

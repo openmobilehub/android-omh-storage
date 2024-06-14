@@ -44,9 +44,14 @@ internal interface GoogleStorageApiService {
         private const val QUERY_MIME_TYPE = "mimeType"
         private const val QUERY_ALT = "alt"
 
-        private const val Q_VALUE = "'%s' in parents and trashed = false"
+        private const val PARENT_ID_Q_VALUE = "'%s' in parents and trashed = false"
+        private const val SEARCH_BY_NAME_Q_VALUE = "name contains '%s' and trashed = false"
 
-        internal fun getQueryValue(parentId: String = "root") = String.format(Q_VALUE, parentId)
+        internal fun getParentIdQuery(parentId: String = "root") =
+            String.format(PARENT_ID_Q_VALUE, parentId)
+
+        internal fun getSearchByNameQuery(query: String) =
+            String.format(SEARCH_BY_NAME_Q_VALUE, query)
 
         private const val QUERY_REQUESTED_FIELDS = "id,name,mimeType,modifiedTime,parents"
         private const val FIELDS_VALUE = "files($QUERY_REQUESTED_FIELDS)"

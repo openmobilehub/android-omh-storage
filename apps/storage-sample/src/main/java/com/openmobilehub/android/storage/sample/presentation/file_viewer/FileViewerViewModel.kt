@@ -62,7 +62,7 @@ class FileViewerViewModel @Inject constructor(
 
         const val ANY_MIME_TYPE = "*/*"
         const val DEFAULT_FILE_NAME = "Untitled"
-        private const val SEARCH_QUERY_DEBOUNCE_MILLIS = 200L
+        private const val SEARCH_QUERY_DEBOUNCE_MILLIS = 250L
     }
 
     var isGridLayoutManager = true
@@ -152,7 +152,7 @@ class FileViewerViewModel @Inject constructor(
 
         if (file.isFolder()) {
             val fileId = file.id
-
+            searchQuery.value = ""
             parentId.push(fileId)
         } else {
             lastFileClicked = file

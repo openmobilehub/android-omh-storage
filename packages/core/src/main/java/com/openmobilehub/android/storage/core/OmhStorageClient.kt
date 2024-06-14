@@ -45,11 +45,11 @@ abstract class OmhStorageClient protected constructor(
     abstract suspend fun listFiles(parentId: String = "root"): List<OmhFile>
 
     /**
-     * This method returns files with a name containing the query value.
+     * This method list files with a name containing the query value.
      *
      * @param query Text that the file name should contain
      *
-     * @return A list of OmhFiles whose names contain query
+     * @return A list of OmhFiles whose names contain the query
      */
     abstract suspend fun search(query: String): List<OmhFile>
 
