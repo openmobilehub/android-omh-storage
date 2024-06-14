@@ -11,10 +11,12 @@ import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import java.io.File
 
 class OneDriveFileRepositoryTest {
 
@@ -29,6 +31,9 @@ class OneDriveFileRepositoryTest {
 
     @MockK
     private lateinit var driveItemToOmhFile: DriveItemToOmhFile
+
+    @MockK(relaxed = true)
+    private lateinit var file: File
 
     private lateinit var repository: OneDriveFileRepository
 
@@ -67,5 +72,18 @@ class OneDriveFileRepositoryTest {
 
         // Assert
         assertEquals(emptyList<OmhFile>(), result)
+    }
+
+    @Test
+    fun `given an api service returns DriveItem, when uploading the file, then returns OmhFile`() {
+        // Arrange
+        every { apiService.uploadFile(any(), any()) } returns mockk<DriveItem>()
+        every { driveItemToOmhFile(any()) } returns omhFile
+
+        // Act
+        val result = repository.uploadFile(file, TEST_FILE_PARENT_ID)
+
+        // Assert
+        assertEquals(omhFile, result)
     }
 }
