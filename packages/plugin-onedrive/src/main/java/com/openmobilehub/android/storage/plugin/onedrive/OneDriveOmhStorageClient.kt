@@ -72,8 +72,8 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
     }
 
     override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhFile? {
-        // To be implemented
-        return null
+        val safeParentId = parentId ?: rootFolder
+        return repository.uploadFile(safeParentId)
     }
 
     override suspend fun downloadFile(fileId: String, mimeType: String?): ByteArrayOutputStream {
