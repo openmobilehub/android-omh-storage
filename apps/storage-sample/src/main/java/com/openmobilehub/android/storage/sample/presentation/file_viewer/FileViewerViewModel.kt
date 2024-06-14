@@ -30,11 +30,22 @@ import com.openmobilehub.android.storage.sample.util.isDownloadable
 import com.openmobilehub.android.storage.sample.util.normalizedMimeType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.File
-import java.util.Stack
 import javax.inject.Inject
+import kotlin.random.Random
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+@OptIn(FlowPreview::class)
 @HiltViewModel
 class FileViewerViewModel @Inject constructor(
     private val authClient: OmhAuthClient,
@@ -51,13 +62,55 @@ class FileViewerViewModel @Inject constructor(
 
         const val ANY_MIME_TYPE = "*/*"
         const val DEFAULT_FILE_NAME = "Untitled"
+        private const val SEARCH_QUERY_DEBOUNCE_MILLIS = 250L
     }
 
-    var isUpload = false
     var isGridLayoutManager = true
     var createFileSelectedType: OmhFileType? = null
-    private val parentIdStack = Stack<String>().apply { push(omhStorageClient.rootFolder) }
     private var lastFileClicked: OmhFile? = null
+
+    private val parentId = StackWithFlow(omhStorageClient.rootFolder)
+    private var searchQuery: MutableStateFlow<String?> = MutableStateFlow(null)
+    private var forceRefresh: MutableStateFlow<Int> = MutableStateFlow(0)
+
+    init {
+        viewModelScope.launch {
+            combine(
+                parentId.peekFlow,
+                searchQuery
+                    .debounce(SEARCH_QUERY_DEBOUNCE_MILLIS),
+                forceRefresh
+            ) { parentId, searchQuery, _ ->
+                setState(FileViewerViewState.Loading)
+
+                val files = if (searchQuery.isNullOrBlank()) {
+                    omhStorageClient.listFiles(parentId)
+                } else {
+                    omhStorageClient.search(searchQuery)
+                }
+
+                return@combine files.sortedWith(
+                    compareBy<OmhFile> { !it.isFolder() }
+                        .thenBy { it.mimeType }
+                        .thenBy { it.name }
+                )
+            }
+                .catch {
+                    errorDialogMessage.postValue(it.message)
+                    toastMessage.postValue(it.message)
+                    it.printStackTrace()
+                    emit(emptyList())
+                }
+                .onEach {
+                    setState(FileViewerViewState.Content(it, !searchQuery.value.isNullOrEmpty()))
+                }
+                .flowOn(Dispatchers.IO)
+                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+                .collect {
+                    // we use onEach to update state, even it the result is the same
+                }
+        }
+    }
 
     override fun getInitialState(): FileViewerViewState = FileViewerViewState.Initial
 
@@ -76,6 +129,7 @@ class FileViewerViewModel @Inject constructor(
             is FileViewerViewEvent.DownloadFile -> downloadFileEvent()
             is FileViewerViewEvent.SaveFileResult -> saveFileResultEvent(event)
             is FileViewerViewEvent.UpdateFileClicked -> updateFileClickEvent(event)
+            is FileViewerViewEvent.UpdateSearchQuery -> updateSearchQuery(event)
         }
     }
 
@@ -84,26 +138,8 @@ class FileViewerViewModel @Inject constructor(
     }
 
     private fun refreshFileListEvent() {
-        setState(FileViewerViewState.Loading)
-        val parentId = parentIdStack.peek()
-
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val files = omhStorageClient.listFiles(parentId)
-                    .sortedWith(
-                        compareBy<OmhFile> { !it.isFolder() }
-                            .thenBy { it.mimeType }
-                            .thenBy { it.name }
-                    )
-                setState(FileViewerViewState.Content(files))
-            } catch (exception: Exception) {
-                errorDialogMessage.postValue(exception.message)
-                toastMessage.postValue(exception.message)
-                exception.printStackTrace()
-
-                setState(FileViewerViewState.Content(emptyList()))
-            }
-        }
+        // We use a flow of random values to force emitting new value from files flow
+        forceRefresh.value = Random.Default.nextInt()
     }
 
     private fun swapLayoutManagerEvent() {
@@ -116,9 +152,9 @@ class FileViewerViewModel @Inject constructor(
 
         if (file.isFolder()) {
             val fileId = file.id
-
-            parentIdStack.push(fileId)
-            refreshFileListEvent()
+            searchQuery.value = ""
+            setState(FileViewerViewState.ClearSearch)
+            parentId.push(fileId)
         } else {
             lastFileClicked = file
             setState(FileViewerViewState.CheckDownloadPermissions)
@@ -126,11 +162,10 @@ class FileViewerViewModel @Inject constructor(
     }
 
     private fun backPressedEvent() {
-        if (parentIdStack.peek() == omhStorageClient.rootFolder) {
+        if (parentId.peek() == omhStorageClient.rootFolder) {
             setState(FileViewerViewState.Finish)
         } else {
-            parentIdStack.pop()
-            refreshFileListEvent()
+            parentId.pop()
         }
     }
 
@@ -198,7 +233,7 @@ class FileViewerViewModel @Inject constructor(
 
     private fun createFileEvent(event: FileViewerViewEvent.CreateFile) {
         setState(FileViewerViewState.Loading)
-        val parentId = parentIdStack.peek()
+        val parentId = parentId.peek()
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -217,7 +252,7 @@ class FileViewerViewModel @Inject constructor(
     private fun uploadFile(event: FileViewerViewEvent.UploadFile) {
         setState(FileViewerViewState.Loading)
 
-        val parentId = parentIdStack.peek()
+        val parentId = parentId.peek()
         val filePath = getFile(event.context, event.uri, event.fileName)
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -301,6 +336,10 @@ class FileViewerViewModel @Inject constructor(
         setState(FileViewerViewState.ShowUpdateFilePicker)
     }
 
+    private fun updateSearchQuery(event: FileViewerViewEvent.UpdateSearchQuery) {
+        searchQuery.value = event.query
+    }
+
     private fun saveFileResultEvent(event: FileViewerViewEvent.SaveFileResult) {
         event.result.run {
             if (isSuccess) {
@@ -313,4 +352,25 @@ class FileViewerViewModel @Inject constructor(
     }
 
     fun getFileName(documentFileName: String?): String = documentFileName ?: DEFAULT_FILE_NAME
+
+    // Utility class for encapsulating stack operation and exposing a flow with the current peek value
+    private class StackWithFlow<T>(first: T) {
+        private val stack = ArrayDeque<T>().apply { add(first) }
+        private val _flow: MutableStateFlow<T> = MutableStateFlow(stack.first())
+        val peekFlow: StateFlow<T> = _flow
+
+        fun push(value: T) {
+            stack.addFirst(value)
+            _flow.value = stack.first()
+        }
+
+        fun pop() {
+            stack.removeFirst()
+            _flow.value = stack.first()
+        }
+
+        fun peek(): T {
+            return _flow.value
+        }
+    }
 }

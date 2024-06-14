@@ -20,3 +20,7 @@
 # hide the original source file name./
 #-renamesourcefileattribute SourceFile
 
+# Dokka
+-dontwarn aQute.bnd.annotation.spi.ServiceProvider
+-dontwarn javax.xml.stream.**
+-dontwarn org.codehaus.stax2.validation.**

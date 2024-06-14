@@ -1,6 +1,7 @@
 package com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper
 
 import com.google.api.services.drive.model.File
+import com.google.api.services.drive.model.FileList
 import com.openmobilehub.android.storage.core.model.OmhFile
 
 @SuppressWarnings("ComplexCondition")
@@ -24,4 +25,8 @@ fun File.toOmhFile(): OmhFile? {
         formattedModifiedTime,
         parentId
     )
+}
+
+fun FileList.toOmhFiles(): List<OmhFile> {
+    return this.files.toList().mapNotNull { googleFile -> googleFile.toOmhFile() }
 }

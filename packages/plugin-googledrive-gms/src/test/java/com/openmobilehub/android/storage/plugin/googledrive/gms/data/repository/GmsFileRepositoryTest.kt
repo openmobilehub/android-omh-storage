@@ -168,4 +168,17 @@ internal class GmsFileRepositoryTest {
             assertEquals(testOmhFile, result)
             verify { apiService.updateFile(any(), any(), any()) }
         }
+
+    @Test
+    fun `given a search query, when search is success, then a list of OmhFiles is returned`() =
+        runTest {
+            every { apiFileList.files } returns listOf(googleDriveFile)
+            every { driveFilesListRequest.execute() } returns apiFileList
+            every { apiService.search(TEST_FILE_NAME) } returns driveFilesListRequest
+
+            val result = fileRepositoryImpl.search(TEST_FILE_NAME)
+
+            assertEquals(listOf(testOmhFile), result)
+            verify { apiService.search(TEST_FILE_NAME) }
+        }
 }

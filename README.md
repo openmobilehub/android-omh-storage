@@ -50,7 +50,7 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 | File deletion   | ✅               | ✅                   | ⚠️       | ⚠️      |
 | File upload     | ✅               | ✅                   | ⚠️       | ⚠️      |
 | File download   | ✅               | ✅                   | ⚠️       | ⚠️      |
-| File searching  | ⚠️               | ⚠️                   | ⚠️       | ⚠️      |
+| File searching  | ✅               | ✅                   | ⚠️       | ⚠️      |
 | File metadata   | ⚠️               | ⚠️                   | ⚠️       | ⚠️      |
 | File sharing    | ⚠️               | ⚠️                   | ⚠️       | ⚠️      |
 | File versioning | ⚠️               | ⚠️                   | ⚠️       | ⚠️      |

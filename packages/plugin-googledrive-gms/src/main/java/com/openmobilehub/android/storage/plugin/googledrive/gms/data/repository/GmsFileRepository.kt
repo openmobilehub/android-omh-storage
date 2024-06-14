@@ -19,11 +19,11 @@ package com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository
 import android.webkit.MimeTypeMap
 import com.google.api.client.http.FileContent
 import com.google.api.client.http.HttpResponseException
-import com.google.api.services.drive.model.FileList
 import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhFile
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhFiles
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.service.GoogleDriveApiService
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -37,9 +37,11 @@ internal class GmsFileRepository(
     }
 
     fun getFilesList(parentId: String): List<OmhFile> {
-        val googleJsonFileList: FileList = apiService.getFilesList(parentId).execute()
-        val googleFileList: List<GoogleDriveFile> = googleJsonFileList.files.toList()
-        return googleFileList.mapNotNull { googleFile -> googleFile.toOmhFile() }
+        return apiService.getFilesList(parentId).execute().toOmhFiles()
+    }
+
+    fun search(query: String): List<OmhFile> {
+        return apiService.search(query).execute().toOmhFiles()
     }
 
     fun createFile(name: String, mimeType: String, parentId: String?): OmhFile? {

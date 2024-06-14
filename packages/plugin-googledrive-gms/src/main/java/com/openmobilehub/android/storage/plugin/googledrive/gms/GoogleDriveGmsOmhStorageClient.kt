@@ -55,6 +55,10 @@ internal class GoogleDriveGmsOmhStorageClient private constructor(
         return fileRepository.getFilesList(parentId)
     }
 
+    override suspend fun search(query: String): List<OmhFile> {
+        return fileRepository.search(query)
+    }
+
     override suspend fun createFile(name: String, mimeType: String, parentId: String): OmhFile? {
         return fileRepository.createFile(name, mimeType, parentId)
     }
