@@ -11,6 +11,9 @@ internal class DropboxApiService(private val apiClient: DropboxApiClient) {
     }
 
     fun uploadFile(inputStream: InputStream, path: String): FileMetadata {
-        return apiClient.dropboxApiService.files().uploadBuilder(path).uploadAndFinish(inputStream)
+        // withAutorename(true) is used to avoid conflicts with existing files
+        // by renaming the uploaded file. It matches the Google Drive API behavior.
+        return apiClient.dropboxApiService.files().uploadBuilder(path).withAutorename(true)
+            .uploadAndFinish(inputStream)
     }
 }

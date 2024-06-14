@@ -57,7 +57,7 @@ class DropboxApiServiceTest {
     fun `given apiClient returns FileMetadata, when uploading a file, then return FileMetadata`() {
         // Arrange
         every {
-            apiClient.dropboxApiService.files().uploadBuilder(any()).uploadAndFinish(inputStream)
+            apiClient.dropboxApiService.files().uploadBuilder(any()).withAutorename(any()).uploadAndFinish(inputStream)
         } returns metadata
 
         // Act
