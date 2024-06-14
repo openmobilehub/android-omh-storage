@@ -87,4 +87,9 @@ sealed class FileViewerViewEvent : ViewEvent {
 
         override fun getEventName() = "FileViewerViewEvent.UpdateFile"
     }
+
+    class UpdateSearchQuery(val query: String?) : FileViewerViewEvent() {
+
+        override fun getEventName() = "FileViewerViewEvent.UpdateSearchQuery"
+    }
 }

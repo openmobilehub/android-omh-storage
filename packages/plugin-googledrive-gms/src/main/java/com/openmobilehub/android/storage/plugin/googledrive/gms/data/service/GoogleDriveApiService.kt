@@ -32,6 +32,16 @@ internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProv
             }
         }
 
+    fun search(query: String): Drive.Files.List = apiProvider
+        .googleDriveApiService
+        .files()
+        .list()
+        .apply {
+            if (query.isNotEmpty()) {
+                q = "name contains '$query' and trashed = false"
+            }
+        }
+
     fun createFile(file: File): Drive.Files.Create = apiProvider
         .googleDriveApiService
         .files()

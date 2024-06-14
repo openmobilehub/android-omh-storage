@@ -287,4 +287,18 @@ internal class NonGmsFileRepositoryTest {
 
             fileRepositoryImpl.updateFile(localFileUpload, TEST_FILE_ID)
         }
+
+    @Test
+    fun `given a search query, when search is success, then a list of OmhFiles is returned`() =
+        runTest {
+            val expectedQuery = "name contains '$TEST_FILE_NAME' and trashed = false"
+            coEvery { googleStorageApiService.getFilesList(expectedQuery) } returns Response.success(
+                testFileListRemote
+            )
+
+            val result = fileRepositoryImpl.search(TEST_FILE_NAME)
+
+            assertEquals(listOf(testOmhFile), result)
+            coVerify { googleStorageApiService.getFilesList(expectedQuery) }
+        }
 }

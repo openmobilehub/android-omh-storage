@@ -1,3 +1,5 @@
+@file:Suppress("MaximumLineLength", "MaxLineLength")
+
 package com.openmobilehub.android.storage.plugin.dropbox
 
 import android.webkit.MimeTypeMap
@@ -5,12 +7,14 @@ import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.plugin.dropbox.data.repository.DropboxFileRepository
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_PARENT_ID
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.mockkStatic
+import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -19,6 +23,7 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
+import java.io.File
 
 internal class DropboxOmhStorageClientBuilderTest {
 
@@ -77,6 +82,12 @@ internal class DropboxOmhStorageClientTest {
     @MockK
     private lateinit var repository: DropboxFileRepository
 
+    @MockK
+    private lateinit var fileToUpload: File
+
+    @MockK
+    private lateinit var uploadedFile: OmhFile
+
     private lateinit var client: DropboxOmhStorageClient
 
     @Before
@@ -104,5 +115,32 @@ internal class DropboxOmhStorageClientTest {
 
         // Assert
         assertEquals(files, result)
+    }
+
+    @Test
+    fun `given a repository, when uploading a file to unknown parent, then upload a file from repository to root`() = runTest {
+        // Arrange
+        val parentId = null
+        every { repository.uploadFile(any(), any()) } returns uploadedFile
+
+        // Act
+        val result = client.uploadFile(fileToUpload, parentId)
+
+        // Assert
+        assertEquals(uploadedFile, result)
+        verify { repository.uploadFile(fileToUpload, DropboxConstants.ROOT_FOLDER) }
+    }
+
+    @Test
+    fun `given a repository, when uploading a file to known parent, then upload a file from repository to a given parent`() = runTest {
+        // Arrange
+        every { repository.uploadFile(any(), any()) } returns uploadedFile
+
+        // Act
+        val result = client.uploadFile(fileToUpload, TEST_FILE_PARENT_ID)
+
+        // Assert
+        assertEquals(uploadedFile, result)
+        verify { repository.uploadFile(fileToUpload, TEST_FILE_PARENT_ID) }
     }
 }

@@ -59,6 +59,11 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         return repository.getFilesList(parentId)
     }
 
+    override suspend fun search(query: String): List<OmhFile> {
+        // To be implemented
+        return emptyList()
+    }
+
     override suspend fun createFile(name: String, mimeType: String, parentId: String): OmhFile? {
         // To be implemented
         return null
@@ -70,8 +75,8 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
     }
 
     override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhFile? {
-        // To be implemented
-        return null
+        val safeParentId = parentId ?: rootFolder
+        return repository.uploadFile(localFileToUpload, safeParentId)
     }
 
     override suspend fun downloadFile(fileId: String, mimeType: String?): ByteArrayOutputStream {

@@ -5,6 +5,7 @@ plugins {
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android") version Versions.hilt apply true
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+    id("org.jetbrains.dokka") version Versions.dokka
 }
 
 @Suppress("UnstableApiUsage")
@@ -133,6 +134,8 @@ dependencies {
     implementation(Libs.omhDropboxAuthLibrary)
     implementation(Libs.omhMicrosoftAuthLibrary)
 
+    implementation(Libs.dokka)
+
     // Use local implementation instead of dependencies
     if (useLocalProjects) {
         implementation(project(":packages:core"))
@@ -148,4 +151,8 @@ dependencies {
     }
 
     testImplementation(Libs.junit)
+}
+
+tasks.dokkaHtmlPartial {
+    enabled = false
 }

@@ -32,7 +32,7 @@ sealed class FileViewerViewState : ViewState {
         override fun getName() = "FileViewerViewState.Loading"
     }
 
-    class Content(val files: List<OmhFile>) : FileViewerViewState() {
+    data class Content(val files: List<OmhFile>, val isSearching: Boolean) : FileViewerViewState() {
 
         override fun getName() = "FileViewerViewState.Content"
     }
@@ -73,5 +73,10 @@ sealed class FileViewerViewState : ViewState {
     object ShowDownloadExceptionDialog : FileViewerViewState() {
 
         override fun getName() = "FileViewerViewState.ShowDownloadExceptionDialog"
+    }
+
+    object ClearSearch : FileViewerViewState() {
+
+        override fun getName() = "FileViewerViewState.ClearSearch"
     }
 }

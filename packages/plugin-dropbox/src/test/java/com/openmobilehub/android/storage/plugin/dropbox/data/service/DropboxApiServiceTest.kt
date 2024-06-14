@@ -1,5 +1,6 @@
 package com.openmobilehub.android.storage.plugin.dropbox.data.service
 
+import com.dropbox.core.v2.files.FileMetadata
 import com.dropbox.core.v2.files.ListFolderResult
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_PARENT_ID
 import io.mockk.MockKAnnotations
@@ -10,6 +11,7 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import java.io.InputStream
 
 class DropboxApiServiceTest {
 
@@ -18,6 +20,12 @@ class DropboxApiServiceTest {
 
     @MockK
     private lateinit var apiClient: DropboxApiClient
+
+    @MockK
+    private lateinit var metadata: FileMetadata
+
+    @MockK
+    private lateinit var inputStream: InputStream
 
     private lateinit var apiService: DropboxApiService
 
@@ -43,5 +51,19 @@ class DropboxApiServiceTest {
 
         // Assert
         assertEquals(listFolderResult, result)
+    }
+
+    @Test
+    fun `given apiClient returns FileMetadata, when uploading a file, then return FileMetadata`() {
+        // Arrange
+        every {
+            apiClient.dropboxApiService.files().uploadBuilder(any()).withAutorename(any()).uploadAndFinish(inputStream)
+        } returns metadata
+
+        // Act
+        val result = apiService.uploadFile(inputStream, TEST_FILE_PARENT_ID)
+
+        // Assert
+        assertEquals(metadata, result)
     }
 }

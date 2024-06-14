@@ -50,10 +50,18 @@ internal class NonGmsFileRepository(
     }
 
     suspend fun getFilesList(parentId: String): List<OmhFile> {
+        return getFiles(GoogleStorageApiService.getParentIdQuery(parentId))
+    }
+
+    suspend fun search(query: String): List<OmhFile> {
+        return getFiles(GoogleStorageApiService.getSearchByNameQuery(query))
+    }
+
+    private suspend fun getFiles(query: String): List<OmhFile> {
         val response = retrofitImpl
             .getGoogleStorageApiService()
             .getFilesList(
-                query = GoogleStorageApiService.getQueryValue(parentId)
+                query = query
             )
 
         return if (response.isSuccessful) {

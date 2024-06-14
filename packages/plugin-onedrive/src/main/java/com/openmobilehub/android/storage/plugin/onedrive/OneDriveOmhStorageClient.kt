@@ -61,6 +61,11 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
         return repository.getFilesList(parentId)
     }
 
+    override suspend fun search(query: String): List<OmhFile> {
+        // To be implemented
+        return emptyList()
+    }
+
     override suspend fun createFile(name: String, mimeType: String, parentId: String): OmhFile? {
         // To be implemented
         return null
