@@ -18,6 +18,7 @@ package com.openmobilehub.android.storage.core
 
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhFileRevision
 import java.io.ByteArrayOutputStream
 import java.io.File
 
@@ -112,4 +113,23 @@ abstract class OmhStorageClient protected constructor(
         localFileToUpload: File,
         fileId: String
     ): OmhFile?
+
+    /**
+     * This method get the revisions of a file with a given file id
+     *
+     * @param fileId The id of the file to get the revisions
+     *
+     * @return A list of OmhFileRevisions
+     */
+    abstract suspend fun getFileRevisions(fileId: String): List<OmhFileRevision>
+
+    /**
+     * This method download a file revision with a given file id and revision id
+     *
+     * @param fileId The id of the file to get the revision
+     * @param revisionId The id of the revision to be downloaded
+     *
+     * @return A ByteArrayOutputStream with the content of the downloaded file revision
+     */
+    abstract suspend fun downloadFileRevision(fileId: String, revisionId: String): ByteArrayOutputStream
 }

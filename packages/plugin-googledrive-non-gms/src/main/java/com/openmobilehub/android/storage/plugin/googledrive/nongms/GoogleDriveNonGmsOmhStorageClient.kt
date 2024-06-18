@@ -21,6 +21,7 @@ import com.openmobilehub.android.auth.core.OmhCredentials
 import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhFileRevision
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.NonGmsFileRepository
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit.GoogleStorageApiServiceProvider
@@ -75,5 +76,18 @@ internal class GoogleDriveNonGmsOmhStorageClient private constructor(
 
     override suspend fun updateFile(localFileToUpload: File, fileId: String): OmhFile? {
         return fileRepository.updateFile(localFileToUpload, fileId)
+    }
+
+    override suspend fun getFileRevisions(fileId: String): List<OmhFileRevision> {
+        // To be implemented
+        return emptyList()
+    }
+
+    override suspend fun downloadFileRevision(
+        fileId: String,
+        revisionId: String
+    ): ByteArrayOutputStream {
+        // To be implemented
+        return ByteArrayOutputStream()
     }
 }
