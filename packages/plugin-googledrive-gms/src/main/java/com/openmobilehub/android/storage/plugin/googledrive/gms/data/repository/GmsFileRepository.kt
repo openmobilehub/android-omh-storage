@@ -24,7 +24,7 @@ import com.openmobilehub.android.storage.core.model.OmhFileRevision
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhFile
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhFileVersion
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhFileRevisions
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhFiles
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.service.GoogleDriveApiService
 import java.io.ByteArrayOutputStream
@@ -139,9 +139,7 @@ internal class GmsFileRepository(
     }
 
     fun getFileRevisions(fileId: String): List<OmhFileRevision> {
-        return apiService.getFileRevisions(fileId).execute().revisions.map {
-            it.toOmhFileVersion(fileId)
-        }
+        return apiService.getFileRevisions(fileId).execute().toOmhFileRevisions(fileId)
     }
 
     fun downloadFileRevision(fileId: String, revisionId: String): ByteArrayOutputStream {

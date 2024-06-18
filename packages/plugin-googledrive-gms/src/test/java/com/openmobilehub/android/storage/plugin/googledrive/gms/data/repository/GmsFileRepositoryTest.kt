@@ -14,17 +14,24 @@
  * limitations under the License.
  */
 
+@file:Suppress("MaximumLineLength", "MaxLineLength")
+
 package com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository
 
 import android.webkit.MimeTypeMap
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.model.FileList
+import com.google.api.services.drive.model.Revision
+import com.google.api.services.drive.model.RevisionList
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_FILE_MIME_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_FILE_NAME
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_FILE_PARENT_ID
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_REVISION_FILE_ID
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_REVISION_ID
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.setUpMock
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.testOmhFile
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.testOmhRevision
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.service.GoogleDriveApiService
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
@@ -56,10 +63,16 @@ internal class GmsFileRepositoryTest {
     private lateinit var googleDriveFile: GoogleDriveFile
 
     @MockK(relaxed = true)
+    private lateinit var googleDriveRevision: Revision
+
+    @MockK(relaxed = true)
     private lateinit var mimeTypeMap: MimeTypeMap
 
     @MockK(relaxed = true)
     private lateinit var apiFileList: FileList
+
+    @MockK(relaxed = true)
+    private lateinit var revisionList: RevisionList
 
     @MockK(relaxed = true)
     private lateinit var driveFilesListRequest: Drive.Files.List
@@ -74,7 +87,13 @@ internal class GmsFileRepositoryTest {
     private lateinit var driveFilesGetRequest: Drive.Files.Get
 
     @MockK(relaxed = true)
+    lateinit var driveRevisionsGetRequest: Drive.Revisions.Get
+
+    @MockK(relaxed = true)
     private lateinit var driveFilesUpdateRequest: Drive.Files.Update
+
+    @MockK(relaxed = true)
+    private lateinit var driveRevisionsListRequest: Drive.Revisions.List
 
     private lateinit var fileRepositoryImpl: GmsFileRepository
 
@@ -83,6 +102,7 @@ internal class GmsFileRepositoryTest {
         MockKAnnotations.init(this)
         fileRepositoryImpl = GmsFileRepository(apiService)
         googleDriveFile.setUpMock()
+        googleDriveRevision.setUpMock()
 
         mockkStatic(MimeTypeMap::class)
         every { MimeTypeMap.getSingleton() } returns mimeTypeMap
@@ -180,5 +200,27 @@ internal class GmsFileRepositoryTest {
 
             assertEquals(listOf(testOmhFile), result)
             verify { apiService.search(TEST_FILE_NAME) }
+        }
+
+    @Test
+    fun `given a file id, when getFileRevisions is success, then list of OmhFileRevision is returned`() =
+        runTest {
+            every { revisionList.revisions } returns listOf(googleDriveRevision)
+            every { driveRevisionsListRequest.execute() } returns revisionList
+            every { apiService.getFileRevisions(TEST_FILE_ID) } returns driveRevisionsListRequest
+
+            val result = fileRepositoryImpl.getFileRevisions(TEST_REVISION_FILE_ID)
+
+            assertEquals(listOf(testOmhRevision), result)
+        }
+
+    @Test
+    fun `given a file id and a revision id, when downloadFileRevision is success, then a ByteArrayOutputStream is returned`() =
+        runTest {
+            every { apiService.downloadFileRevision(TEST_REVISION_FILE_ID, TEST_REVISION_ID) } returns driveRevisionsGetRequest
+
+            fileRepositoryImpl.downloadFileRevision(TEST_REVISION_FILE_ID, TEST_REVISION_ID)
+
+            verify { apiService.downloadFileRevision(TEST_REVISION_FILE_ID, TEST_REVISION_ID) }
         }
 }
