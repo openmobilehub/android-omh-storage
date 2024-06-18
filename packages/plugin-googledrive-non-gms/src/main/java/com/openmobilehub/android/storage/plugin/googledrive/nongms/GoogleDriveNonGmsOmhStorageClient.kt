@@ -79,15 +79,13 @@ internal class GoogleDriveNonGmsOmhStorageClient private constructor(
     }
 
     override suspend fun getFileRevisions(fileId: String): List<OmhFileRevision> {
-        // To be implemented
-        return emptyList()
+        return fileRepository.getFileRevisions(fileId)
     }
 
     override suspend fun downloadFileRevision(
         fileId: String,
         revisionId: String
     ): ByteArrayOutputStream {
-        // To be implemented
-        return ByteArrayOutputStream()
+        return fileRepository.downloadFileRevision(fileId, revisionId)
     }
 }
