@@ -91,3 +91,5 @@ lint/tmp/
 
 # Dokka
 docs/generated/
+
+apps/storage-sample/src/main/res/raw/ms_auth_config.json
