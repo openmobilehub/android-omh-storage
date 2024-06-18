@@ -3,7 +3,7 @@
 package com.openmobilehub.android.storage.plugin.onedrive.data.repository
 
 import com.microsoft.graph.models.DriveItem
-import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhFile
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiService
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_PARENT_ID
@@ -21,7 +21,7 @@ import java.io.File
 class OneDriveFileRepositoryTest {
 
     @MockK
-    private lateinit var omhFile: OmhFile
+    private lateinit var omhFile: OmhStorageEntity
 
     @MockK
     private lateinit var driveItem: DriveItem
@@ -71,7 +71,7 @@ class OneDriveFileRepositoryTest {
         val result = repository.getFilesList(TEST_FILE_PARENT_ID)
 
         // Assert
-        assertEquals(emptyList<OmhFile>(), result)
+        assertEquals(emptyList<OmhStorageEntity>(), result)
     }
 
     @Test

@@ -2,31 +2,46 @@ package com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper
 
 import com.google.api.services.drive.model.File
 import com.google.api.services.drive.model.FileList
-import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
+import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants
+import java.util.Date
 
 @SuppressWarnings("ComplexCondition")
-fun File.toOmhFile(): OmhFile? {
-    val formattedModifiedTime = modifiedTime?.toStringRfc3339().orEmpty()
-
-    if (mimeType == null || id == null || name == null) {
-        return null
-    }
-
+fun File.toOmhFile(): OmhStorageEntity {
     val parentId = if (parents.isNullOrEmpty()) {
-        ""
+        GoogleDriveGmsConstants.ROOT_FOLDER
     } else {
         parents[0]
     }
 
-    return OmhFile(
-        mimeType,
-        id,
-        name,
-        formattedModifiedTime,
-        parentId
-    )
+    return when (mimeType) {
+        GoogleFileType.FOLDER.mimeType -> {
+            OmhStorageEntity.OmhStorageFolder(
+                id,
+                name,
+                Date(createdTime.value),
+                Date(modifiedTime.value),
+                parentId,
+                null
+            )
+        }
+
+        else -> {
+            OmhStorageEntity.OmhStorageFile(
+                id,
+                name,
+                Date(createdTime.value),
+                Date(modifiedTime.value),
+                parentId,
+                mimeType,
+                null,
+                size,
+                fileExtension
+            )
+        }
+    }
 }
 
-fun FileList.toOmhFiles(): List<OmhFile> {
+fun FileList.toOmhFiles(): List<OmhStorageEntity> {
     return this.files.toList().mapNotNull { googleFile -> googleFile.toOmhFile() }
 }

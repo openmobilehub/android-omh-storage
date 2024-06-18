@@ -21,8 +21,8 @@ import android.net.Uri
 import androidx.lifecycle.viewModelScope
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
-import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.core.model.OmhFileType
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.sample.domain.model.FileType
 import com.openmobilehub.android.storage.sample.presentation.BaseViewModel
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerAction
@@ -77,7 +77,7 @@ class FileViewerViewModel @Inject constructor(
 
     var isGridLayoutManager = true
         private set
-    var lastFileClicked: OmhFile? = null
+    var lastFileClicked: OmhStorageEntity? = null
         private set
 
     private val parentId = StackWithFlow(omhStorageClient.rootFolder)
@@ -101,7 +101,7 @@ class FileViewerViewModel @Inject constructor(
                 }
 
                 return@combine files.sortedWith(
-                    compareBy<OmhFile> { !it.isFolder() }
+                    compareBy<OmhStorageEntity> { !it.isFolder() }
                         .thenBy { it.mimeType }
                         .thenBy { it.name }
                 )
@@ -325,7 +325,7 @@ class FileViewerViewModel @Inject constructor(
         }
     }
 
-    private fun handleDeleteSuccess(isSuccessful: Boolean, file: OmhFile) {
+    private fun handleDeleteSuccess(isSuccessful: Boolean, file: OmhStorageEntity) {
         val toastText = if (isSuccessful) {
             "${file.name} was successfully deleted"
         } else {

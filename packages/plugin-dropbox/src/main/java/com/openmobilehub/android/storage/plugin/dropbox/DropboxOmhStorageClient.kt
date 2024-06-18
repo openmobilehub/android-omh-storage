@@ -21,8 +21,8 @@ import androidx.annotation.VisibleForTesting
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 import com.openmobilehub.android.storage.core.OmhStorageClient
-import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.core.model.OmhFilePermission
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.MetadataToOmhFile
 import com.openmobilehub.android.storage.plugin.dropbox.data.repository.DropboxFileRepository
@@ -56,16 +56,16 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
     override val rootFolder: String
         get() = DropboxConstants.ROOT_FOLDER
 
-    override suspend fun listFiles(parentId: String): List<OmhFile> {
+    override suspend fun listFiles(parentId: String): List<OmhStorageEntity> {
         return repository.getFilesList(parentId)
     }
 
-    override suspend fun search(query: String): List<OmhFile> {
+    override suspend fun search(query: String): List<OmhStorageEntity> {
         // To be implemented
         return emptyList()
     }
 
-    override suspend fun createFile(name: String, mimeType: String, parentId: String): OmhFile? {
+    override suspend fun createFile(name: String, mimeType: String, parentId: String): OmhStorageEntity? {
         // To be implemented
         return null
     }
@@ -75,7 +75,7 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         return true
     }
 
-    override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhFile? {
+    override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity? {
         val safeParentId = parentId ?: rootFolder
         return repository.uploadFile(localFileToUpload, safeParentId)
     }
@@ -85,7 +85,7 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         return ByteArrayOutputStream()
     }
 
-    override suspend fun updateFile(localFileToUpload: File, fileId: String): OmhFile? {
+    override suspend fun updateFile(localFileToUpload: File, fileId: String): OmhStorageEntity? {
         // To be implemented
         return null
     }

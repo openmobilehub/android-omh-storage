@@ -17,9 +17,10 @@
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository
 
 import android.webkit.MimeTypeMap
-import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.GoogleFileType
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toFile
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toFileList
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.GoogleStorageApiService
@@ -49,15 +50,15 @@ internal class NonGmsFileRepository(
         private val JSON_MIME_TYPE = "application/json".toMediaTypeOrNull()
     }
 
-    suspend fun getFilesList(parentId: String): List<OmhFile> {
+    suspend fun getFilesList(parentId: String): List<OmhStorageEntity> {
         return getFiles(GoogleStorageApiService.getParentIdQuery(parentId))
     }
 
-    suspend fun search(query: String): List<OmhFile> {
+    suspend fun search(query: String): List<OmhStorageEntity> {
         return getFiles(GoogleStorageApiService.getSearchByNameQuery(query))
     }
 
-    private suspend fun getFiles(query: String): List<OmhFile> {
+    private suspend fun getFiles(query: String): List<OmhStorageEntity> {
         val response = retrofitImpl
             .getGoogleStorageApiService()
             .getFilesList(
@@ -71,7 +72,7 @@ internal class NonGmsFileRepository(
         }
     }
 
-    suspend fun createFile(name: String, mimeType: String, parentId: String?): OmhFile? {
+    suspend fun createFile(name: String, mimeType: String, parentId: String?): OmhStorageEntity? {
         val parents = if (parentId.isNullOrBlank()) {
             emptyList()
         } else {
@@ -102,7 +103,7 @@ internal class NonGmsFileRepository(
     suspend fun uploadFile(
         localFileToUpload: File,
         parentId: String?
-    ): OmhFile? {
+    ): OmhStorageEntity? {
         val stringMimeType = MimeTypeMap
             .getSingleton()
             .getMimeTypeFromExtension(localFileToUpload.extension)
@@ -176,7 +177,7 @@ internal class NonGmsFileRepository(
     suspend fun updateFile(
         localFileToUpload: File,
         fileId: String
-    ): OmhFile? {
+    ): OmhStorageEntity? {
         val jsonMetaData = JSONObject().apply {
             put(FILE_NAME_KEY, localFileToUpload.name)
         }
@@ -199,9 +200,9 @@ internal class NonGmsFileRepository(
 
     private suspend fun updateMediaFile(
         localFileToUpload: File,
-        omhFile: OmhFile
-    ): OmhFile? {
-        val mimeType = omhFile.mimeType.toMediaTypeOrNull()
+        omhFile: OmhStorageEntity
+    ): OmhStorageEntity? {
+        val mimeType = (if (omhFile is OmhStorageEntity.OmhStorageFile) omhFile.mimeType else GoogleFileType.FOLDER.mimeType)?.toMediaTypeOrNull()
         val requestFile = localFileToUpload.asRequestBody(mimeType)
 
         val response = retrofitImpl

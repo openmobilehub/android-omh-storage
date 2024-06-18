@@ -17,8 +17,8 @@
 package com.openmobilehub.android.storage.core
 
 import com.openmobilehub.android.auth.core.OmhAuthClient
-import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.core.model.OmhFilePermission
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import java.io.ByteArrayOutputStream
 import java.io.File
 
@@ -43,7 +43,7 @@ abstract class OmhStorageClient protected constructor(
      *
      * @return A list of OmhFiles
      */
-    abstract suspend fun listFiles(parentId: String = "root"): List<OmhFile>
+    abstract suspend fun listFiles(parentId: String = "root"): List<OmhStorageEntity>
 
     /**
      * This method list files with a name containing the query value.
@@ -52,7 +52,7 @@ abstract class OmhStorageClient protected constructor(
      *
      * @return A list of OmhFiles whose names contain the query
      */
-    abstract suspend fun search(query: String): List<OmhFile>
+    abstract suspend fun search(query: String): List<OmhStorageEntity>
 
     /**
      * This method create files in an specific folder
@@ -67,7 +67,7 @@ abstract class OmhStorageClient protected constructor(
         name: String,
         mimeType: String,
         parentId: String
-    ): OmhFile?
+    ): OmhStorageEntity?
 
     /**
      * This method delete files with a given file id
@@ -89,7 +89,7 @@ abstract class OmhStorageClient protected constructor(
     abstract suspend fun uploadFile(
         localFileToUpload: File,
         parentId: String?
-    ): OmhFile?
+    ): OmhStorageEntity?
 
     /**
      * This method download a file with a given mime type and a given id
@@ -112,7 +112,7 @@ abstract class OmhStorageClient protected constructor(
     abstract suspend fun updateFile(
         localFileToUpload: File,
         fileId: String
-    ): OmhFile?
+    ): OmhStorageEntity?
 
     /**
      * This method list permissions to a given file

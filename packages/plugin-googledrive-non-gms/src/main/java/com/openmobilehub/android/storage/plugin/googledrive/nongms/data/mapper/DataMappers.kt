@@ -16,30 +16,51 @@
 
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper
 
-import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
+import com.openmobilehub.android.storage.core.utils.fromRFC3339StringToDate
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileListRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileRemoteResponse
 
 @SuppressWarnings("ComplexCondition")
-internal fun FileRemoteResponse.toFile(): OmhFile? {
+internal fun FileRemoteResponse.toFile(): OmhStorageEntity? {
     if (mimeType == null || id == null || name == null) {
         return null
     }
 
     val parentId = if (parents.isNullOrEmpty()) {
-        ""
+        GoogleDriveNonGmsConstants.ROOT_FOLDER
     } else {
         parents[0]
     }
 
-    return OmhFile(
-        mimeType,
-        id,
-        name,
-        modifiedTime.orEmpty(),
-        parentId
-    )
+    return when (mimeType) {
+        GoogleFileType.FOLDER.mimeType -> {
+            OmhStorageEntity.OmhStorageFolder(
+                id,
+                name,
+                createdTime?.fromRFC3339StringToDate(),
+                modifiedTime?.fromRFC3339StringToDate(),
+                parentId,
+                null,
+            )
+        }
+
+        else -> {
+            OmhStorageEntity.OmhStorageFile(
+                id,
+                name,
+                createdTime?.fromRFC3339StringToDate(),
+                modifiedTime?.fromRFC3339StringToDate(),
+                parentId,
+                mimeType,
+                null,
+                size?.toIntOrNull(),
+                fileExtension,
+            )
+        }
+    }
 }
 
-internal fun FileListRemoteResponse.toFileList(): List<OmhFile> =
+internal fun FileListRemoteResponse.toFileList(): List<OmhStorageEntity> =
     files?.mapNotNull { remoteFileModel -> remoteFileModel?.toFile() }.orEmpty()

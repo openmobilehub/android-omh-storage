@@ -4,7 +4,7 @@ package com.openmobilehub.android.storage.plugin.dropbox.data.repository
 
 import com.dropbox.core.v2.files.FileMetadata
 import com.dropbox.core.v2.files.ListFolderResult
-import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.utils.toInputStream
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.MetadataToOmhFile
 import com.openmobilehub.android.storage.plugin.dropbox.data.service.DropboxApiService
@@ -25,7 +25,7 @@ import java.io.FileInputStream
 class DropboxFileRepositoryTest {
 
     @MockK
-    private lateinit var omhFile: OmhFile
+    private lateinit var omhFile: OmhStorageEntity
 
     @MockK
     private lateinit var dropboxFiles: ListFolderResult
@@ -82,7 +82,7 @@ class DropboxFileRepositoryTest {
         val result = repository.getFilesList(TEST_FILE_PARENT_ID)
 
         // Assert
-        assertEquals(emptyList<OmhFile>(), result)
+        assertEquals(emptyList<OmhStorageEntity>(), result)
     }
 
     @Test

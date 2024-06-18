@@ -1,6 +1,6 @@
 package com.openmobilehub.android.storage.plugin.dropbox.data.repository
 
-import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.utils.toInputStream
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.MetadataToOmhFile
 import com.openmobilehub.android.storage.plugin.dropbox.data.service.DropboxApiService
@@ -11,14 +11,14 @@ internal class DropboxFileRepository(
     private val metadataToOmhFile: MetadataToOmhFile
 ) {
 
-    fun getFilesList(parentId: String): List<OmhFile> {
+    fun getFilesList(parentId: String): List<OmhStorageEntity> {
         val dropboxFiles = apiService.getFilesList(parentId)
         return dropboxFiles.entries.mapNotNull {
             metadataToOmhFile(it)
         }
     }
 
-    fun uploadFile(localFileToUpload: File, parentId: String): OmhFile? {
+    fun uploadFile(localFileToUpload: File, parentId: String): OmhStorageEntity? {
         val inputStream = localFileToUpload.toInputStream()
 
         val path = "$parentId/${localFileToUpload.name}"

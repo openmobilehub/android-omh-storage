@@ -1,3 +1,5 @@
+package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper
+
 /*
  * Copyright 2023 Open Mobile Hub
  *
@@ -14,9 +16,7 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.core.model
-
-enum class OmhFileType(
+enum class GoogleFileType(
     val mimeType: String,
     val extension: String? = null
 ) {

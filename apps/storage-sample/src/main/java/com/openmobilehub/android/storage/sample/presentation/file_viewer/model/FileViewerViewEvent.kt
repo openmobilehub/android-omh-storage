@@ -18,7 +18,7 @@ package com.openmobilehub.android.storage.sample.presentation.file_viewer.model
 
 import android.content.Context
 import android.net.Uri
-import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.sample.presentation.ViewEvent
 
 sealed class FileViewerViewEvent : ViewEvent {
@@ -38,7 +38,7 @@ sealed class FileViewerViewEvent : ViewEvent {
         override fun getEventName() = "FileViewerViewEvent.SwapLayoutManager"
     }
 
-    class FileClicked(val file: OmhFile) : FileViewerViewEvent() {
+    class FileClicked(val file: OmhStorageEntity) : FileViewerViewEvent() {
 
         override fun getEventName() = "FileViewerViewEvent.FileClicked"
     }
@@ -48,7 +48,7 @@ sealed class FileViewerViewEvent : ViewEvent {
         override fun getEventName() = "FileViewerViewEvent.DownloadFile"
     }
 
-    data class SaveFileResult(val result: Result<OmhFile>) : FileViewerViewEvent() {
+    data class SaveFileResult(val result: Result<OmhStorageEntity>) : FileViewerViewEvent() {
 
         override fun getEventName() = "FileViewerViewEvent.SaveFileResult"
     }
@@ -63,7 +63,7 @@ sealed class FileViewerViewEvent : ViewEvent {
         override fun getEventName() = "FileViewerViewEvent.CreateFile"
     }
 
-    class DeleteFile(val file: OmhFile) : FileViewerViewEvent() {
+    class DeleteFile(val file: OmhStorageEntity) : FileViewerViewEvent() {
 
         override fun getEventName() = "FileViewerViewEvent.CreateFile"
     }
@@ -78,7 +78,7 @@ sealed class FileViewerViewEvent : ViewEvent {
         override fun getEventName() = "FileViewerViewEvent.SignOut"
     }
 
-    class UpdateFileClicked(val file: OmhFile) : FileViewerViewEvent() {
+    class UpdateFileClicked(val file: OmhStorageEntity) : FileViewerViewEvent() {
 
         override fun getEventName() = "FileViewerViewEvent.UpdateFileClicked"
     }
