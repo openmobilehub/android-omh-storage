@@ -39,3 +39,6 @@
 
 # blockhound
 -dontwarn reactor.blockhound.integration.BlockHoundIntegration
+
+# OneDrive SDK
+-keep class com.microsoft.graph.models.UploadSession { *; }
