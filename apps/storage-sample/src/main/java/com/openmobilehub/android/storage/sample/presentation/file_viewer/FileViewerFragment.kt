@@ -45,6 +45,8 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.openmobilehub.android.storage.core.model.OmhFile
@@ -53,11 +55,19 @@ import com.openmobilehub.android.storage.sample.databinding.DialogCreateFileBind
 import com.openmobilehub.android.storage.sample.databinding.DialogUploadFileBinding
 import com.openmobilehub.android.storage.sample.databinding.FragmentFileViewerBinding
 import com.openmobilehub.android.storage.sample.presentation.BaseFragment
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.menu.FileMenuDialog
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.metadata.FileMetadataDialog
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.FilePermissionsDialog
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.versions.FileVersionsDialog
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerAction
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewEvent
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewState
 import com.openmobilehub.android.storage.sample.presentation.util.navigateTo
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class FileViewerFragment :
@@ -148,6 +158,19 @@ class FileViewerFragment :
         }
 
         setupToolbar()
+
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.action.collect {
+                    when (it) {
+                        FileViewerAction.ShowFileMetadata -> showFileMetadata()
+                        FileViewerAction.ShowFilePermissions -> showFilePermissions()
+                        FileViewerAction.ShowFileVersions -> showFileVersions()
+                        FileViewerAction.ShowMoreOptions -> showMoreOptions()
+                    }
+                }
+            }
+        }
     }
 
     private fun setupToolbar() {
@@ -158,13 +181,30 @@ class FileViewerFragment :
         }
     }
 
-    fun swapLayout() = dispatchEvent(FileViewerViewEvent.SwapLayoutManager)
+    private fun swapLayout() = dispatchEvent(FileViewerViewEvent.SwapLayoutManager)
+    private fun createFile() = showCreateFileDialog()
+    private fun uploadFile() = filePickerUpload.launch(FileViewerViewModel.ANY_MIME_TYPE)
+    private fun signOut() = dispatchEvent(FileViewerViewEvent.SignOut)
 
-    fun createFile() = showCreateFileDialog()
+    private fun showFileMetadata() = FileMetadataDialog().show(
+        childFragmentManager,
+        FILE_METADATA_DIALOG_TAG
+    )
 
-    fun uploadFile() = filePickerUpload.launch(FileViewerViewModel.ANY_MIME_TYPE)
+    private fun showFilePermissions() = FilePermissionsDialog().show(
+        childFragmentManager,
+        FILE_PERMISSIONS_DIALOG_TAG
+    )
 
-    fun signOut() = dispatchEvent(FileViewerViewEvent.SignOut)
+    private fun showFileVersions() = FileVersionsDialog().show(
+        childFragmentManager,
+        FILE_VERSIONS_DIALOG_TAG
+    )
+
+    private fun showMoreOptions() = FileMenuDialog().show(
+        childFragmentManager,
+        FILE_MENU_DIALOG_TAG
+    )
 
     override fun buildState(state: FileViewerViewState) = when (state) {
         FileViewerViewState.Initial -> buildInitialState()
@@ -326,12 +366,8 @@ class FileViewerFragment :
         dispatchEvent(FileViewerViewEvent.FileClicked(file))
     }
 
-    override fun onDeleteClicked(file: OmhFile) {
-        dispatchEvent(FileViewerViewEvent.DeleteFile(file))
-    }
-
-    override fun onUpdateClicked(file: OmhFile) {
-        dispatchEvent(FileViewerViewEvent.UpdateFileClicked(file))
+    override fun onMoreOptionsClicked(file: OmhFile) {
+        dispatchEvent(FileViewerViewEvent.MoreOptionsClicked(file))
     }
 
     private fun launchUpdateFilePicker() {
@@ -501,6 +537,14 @@ class FileViewerFragment :
             clearFocus()
             isIconified = true
         }
+    }
+
+
+    companion object {
+        const val FILE_MENU_DIALOG_TAG = "file_menu_dialog_tag"
+        const val FILE_VERSIONS_DIALOG_TAG = "file_versions_dialog_tag"
+        const val FILE_METADATA_DIALOG_TAG = "file_metadata_dialog_tag"
+        const val FILE_PERMISSIONS_DIALOG_TAG = "file_permissions_dialog_tag"
     }
 
     inner class FileViewerMenuProvider(
