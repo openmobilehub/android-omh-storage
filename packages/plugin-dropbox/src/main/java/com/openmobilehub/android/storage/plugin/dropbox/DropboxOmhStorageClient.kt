@@ -22,6 +22,7 @@ import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhFilePermission
 import com.openmobilehub.android.storage.core.model.OmhFileRevision
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.MetadataToOmhFile
@@ -101,5 +102,10 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
     ): ByteArrayOutputStream {
         // To be implemented
         return ByteArrayOutputStream()
+    }
+
+    override suspend fun getFilePermissions(fileId: String): List<OmhFilePermission> {
+        // To be implemented
+        return emptyList()
     }
 }

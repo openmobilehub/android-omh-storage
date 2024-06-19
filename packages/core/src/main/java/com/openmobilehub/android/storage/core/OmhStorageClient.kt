@@ -18,6 +18,7 @@ package com.openmobilehub.android.storage.core
 
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhFilePermission
 import com.openmobilehub.android.storage.core.model.OmhFileRevision
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -132,4 +133,13 @@ abstract class OmhStorageClient protected constructor(
      * @return A ByteArrayOutputStream with the content of the downloaded file revision
      */
     abstract suspend fun downloadFileRevision(fileId: String, revisionId: String): ByteArrayOutputStream
+
+    /**
+     * This method list permissions to a given file
+     *
+     * @param fileId The id of the file you want to get the list of permissions for
+     *
+     * @return A list of OmhFilePermission for the given file
+     */
+    abstract suspend fun getFilePermissions(fileId: String): List<OmhFilePermission>
 }

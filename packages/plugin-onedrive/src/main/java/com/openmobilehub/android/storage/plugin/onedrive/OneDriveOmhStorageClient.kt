@@ -22,6 +22,7 @@ import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhFilePermission
 import com.openmobilehub.android.storage.core.model.OmhFileRevision
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhFile
@@ -78,8 +79,8 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
     }
 
     override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhFile? {
-        // To be implemented
-        return null
+        val safeParentId = parentId ?: rootFolder
+        return repository.uploadFile(localFileToUpload, safeParentId)
     }
 
     override suspend fun downloadFile(fileId: String, mimeType: String?): ByteArrayOutputStream {
@@ -103,5 +104,10 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
     ): ByteArrayOutputStream {
         // To be implemented
         return ByteArrayOutputStream()
+    }
+
+    override suspend fun getFilePermissions(fileId: String): List<OmhFilePermission> {
+        // To be implemented
+        return emptyList()
     }
 }
