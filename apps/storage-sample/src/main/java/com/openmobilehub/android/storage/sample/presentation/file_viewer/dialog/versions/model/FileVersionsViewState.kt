@@ -4,5 +4,6 @@ import com.openmobilehub.android.storage.core.model.OmhFileRevision
 
 data class FileVersionsViewState(
     val revisions: List<OmhFileRevision>,
-    val isLoading: Boolean
+    val isLoading: Boolean,
+    val isDownloading: Boolean,
 )

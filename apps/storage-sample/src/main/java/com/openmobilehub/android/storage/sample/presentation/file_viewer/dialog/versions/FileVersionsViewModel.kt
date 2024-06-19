@@ -19,7 +19,8 @@ class FileVersionsViewModel @Inject constructor(
     private val _state = MutableStateFlow(
         FileVersionsViewState(
             isLoading = false,
-            revisions = emptyList()
+            revisions = emptyList(),
+            isDownloading = false
         )
     )
     val state: StateFlow<FileVersionsViewState> = _state
@@ -29,6 +30,14 @@ class FileVersionsViewModel @Inject constructor(
             _state.value = _state.value.copy(isLoading = true)
             val revisions = omhStorageClient.getFileRevisions(fileId)
             _state.value = _state.value.copy( revisions = revisions , isLoading = false)
+        }
+    }
+
+    fun downloadRevision(fileId: String, revisionId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _state.value = _state.value.copy(isDownloading = true)
+            omhStorageClient.downloadFileRevision(fileId, revisionId)
+            _state.value = _state.value.copy(isDownloading = false)
         }
     }
 }

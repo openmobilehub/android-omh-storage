@@ -25,6 +25,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -214,7 +215,7 @@ class FileViewerFragment :
         is FileViewerViewState.SwapLayoutManager -> buildSwapLayoutManagerState()
         FileViewerViewState.Finish -> buildFinishState()
         FileViewerViewState.CheckDownloadPermissions -> requestDownloadPermissions()
-        FileViewerViewState.SignOut -> buildSignOutState()
+        is FileViewerViewState.SignOut -> buildSignOutState()
         is FileViewerViewState.ShowUpdateFilePicker -> launchUpdateFilePicker()
         FileViewerViewState.ShowDownloadExceptionDialog -> showDownloadExceptionDialog()
         is FileViewerViewState.SaveFile -> saveFile(state)
@@ -529,7 +530,8 @@ class FileViewerFragment :
     }
 
     private fun buildSignOutState() {
-        navigateTo(R.id.action_file_viewer_fragment_to_login_fragment)
+        Log.v("Debug", "SignOut")
+//        navigateTo(R.id.action_file_viewer_fragment_to_login_fragment)
     }
 
     private fun clearSearch() {
@@ -564,6 +566,7 @@ class FileViewerFragment :
         }
 
         override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+            Log.v("Debug", "onMenuItemSelected")
             when (menuItem.itemId) {
                 R.id.swapGridOrLinear -> swapLayout()
                 R.id.createFile -> createFile()

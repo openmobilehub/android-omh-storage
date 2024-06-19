@@ -139,7 +139,7 @@ internal class GmsFileRepository(
     }
 
     fun getFileRevisions(fileId: String): List<OmhFileRevision> {
-        return apiService.getFileRevisions(fileId).execute().toOmhFileRevisions(fileId)
+        return apiService.getFileRevisions(fileId).execute().toOmhFileRevisions(fileId).reversed()
     }
 
     fun downloadFileRevision(fileId: String, revisionId: String): ByteArrayOutputStream {

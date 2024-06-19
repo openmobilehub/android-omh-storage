@@ -88,7 +88,7 @@ class FileVersionsDialog : BottomSheetDialogFragment(), FileRevisionAdapter.Item
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 revisionsViewModel.state.collect {
-                    if (it.isLoading) {
+                    if (it.isLoading || it.isDownloading) {
                         buildLoadingState()
                     } else {
                         buildLoadedState(it.revisions)
@@ -100,7 +100,7 @@ class FileVersionsDialog : BottomSheetDialogFragment(), FileRevisionAdapter.Item
         }
     }
 
-    override fun onFileClicked(file: OmhFileRevision) {
-        Log.v("FileVersionsDialog", "File clicked: $file")
+    override fun onFileClicked(revision: OmhFileRevision) {
+        revisionsViewModel.downloadRevision(revision.fileId, revision.revisionId)
     }
 }

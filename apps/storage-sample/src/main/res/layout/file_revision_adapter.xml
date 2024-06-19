@@ -24,12 +24,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/fileIcon"
+    <TextView
+        android:id="@+id/versionIndex"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
+        android:textAlignment="center"
+        android:gravity="center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -41,10 +43,10 @@
         android:layout_marginEnd="10dp"
         android:ellipsize="end"
         android:maxLines="1"
-        app:layout_constraintBottom_toBottomOf="@+id/fileIcon"
+        app:layout_constraintBottom_toBottomOf="@+id/versionIndex"
         app:layout_constraintEnd_toStartOf="@+id/buttonMoreOptions"
-        app:layout_constraintStart_toEndOf="@+id/fileIcon"
-        app:layout_constraintTop_toTopOf="@+id/fileIcon"
+        app:layout_constraintStart_toEndOf="@+id/versionIndex"
+        app:layout_constraintTop_toTopOf="@+id/versionIndex"
         tools:text="File Name" />
 
     <ImageView
@@ -52,7 +54,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="5dp"
-        android:src="@drawable/more_vert"
+        android:src="@drawable/download"
         app:layout_constraintBottom_toBottomOf="@+id/fileName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/fileName" />
@@ -66,6 +68,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/fileIcon" />
+        app:layout_constraintTop_toBottomOf="@+id/versionIndex" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

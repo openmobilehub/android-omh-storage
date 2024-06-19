@@ -18,6 +18,7 @@ package com.openmobilehub.android.storage.sample.presentation.file_viewer
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
@@ -336,10 +337,16 @@ class FileViewerViewModel @Inject constructor(
     }
 
     private fun signOut() {
+        Log.v("FileViewerViewModel", "debug 1")
+
         viewModelScope.launch {
+            Log.v("FileViewerViewModel", "debug 2")
             try {
+                Log.v("FileViewerViewModel", "debug 3")
                 authClient.coSignOut()
+                Log.v("FileViewerViewModel", "debug 4")
                 setState(FileViewerViewState.SignOut)
+                Log.v("FileViewerViewModel", "signing out...")
             } catch (e: Exception) {
                 setState(FileViewerViewState.Finish)
             }
