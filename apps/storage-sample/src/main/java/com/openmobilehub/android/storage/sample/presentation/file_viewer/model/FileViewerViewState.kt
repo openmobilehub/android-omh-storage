@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.sample.presentation.file_viewer
+package com.openmobilehub.android.storage.sample.presentation.file_viewer.model
 
 import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.sample.presentation.ViewState

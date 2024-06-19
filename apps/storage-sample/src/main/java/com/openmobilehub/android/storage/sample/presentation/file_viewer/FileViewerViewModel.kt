@@ -25,6 +25,9 @@ import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.core.model.OmhFileType
 import com.openmobilehub.android.storage.sample.domain.model.FileType
 import com.openmobilehub.android.storage.sample.presentation.BaseViewModel
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerAction
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewEvent
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewState
 import com.openmobilehub.android.storage.sample.util.coSignOut
 import com.openmobilehub.android.storage.sample.util.isDownloadable
 import com.openmobilehub.android.storage.sample.util.normalizedMimeType
@@ -34,6 +37,7 @@ import javax.inject.Inject
 import kotlin.random.Random
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -42,6 +46,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -65,9 +70,15 @@ class FileViewerViewModel @Inject constructor(
         private const val SEARCH_QUERY_DEBOUNCE_MILLIS = 250L
     }
 
-    var isGridLayoutManager = true
+    private val _action = Channel<FileViewerAction>()
+    val action = _action.receiveAsFlow()
+
     var createFileSelectedType: OmhFileType? = null
-    private var lastFileClicked: OmhFile? = null
+
+    var isGridLayoutManager = true
+        private set
+    var lastFileClicked: OmhFile? = null
+        private set
 
     private val parentId = StackWithFlow(omhStorageClient.rootFolder)
     private var searchQuery: MutableStateFlow<String?> = MutableStateFlow(null)
@@ -130,6 +141,10 @@ class FileViewerViewModel @Inject constructor(
             is FileViewerViewEvent.SaveFileResult -> saveFileResultEvent(event)
             is FileViewerViewEvent.UpdateFileClicked -> updateFileClickEvent(event)
             is FileViewerViewEvent.UpdateSearchQuery -> updateSearchQuery(event)
+            is FileViewerViewEvent.FileMetadataClicked -> onFileMetadata(event)
+            is FileViewerViewEvent.FilePermissionsClicked -> onFilePermissions(event)
+            is FileViewerViewEvent.FileVersionsClicked -> onFileVersions(event)
+            is FileViewerViewEvent.MoreOptionsClicked -> onMoreOptions(event)
         }
     }
 
@@ -352,6 +367,34 @@ class FileViewerViewModel @Inject constructor(
     }
 
     fun getFileName(documentFileName: String?): String = documentFileName ?: DEFAULT_FILE_NAME
+
+    private fun onFileVersions(event: FileViewerViewEvent.FileVersionsClicked) {
+        lastFileClicked = event.file
+        viewModelScope.launch {
+            _action.send(FileViewerAction.ShowFileVersions)
+        }
+    }
+
+    private fun onFilePermissions(event: FileViewerViewEvent.FilePermissionsClicked) {
+        lastFileClicked = event.file
+        viewModelScope.launch {
+            _action.send(FileViewerAction.ShowFilePermissions)
+        }
+    }
+
+    private fun onFileMetadata(event: FileViewerViewEvent.FileMetadataClicked) {
+        lastFileClicked = event.file
+        viewModelScope.launch {
+            _action.send(FileViewerAction.ShowFileMetadata)
+        }
+    }
+
+    private fun onMoreOptions(event: FileViewerViewEvent.MoreOptionsClicked) {
+        lastFileClicked = event.file
+        viewModelScope.launch {
+            _action.send(FileViewerAction.ShowMoreOptions)
+        }
+    }
 
     // Utility class for encapsulating stack operation and exposing a flow with the current peek value
     private class StackWithFlow<T>(first: T) {

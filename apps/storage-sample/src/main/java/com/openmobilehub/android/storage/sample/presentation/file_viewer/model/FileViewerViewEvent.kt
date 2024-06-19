@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.sample.presentation.file_viewer
+package com.openmobilehub.android.storage.sample.presentation.file_viewer.model
 
 import android.content.Context
 import android.net.Uri
@@ -81,6 +81,26 @@ sealed class FileViewerViewEvent : ViewEvent {
     class UpdateFileClicked(val file: OmhFile) : FileViewerViewEvent() {
 
         override fun getEventName() = "FileViewerViewEvent.UpdateFileClicked"
+    }
+
+    class MoreOptionsClicked(val file: OmhFile) : FileViewerViewEvent() {
+
+        override fun getEventName() = "FileViewerViewEvent.MoreOptionsClicked"
+    }
+
+    class FileMetadataClicked(val file: OmhFile) : FileViewerViewEvent() {
+
+        override fun getEventName() = "FileViewerViewEvent.FileMetadataClicked"
+    }
+
+    class FileVersionsClicked(val file: OmhFile) : FileViewerViewEvent() {
+
+        override fun getEventName() = "FileViewerViewEvent.FileVersionsClicked"
+    }
+
+    class FilePermissionsClicked(val file: OmhFile) : FileViewerViewEvent() {
+
+        override fun getEventName() = "FileViewerViewEvent.FilePermissionsClicked"
     }
 
     class UpdateFile(val context: Context, val uri: Uri, val fileName: String) : FileViewerViewEvent() {

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <include
+                android:id="@+id/header"
+                layout="@layout/row_dialog_header" />
+
+        <LinearLayout
+                android:id="@+id/menu_rows"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="@drawable/divider"
+                android:orientation="vertical"
+                android:showDividers="beginning|middle"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/header"
+                app:layout_constraintVertical_bias="0.0"
+                android:layout_marginTop="24dp">
+
+            <include
+                    android:id="@+id/metadata"
+                    layout="@layout/row_menu" />
+
+            <include
+                    android:id="@+id/permissions"
+                    layout="@layout/row_menu" />
+
+            <include
+                    android:id="@+id/versions"
+                    layout="@layout/row_menu" />
+
+            <include
+                    android:id="@+id/update"
+                    layout="@layout/row_menu" />
+
+            <include
+                    android:id="@+id/delete"
+                    layout="@layout/row_menu" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
