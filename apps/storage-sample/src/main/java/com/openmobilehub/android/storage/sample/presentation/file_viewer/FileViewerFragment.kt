@@ -72,11 +72,6 @@ class FileViewerFragment :
     BaseFragment<FileViewerViewModel, FileViewerViewState, FileViewerViewEvent>(),
     FileAdapter.GridItemListener {
 
-    interface FileViewerFragmentListener {
-
-        fun finishApplication()
-    }
-
     override val viewModel: FileViewerViewModel by viewModels()
     private lateinit var binding: FragmentFileViewerBinding
 
@@ -174,9 +169,10 @@ class FileViewerFragment :
     private fun setupToolbar() {
         val fragmentActivity: FragmentActivity = activity ?: return
         fragmentActivity.addMenuProvider(menuProvider, viewLifecycleOwner, Lifecycle.State.RESUMED)
-        fragmentActivity.onBackPressedDispatcher.addCallback {
-            dispatchEvent(FileViewerViewEvent.BackPressed)
-        }
+    }
+
+    override fun onBackPressed() {
+        dispatchEvent(FileViewerViewEvent.BackPressed)
     }
 
     private fun swapLayout() = dispatchEvent(FileViewerViewEvent.SwapLayoutManager)
@@ -212,7 +208,7 @@ class FileViewerFragment :
         FileViewerViewState.Loading -> buildLoadingState()
         is FileViewerViewState.Content -> buildContentState(state)
         is FileViewerViewState.SwapLayoutManager -> buildSwapLayoutManagerState()
-        FileViewerViewState.Finish -> buildFinishState()
+        FileViewerViewState.Finish -> finishApplication()
         FileViewerViewState.CheckDownloadPermissions -> requestDownloadPermissions()
         FileViewerViewState.SignOut -> buildSignOutState()
         is FileViewerViewState.ShowUpdateFilePicker -> launchUpdateFilePicker()
@@ -373,11 +369,6 @@ class FileViewerFragment :
 
     private fun launchUpdateFilePicker() {
         filePickerUpdate.launch(FileViewerViewModel.ANY_MIME_TYPE)
-    }
-
-    private fun buildFinishState() {
-        val activity = activity as? FileViewerFragmentListener
-        activity?.finishApplication()
     }
 
     private fun showCreateFileDialog() {
