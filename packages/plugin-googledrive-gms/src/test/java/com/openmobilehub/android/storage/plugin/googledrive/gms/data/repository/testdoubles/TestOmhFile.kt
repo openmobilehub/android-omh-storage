@@ -16,7 +16,7 @@
 
 package com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles
 
-import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 
 const val TEST_FILE_MIME_TYPE = "image/jpg"
 const val TEST_FILE_ID = "123"
@@ -24,7 +24,7 @@ const val TEST_FILE_NAME = "fileName"
 const val TEST_FILE_MODIFIED_TIME = "2023-07-04T03:03:55.397Z"
 const val TEST_FILE_PARENT_ID = "parentId"
 
-val testOmhFile = OmhFile(
+val testOmhStorageEntity = OmhStorageEntity(
     TEST_FILE_MIME_TYPE,
     TEST_FILE_ID,
     TEST_FILE_NAME,

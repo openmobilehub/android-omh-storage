@@ -25,8 +25,8 @@ import androidx.recyclerview.widget.DiffUtil.ItemCallback
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.core.model.OmhFileType
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.FileGridAdapterBinding
 import com.openmobilehub.android.storage.sample.databinding.FileLinearAdapterBinding
@@ -34,7 +34,7 @@ import com.openmobilehub.android.storage.sample.databinding.FileLinearAdapterBin
 class FileAdapter(
     private val listener: GridItemListener,
     private val isGridLayout: Boolean
-) : ListAdapter<OmhFile, FileAdapter.FileViewHolder>(DiffCallBack()) {
+) : ListAdapter<OmhStorageEntity, FileAdapter.FileViewHolder>(DiffCallBack()) {
 
     companion object {
 
@@ -99,31 +99,33 @@ class FileAdapter(
         }
     }
 
-    private class DiffCallBack : ItemCallback<OmhFile>() {
+    private class DiffCallBack : ItemCallback<OmhStorageEntity>() {
 
-        override fun areItemsTheSame(oldItem: OmhFile, newItem: OmhFile) = oldItem.id == newItem.id
+        override fun areItemsTheSame(oldItem: OmhStorageEntity, newItem: OmhStorageEntity) =
+            oldItem.id == newItem.id
 
-        override fun areContentsTheSame(oldItem: OmhFile, newItem: OmhFile) = oldItem == newItem
+        override fun areContentsTheSame(oldItem: OmhStorageEntity, newItem: OmhStorageEntity) =
+            oldItem == newItem
     }
 
     interface GridItemListener {
 
-        fun onFileClicked(file: OmhFile)
+        fun onFileClicked(file: OmhStorageEntity)
 
-        fun onMoreOptionsClicked(file: OmhFile)
+        fun onMoreOptionsClicked(file: OmhStorageEntity)
 
     }
 
     abstract class FileViewHolder(binding: View) : RecyclerView.ViewHolder(binding) {
 
-        abstract fun bind(file: OmhFile, listener: GridItemListener)
+        abstract fun bind(file: OmhStorageEntity, listener: GridItemListener)
     }
 
     class FileGridViewHolder(
         private val binding: FileGridAdapterBinding
     ) : FileViewHolder(binding.root) {
 
-        override fun bind(file: OmhFile, listener: GridItemListener) {
+        override fun bind(file: OmhStorageEntity, listener: GridItemListener) {
             val context = binding.root.context
             val iconLink = getFileIconUrl(file.fileType)
 
@@ -140,7 +142,7 @@ class FileAdapter(
         private val binding: FileLinearAdapterBinding
     ) : FileViewHolder(binding.root) {
 
-        override fun bind(file: OmhFile, listener: GridItemListener) {
+        override fun bind(file: OmhStorageEntity, listener: GridItemListener) {
             val context = binding.root.context
             val iconLink = getFileIconUrl(file.fileType)
 

@@ -28,7 +28,7 @@ import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.reposito
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_VERSION_ID
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testFileListRemote
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testFileRemote
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testOmhFile
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testOmhVersion
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testVersionListRemote
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.GoogleStorageApiService
@@ -94,7 +94,7 @@ internal class NonGmsFileRepositoryTest {
     }
 
     @Test
-    fun `given a parentId, when getFilesList is success, then a list of OmhFiles is returned`() =
+    fun `given a parentId, when getFilesList is success, then a list of OmhStorageEntities is returned`() =
         runTest {
             coEvery { googleStorageApiService.getFilesList(any()) } returns Response.success(
                 testFileListRemote
@@ -102,12 +102,12 @@ internal class NonGmsFileRepositoryTest {
 
             val result = fileRepositoryImpl.getFilesList(TEST_FILE_PARENT_ID)
 
-            assertEquals(listOf(testOmhFile), result)
+            assertEquals(listOf(testOmhStorageEntity), result)
             coVerify { googleStorageApiService.getFilesList(any()) }
         }
 
     @Test
-    fun `given the information of a new file, when createFile is success, then a OmhFile is returned`() =
+    fun `given the information of a new file, when createFile is success, then a OmhStorageEntity is returned`() =
         runTest {
             coEvery { googleStorageApiService.createFile(any(), any()) } returns Response.success(
                 testFileRemote
@@ -119,7 +119,7 @@ internal class NonGmsFileRepositoryTest {
                 TEST_FILE_PARENT_ID
             )
 
-            assertEquals(testOmhFile, result)
+            assertEquals(testOmhStorageEntity, result)
             coVerify { googleStorageApiService.createFile(any(), any()) }
         }
 
@@ -134,7 +134,7 @@ internal class NonGmsFileRepositoryTest {
     }
 
     @Test
-    fun `given a File and a parentId, when uploadFile is success, then a OmhFile is returned`() =
+    fun `given a File and a parentId, when uploadFile is success, then a OmhStorageEntity is returned`() =
         runTest {
             val localFileUpload: File = mockk()
             every { localFileUpload.name } returns TEST_FILE_NAME
@@ -145,7 +145,7 @@ internal class NonGmsFileRepositoryTest {
 
             val result = fileRepositoryImpl.uploadFile(localFileUpload, TEST_FILE_PARENT_ID)
 
-            assertEquals(testOmhFile, result)
+            assertEquals(testOmhStorageEntity, result)
             coVerify { googleStorageApiService.uploadFile(any(), any()) }
         }
 
@@ -171,7 +171,7 @@ internal class NonGmsFileRepositoryTest {
         }
 
     @Test
-    fun `given a File and a file id, when updateFile is success, then a OmhFile is returned`() =
+    fun `given a File and a file id, when updateFile is success, then a OmhStorageEntity is returned`() =
         runTest {
             coEvery { googleStorageApiService.updateFile(any(), any()) } returns Response.success(
                 testFileRemote
@@ -187,7 +187,7 @@ internal class NonGmsFileRepositoryTest {
 
             val result = fileRepositoryImpl.updateFile(File(FILE_PATH), TEST_FILE_ID)
 
-            assertEquals(testOmhFile, result)
+            assertEquals(testOmhStorageEntity, result)
             coVerify { googleStorageApiService.updateFile(any(), any()) }
         }
 
@@ -295,7 +295,7 @@ internal class NonGmsFileRepositoryTest {
         }
 
     @Test
-    fun `given a search query, when search is success, then a list of OmhFiles is returned`() =
+    fun `given a search query, when search is success, then a list of OmhStorageEntities is returned`() =
         runTest {
             val expectedQuery = "name contains '$TEST_FILE_NAME' and trashed = false"
             coEvery { googleStorageApiService.getFilesList(expectedQuery) } returns Response.success(
@@ -304,7 +304,7 @@ internal class NonGmsFileRepositoryTest {
 
             val result = fileRepositoryImpl.search(TEST_FILE_NAME)
 
-            assertEquals(listOf(testOmhFile), result)
+            assertEquals(listOf(testOmhStorageEntity), result)
             coVerify { googleStorageApiService.getFilesList(expectedQuery) }
         }
 

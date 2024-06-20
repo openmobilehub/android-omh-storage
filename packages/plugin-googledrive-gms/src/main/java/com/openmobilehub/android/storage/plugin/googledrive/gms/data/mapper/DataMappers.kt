@@ -4,12 +4,12 @@ import com.google.api.services.drive.model.File
 import com.google.api.services.drive.model.FileList
 import com.google.api.services.drive.model.Revision
 import com.google.api.services.drive.model.RevisionList
-import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import java.util.Date
 
 @SuppressWarnings("ComplexCondition")
-fun File.toOmhFile(): OmhFile? {
+fun File.toOmhStorageEntity(): OmhStorageEntity? {
     val formattedModifiedTime = modifiedTime?.toStringRfc3339().orEmpty()
 
     if (mimeType == null || id == null || name == null) {
@@ -22,7 +22,7 @@ fun File.toOmhFile(): OmhFile? {
         parents[0]
     }
 
-    return OmhFile(
+    return OmhStorageEntity(
         mimeType,
         id,
         name,
@@ -31,8 +31,8 @@ fun File.toOmhFile(): OmhFile? {
     )
 }
 
-fun FileList.toOmhFiles(): List<OmhFile> {
-    return this.files.toList().mapNotNull { googleFile -> googleFile.toOmhFile() }
+fun FileList.toOmhStorageEntities(): List<OmhStorageEntity> {
+    return this.files.toList().mapNotNull { googleFile -> googleFile.toOmhStorageEntity() }
 }
 
 fun Revision.toOmhFileVersion(fileId: String): OmhFileVersion {

@@ -30,7 +30,7 @@ import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_VERSION_FILE_ID
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_VERSION_ID
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.setUpMock
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.testOmhFile
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.testOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.testOmhVersion
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.service.GoogleDriveApiService
 import io.mockk.MockKAnnotations
@@ -115,7 +115,7 @@ internal class GmsFileRepositoryTest {
     }
 
     @Test
-    fun `given a parentId, when getFilesList is success, then a list of OmhFiles is returned`() =
+    fun `given a parentId, when getFilesList is success, then a list of OmhStorageEntities is returned`() =
         runTest {
             every { apiFileList.files } returns listOf(googleDriveFile)
             every { driveFilesListRequest.execute() } returns apiFileList
@@ -123,12 +123,12 @@ internal class GmsFileRepositoryTest {
 
             val result = fileRepositoryImpl.getFilesList(TEST_FILE_PARENT_ID)
 
-            assertEquals(listOf(testOmhFile), result)
+            assertEquals(listOf(testOmhStorageEntity), result)
             verify { apiService.getFilesList(TEST_FILE_PARENT_ID) }
         }
 
     @Test
-    fun `given the information of a new file, when createFile is success, then a OmhFile is returned`() =
+    fun `given the information of a new file, when createFile is success, then a OmhStorageEntity is returned`() =
         runTest {
             every { driveFilesCreateRequest.execute() } returns googleDriveFile
             every { apiService.createFile(any()) } returns driveFilesCreateRequest
@@ -139,7 +139,7 @@ internal class GmsFileRepositoryTest {
                 TEST_FILE_PARENT_ID
             )
 
-            assertEquals(testOmhFile, result)
+            assertEquals(testOmhStorageEntity, result)
             verify { apiService.createFile(any()) }
         }
 
@@ -154,7 +154,7 @@ internal class GmsFileRepositoryTest {
     }
 
     @Test
-    fun `given a File and a parentId, when uploadFile is success, then a OmhFile is returned`() =
+    fun `given a File and a parentId, when uploadFile is success, then a OmhStorageEntity is returned`() =
         runTest {
             val localFileUpload = File(FILE_PATH)
             every { driveFilesCreateRequest.execute() } returns googleDriveFile
@@ -162,7 +162,7 @@ internal class GmsFileRepositoryTest {
 
             val result = fileRepositoryImpl.uploadFile(localFileUpload, TEST_FILE_PARENT_ID)
 
-            assertEquals(testOmhFile, result)
+            assertEquals(testOmhStorageEntity, result)
             verify { apiService.uploadFile(any(), any()) }
         }
 
@@ -177,7 +177,7 @@ internal class GmsFileRepositoryTest {
         }
 
     @Test
-    fun `given a File and a file id, when updateFile is success, then a OmhFile is returned`() =
+    fun `given a File and a file id, when updateFile is success, then a OmhStorageEntity is returned`() =
         runTest {
             val localFileUpdate = File(FILE_PATH)
             every { driveFilesUpdateRequest.execute() } returns googleDriveFile
@@ -185,12 +185,12 @@ internal class GmsFileRepositoryTest {
 
             val result = fileRepositoryImpl.updateFile(localFileUpdate, TEST_FILE_ID)
 
-            assertEquals(testOmhFile, result)
+            assertEquals(testOmhStorageEntity, result)
             verify { apiService.updateFile(any(), any(), any()) }
         }
 
     @Test
-    fun `given a search query, when search is success, then a list of OmhFiles is returned`() =
+    fun `given a search query, when search is success, then a list of OmhStorageEntities is returned`() =
         runTest {
             every { apiFileList.files } returns listOf(googleDriveFile)
             every { driveFilesListRequest.execute() } returns apiFileList
@@ -198,7 +198,7 @@ internal class GmsFileRepositoryTest {
 
             val result = fileRepositoryImpl.search(TEST_FILE_NAME)
 
-            assertEquals(listOf(testOmhFile), result)
+            assertEquals(listOf(testOmhStorageEntity), result)
             verify { apiService.search(TEST_FILE_NAME) }
         }
 

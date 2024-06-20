@@ -17,8 +17,8 @@
 package com.openmobilehub.android.storage.sample.util
 
 import com.openmobilehub.android.auth.core.OmhAuthClient
-import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.core.model.OmhFileType
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -34,9 +34,10 @@ private val NON_SUPPORTED_MIME_TYPES_FOR_DOWNLOAD = listOf(
     OmhFileType.UNKNOWN
 )
 
-fun OmhFile.isDownloadable(): Boolean = !NON_SUPPORTED_MIME_TYPES_FOR_DOWNLOAD.contains(fileType)
+fun OmhStorageEntity.isDownloadable(): Boolean =
+    !NON_SUPPORTED_MIME_TYPES_FOR_DOWNLOAD.contains(fileType)
 
-fun OmhFile.normalizedMimeType(): String = when (fileType) {
+fun OmhStorageEntity.normalizedMimeType(): String = when (fileType) {
     OmhFileType.DOCUMENT -> OmhFileType.MICROSOFT_WORD.mimeType
     OmhFileType.DRAWING -> OmhFileType.PNG.mimeType
     OmhFileType.FORM -> OmhFileType.PDF.mimeType
@@ -51,7 +52,7 @@ fun OmhFile.normalizedMimeType(): String = when (fileType) {
     else -> this.mimeType
 }
 
-fun OmhFile.normalizeFileName(): String {
+fun OmhStorageEntity.normalizeFileName(): String {
     val invalidChars = Regex("[\\\\/:*?\"'<>|]")
 
     var downloadName = name.replace(invalidChars, " ")
@@ -63,7 +64,7 @@ fun OmhFile.normalizeFileName(): String {
     return downloadName
 }
 
-fun OmhFile.getNameWithExtension(): String = if (isFileNameWithExtension(name)) {
+fun OmhStorageEntity.getNameWithExtension(): String = if (isFileNameWithExtension(name)) {
     name
 } else {
     "$name${getExtension().orEmpty()}"

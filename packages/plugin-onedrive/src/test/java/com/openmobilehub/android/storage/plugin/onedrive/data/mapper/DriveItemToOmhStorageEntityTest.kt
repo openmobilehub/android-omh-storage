@@ -11,8 +11,8 @@ import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FIRST_
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FOLDER_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FOLDER_NAME
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FOLDER_PARENT_ID
-import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.testOmhFile
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.testOmhFolder
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.testOmhStorageEntity
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -26,7 +26,7 @@ import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 
-class DriveItemToOmhFileTest {
+class DriveItemToOmhStorageEntityTest {
 
     @MockK
     private lateinit var mimeTypeMap: MimeTypeMap
@@ -37,7 +37,7 @@ class DriveItemToOmhFileTest {
     @MockK(relaxed = true)
     private lateinit var folderDriveItem: DriveItem
 
-    private lateinit var mapper: DriveItemToOmhFile
+    private lateinit var mapper: DriveItemToOmhStorageEntity
 
     @Before
     fun setUp() {
@@ -46,7 +46,7 @@ class DriveItemToOmhFileTest {
         mockkStatic("com.openmobilehub.android.storage.core.utils.MimeTypeMapExtensionsKt")
         every { mimeTypeMap.getMimeTypeFromUrl(any()) } returns TEST_FILE_MIME_TYPE
 
-        mapper = DriveItemToOmhFile(mimeTypeMap)
+        mapper = DriveItemToOmhStorageEntity(mimeTypeMap)
     }
 
     @After
@@ -55,7 +55,7 @@ class DriveItemToOmhFileTest {
     }
 
     @Test
-    fun `given a file with specific properties, when mapped, then return the expected OmhFile`() {
+    fun `given a file with specific properties, when mapped, then return the expected OmhStorageEntity`() {
         // Arrange
         every { fileDriveItem.folder } returns null
         every { fileDriveItem.name } returns TEST_FILE_NAME
@@ -69,7 +69,7 @@ class DriveItemToOmhFileTest {
         val result = mapper(fileDriveItem)
 
         // Assert
-        Assert.assertEquals(testOmhFile, result)
+        Assert.assertEquals(testOmhStorageEntity, result)
     }
 
     @Test

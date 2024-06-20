@@ -14,8 +14,8 @@ import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FIRST_M
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FOLDER_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FOLDER_NAME
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FOLDER_PARENT_ID
-import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhFile
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhFolder
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhStorageEntity
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -28,7 +28,7 @@ import org.junit.Before
 import org.junit.Test
 import java.util.Date
 
-class MetadataToOmhFileTest {
+class MetadataToOmhStorageEntityTest {
 
     @MockK
     private lateinit var mimeTypeMap: MimeTypeMap
@@ -42,7 +42,7 @@ class MetadataToOmhFileTest {
     @MockK
     private lateinit var metadata: Metadata
 
-    private lateinit var mapper: MetadataToOmhFile
+    private lateinit var mapper: MetadataToOmhStorageEntity
 
     @Before
     fun setUp() {
@@ -51,7 +51,7 @@ class MetadataToOmhFileTest {
         mockkStatic("com.openmobilehub.android.storage.core.utils.MimeTypeMapExtensionsKt")
         every { mimeTypeMap.getMimeTypeFromUrl(any()) } returns TEST_FILE_MIME_TYPE
 
-        mapper = MetadataToOmhFile(mimeTypeMap)
+        mapper = MetadataToOmhStorageEntity(mimeTypeMap)
     }
 
     @After
@@ -60,7 +60,7 @@ class MetadataToOmhFileTest {
     }
 
     @Test
-    fun `given a file metadata with specific properties, when mapped, then return the expected OmhFile`() {
+    fun `given a file metadata with specific properties, when mapped, then return the expected OmhStorageEntity`() {
         // Arrange
         every { fileMetadata.name } returns TEST_FILE_NAME
         every { fileMetadata.id } returns TEST_FILE_ID
@@ -72,11 +72,11 @@ class MetadataToOmhFileTest {
         val result = mapper(fileMetadata)
 
         // Assert
-        assertEquals(testOmhFile, result)
+        assertEquals(testOmhStorageEntity, result)
     }
 
     @Test
-    fun `given a folder metadata with specific properties, when mapped, then return the expected OmhFile`() {
+    fun `given a folder metadata with specific properties, when mapped, then return the expected OmhStorageEntity`() {
         // Arrange
         every { folderMetadata.name } returns TEST_FOLDER_NAME
         every { folderMetadata.id } returns TEST_FOLDER_ID

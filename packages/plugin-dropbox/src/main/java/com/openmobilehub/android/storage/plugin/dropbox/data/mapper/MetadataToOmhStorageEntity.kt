@@ -4,22 +4,22 @@ import android.webkit.MimeTypeMap
 import com.dropbox.core.v2.files.FileMetadata
 import com.dropbox.core.v2.files.FolderMetadata
 import com.dropbox.core.v2.files.Metadata
-import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.core.model.OmhFileType
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.utils.DateUtils
 import com.openmobilehub.android.storage.core.utils.getMimeTypeFromUrl
 import com.openmobilehub.android.storage.core.utils.removeWhitespaces
 import com.openmobilehub.android.storage.core.utils.toRFC3339String
 
-class MetadataToOmhFile(private val mimeTypeMap: MimeTypeMap) {
-    operator fun invoke(metadata: Metadata): OmhFile? {
+class MetadataToOmhStorageEntity(private val mimeTypeMap: MimeTypeMap) {
+    operator fun invoke(metadata: Metadata): OmhStorageEntity? {
         metadata.run {
             return when (this) {
                 is FileMetadata -> {
                     val mimeType = mimeTypeMap.getMimeTypeFromUrl(name.removeWhitespaces())
                     val lastModifiedDate = DateUtils.getNewerDate(clientModified, serverModified)
 
-                    OmhFile(
+                    OmhStorageEntity(
                         mimeType.orEmpty(),
                         id,
                         name,
@@ -34,7 +34,7 @@ class MetadataToOmhFile(private val mimeTypeMap: MimeTypeMap) {
                     // Dropbox does not provide a last modified date for folders, so we use an empty string
                     val lastModifiedDate = ""
 
-                    OmhFile(
+                    OmhStorageEntity(
                         mimeType,
                         id,
                         name,

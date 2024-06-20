@@ -18,7 +18,7 @@ package com.openmobilehub.android.storage.core.model
 
 import com.openmobilehub.android.storage.core.mapper.FileTypeMapper
 
-data class OmhFile(
+data class OmhStorageEntity(
     val mimeType: String,
     val id: String,
     val name: String,

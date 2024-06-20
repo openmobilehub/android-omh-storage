@@ -4,9 +4,9 @@ package com.openmobilehub.android.storage.plugin.dropbox.data.repository
 
 import com.dropbox.core.v2.files.FileMetadata
 import com.dropbox.core.v2.files.ListFolderResult
-import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.utils.toInputStream
-import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.MetadataToOmhFile
+import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.MetadataToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.dropbox.data.service.DropboxApiService
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_PARENT_ID
 import io.mockk.MockKAnnotations
@@ -25,7 +25,7 @@ import java.io.FileInputStream
 class DropboxFileRepositoryTest {
 
     @MockK
-    private lateinit var omhFile: OmhFile
+    private lateinit var omhStorageEntity: OmhStorageEntity
 
     @MockK
     private lateinit var dropboxFiles: ListFolderResult
@@ -34,7 +34,7 @@ class DropboxFileRepositoryTest {
     private lateinit var apiService: DropboxApiService
 
     @MockK
-    private lateinit var metadataToOmhFile: MetadataToOmhFile
+    private lateinit var metadataToOmhStorageEntity: MetadataToOmhStorageEntity
 
     @MockK(relaxed = true)
     private lateinit var file: File
@@ -48,7 +48,7 @@ class DropboxFileRepositoryTest {
         mockkStatic("com.openmobilehub.android.storage.core.utils.FileExtensionsKt")
         every { file.toInputStream() } returns mockk<FileInputStream>()
 
-        repository = DropboxFileRepository(apiService, metadataToOmhFile)
+        repository = DropboxFileRepository(apiService, metadataToOmhStorageEntity)
     }
 
     @After
@@ -62,13 +62,13 @@ class DropboxFileRepositoryTest {
         every { apiService.getFilesList(TEST_FILE_PARENT_ID) } returns dropboxFiles
 
         every { dropboxFiles.entries } returns listOf(mockk())
-        every { metadataToOmhFile(any()) } returns omhFile
+        every { metadataToOmhStorageEntity(any()) } returns omhStorageEntity
 
         // Act
         val result = repository.getFilesList(TEST_FILE_PARENT_ID)
 
         // Assert
-        assertEquals(listOf(omhFile), result)
+        assertEquals(listOf(omhStorageEntity), result)
     }
 
     @Test
@@ -82,7 +82,7 @@ class DropboxFileRepositoryTest {
         val result = repository.getFilesList(TEST_FILE_PARENT_ID)
 
         // Assert
-        assertEquals(emptyList<OmhFile>(), result)
+        assertEquals(emptyList<OmhStorageEntity>(), result)
     }
 
     @Test
@@ -91,25 +91,25 @@ class DropboxFileRepositoryTest {
         every { apiService.getFilesList(TEST_FILE_PARENT_ID) } returns dropboxFiles
 
         every { dropboxFiles.entries } returns listOf(mockk(), mockk())
-        every { metadataToOmhFile(any()) } returnsMany listOf(omhFile, null)
+        every { metadataToOmhStorageEntity(any()) } returnsMany listOf(omhStorageEntity, null)
 
         // Act
         val result = repository.getFilesList(TEST_FILE_PARENT_ID)
 
         // Assert
-        assertEquals(listOf(omhFile), result)
+        assertEquals(listOf(omhStorageEntity), result)
     }
 
     @Test
     fun `given an api service returns FileMetadata, when uploading the file, then returns OmhFile`() {
         // Arrange
         every { apiService.uploadFile(any(), any()) } returns mockk<FileMetadata>()
-        every { metadataToOmhFile(any()) } returns omhFile
+        every { metadataToOmhStorageEntity(any()) } returns omhStorageEntity
 
         // Act
         val result = repository.uploadFile(file, TEST_FILE_PARENT_ID)
 
         // Assert
-        assertEquals(omhFile, result)
+        assertEquals(omhStorageEntity, result)
     }
 }

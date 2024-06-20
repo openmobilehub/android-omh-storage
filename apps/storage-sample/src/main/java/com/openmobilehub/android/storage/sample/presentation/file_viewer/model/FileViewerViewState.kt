@@ -16,7 +16,7 @@
 
 package com.openmobilehub.android.storage.sample.presentation.file_viewer.model
 
-import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.sample.presentation.ViewState
 import java.io.ByteArrayOutputStream
 
@@ -32,7 +32,8 @@ sealed class FileViewerViewState : ViewState {
         override fun getName() = "FileViewerViewState.Loading"
     }
 
-    data class Content(val files: List<OmhFile>, val isSearching: Boolean) : FileViewerViewState() {
+    data class Content(val files: List<OmhStorageEntity>, val isSearching: Boolean) :
+        FileViewerViewState() {
 
         override fun getName() = "FileViewerViewState.Content"
     }
@@ -53,7 +54,7 @@ sealed class FileViewerViewState : ViewState {
     }
 
     data class SaveFile(
-        val file: OmhFile,
+        val file: OmhStorageEntity,
         val bytes: ByteArrayOutputStream
     ) : FileViewerViewState() {
 

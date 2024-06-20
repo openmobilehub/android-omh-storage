@@ -21,11 +21,11 @@ import androidx.annotation.VisibleForTesting
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 import com.openmobilehub.android.storage.core.OmhStorageClient
-import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.core.model.OmhFilePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
-import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhFile
+import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.onedrive.data.repository.OneDriveFileRepository
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiClient
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiService
@@ -49,8 +49,9 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
             val authProvider = OneDriveAuthProvider(accessToken)
             val apiClient = OneDriveApiClient.getInstance(authProvider)
             val apiService = OneDriveApiService(apiClient)
-            val driveItemToOmhFile = DriveItemToOmhFile(MimeTypeMap.getSingleton())
-            val repository = OneDriveFileRepository(apiService, driveItemToOmhFile)
+            val driveItemToOmhStorageEntity =
+                DriveItemToOmhStorageEntity(MimeTypeMap.getSingleton())
+            val repository = OneDriveFileRepository(apiService, driveItemToOmhStorageEntity)
 
             return OneDriveOmhStorageClient(authClient, repository)
         }
@@ -59,16 +60,20 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
     override val rootFolder: String
         get() = OneDriveConstants.ROOT_FOLDER
 
-    override suspend fun listFiles(parentId: String): List<OmhFile> {
+    override suspend fun listFiles(parentId: String): List<OmhStorageEntity> {
         return repository.getFilesList(parentId)
     }
 
-    override suspend fun search(query: String): List<OmhFile> {
+    override suspend fun search(query: String): List<OmhStorageEntity> {
         // To be implemented
         return emptyList()
     }
 
-    override suspend fun createFile(name: String, mimeType: String, parentId: String): OmhFile? {
+    override suspend fun createFile(
+        name: String,
+        mimeType: String,
+        parentId: String
+    ): OmhStorageEntity? {
         // To be implemented
         return null
     }
@@ -78,7 +83,7 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
         return true
     }
 
-    override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhFile? {
+    override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity? {
         val safeParentId = parentId ?: rootFolder
         return repository.uploadFile(localFileToUpload, safeParentId)
     }
@@ -88,7 +93,7 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
         return ByteArrayOutputStream()
     }
 
-    override suspend fun updateFile(localFileToUpload: File, fileId: String): OmhFile? {
+    override suspend fun updateFile(localFileToUpload: File, fileId: String): OmhStorageEntity? {
         // To be implemented
         return null
     }

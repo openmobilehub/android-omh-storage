@@ -34,7 +34,7 @@ To upload a file in the application data folder, specify `appDataFolder` in the 
 ```kotlin
 import com.omh.android.auth.api.async.CancellableCollector
 import com.omh.android.storage.api.OmhStorageClient
-import com.omh.android.storage.api.domain.model.OmhFile
+import com.omh.android.storage.api.domain.model.OmhStorageEntity
 import java.io.File
 
 ...
@@ -51,7 +51,7 @@ fun uploadFile(omhStorageClient: OmhStorageClient) {
             if (result.file == null) {
                 // Handle the file was not uploaded.
             } else {
-                val uploadedFile: OmhFile? = result.file
+                val uploadedFile: OmhStorageEntity? = result.file
                 // Handle the uploadedFile as needed.
             }
         }
