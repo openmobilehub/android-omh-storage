@@ -17,62 +17,60 @@
 package com.openmobilehub.android.storage.sample.util
 
 import com.openmobilehub.android.auth.core.OmhAuthClient
-import com.openmobilehub.android.storage.core.model.OmhFileType
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
+import com.openmobilehub.android.storage.sample.domain.model.FileTypeMapper
+import com.openmobilehub.android.storage.sample.domain.model.FileType
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.suspendCancellableCoroutine
 
 private val NON_SUPPORTED_MIME_TYPES_FOR_DOWNLOAD = listOf(
-    OmhFileType.THIRD_PARTY_SHORTCUT,
-    OmhFileType.FILE,
-    OmhFileType.FUSIONTABLE,
-    OmhFileType.JAMBOARD,
-    OmhFileType.MAP,
-    OmhFileType.SITE,
-    OmhFileType.UNKNOWN
+    FileType.GOOGLE_THIRD_PARTY_SHORTCUT,
+    FileType.GOOGLE_FILE,
+    FileType.GOOGLE_FUSIONTABLE,
+    FileType.GOOGLE_JAMBOARD,
+    FileType.GOOGLE_MAP,
+    FileType.GOOGLE_SITE,
+    FileType.GOOGLE_UNKNOWN
 )
 
 fun OmhStorageEntity.isDownloadable(): Boolean =
-    !NON_SUPPORTED_MIME_TYPES_FOR_DOWNLOAD.contains(fileType)
+    !NON_SUPPORTED_MIME_TYPES_FOR_DOWNLOAD.contains(getFileType())
 
-fun OmhStorageEntity.normalizedMimeType(): String = when (fileType) {
-    OmhFileType.DOCUMENT -> OmhFileType.MICROSOFT_WORD.mimeType
-    OmhFileType.DRAWING -> OmhFileType.PNG.mimeType
-    OmhFileType.FORM -> OmhFileType.PDF.mimeType
-    OmhFileType.PHOTO -> OmhFileType.JPEG.mimeType
-    OmhFileType.PRESENTATION -> OmhFileType.MICROSOFT_POWERPOINT.mimeType
-    OmhFileType.SCRIPT -> OmhFileType.JSON.mimeType
-    OmhFileType.SHORTCUT -> OmhFileType.SHORTCUT.mimeType
-    OmhFileType.SPREADSHEET -> OmhFileType.MICROSOFT_EXCEL.mimeType
-    OmhFileType.VIDEO,
-    OmhFileType.AUDIO -> OmhFileType.MP4.mimeType
-
-    else -> this.mimeType
-}
-
-fun OmhStorageEntity.normalizeFileName(): String {
-    val invalidChars = Regex("[\\\\/:*?\"'<>|]")
-
-    var downloadName = name.replace(invalidChars, " ")
-
-    if (downloadName.length >= 255) {
-        downloadName = downloadName.substring(0..254)
+fun OmhStorageEntity.getFileType() = when (this) {
+    is OmhStorageEntity.OmhFile -> {
+        mimeType?.let {
+            FileTypeMapper.getFileTypeWithMime(it)
+        } ?: FileType.GOOGLE_UNKNOWN
     }
 
-    return downloadName
+    is OmhStorageEntity.OmhFolder -> {
+        FileType.OMH_FOLDER
+    }
 }
 
-fun OmhStorageEntity.getNameWithExtension(): String = if (isFileNameWithExtension(name)) {
-    name
-} else {
-    "$name${getExtension().orEmpty()}"
+fun OmhStorageEntity.normalizedMimeType(): String = when (getFileType()) {
+    FileType.GOOGLE_DOCUMENT -> FileType.MICROSOFT_WORD.mimeType
+    FileType.GOOGLE_DRAWING -> FileType.PNG.mimeType
+    FileType.GOOGLE_FORM -> FileType.PDF.mimeType
+    FileType.GOOGLE_PHOTO -> FileType.JPEG.mimeType
+    FileType.GOOGLE_PRESENTATION -> FileType.MICROSOFT_POWERPOINT.mimeType
+    FileType.GOOGLE_SCRIPT -> FileType.JSON.mimeType
+    FileType.GOOGLE_SHORTCUT -> FileType.GOOGLE_SHORTCUT.mimeType
+    FileType.GOOGLE_SPREADSHEET -> FileType.MICROSOFT_EXCEL.mimeType
+    FileType.GOOGLE_VIDEO,
+    FileType.GOOGLE_AUDIO -> FileType.MP4.mimeType
+
+    else -> getMimeType()
 }
 
-private fun isFileNameWithExtension(fileName: String): Boolean {
-    val lastDotIndex: Int = fileName.lastIndexOf('.')
-    return lastDotIndex != -1 && lastDotIndex < fileName.length - 1
+fun OmhStorageEntity.isFolder() = this is OmhStorageEntity.OmhFolder
+fun OmhStorageEntity.isFile() = this is OmhStorageEntity.OmhFile
+
+fun OmhStorageEntity.getMimeType(): String = when (this) {
+    is OmhStorageEntity.OmhFile -> mimeType.orEmpty()
+    is OmhStorageEntity.OmhFolder -> ""
 }
 
 suspend fun OmhAuthClient.isUserLoggedIn(): Boolean = suspendCoroutine { continuation ->

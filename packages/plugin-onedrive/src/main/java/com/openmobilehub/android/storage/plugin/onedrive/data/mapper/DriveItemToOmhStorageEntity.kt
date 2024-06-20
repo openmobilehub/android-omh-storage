@@ -2,35 +2,40 @@ package com.openmobilehub.android.storage.plugin.onedrive.data.mapper
 
 import android.webkit.MimeTypeMap
 import com.microsoft.graph.models.DriveItem
-import com.openmobilehub.android.storage.core.model.OmhFileType
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.utils.getMimeTypeFromUrl
 import com.openmobilehub.android.storage.core.utils.removeWhitespaces
-import com.openmobilehub.android.storage.core.utils.toRFC3339String
+import com.openmobilehub.android.storage.plugin.onedrive.OneDriveConstants.ROOT_FOLDER
 import java.util.Date
 
 class DriveItemToOmhStorageEntity(private val mimeTypeMap: MimeTypeMap) {
     operator fun invoke(driveItem: DriveItem): OmhStorageEntity {
         driveItem.run {
             val isFolder = folder != null
-            val mimeType = if (isFolder) {
-                OmhFileType.OMH_FOLDER.mimeType
+            val modifiedTime = Date.from(lastModifiedDateTime.toInstant())
+            val parentId = parentReference.id ?: ROOT_FOLDER
+
+            return if (isFolder) {
+                OmhStorageEntity.OmhFolder(
+                    id,
+                    name,
+                    modifiedTime,
+                    parentId,
+                )
             } else {
-                mimeTypeMap.getMimeTypeFromUrl(
-                    name.removeWhitespaces()
+                val sanitizedName = name.removeWhitespaces()
+                val mimeType = mimeTypeMap.getMimeTypeFromUrl(sanitizedName)
+                val extension = MimeTypeMap.getFileExtensionFromUrl(sanitizedName)?.ifEmpty { null }
+
+                OmhStorageEntity.OmhFile(
+                    id,
+                    name,
+                    modifiedTime,
+                    parentId,
+                    mimeType,
+                    extension,
                 )
             }
-
-            val instant = lastModifiedDateTime.toInstant()
-            val lastModifiedDate = Date.from(instant)
-
-            return OmhStorageEntity(
-                mimeType.orEmpty(),
-                id,
-                name,
-                lastModifiedDate.toRFC3339String(),
-                parentReference.id.orEmpty()
-            )
         }
     }
 }

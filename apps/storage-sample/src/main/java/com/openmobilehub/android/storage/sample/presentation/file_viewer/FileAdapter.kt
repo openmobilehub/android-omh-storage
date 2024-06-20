@@ -25,11 +25,12 @@ import androidx.recyclerview.widget.DiffUtil.ItemCallback
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.openmobilehub.android.storage.core.model.OmhFileType
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.FileGridAdapterBinding
 import com.openmobilehub.android.storage.sample.databinding.FileLinearAdapterBinding
+import com.openmobilehub.android.storage.sample.domain.model.FileType
+import com.openmobilehub.android.storage.sample.util.getFileType
 
 class FileAdapter(
     private val listener: GridItemListener,
@@ -56,31 +57,31 @@ class FileAdapter(
             "https://drive-thirdparty.googleusercontent.com/32/type/video/mp4"
         private const val URL_OTHER = "https://static.thenounproject.com/png/3482632-200.png"
 
-        private fun getFileIconUrl(fileType: OmhFileType) = when (fileType) {
-            OmhFileType.OMH_FOLDER,
-            OmhFileType.FOLDER -> URL_FOLDER
+        private fun getFileIconUrl(fileType: FileType) = when (fileType) {
+            FileType.OMH_FOLDER,
+            FileType.GOOGLE_FOLDER -> URL_FOLDER
 
-            OmhFileType.PDF -> URL_PDF
+            FileType.PDF -> URL_PDF
 
-            OmhFileType.DOCUMENT,
-            OmhFileType.MICROSOFT_WORD,
-            OmhFileType.OPEN_DOCUMENT_TEXT -> URL_DOCUMENT
+            FileType.GOOGLE_DOCUMENT,
+            FileType.MICROSOFT_WORD,
+            FileType.OPEN_DOCUMENT_TEXT -> URL_DOCUMENT
 
-            OmhFileType.SPREADSHEET,
-            OmhFileType.MICROSOFT_EXCEL,
-            OmhFileType.OPEN_DOCUMENT_SPREADSHEET -> URL_SHEET
+            FileType.GOOGLE_SPREADSHEET,
+            FileType.MICROSOFT_EXCEL,
+            FileType.OPEN_DOCUMENT_SPREADSHEET -> URL_SHEET
 
-            OmhFileType.PRESENTATION,
-            OmhFileType.MICROSOFT_POWERPOINT,
-            OmhFileType.OPEN_DOCUMENT_PRESENTATION -> URL_PRESENTATION
+            FileType.GOOGLE_PRESENTATION,
+            FileType.MICROSOFT_POWERPOINT,
+            FileType.OPEN_DOCUMENT_PRESENTATION -> URL_PRESENTATION
 
-            OmhFileType.PNG,
-            OmhFileType.JPEG -> URL_PNG
+            FileType.PNG,
+            FileType.JPEG -> URL_PNG
 
-            OmhFileType.ZIP -> URL_ZIP
+            FileType.ZIP -> URL_ZIP
 
-            OmhFileType.VIDEO,
-            OmhFileType.MP4 -> URL_VIDEO
+            FileType.GOOGLE_VIDEO,
+            FileType.MP4 -> URL_VIDEO
 
             else -> URL_OTHER
         }
@@ -127,7 +128,7 @@ class FileAdapter(
 
         override fun bind(file: OmhStorageEntity, listener: GridItemListener) {
             val context = binding.root.context
-            val iconLink = getFileIconUrl(file.fileType)
+            val iconLink = getFileIconUrl(file.getFileType())
 
             with(binding) {
                 fileName.text = file.name
@@ -144,7 +145,7 @@ class FileAdapter(
 
         override fun bind(file: OmhStorageEntity, listener: GridItemListener) {
             val context = binding.root.context
-            val iconLink = getFileIconUrl(file.fileType)
+            val iconLink = getFileIconUrl(file.getFileType())
 
             with(binding) {
                 fileName.text = file.name

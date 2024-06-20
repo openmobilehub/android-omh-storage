@@ -19,6 +19,8 @@ package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.utils.fromRFC3339StringToDate
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.FOLDER_MIME_TYPE
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.ROOT_FOLDER
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileListRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.RevisionListRemoteResponse
@@ -31,18 +33,30 @@ internal fun FileRemoteResponse.toFile(): OmhStorageEntity? {
     }
 
     val parentId = if (parents.isNullOrEmpty()) {
-        ""
+        ROOT_FOLDER
     } else {
         parents[0]
     }
 
-    return OmhStorageEntity(
-        mimeType,
-        id,
-        name,
-        modifiedTime.orEmpty(),
-        parentId
-    )
+    val modifiedTime = modifiedTime?.fromRFC3339StringToDate()
+
+    return if (isFolder(mimeType)) {
+        OmhStorageEntity.OmhFolder(
+            id,
+            name,
+            modifiedTime,
+            parentId,
+        )
+    } else {
+        OmhStorageEntity.OmhFile(
+            id,
+            name,
+            modifiedTime,
+            parentId,
+            mimeType,
+            fileExtension,
+        )
+    }
 }
 
 internal fun FileListRemoteResponse.toFileList(): List<OmhStorageEntity> =
@@ -63,4 +77,7 @@ internal fun RevisionRemoteResponse.toOmhFileVersion(fileId: String): OmhFileVer
 }
 
 internal fun RevisionListRemoteResponse.toOmhFileVersions(fileId: String): List<OmhFileVersion> =
-    revisions?.mapNotNull { remoteRevisionModel -> remoteRevisionModel?.toOmhFileVersion(fileId) }.orEmpty()
+    revisions?.mapNotNull { remoteRevisionModel -> remoteRevisionModel?.toOmhFileVersion(fileId) }
+        .orEmpty()
+
+internal fun isFolder(mimeType: String) = mimeType == FOLDER_MIME_TYPE

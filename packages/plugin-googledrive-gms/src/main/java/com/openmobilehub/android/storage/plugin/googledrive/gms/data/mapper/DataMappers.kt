@@ -6,29 +6,40 @@ import com.google.api.services.drive.model.Revision
 import com.google.api.services.drive.model.RevisionList
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
+import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.ROOT_FOLDER
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.extension.isFolder
 import java.util.Date
 
 @SuppressWarnings("ComplexCondition")
 fun File.toOmhStorageEntity(): OmhStorageEntity? {
-    val formattedModifiedTime = modifiedTime?.toStringRfc3339().orEmpty()
-
     if (mimeType == null || id == null || name == null) {
         return null
     }
 
     val parentId = if (parents.isNullOrEmpty()) {
-        ""
+        ROOT_FOLDER
     } else {
         parents[0]
     }
+    val modifiedTime = modifiedTime?.let { Date(it.value) }
 
-    return OmhStorageEntity(
-        mimeType,
-        id,
-        name,
-        formattedModifiedTime,
-        parentId
-    )
+    return if (isFolder()) {
+        OmhStorageEntity.OmhFolder(
+            id,
+            name,
+            modifiedTime,
+            parentId,
+        )
+    } else {
+        OmhStorageEntity.OmhFile(
+            id,
+            name,
+            modifiedTime,
+            parentId,
+            mimeType,
+            fileExtension,
+        )
+    }
 }
 
 fun FileList.toOmhStorageEntities(): List<OmhStorageEntity> {

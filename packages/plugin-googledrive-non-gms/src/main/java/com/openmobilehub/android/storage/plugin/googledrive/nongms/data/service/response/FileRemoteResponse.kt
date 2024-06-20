@@ -27,5 +27,6 @@ internal data class FileRemoteResponse(
     @JsonProperty("id") val id: String?,
     @JsonProperty("name") val name: String?,
     @JsonProperty("modifiedTime") val modifiedTime: String?,
-    @JsonProperty("parents") val parents: List<String>?
+    @JsonProperty("parents") val parents: List<String>?,
+    @JsonProperty("fileExtension") val fileExtension: String?
 )

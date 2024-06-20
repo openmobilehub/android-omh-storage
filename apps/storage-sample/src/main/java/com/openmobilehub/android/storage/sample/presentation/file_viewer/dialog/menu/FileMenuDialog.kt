@@ -11,6 +11,7 @@ import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.DialogFileMenuBinding
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.FileViewerViewModel
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewEvent
+import com.openmobilehub.android.storage.sample.util.isFile
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

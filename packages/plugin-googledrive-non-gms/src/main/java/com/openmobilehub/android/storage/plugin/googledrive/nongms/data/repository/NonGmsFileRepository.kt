@@ -204,7 +204,12 @@ internal class NonGmsFileRepository(
         localFileToUpload: File,
         omhStorageEntity: OmhStorageEntity
     ): OmhStorageEntity? {
-        val mimeType = omhStorageEntity.mimeType.toMediaTypeOrNull()
+        val mimeType =
+            if (omhStorageEntity is OmhStorageEntity.OmhFile) {
+                omhStorageEntity.mimeType?.toMediaTypeOrNull()
+            } else {
+                null
+            }
         val requestFile = localFileToUpload.asRequestBody(mimeType)
 
         val response = retrofitImpl

@@ -61,6 +61,7 @@ import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.F
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewState
 import com.openmobilehub.android.storage.sample.presentation.util.displayToast
 import com.openmobilehub.android.storage.sample.presentation.util.navigateTo
+import com.openmobilehub.android.storage.sample.util.getMimeType
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -245,7 +246,7 @@ class FileViewerFragment :
 
         val fileDetails = ContentValues().apply {
             put(MediaStore.Downloads.DISPLAY_NAME, file.name)
-            put(MediaStore.Downloads.MIME_TYPE, file.mimeType)
+            put(MediaStore.Downloads.MIME_TYPE, file.getMimeType())
             put(MediaStore.Downloads.IS_PENDING, 1)
         }
 
@@ -426,12 +427,12 @@ class FileViewerFragment :
                         parent: AdapterView<*>?, view: View?, position: Int, id: Long
                     ) {
                         val fileType = fileTypes[position]
-                        viewModel.createFileSelectedType = fileType.omhFileType
+                        viewModel.createFileSelectedType = fileType.fileType
                     }
 
                     override fun onNothingSelected(parent: AdapterView<*>?) {
                         val fileType = fileTypes[0]
-                        viewModel.createFileSelectedType = fileType.omhFileType
+                        viewModel.createFileSelectedType = fileType.fileType
                     }
                 }
             }
