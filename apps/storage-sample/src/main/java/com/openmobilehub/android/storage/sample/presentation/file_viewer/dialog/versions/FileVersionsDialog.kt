@@ -97,7 +97,7 @@ class FileVersionsDialog : BottomSheetDialogFragment(), FileVersionAdapter.ItemL
         }
     }
 
-    override fun onFileClicked(version: OmhFileVersion) {
+    override fun onFileVersionClicked(version: OmhFileVersion) {
         dismiss()
         parentViewModel.dispatchEvent(FileViewerViewEvent.FileVersionClicked(version))
     }

@@ -1,7 +1,6 @@
 package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.versions
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -12,7 +11,7 @@ import com.openmobilehub.android.storage.sample.databinding.FileVersionAdapterBi
 class FileVersionAdapter(
     private val listener: ItemListener,
     private val itemsCount: Int,
-) : ListAdapter<OmhFileVersion, FileVersionAdapter.FileViewHolder>(DiffCallBack()) {
+) : ListAdapter<OmhFileVersion, FileVersionAdapter.FileLinearViewHolder>(DiffCallBack()) {
 
     private class DiffCallBack : DiffUtil.ItemCallback<OmhFileVersion>() {
         override fun areItemsTheSame(oldItem: OmhFileVersion, newItem: OmhFileVersion) =
@@ -23,26 +22,21 @@ class FileVersionAdapter(
     }
 
     interface ItemListener {
-        fun onFileClicked(version: OmhFileVersion)
-    }
-
-    abstract class FileViewHolder(binding: View) : RecyclerView.ViewHolder(binding) {
-
-        abstract fun bind(file: OmhFileVersion, listener: ItemListener, position: Int)
+        fun onFileVersionClicked(version: OmhFileVersion)
     }
 
     class FileLinearViewHolder(
         private val binding: FileVersionAdapterBinding,
         private val itemsCount: Int,
-    ) : FileViewHolder(binding.root) {
+    ) : RecyclerView.ViewHolder(binding.root)  {
 
-        override fun bind(file: OmhFileVersion, listener: ItemListener, position: Int) {
+        fun bind(file: OmhFileVersion, listener: ItemListener, position: Int) {
             with(binding) {
                 val versionIndexText = itemsCount - position
 
                 fileName.text = file.lastModified.toString()
                 versionIndex.text = versionIndexText.toString()
-                root.setOnClickListener { listener.onFileClicked(file) }
+                root.setOnClickListener { listener.onFileVersionClicked(file) }
             }
         }
     }
@@ -56,7 +50,7 @@ class FileVersionAdapter(
         ), itemsCount
     )
 
-    override fun onBindViewHolder(holder: FileViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: FileLinearViewHolder, position: Int) {
         holder.bind(getItem(position), listener, position)
     }
 }
