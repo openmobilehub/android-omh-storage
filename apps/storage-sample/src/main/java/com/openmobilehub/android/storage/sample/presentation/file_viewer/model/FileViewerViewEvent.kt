@@ -19,6 +19,7 @@ package com.openmobilehub.android.storage.sample.presentation.file_viewer.model
 import android.content.Context
 import android.net.Uri
 import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.sample.presentation.ViewEvent
 
 sealed class FileViewerViewEvent : ViewEvent {
@@ -41,6 +42,11 @@ sealed class FileViewerViewEvent : ViewEvent {
     class FileClicked(val file: OmhFile) : FileViewerViewEvent() {
 
         override fun getEventName() = "FileViewerViewEvent.FileClicked"
+    }
+
+    class FileVersionClicked(val version: OmhFileVersion) : FileViewerViewEvent() {
+
+        override fun getEventName() = "FileViewerViewEvent.FileVersionClicked"
     }
 
     object DownloadFile : FileViewerViewEvent() {

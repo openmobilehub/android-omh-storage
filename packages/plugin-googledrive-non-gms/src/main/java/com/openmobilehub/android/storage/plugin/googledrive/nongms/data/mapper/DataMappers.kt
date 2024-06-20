@@ -17,8 +17,12 @@
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper
 
 import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.utils.fromRFC3339StringToDate
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileListRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileRemoteResponse
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.RevisionListRemoteResponse
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.RevisionRemoteResponse
 
 @SuppressWarnings("ComplexCondition")
 internal fun FileRemoteResponse.toFile(): OmhFile? {
@@ -43,3 +47,20 @@ internal fun FileRemoteResponse.toFile(): OmhFile? {
 
 internal fun FileListRemoteResponse.toFileList(): List<OmhFile> =
     files?.mapNotNull { remoteFileModel -> remoteFileModel?.toFile() }.orEmpty()
+
+internal fun RevisionRemoteResponse.toOmhFileVersion(fileId: String): OmhFileVersion? {
+    val modifiedDate = modifiedTime?.fromRFC3339StringToDate()
+
+    if (id == null || modifiedDate == null) {
+        return null
+    }
+
+    return OmhFileVersion(
+        fileId,
+        id,
+        modifiedDate
+    )
+}
+
+internal fun RevisionListRemoteResponse.toOmhFileVersions(fileId: String): List<OmhFileVersion> =
+    revisions?.mapNotNull { remoteRevisionModel -> remoteRevisionModel?.toOmhFileVersion(fileId) }.orEmpty()

@@ -2,7 +2,11 @@ package com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper
 
 import com.google.api.services.drive.model.File
 import com.google.api.services.drive.model.FileList
+import com.google.api.services.drive.model.Revision
+import com.google.api.services.drive.model.RevisionList
 import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import java.util.Date
 
 @SuppressWarnings("ComplexCondition")
 fun File.toOmhFile(): OmhFile? {
@@ -29,4 +33,16 @@ fun File.toOmhFile(): OmhFile? {
 
 fun FileList.toOmhFiles(): List<OmhFile> {
     return this.files.toList().mapNotNull { googleFile -> googleFile.toOmhFile() }
+}
+
+fun Revision.toOmhFileVersion(fileId: String): OmhFileVersion {
+    return OmhFileVersion(
+        fileId,
+        id,
+        Date(modifiedTime.value)
+    )
+}
+
+fun RevisionList.toOmhFileVersions(fileId: String): List<OmhFileVersion> {
+    return this.revisions.toList().map { revision -> revision.toOmhFileVersion(fileId) }
 }

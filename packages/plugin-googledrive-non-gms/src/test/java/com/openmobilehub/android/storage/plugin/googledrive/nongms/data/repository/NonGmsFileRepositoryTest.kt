@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("MaximumLineLength", "MaxLineLength")
+
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository
 
 import android.webkit.MimeTypeMap
@@ -22,9 +24,13 @@ import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.reposito
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_FILE_MIME_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_FILE_NAME
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_FILE_PARENT_ID
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_VERSION_FILE_ID
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_VERSION_ID
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testFileListRemote
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testFileRemote
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testOmhFile
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testOmhVersion
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testVersionListRemote
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.GoogleStorageApiService
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit.GoogleStorageApiServiceProvider
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.toByteArrayOutputStream
@@ -300,5 +306,40 @@ internal class NonGmsFileRepositoryTest {
 
             assertEquals(listOf(testOmhFile), result)
             coVerify { googleStorageApiService.getFilesList(expectedQuery) }
+        }
+
+    @Test
+    fun `given a file id, when getFileVersions is success, then list of OmhFileVersion is returned`() =
+        runTest {
+            coEvery { googleStorageApiService.getFileRevisions(any()) } returns Response.success(
+                testVersionListRemote
+            )
+
+            val result = fileRepositoryImpl.getFileVersions(TEST_VERSION_FILE_ID)
+
+            assertEquals(listOf(testOmhVersion), result)
+            coVerify { googleStorageApiService.getFileRevisions(any()) }
+        }
+
+    @Test
+    fun `given a file id and a version id, when downloadFileVersion is success, then a ByteArrayOutputStream is returned`() =
+        runTest {
+            val expectedResult = ByteArrayOutputStream()
+            mockkStatic(ResponseBody?::toByteArrayOutputStream)
+            every { responseBody.toByteArrayOutputStream() } returns expectedResult
+            coEvery {
+                googleStorageApiService.downloadFileRevision(
+                    any(),
+                    any(),
+                    any()
+                )
+            } returns Response.success(
+                responseBody
+            )
+
+            val result = fileRepositoryImpl.downloadFileVersion(TEST_VERSION_FILE_ID, TEST_VERSION_ID)
+
+            assertEquals(expectedResult, result)
+            coVerify { googleStorageApiService.downloadFileRevision(any(), any(), any()) }
         }
 }

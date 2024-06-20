@@ -19,6 +19,7 @@ package com.openmobilehub.android.storage.core
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.core.model.OmhFilePermission
+import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import java.io.ByteArrayOutputStream
 import java.io.File
 
@@ -113,6 +114,25 @@ abstract class OmhStorageClient protected constructor(
         localFileToUpload: File,
         fileId: String
     ): OmhFile?
+
+    /**
+     * This method get the versions of a file with a given file id
+     *
+     * @param fileId The id of the file to get the versions
+     *
+     * @return A list of OmhFileVersion
+     */
+    abstract suspend fun getFileVersions(fileId: String): List<OmhFileVersion>
+
+    /**
+     * This method download a file version with a given file id and version id
+     *
+     * @param fileId The id of the file to get the version
+     * @param versionId The id of the version to be downloaded
+     *
+     * @return A ByteArrayOutputStream with the content of the downloaded file version
+     */
+    abstract suspend fun downloadFileVersion(fileId: String, versionId: String): ByteArrayOutputStream
 
     /**
      * This method list permissions to a given file

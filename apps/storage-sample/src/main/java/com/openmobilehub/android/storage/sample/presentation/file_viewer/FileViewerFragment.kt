@@ -56,6 +56,7 @@ import com.openmobilehub.android.storage.sample.databinding.DialogUploadFileBind
 import com.openmobilehub.android.storage.sample.databinding.FragmentFileViewerBinding
 import com.openmobilehub.android.storage.sample.presentation.BaseFragment
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.menu.FileMenuDialog
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.versions.FileVersionsDialog
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerAction
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewEvent
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewState
@@ -192,11 +193,10 @@ class FileViewerFragment :
 //        FILE_PERMISSIONS_DIALOG_TAG
 //    )
 
-    private fun showFileVersions() = displayToast("To be implemented")
-//    FileVersionsDialog().show(
-//        childFragmentManager,
-//        FILE_VERSIONS_DIALOG_TAG
-//    )
+    private fun showFileVersions() = FileVersionsDialog().show(
+        childFragmentManager,
+        FILE_VERSIONS_DIALOG_TAG
+    )
 
     private fun showMoreOptions() = FileMenuDialog().show(
         childFragmentManager,

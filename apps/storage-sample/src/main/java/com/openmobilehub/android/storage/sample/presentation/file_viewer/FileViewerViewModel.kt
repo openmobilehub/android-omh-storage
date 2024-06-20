@@ -22,6 +22,7 @@ import androidx.lifecycle.viewModelScope
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhFileType
 import com.openmobilehub.android.storage.sample.domain.model.FileType
 import com.openmobilehub.android.storage.sample.presentation.BaseViewModel
@@ -80,6 +81,8 @@ class FileViewerViewModel @Inject constructor(
     var lastFileClicked: OmhFile? = null
         private set
 
+    private var lastFileVersionClicked: OmhFileVersion? = null
+
     private val parentId = StackWithFlow(omhStorageClient.rootFolder)
     private var searchQuery: MutableStateFlow<String?> = MutableStateFlow(null)
     private var forceRefresh: MutableStateFlow<Int> = MutableStateFlow(0)
@@ -131,6 +134,7 @@ class FileViewerViewModel @Inject constructor(
             is FileViewerViewEvent.RefreshFileList -> refreshFileListEvent()
             is FileViewerViewEvent.SwapLayoutManager -> swapLayoutManagerEvent()
             is FileViewerViewEvent.FileClicked -> fileClickedEvent(event)
+            is FileViewerViewEvent.FileVersionClicked -> fileVersionClicked(event)
             is FileViewerViewEvent.BackPressed -> backPressedEvent()
             is FileViewerViewEvent.CreateFile -> createFileEvent(event)
             is FileViewerViewEvent.DeleteFile -> deleteFileEvent(event)
@@ -176,6 +180,11 @@ class FileViewerViewModel @Inject constructor(
         }
     }
 
+    private fun fileVersionClicked(event: FileViewerViewEvent.FileVersionClicked) {
+        lastFileVersionClicked = event.version
+        setState(FileViewerViewState.CheckDownloadPermissions)
+    }
+
     private fun backPressedEvent() {
         if (parentId.peek() == omhStorageClient.rootFolder) {
             setState(FileViewerViewState.Finish)
@@ -198,18 +207,27 @@ class FileViewerViewModel @Inject constructor(
 
             viewModelScope.launch(Dispatchers.IO) {
                 try {
-                    val data = omhStorageClient.downloadFile(file.id, mimeTypeToSave)
+                    val data = lastFileVersionClicked?.let {
+                        omhStorageClient.downloadFileVersion(
+                            it.fileId,
+                            it.versionId
+                        )
+                    } ?: omhStorageClient.downloadFile(file.id, mimeTypeToSave)
+
                     setState(FileViewerViewState.SaveFile(file, data))
                 } catch (exception: Exception) {
                     errorDialogMessage.postValue(exception.message)
                     toastMessage.postValue("ERROR: ${file.name} was NOT downloaded")
                     exception.printStackTrace()
                     refreshFileListEvent()
+                } finally {
+                    lastFileVersionClicked = null
                 }
             }
         } ?: run {
             toastMessage.postValue("The file was NOT downloaded")
             refreshFileListEvent()
+            lastFileVersionClicked = null
         }
     }
 

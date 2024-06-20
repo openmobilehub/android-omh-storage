@@ -20,9 +20,11 @@ import android.webkit.MimeTypeMap
 import com.google.api.client.http.FileContent
 import com.google.api.client.http.HttpResponseException
 import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhFile
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhFileVersions
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhFiles
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.service.GoogleDriveApiService
 import java.io.ByteArrayOutputStream
@@ -134,5 +136,16 @@ internal class GmsFileRepository(
             apiService.updateFile(fileId, file, mediaContent).execute()
 
         return response.toOmhFile()
+    }
+
+    fun getFileVersions(fileId: String): List<OmhFileVersion> {
+        return apiService.getFileRevisions(fileId).execute().toOmhFileVersions(fileId).reversed()
+    }
+
+    fun downloadFileVersion(fileId: String, versionId: String): ByteArrayOutputStream {
+        val outputStream = ByteArrayOutputStream()
+        apiService.downloadFileRevision(fileId, versionId).executeMediaAndDownloadTo(outputStream)
+
+        return outputStream
     }
 }

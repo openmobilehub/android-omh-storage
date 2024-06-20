@@ -19,6 +19,7 @@ package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body.CreateFileRequestBody
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileListRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileRemoteResponse
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.RevisionListRemoteResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
@@ -57,6 +58,7 @@ internal interface GoogleStorageApiService {
         private const val FIELDS_VALUE = "files($QUERY_REQUESTED_FIELDS)"
 
         private const val FILE_ID = "fileId"
+        private const val REVISION_ID = "revisionId"
         private const val META_DATA = "metadata"
     }
 
@@ -107,4 +109,16 @@ internal interface GoogleStorageApiService {
         @Body filePart: RequestBody,
         @Path(FILE_ID) fileId: String
     ): Response<FileRemoteResponse>
+
+    @GET("$FILES_PARTICLE/{$FILE_ID}/revisions")
+    suspend fun getFileRevisions(
+        @Path(FILE_ID) fileId: String
+    ): Response<RevisionListRemoteResponse>
+
+    @GET("$FILES_PARTICLE/{$FILE_ID}/revisions/{$REVISION_ID}")
+    suspend fun downloadFileRevision(
+        @Path(FILE_ID) fileId: String,
+        @Path(REVISION_ID) revisionId: String,
+        @Query(QUERY_ALT) alt: String
+    ): Response<ResponseBody>
 }
