@@ -48,14 +48,14 @@
         tools:text="File Name" />
 
     <ImageView
-            android:id="@+id/buttonMoreOptions"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/buttonMoreOptions"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_marginEnd="5dp"
-            android:src="@drawable/more_vert"
+        android:src="@drawable/more_vert"
         app:layout_constraintBottom_toBottomOf="@+id/fileName"
         app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/fileName" />
+        app:layout_constraintTop_toTopOf="@+id/fileName" />
 
     <View
         android:id="@+id/line"

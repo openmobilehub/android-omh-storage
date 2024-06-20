@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,7 +21,6 @@ class FileVersionsViewModel @Inject constructor(
         FileVersionsViewState(
             isLoading = false,
             revisions = emptyList(),
-            isDownloading = false
         )
     )
     val state: StateFlow<FileVersionsViewState> = _state
@@ -30,14 +30,6 @@ class FileVersionsViewModel @Inject constructor(
             _state.value = _state.value.copy(isLoading = true)
             val revisions = omhStorageClient.getFileRevisions(fileId)
             _state.value = _state.value.copy( revisions = revisions , isLoading = false)
-        }
-    }
-
-    fun downloadRevision(fileId: String, revisionId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _state.value = _state.value.copy(isDownloading = true)
-            omhStorageClient.downloadFileRevision(fileId, revisionId)
-            _state.value = _state.value.copy(isDownloading = false)
         }
     }
 }

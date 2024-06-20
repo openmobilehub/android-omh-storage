@@ -11,6 +11,7 @@ import com.openmobilehub.android.storage.sample.databinding.FileRevisionAdapterB
 
 class FileRevisionAdapter(
     private val listener: ItemListener,
+    private val itemsCount: Int,
 ) : ListAdapter<OmhFileRevision, FileRevisionAdapter.FileViewHolder>(DiffCallBack()) {
 
     private class DiffCallBack : DiffUtil.ItemCallback<OmhFileRevision>() {
@@ -31,12 +32,13 @@ class FileRevisionAdapter(
     }
 
     class FileLinearViewHolder(
-        private val binding: FileRevisionAdapterBinding // TODO: Change it
+        private val binding: FileRevisionAdapterBinding,
+        private val itemsCount: Int,
     ) : FileViewHolder(binding.root) {
 
         override fun bind(file: OmhFileRevision, listener: ItemListener, position: Int) {
             with(binding) {
-                val versionIndexText = position + 1
+                val versionIndexText = itemsCount - position
 
                 fileName.text = file.lastModified.toString()
                 versionIndex.text = versionIndexText.toString()
@@ -51,7 +53,7 @@ class FileRevisionAdapter(
     ) = FileLinearViewHolder(
         FileRevisionAdapterBinding.inflate(
             LayoutInflater.from(parent.context), parent, false
-        )
+        ), itemsCount
     )
 
     override fun onBindViewHolder(holder: FileViewHolder, position: Int) {

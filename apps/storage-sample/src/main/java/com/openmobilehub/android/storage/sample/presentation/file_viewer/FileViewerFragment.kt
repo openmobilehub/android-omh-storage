@@ -530,8 +530,7 @@ class FileViewerFragment :
     }
 
     private fun buildSignOutState() {
-        Log.v("Debug", "SignOut")
-//        navigateTo(R.id.action_file_viewer_fragment_to_login_fragment)
+        navigateTo(R.id.action_file_viewer_fragment_to_login_fragment)
     }
 
     private fun clearSearch() {
@@ -566,7 +565,6 @@ class FileViewerFragment :
         }
 
         override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-            Log.v("Debug", "onMenuItemSelected")
             when (menuItem.itemId) {
                 R.id.swapGridOrLinear -> swapLayout()
                 R.id.createFile -> createFile()

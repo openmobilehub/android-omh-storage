@@ -15,6 +15,8 @@ import com.openmobilehub.android.storage.core.model.OmhFileRevision
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.DialogFileVersionsBinding
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.FileViewerViewModel
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewEvent
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -58,7 +60,7 @@ class FileVersionsDialog : BottomSheetDialogFragment(), FileRevisionAdapter.Item
             return
         }
 
-        fileRevisionAdapter = FileRevisionAdapter(this)
+        fileRevisionAdapter = FileRevisionAdapter(this, revisionsViewModel.state.value.revisions.size)
 
         context?.let { context ->
 
@@ -72,7 +74,6 @@ class FileVersionsDialog : BottomSheetDialogFragment(), FileRevisionAdapter.Item
     }
 
     private fun buildLoadedState(revisions: List<OmhFileRevision>) = with(binding) {
-        Log.v("FileVersionsDialog", "Revisions: $revisions")
         progressBar.visibility = View.GONE
         fileVersionsList.visibility = View.VISIBLE
 
@@ -88,19 +89,18 @@ class FileVersionsDialog : BottomSheetDialogFragment(), FileRevisionAdapter.Item
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 revisionsViewModel.state.collect {
-                    if (it.isLoading || it.isDownloading) {
+                    if (it.isLoading) {
                         buildLoadingState()
                     } else {
                         buildLoadedState(it.revisions)
-                        // TODO update UI with the list of revisions
                     }
-                    // TODO update UI with the loading status and a list of revisions
                 }
             }
         }
     }
 
     override fun onFileClicked(revision: OmhFileRevision) {
-        revisionsViewModel.downloadRevision(revision.fileId, revision.revisionId)
+        dismiss()
+        parentViewModel.dispatchEvent(FileViewerViewEvent.FileRevisionClicked(revision))
     }
 }
