@@ -20,11 +20,11 @@ import android.webkit.MimeTypeMap
 import com.google.api.client.http.FileContent
 import com.google.api.client.http.HttpResponseException
 import com.openmobilehub.android.storage.core.model.OmhFile
-import com.openmobilehub.android.storage.core.model.OmhFileRevision
+import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhFile
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhFileRevisions
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhFileVersions
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhFiles
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.service.GoogleDriveApiService
 import java.io.ByteArrayOutputStream
@@ -138,13 +138,13 @@ internal class GmsFileRepository(
         return response.toOmhFile()
     }
 
-    fun getFileRevisions(fileId: String): List<OmhFileRevision> {
-        return apiService.getFileRevisions(fileId).execute().toOmhFileRevisions(fileId).reversed()
+    fun getFileVersions(fileId: String): List<OmhFileVersion> {
+        return apiService.getFileRevisions(fileId).execute().toOmhFileVersions(fileId).reversed()
     }
 
-    fun downloadFileRevision(fileId: String, revisionId: String): ByteArrayOutputStream {
+    fun downloadFileVersion(fileId: String, versionId: String): ByteArrayOutputStream {
         val outputStream = ByteArrayOutputStream()
-        apiService.downloadFileRevision(fileId, revisionId).executeMediaAndDownloadTo(outputStream)
+        apiService.downloadFileRevision(fileId, versionId).executeMediaAndDownloadTo(outputStream)
 
         return outputStream
     }

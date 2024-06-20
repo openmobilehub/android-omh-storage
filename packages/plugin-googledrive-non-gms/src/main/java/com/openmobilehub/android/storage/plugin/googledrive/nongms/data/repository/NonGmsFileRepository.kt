@@ -18,12 +18,12 @@ package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.reposit
 
 import android.webkit.MimeTypeMap
 import com.openmobilehub.android.storage.core.model.OmhFile
-import com.openmobilehub.android.storage.core.model.OmhFileRevision
+import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toFile
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toFileList
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toRevisionList
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toOmhFileVersions
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.GoogleStorageApiService
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body.CreateFileRequestBody
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit.GoogleStorageApiServiceProvider
@@ -221,7 +221,7 @@ internal class NonGmsFileRepository(
         }
     }
 
-    suspend fun getFileRevisions(fileId: String): List<OmhFileRevision> {
+    suspend fun getFileVersions(fileId: String): List<OmhFileVersion> {
         val response = retrofitImpl
             .getGoogleStorageApiService()
             .getFileRevisions(
@@ -229,16 +229,16 @@ internal class NonGmsFileRepository(
             )
 
         return if (response.isSuccessful) {
-            response.body()?.toRevisionList(fileId).orEmpty()
+            response.body()?.toOmhFileVersions(fileId).orEmpty()
         } else {
             throw OmhStorageException.ApiException(response.code(), HttpException(response))
         }
     }
 
-    suspend fun downloadFileRevision(fileId: String, revisionId: String): ByteArrayOutputStream {
+    suspend fun downloadFileVersion(fileId: String, versionId: String): ByteArrayOutputStream {
         val response = retrofitImpl
             .getGoogleStorageApiService()
-            .downloadFileRevision(fileId = fileId, revisionId = revisionId, alt = MEDIA)
+            .downloadFileRevision(fileId = fileId, revisionId = versionId, alt = MEDIA)
 
         return if (response.isSuccessful) {
             response.body().toByteArrayOutputStream()

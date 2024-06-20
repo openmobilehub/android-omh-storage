@@ -27,11 +27,11 @@ import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_FILE_MIME_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_FILE_NAME
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_FILE_PARENT_ID
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_REVISION_FILE_ID
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_REVISION_ID
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_VERSION_FILE_ID
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_VERSION_ID
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.setUpMock
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.testOmhFile
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.testOmhRevision
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.testOmhVersion
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.service.GoogleDriveApiService
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
@@ -203,24 +203,24 @@ internal class GmsFileRepositoryTest {
         }
 
     @Test
-    fun `given a file id, when getFileRevisions is success, then list of OmhFileRevision is returned`() =
+    fun `given a file id, when getFileVersions is success, then list of OmhFileVersion is returned`() =
         runTest {
             every { revisionList.revisions } returns listOf(googleDriveRevision)
             every { driveRevisionsListRequest.execute() } returns revisionList
             every { apiService.getFileRevisions(TEST_FILE_ID) } returns driveRevisionsListRequest
 
-            val result = fileRepositoryImpl.getFileRevisions(TEST_REVISION_FILE_ID)
+            val result = fileRepositoryImpl.getFileVersions(TEST_VERSION_FILE_ID)
 
-            assertEquals(listOf(testOmhRevision), result)
+            assertEquals(listOf(testOmhVersion), result)
         }
 
     @Test
-    fun `given a file id and a revision id, when downloadFileRevision is success, then a ByteArrayOutputStream is returned`() =
+    fun `given a file id and a version id, when downloadFileVersion is success, then a ByteArrayOutputStream is returned`() =
         runTest {
-            every { apiService.downloadFileRevision(TEST_REVISION_FILE_ID, TEST_REVISION_ID) } returns driveRevisionsGetRequest
+            every { apiService.downloadFileRevision(TEST_VERSION_FILE_ID, TEST_VERSION_ID) } returns driveRevisionsGetRequest
 
-            fileRepositoryImpl.downloadFileRevision(TEST_REVISION_FILE_ID, TEST_REVISION_ID)
+            fileRepositoryImpl.downloadFileVersion(TEST_VERSION_FILE_ID, TEST_VERSION_ID)
 
-            verify { apiService.downloadFileRevision(TEST_REVISION_FILE_ID, TEST_REVISION_ID) }
+            verify { apiService.downloadFileRevision(TEST_VERSION_FILE_ID, TEST_VERSION_ID) }
         }
 }

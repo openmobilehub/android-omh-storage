@@ -5,8 +5,8 @@ import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.RevisionRemoteResponse
 
 internal val testRevisionRemote = RevisionRemoteResponse(
-    TEST_REVISION_ID,
-    TEST_REVISION_FILE_MODIFIED_TIME.toRFC3339String(),
+    TEST_VERSION_ID,
+    TEST_VERSION_FILE_MODIFIED_TIME.toRFC3339String(),
 )
 
-internal val testRevisionListRemote = RevisionListRemoteResponse(listOf(testRevisionRemote))
+internal val testVersionListRemote = RevisionListRemoteResponse(listOf(testRevisionRemote))

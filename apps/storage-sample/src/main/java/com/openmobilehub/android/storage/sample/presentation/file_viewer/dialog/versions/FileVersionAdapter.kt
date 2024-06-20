@@ -6,37 +6,37 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.openmobilehub.android.storage.core.model.OmhFileRevision
-import com.openmobilehub.android.storage.sample.databinding.FileRevisionAdapterBinding
+import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.sample.databinding.FileVersionAdapterBinding
 
-class FileRevisionAdapter(
+class FileVersionAdapter(
     private val listener: ItemListener,
     private val itemsCount: Int,
-) : ListAdapter<OmhFileRevision, FileRevisionAdapter.FileViewHolder>(DiffCallBack()) {
+) : ListAdapter<OmhFileVersion, FileVersionAdapter.FileViewHolder>(DiffCallBack()) {
 
-    private class DiffCallBack : DiffUtil.ItemCallback<OmhFileRevision>() {
-        override fun areItemsTheSame(oldItem: OmhFileRevision, newItem: OmhFileRevision) =
-            oldItem.revisionId == newItem.revisionId
+    private class DiffCallBack : DiffUtil.ItemCallback<OmhFileVersion>() {
+        override fun areItemsTheSame(oldItem: OmhFileVersion, newItem: OmhFileVersion) =
+            oldItem.versionId == newItem.versionId
 
-        override fun areContentsTheSame(oldItem: OmhFileRevision, newItem: OmhFileRevision) =
+        override fun areContentsTheSame(oldItem: OmhFileVersion, newItem: OmhFileVersion) =
             oldItem == newItem
     }
 
     interface ItemListener {
-        fun onFileClicked(revision: OmhFileRevision)
+        fun onFileClicked(version: OmhFileVersion)
     }
 
     abstract class FileViewHolder(binding: View) : RecyclerView.ViewHolder(binding) {
 
-        abstract fun bind(file: OmhFileRevision, listener: ItemListener, position: Int)
+        abstract fun bind(file: OmhFileVersion, listener: ItemListener, position: Int)
     }
 
     class FileLinearViewHolder(
-        private val binding: FileRevisionAdapterBinding,
+        private val binding: FileVersionAdapterBinding,
         private val itemsCount: Int,
     ) : FileViewHolder(binding.root) {
 
-        override fun bind(file: OmhFileRevision, listener: ItemListener, position: Int) {
+        override fun bind(file: OmhFileVersion, listener: ItemListener, position: Int) {
             with(binding) {
                 val versionIndexText = itemsCount - position
 
@@ -51,7 +51,7 @@ class FileRevisionAdapter(
         parent: ViewGroup,
         viewType: Int,
     ) = FileLinearViewHolder(
-        FileRevisionAdapterBinding.inflate(
+        FileVersionAdapterBinding.inflate(
             LayoutInflater.from(parent.context), parent, false
         ), itemsCount
     )

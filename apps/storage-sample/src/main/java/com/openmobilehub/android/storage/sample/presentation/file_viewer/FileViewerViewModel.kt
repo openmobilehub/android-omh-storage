@@ -18,12 +18,11 @@ package com.openmobilehub.android.storage.sample.presentation.file_viewer
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhFile
-import com.openmobilehub.android.storage.core.model.OmhFileRevision
+import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhFileType
 import com.openmobilehub.android.storage.sample.domain.model.FileType
 import com.openmobilehub.android.storage.sample.presentation.BaseViewModel
@@ -51,7 +50,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.io.ByteArrayOutputStream
 
 @OptIn(FlowPreview::class)
 @HiltViewModel
@@ -83,7 +81,7 @@ class FileViewerViewModel @Inject constructor(
     var lastFileClicked: OmhFile? = null
         private set
 
-    private var lastFileRevisionClicked: OmhFileRevision? = null
+    private var lastFileVersionClicked: OmhFileVersion? = null
 
     private val parentId = StackWithFlow(omhStorageClient.rootFolder)
     private var searchQuery: MutableStateFlow<String?> = MutableStateFlow(null)
@@ -136,7 +134,7 @@ class FileViewerViewModel @Inject constructor(
             is FileViewerViewEvent.RefreshFileList -> refreshFileListEvent()
             is FileViewerViewEvent.SwapLayoutManager -> swapLayoutManagerEvent()
             is FileViewerViewEvent.FileClicked -> fileClickedEvent(event)
-            is FileViewerViewEvent.FileRevisionClicked -> fileRevisionClicked(event)
+            is FileViewerViewEvent.FileVersionClicked -> fileVersionClicked(event)
             is FileViewerViewEvent.BackPressed -> backPressedEvent()
             is FileViewerViewEvent.CreateFile -> createFileEvent(event)
             is FileViewerViewEvent.DeleteFile -> deleteFileEvent(event)
@@ -182,8 +180,8 @@ class FileViewerViewModel @Inject constructor(
         }
     }
 
-    private fun fileRevisionClicked(event: FileViewerViewEvent.FileRevisionClicked) {
-        lastFileRevisionClicked = event.revision
+    private fun fileVersionClicked(event: FileViewerViewEvent.FileVersionClicked) {
+        lastFileVersionClicked = event.version
         setState(FileViewerViewState.CheckDownloadPermissions)
     }
 
@@ -209,10 +207,10 @@ class FileViewerViewModel @Inject constructor(
 
             viewModelScope.launch(Dispatchers.IO) {
                 try {
-                    val data = lastFileRevisionClicked?.let {
-                        omhStorageClient.downloadFileRevision(
+                    val data = lastFileVersionClicked?.let {
+                        omhStorageClient.downloadFileVersion(
                             it.fileId,
-                            it.revisionId
+                            it.versionId
                         )
                     } ?: omhStorageClient.downloadFile(file.id, mimeTypeToSave)
 
@@ -223,13 +221,13 @@ class FileViewerViewModel @Inject constructor(
                     exception.printStackTrace()
                     refreshFileListEvent()
                 } finally {
-                    lastFileRevisionClicked = null
+                    lastFileVersionClicked = null
                 }
             }
         } ?: run {
             toastMessage.postValue("The file was NOT downloaded")
             refreshFileListEvent()
-            lastFileRevisionClicked = null
+            lastFileVersionClicked = null
         }
     }
 

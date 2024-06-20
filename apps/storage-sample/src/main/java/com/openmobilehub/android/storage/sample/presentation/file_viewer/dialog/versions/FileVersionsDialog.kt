@@ -1,7 +1,6 @@
 package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.versions
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,23 +10,22 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.openmobilehub.android.storage.core.model.OmhFileRevision
+import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.DialogFileVersionsBinding
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.FileViewerViewModel
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewEvent
-import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class FileVersionsDialog : BottomSheetDialogFragment(), FileRevisionAdapter.ItemListener {
+class FileVersionsDialog : BottomSheetDialogFragment(), FileVersionAdapter.ItemListener {
 
     private val parentViewModel: FileViewerViewModel by viewModels({ requireParentFragment() })
-    private val revisionsViewModel: FileVersionsViewModel by viewModels()
+    private val versionsViewModel: FileVersionsViewModel by viewModels()
     private lateinit var binding: DialogFileVersionsBinding
 
-    private var fileRevisionAdapter: FileRevisionAdapter? = null
+    private var fileVersionAdapter: FileVersionAdapter? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,52 +53,52 @@ class FileVersionsDialog : BottomSheetDialogFragment(), FileRevisionAdapter.Item
         fileVersionsList.visibility = View.GONE
     }
 
-    private fun initializeAdapter(revisions: List<OmhFileRevision>) {
-        if (fileRevisionAdapter != null) {
+    private fun initializeAdapter(versions: List<OmhFileVersion>) {
+        if (fileVersionAdapter != null) {
             return
         }
 
-        fileRevisionAdapter = FileRevisionAdapter(this, revisionsViewModel.state.value.revisions.size)
+        fileVersionAdapter = FileVersionAdapter(this, versionsViewModel.state.value.versions.size)
 
         context?.let { context ->
 
             with(binding.fileVersionsList) {
                 layoutManager = LinearLayoutManager(context)
-                adapter = fileRevisionAdapter
+                adapter = fileVersionAdapter
             }
         }
 
-        fileRevisionAdapter?.submitList(revisions)
+        fileVersionAdapter?.submitList(versions)
     }
 
-    private fun buildLoadedState(revisions: List<OmhFileRevision>) = with(binding) {
+    private fun buildLoadedState(versions: List<OmhFileVersion>) = with(binding) {
         progressBar.visibility = View.GONE
         fileVersionsList.visibility = View.VISIBLE
 
-        initializeAdapter(revisions)
+        initializeAdapter(versions)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val file = requireNotNull(parentViewModel.lastFileClicked)
 
-        revisionsViewModel.getRevisions(file.id)
+        versionsViewModel.getFileVersions(file.id)
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                revisionsViewModel.state.collect {
+                versionsViewModel.state.collect {
                     if (it.isLoading) {
                         buildLoadingState()
                     } else {
-                        buildLoadedState(it.revisions)
+                        buildLoadedState(it.versions)
                     }
                 }
             }
         }
     }
 
-    override fun onFileClicked(revision: OmhFileRevision) {
+    override fun onFileClicked(version: OmhFileVersion) {
         dismiss()
-        parentViewModel.dispatchEvent(FileViewerViewEvent.FileRevisionClicked(revision))
+        parentViewModel.dispatchEvent(FileViewerViewEvent.FileVersionClicked(version))
     }
 }

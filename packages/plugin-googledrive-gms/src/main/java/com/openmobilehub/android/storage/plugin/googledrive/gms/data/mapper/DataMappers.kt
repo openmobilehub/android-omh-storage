@@ -5,7 +5,7 @@ import com.google.api.services.drive.model.FileList
 import com.google.api.services.drive.model.Revision
 import com.google.api.services.drive.model.RevisionList
 import com.openmobilehub.android.storage.core.model.OmhFile
-import com.openmobilehub.android.storage.core.model.OmhFileRevision
+import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import java.util.Date
 
 @SuppressWarnings("ComplexCondition")
@@ -35,14 +35,14 @@ fun FileList.toOmhFiles(): List<OmhFile> {
     return this.files.toList().mapNotNull { googleFile -> googleFile.toOmhFile() }
 }
 
-fun Revision.toOmhFileRevision(fileId: String): OmhFileRevision {
-    return OmhFileRevision(
+fun Revision.toOmhFileVersion(fileId: String): OmhFileVersion {
+    return OmhFileVersion(
         fileId,
         id,
         Date(modifiedTime.value)
     )
 }
 
-fun RevisionList.toOmhFileRevisions(fileId: String): List<OmhFileRevision> {
-    return this.revisions.toList().map { revision -> revision.toOmhFileRevision(fileId) }
+fun RevisionList.toOmhFileVersions(fileId: String): List<OmhFileVersion> {
+    return this.revisions.toList().map { revision -> revision.toOmhFileVersion(fileId) }
 }
