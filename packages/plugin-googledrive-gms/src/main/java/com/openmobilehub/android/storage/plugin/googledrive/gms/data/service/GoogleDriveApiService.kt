@@ -31,6 +31,7 @@ internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProv
             if (parentId.isNotEmpty()) {
                 q = "'$parentId' in parents and trashed = false"
             }
+            fields = "*"
         }
 
     fun search(query: String): Drive.Files.List = apiProvider

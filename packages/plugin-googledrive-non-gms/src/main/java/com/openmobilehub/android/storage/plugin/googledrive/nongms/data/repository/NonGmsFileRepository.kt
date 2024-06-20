@@ -65,7 +65,8 @@ internal class NonGmsFileRepository(
         val response = retrofitImpl
             .getGoogleStorageApiService()
             .getFilesList(
-                query = query
+                query = query,
+                fields = "*",
             )
 
         return if (response.isSuccessful) {

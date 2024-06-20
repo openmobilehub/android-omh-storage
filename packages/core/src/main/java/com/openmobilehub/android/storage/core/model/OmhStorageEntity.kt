@@ -21,19 +21,23 @@ import java.util.Date
 sealed class OmhStorageEntity(
     open val id: String,
     open val name: String,
+    open val createdTime: Date?,
     open val modifiedTime: Date?,
     open val parentId: String?,
 ) {
     data class OmhFile(
         override val id: String,
         override val name: String,
+        override val createdTime: Date?,
         override val modifiedTime: Date?,
         override val parentId: String?,
         val mimeType: String?,
-        val extension: String?
+        val extension: String?,
+        val size: Int?,
     ) : OmhStorageEntity(
         id,
         name,
+        createdTime,
         modifiedTime,
         parentId,
     )
@@ -41,11 +45,13 @@ sealed class OmhStorageEntity(
     data class OmhFolder(
         override val id: String,
         override val name: String,
+        override val createdTime: Date?,
         override val modifiedTime: Date?,
         override val parentId: String?,
     ) : OmhStorageEntity(
         id,
         name,
+        createdTime,
         modifiedTime,
         parentId,
     )

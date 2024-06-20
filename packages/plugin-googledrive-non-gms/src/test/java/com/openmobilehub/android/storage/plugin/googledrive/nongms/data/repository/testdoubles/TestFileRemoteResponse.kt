@@ -20,12 +20,14 @@ import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileRemoteResponse
 
 internal val testFileRemote = FileRemoteResponse(
-    TEST_FILE_MIME_TYPE,
     TEST_FILE_ID,
     TEST_FILE_NAME,
     TEST_FIRST_MAY_2024_RFC_3339,
+    TEST_FIRST_JUNE_2024_RFC_3339,
     listOf(TEST_FILE_PARENT_ID),
-    TEST_FILE_EXTENSION
+    TEST_FILE_MIME_TYPE,
+    TEST_FILE_EXTENSION,
+    TEST_FILE_SIZE
 )
 
 internal val testFileListRemote = FileListRemoteResponse(listOf(testFileRemote))

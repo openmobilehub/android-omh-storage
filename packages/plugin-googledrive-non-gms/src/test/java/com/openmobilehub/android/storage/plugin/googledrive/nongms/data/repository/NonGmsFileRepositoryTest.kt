@@ -96,14 +96,14 @@ internal class NonGmsFileRepositoryTest {
     @Test
     fun `given a parentId, when getFilesList is success, then a list of OmhStorageEntities is returned`() =
         runTest {
-            coEvery { googleStorageApiService.getFilesList(any()) } returns Response.success(
+            coEvery { googleStorageApiService.getFilesList(any(), any()) } returns Response.success(
                 testFileListRemote
             )
 
             val result = fileRepositoryImpl.getFilesList(TEST_FILE_PARENT_ID)
 
             assertEquals(listOf(testOmhFile), result)
-            coVerify { googleStorageApiService.getFilesList(any()) }
+            coVerify { googleStorageApiService.getFilesList(any(), any()) }
         }
 
     @Test
@@ -323,14 +323,14 @@ internal class NonGmsFileRepositoryTest {
     fun `given a search query, when search is success, then a list of OmhStorageEntities is returned`() =
         runTest {
             val expectedQuery = "name contains '$TEST_FILE_NAME' and trashed = false"
-            coEvery { googleStorageApiService.getFilesList(expectedQuery) } returns Response.success(
+            coEvery { googleStorageApiService.getFilesList(expectedQuery, "*") } returns Response.success(
                 testFileListRemote
             )
 
             val result = fileRepositoryImpl.search(TEST_FILE_NAME)
 
             assertEquals(listOf(testOmhFile), result)
-            coVerify { googleStorageApiService.getFilesList(expectedQuery) }
+            coVerify { googleStorageApiService.getFilesList(expectedQuery, "*") }
         }
 
     @Test
