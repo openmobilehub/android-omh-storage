@@ -25,6 +25,11 @@ android {
         resValue("string", "db_login_protocol_scheme", "db-${dropboxAppKey}")
 
         resValue("string", "microsoft_path", "/${microsoftSignatureHash}")
+
+        val rawDir = file("./src/main/res/raw")
+        if (!rawDir.exists()) {
+            rawDir.mkdirs()
+        }
         file("./src/main/res/raw/ms_auth_config.json").writeText(
             """
 {
