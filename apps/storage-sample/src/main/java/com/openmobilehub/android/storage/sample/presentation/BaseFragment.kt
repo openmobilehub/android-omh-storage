@@ -19,7 +19,9 @@ package com.openmobilehub.android.storage.sample.presentation
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import com.openmobilehub.android.storage.sample.presentation.util.displayErrorDialog
 import com.openmobilehub.android.storage.sample.presentation.util.displayToast
 import com.openmobilehub.android.storage.sample.util.LOG_MESSAGE_STATE
@@ -29,6 +31,12 @@ abstract class BaseFragment<ViewModel : BaseViewModel<State, Event>, State : Vie
     Fragment() {
 
     abstract val viewModel: ViewModel
+
+
+    interface BaseFragmentListener {
+
+        fun finishApplication()
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -47,6 +55,20 @@ abstract class BaseFragment<ViewModel : BaseViewModel<State, Event>, State : Vie
                 displayErrorDialog(message)
             }
         }
+
+        val fragmentActivity: FragmentActivity = activity ?: return
+        fragmentActivity.onBackPressedDispatcher.addCallback {
+            onBackPressed()
+        }
+    }
+
+    protected fun finishApplication() {
+        val activity = activity as? BaseFragmentListener
+        activity?.finishApplication()
+    }
+
+    protected open fun onBackPressed() {
+        finishApplication()
     }
 
     protected abstract fun buildState(state: State)
