@@ -20,9 +20,9 @@ import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.auth.core.OmhCredentials
 import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 import com.openmobilehub.android.storage.core.OmhStorageClient
-import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.core.model.OmhFilePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.NonGmsFileRepository
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit.GoogleStorageApiServiceProvider
@@ -51,15 +51,19 @@ internal class GoogleDriveNonGmsOmhStorageClient private constructor(
     override val rootFolder: String
         get() = GoogleDriveNonGmsConstants.ROOT_FOLDER
 
-    override suspend fun listFiles(parentId: String): List<OmhFile> {
+    override suspend fun listFiles(parentId: String): List<OmhStorageEntity> {
         return fileRepository.getFilesList(parentId)
     }
 
-    override suspend fun search(query: String): List<OmhFile> {
+    override suspend fun search(query: String): List<OmhStorageEntity> {
         return fileRepository.search(query)
     }
 
-    override suspend fun createFile(name: String, mimeType: String, parentId: String): OmhFile? {
+    override suspend fun createFile(
+        name: String,
+        mimeType: String,
+        parentId: String
+    ): OmhStorageEntity? {
         return fileRepository.createFile(name, mimeType, parentId)
     }
 
@@ -67,7 +71,7 @@ internal class GoogleDriveNonGmsOmhStorageClient private constructor(
         return fileRepository.deleteFile(id)
     }
 
-    override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhFile? {
+    override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity? {
         return fileRepository.uploadFile(localFileToUpload, parentId)
     }
 
@@ -75,7 +79,7 @@ internal class GoogleDriveNonGmsOmhStorageClient private constructor(
         return fileRepository.downloadFile(fileId, mimeType)
     }
 
-    override suspend fun updateFile(localFileToUpload: File, fileId: String): OmhFile? {
+    override suspend fun updateFile(localFileToUpload: File, fileId: String): OmhStorageEntity.OmhFile? {
         return fileRepository.updateFile(localFileToUpload, fileId)
     }
 

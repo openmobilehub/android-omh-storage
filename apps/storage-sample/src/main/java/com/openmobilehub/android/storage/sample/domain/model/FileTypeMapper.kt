@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles
+package com.openmobilehub.android.storage.sample.domain.model
 
-import com.openmobilehub.android.storage.core.model.OmhFile
+object FileTypeMapper {
 
-const val TEST_FILE_MIME_TYPE = "image/jpg"
-const val TEST_FILE_ID = "123"
-const val TEST_FILE_NAME = "fileName"
-const val TEST_FILE_MODIFIED_TIME = "2023-07-04T03:03:55.397Z"
-const val TEST_FILE_PARENT_ID = "parentId"
+    private val MAP_FILE_TYPES: Map<String, FileType> =
+        FileType.values().associateBy { fileType -> fileType.mimeType }
 
-val testOmhFile = OmhFile(
-    TEST_FILE_MIME_TYPE,
-    TEST_FILE_ID,
-    TEST_FILE_NAME,
-    TEST_FILE_MODIFIED_TIME,
-    TEST_FILE_PARENT_ID,
-)
+    fun getFileTypeWithMime(mimeType: String): FileType {
+        return if (MAP_FILE_TYPES.containsKey(mimeType)) {
+            MAP_FILE_TYPES[mimeType] ?: FileType.OTHER
+        } else {
+            FileType.OTHER
+        }
+    }
+}

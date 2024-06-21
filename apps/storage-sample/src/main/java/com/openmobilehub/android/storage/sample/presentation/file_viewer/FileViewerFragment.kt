@@ -33,7 +33,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import androidx.activity.addCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -49,7 +48,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.DialogCreateFileBinding
 import com.openmobilehub.android.storage.sample.databinding.DialogUploadFileBinding
@@ -239,14 +238,14 @@ class FileViewerFragment :
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    private fun createInDownloads(file: OmhFile, bytes: ByteArrayOutputStream) {
+    private fun createInDownloads(file: OmhStorageEntity.OmhFile, bytes: ByteArrayOutputStream) {
         val resolver = context?.contentResolver ?: return
 
         val downloadsCollection = MediaStore.Downloads.EXTERNAL_CONTENT_URI
 
         val fileDetails = ContentValues().apply {
             put(MediaStore.Downloads.DISPLAY_NAME, file.name)
-            put(MediaStore.Downloads.MIME_TYPE, file.mimeType)
+            put(MediaStore.Downloads.MIME_TYPE, file.mimeType.orEmpty())
             put(MediaStore.Downloads.IS_PENDING, 1)
         }
 
@@ -359,11 +358,11 @@ class FileViewerFragment :
         dispatchEvent(FileViewerViewEvent.Initialize)
     }
 
-    override fun onFileClicked(file: OmhFile) {
+    override fun onFileClicked(file: OmhStorageEntity) {
         dispatchEvent(FileViewerViewEvent.FileClicked(file))
     }
 
-    override fun onMoreOptionsClicked(file: OmhFile) {
+    override fun onMoreOptionsClicked(file: OmhStorageEntity) {
         dispatchEvent(FileViewerViewEvent.MoreOptionsClicked(file))
     }
 
@@ -427,12 +426,12 @@ class FileViewerFragment :
                         parent: AdapterView<*>?, view: View?, position: Int, id: Long
                     ) {
                         val fileType = fileTypes[position]
-                        viewModel.createFileSelectedType = fileType.omhFileType
+                        viewModel.createFileSelectedType = fileType.fileType
                     }
 
                     override fun onNothingSelected(parent: AdapterView<*>?) {
                         val fileType = fileTypes[0]
-                        viewModel.createFileSelectedType = fileType.omhFileType
+                        viewModel.createFileSelectedType = fileType.fileType
                     }
                 }
             }

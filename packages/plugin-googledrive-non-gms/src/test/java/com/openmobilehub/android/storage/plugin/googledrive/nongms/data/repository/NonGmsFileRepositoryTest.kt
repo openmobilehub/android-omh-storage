@@ -94,7 +94,7 @@ internal class NonGmsFileRepositoryTest {
     }
 
     @Test
-    fun `given a parentId, when getFilesList is success, then a list of OmhFiles is returned`() =
+    fun `given a parentId, when getFilesList is success, then a list of OmhStorageEntities is returned`() =
         runTest {
             coEvery { googleStorageApiService.getFilesList(any()) } returns Response.success(
                 testFileListRemote
@@ -107,7 +107,7 @@ internal class NonGmsFileRepositoryTest {
         }
 
     @Test
-    fun `given the information of a new file, when createFile is success, then a OmhFile is returned`() =
+    fun `given the information of a new file, when createFile is success, then a OmhStorageEntity is returned`() =
         runTest {
             coEvery { googleStorageApiService.createFile(any(), any()) } returns Response.success(
                 testFileRemote
@@ -134,7 +134,7 @@ internal class NonGmsFileRepositoryTest {
     }
 
     @Test
-    fun `given a File and a parentId, when uploadFile is success, then a OmhFile is returned`() =
+    fun `given a File and a parentId, when uploadFile is success, then a OmhStorageEntity is returned`() =
         runTest {
             val localFileUpload: File = mockk()
             every { localFileUpload.name } returns TEST_FILE_NAME
@@ -171,7 +171,7 @@ internal class NonGmsFileRepositoryTest {
         }
 
     @Test
-    fun `given a File and a file id, when updateFile is success, then a OmhFile is returned`() =
+    fun `given a File and a file id, when updateFile is success, then a OmhStorageEntity is returned`() =
         runTest {
             coEvery { googleStorageApiService.updateFile(any(), any()) } returns Response.success(
                 testFileRemote
@@ -295,7 +295,7 @@ internal class NonGmsFileRepositoryTest {
         }
 
     @Test
-    fun `given a search query, when search is success, then a list of OmhFiles is returned`() =
+    fun `given a search query, when search is success, then a list of OmhStorageEntities is returned`() =
         runTest {
             val expectedQuery = "name contains '$TEST_FILE_NAME' and trashed = false"
             coEvery { googleStorageApiService.getFilesList(expectedQuery) } returns Response.success(

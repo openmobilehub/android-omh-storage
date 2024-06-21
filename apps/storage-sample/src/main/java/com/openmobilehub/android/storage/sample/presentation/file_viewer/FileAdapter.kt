@@ -25,16 +25,17 @@ import androidx.recyclerview.widget.DiffUtil.ItemCallback
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.openmobilehub.android.storage.core.model.OmhFile
-import com.openmobilehub.android.storage.core.model.OmhFileType
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.FileGridAdapterBinding
 import com.openmobilehub.android.storage.sample.databinding.FileLinearAdapterBinding
+import com.openmobilehub.android.storage.sample.domain.model.FileType
+import com.openmobilehub.android.storage.sample.util.getFileType
 
 class FileAdapter(
     private val listener: GridItemListener,
     private val isGridLayout: Boolean
-) : ListAdapter<OmhFile, FileAdapter.FileViewHolder>(DiffCallBack()) {
+) : ListAdapter<OmhStorageEntity, FileAdapter.FileViewHolder>(DiffCallBack()) {
 
     companion object {
 
@@ -56,31 +57,33 @@ class FileAdapter(
             "https://drive-thirdparty.googleusercontent.com/32/type/video/mp4"
         private const val URL_OTHER = "https://static.thenounproject.com/png/3482632-200.png"
 
-        private fun getFileIconUrl(fileType: OmhFileType) = when (fileType) {
-            OmhFileType.OMH_FOLDER,
-            OmhFileType.FOLDER -> URL_FOLDER
+        private fun getFileIconUrl(file: OmhStorageEntity) = when(file) {
+            is OmhStorageEntity.OmhFile -> getFileIconUrl(file.getFileType())
+            is OmhStorageEntity.OmhFolder -> URL_FOLDER
+        }
 
-            OmhFileType.PDF -> URL_PDF
+        private fun getFileIconUrl(fileType: FileType) = when (fileType) {
+            FileType.PDF -> URL_PDF
 
-            OmhFileType.DOCUMENT,
-            OmhFileType.MICROSOFT_WORD,
-            OmhFileType.OPEN_DOCUMENT_TEXT -> URL_DOCUMENT
+            FileType.GOOGLE_DOCUMENT,
+            FileType.MICROSOFT_WORD,
+            FileType.OPEN_DOCUMENT_TEXT -> URL_DOCUMENT
 
-            OmhFileType.SPREADSHEET,
-            OmhFileType.MICROSOFT_EXCEL,
-            OmhFileType.OPEN_DOCUMENT_SPREADSHEET -> URL_SHEET
+            FileType.GOOGLE_SPREADSHEET,
+            FileType.MICROSOFT_EXCEL,
+            FileType.OPEN_DOCUMENT_SPREADSHEET -> URL_SHEET
 
-            OmhFileType.PRESENTATION,
-            OmhFileType.MICROSOFT_POWERPOINT,
-            OmhFileType.OPEN_DOCUMENT_PRESENTATION -> URL_PRESENTATION
+            FileType.GOOGLE_PRESENTATION,
+            FileType.MICROSOFT_POWERPOINT,
+            FileType.OPEN_DOCUMENT_PRESENTATION -> URL_PRESENTATION
 
-            OmhFileType.PNG,
-            OmhFileType.JPEG -> URL_PNG
+            FileType.PNG,
+            FileType.JPEG -> URL_PNG
 
-            OmhFileType.ZIP -> URL_ZIP
+            FileType.ZIP -> URL_ZIP
 
-            OmhFileType.VIDEO,
-            OmhFileType.MP4 -> URL_VIDEO
+            FileType.GOOGLE_VIDEO,
+            FileType.MP4 -> URL_VIDEO
 
             else -> URL_OTHER
         }
@@ -99,33 +102,35 @@ class FileAdapter(
         }
     }
 
-    private class DiffCallBack : ItemCallback<OmhFile>() {
+    private class DiffCallBack : ItemCallback<OmhStorageEntity>() {
 
-        override fun areItemsTheSame(oldItem: OmhFile, newItem: OmhFile) = oldItem.id == newItem.id
+        override fun areItemsTheSame(oldItem: OmhStorageEntity, newItem: OmhStorageEntity) =
+            oldItem.id == newItem.id
 
-        override fun areContentsTheSame(oldItem: OmhFile, newItem: OmhFile) = oldItem == newItem
+        override fun areContentsTheSame(oldItem: OmhStorageEntity, newItem: OmhStorageEntity) =
+            oldItem == newItem
     }
 
     interface GridItemListener {
 
-        fun onFileClicked(file: OmhFile)
+        fun onFileClicked(file: OmhStorageEntity)
 
-        fun onMoreOptionsClicked(file: OmhFile)
+        fun onMoreOptionsClicked(file: OmhStorageEntity)
 
     }
 
     abstract class FileViewHolder(binding: View) : RecyclerView.ViewHolder(binding) {
 
-        abstract fun bind(file: OmhFile, listener: GridItemListener)
+        abstract fun bind(file: OmhStorageEntity, listener: GridItemListener)
     }
 
     class FileGridViewHolder(
         private val binding: FileGridAdapterBinding
     ) : FileViewHolder(binding.root) {
 
-        override fun bind(file: OmhFile, listener: GridItemListener) {
+        override fun bind(file: OmhStorageEntity, listener: GridItemListener) {
             val context = binding.root.context
-            val iconLink = getFileIconUrl(file.fileType)
+            val iconLink = getFileIconUrl(file)
 
             with(binding) {
                 fileName.text = file.name
@@ -140,9 +145,9 @@ class FileAdapter(
         private val binding: FileLinearAdapterBinding
     ) : FileViewHolder(binding.root) {
 
-        override fun bind(file: OmhFile, listener: GridItemListener) {
+        override fun bind(file: OmhStorageEntity, listener: GridItemListener) {
             val context = binding.root.context
-            val iconLink = getFileIconUrl(file.fileType)
+            val iconLink = getFileIconUrl(file)
 
             with(binding) {
                 fileName.text = file.name

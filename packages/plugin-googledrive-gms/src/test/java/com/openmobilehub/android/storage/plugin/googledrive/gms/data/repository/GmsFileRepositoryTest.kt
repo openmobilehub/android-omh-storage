@@ -115,7 +115,7 @@ internal class GmsFileRepositoryTest {
     }
 
     @Test
-    fun `given a parentId, when getFilesList is success, then a list of OmhFiles is returned`() =
+    fun `given a parentId, when getFilesList is success, then a list of OmhStorageEntities is returned`() =
         runTest {
             every { apiFileList.files } returns listOf(googleDriveFile)
             every { driveFilesListRequest.execute() } returns apiFileList
@@ -128,7 +128,7 @@ internal class GmsFileRepositoryTest {
         }
 
     @Test
-    fun `given the information of a new file, when createFile is success, then a OmhFile is returned`() =
+    fun `given the information of a new file, when createFile is success, then a OmhStorageEntity is returned`() =
         runTest {
             every { driveFilesCreateRequest.execute() } returns googleDriveFile
             every { apiService.createFile(any()) } returns driveFilesCreateRequest
@@ -154,7 +154,7 @@ internal class GmsFileRepositoryTest {
     }
 
     @Test
-    fun `given a File and a parentId, when uploadFile is success, then a OmhFile is returned`() =
+    fun `given a File and a parentId, when uploadFile is success, then a OmhStorageEntity is returned`() =
         runTest {
             val localFileUpload = File(FILE_PATH)
             every { driveFilesCreateRequest.execute() } returns googleDriveFile
@@ -177,7 +177,7 @@ internal class GmsFileRepositoryTest {
         }
 
     @Test
-    fun `given a File and a file id, when updateFile is success, then a OmhFile is returned`() =
+    fun `given a File and a file id, when updateFile is success, then a OmhStorageEntity is returned`() =
         runTest {
             val localFileUpdate = File(FILE_PATH)
             every { driveFilesUpdateRequest.execute() } returns googleDriveFile
@@ -190,7 +190,7 @@ internal class GmsFileRepositoryTest {
         }
 
     @Test
-    fun `given a search query, when search is success, then a list of OmhFiles is returned`() =
+    fun `given a search query, when search is success, then a list of OmhStorageEntities is returned`() =
         runTest {
             every { apiFileList.files } returns listOf(googleDriveFile)
             every { driveFilesListRequest.execute() } returns apiFileList

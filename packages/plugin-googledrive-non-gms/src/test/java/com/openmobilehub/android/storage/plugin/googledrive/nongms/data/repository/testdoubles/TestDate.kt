@@ -14,20 +14,9 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.core.mapper
+package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles
 
-import com.openmobilehub.android.storage.core.model.OmhFileType
-
-internal object FileTypeMapper {
-
-    private val MAP_FILE_TYPES: Map<String, OmhFileType> =
-        OmhFileType.values().associateBy { fileType -> fileType.mimeType }
-
-    fun getFileTypeWithMime(mimeType: String): OmhFileType {
-        return if (MAP_FILE_TYPES.containsKey(mimeType)) {
-            MAP_FILE_TYPES[mimeType] ?: OmhFileType.OTHER
-        } else {
-            OmhFileType.OTHER
-        }
-    }
-}
+const val TEST_FIRST_MAY_2024_MILLIS = 1714521600000
+const val TEST_FIRST_JUNE_2024_MILLIS = 1717200000000
+const val TEST_FIRST_MAY_2024_RFC_3339 = "2024-05-01T00:00:00.000Z"
+const val TEST_FIRST_JUNE_2024_RFC_3339 = "2024-06-01T00:00:00.000Z"

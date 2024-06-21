@@ -1,10 +1,26 @@
+/*
+ * Copyright 2023 Open Mobile Hub
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 @file:Suppress("MaximumLineLength", "MaxLineLength")
 
 package com.openmobilehub.android.storage.plugin.onedrive.data.repository
 
 import com.microsoft.graph.models.DriveItem
-import com.openmobilehub.android.storage.core.model.OmhFile
-import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhFile
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
+import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiService
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_PARENT_ID
 import io.mockk.MockKAnnotations
@@ -21,7 +37,7 @@ import java.io.File
 class OneDriveFileRepositoryTest {
 
     @MockK
-    private lateinit var omhFile: OmhFile
+    private lateinit var omhStorageEntity: OmhStorageEntity
 
     @MockK
     private lateinit var driveItem: DriveItem
@@ -30,7 +46,7 @@ class OneDriveFileRepositoryTest {
     private lateinit var apiService: OneDriveApiService
 
     @MockK
-    private lateinit var driveItemToOmhFile: DriveItemToOmhFile
+    private lateinit var driveItemToOmhStorageEntity: DriveItemToOmhStorageEntity
 
     @MockK(relaxed = true)
     private lateinit var file: File
@@ -41,7 +57,7 @@ class OneDriveFileRepositoryTest {
     fun setUp() {
         MockKAnnotations.init(this)
 
-        repository = OneDriveFileRepository(apiService, driveItemToOmhFile)
+        repository = OneDriveFileRepository(apiService, driveItemToOmhStorageEntity)
     }
 
     @After
@@ -53,13 +69,13 @@ class OneDriveFileRepositoryTest {
     fun `given an apiService returns a non-empty list, when getting the files list, then return a non-empty list`() {
         // Arrange
         every { apiService.getFilesList(TEST_FILE_PARENT_ID) } returns mutableListOf(driveItem, driveItem)
-        every { driveItemToOmhFile(any()) } returns omhFile
+        every { driveItemToOmhStorageEntity(any()) } returns omhStorageEntity
 
         // Act
         val result = repository.getFilesList(TEST_FILE_PARENT_ID)
 
         // Assert
-        assertEquals(listOf(omhFile, omhFile), result)
+        assertEquals(listOf(omhStorageEntity, omhStorageEntity), result)
     }
 
     @Test
@@ -71,19 +87,19 @@ class OneDriveFileRepositoryTest {
         val result = repository.getFilesList(TEST_FILE_PARENT_ID)
 
         // Assert
-        assertEquals(emptyList<OmhFile>(), result)
+        assertEquals(emptyList<OmhStorageEntity>(), result)
     }
 
     @Test
     fun `given an api service returns DriveItem, when uploading the file, then returns OmhFile`() {
         // Arrange
         every { apiService.uploadFile(any(), any()) } returns mockk<DriveItem>()
-        every { driveItemToOmhFile(any()) } returns omhFile
+        every { driveItemToOmhStorageEntity(any()) } returns omhStorageEntity
 
         // Act
         val result = repository.uploadFile(file, TEST_FILE_PARENT_ID)
 
         // Assert
-        assertEquals(omhFile, result)
+        assertEquals(omhStorageEntity, result)
     }
 }

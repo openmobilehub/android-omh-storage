@@ -14,20 +14,8 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles
+package com.openmobilehub.android.storage.sample.presentation.file_viewer.model
 
-import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.sample.domain.model.FileType
 
-const val TEST_FILE_MIME_TYPE = "image/jpg"
-const val TEST_FILE_ID = "123"
-const val TEST_FILE_NAME = "fileName"
-const val TEST_FILE_MODIFIED_TIME = "2023-07-04T03:03:55.397Z"
-const val TEST_FILE_PARENT_ID = "parentId"
-
-val testOmhFile = OmhFile(
-    TEST_FILE_MIME_TYPE,
-    TEST_FILE_ID,
-    TEST_FILE_NAME,
-    TEST_FILE_MODIFIED_TIME,
-    TEST_FILE_PARENT_ID,
-)
+data class DisplayFileType(val name: String, val fileType: FileType)

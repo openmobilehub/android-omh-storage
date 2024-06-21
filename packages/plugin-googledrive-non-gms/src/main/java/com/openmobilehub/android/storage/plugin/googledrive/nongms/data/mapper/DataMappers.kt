@@ -16,37 +16,50 @@
 
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper
 
-import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.utils.fromRFC3339StringToDate
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.FOLDER_MIME_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileListRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.RevisionListRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.RevisionRemoteResponse
 
 @SuppressWarnings("ComplexCondition")
-internal fun FileRemoteResponse.toFile(): OmhFile? {
+internal fun FileRemoteResponse.toOmhStorageEntity(): OmhStorageEntity? {
     if (mimeType == null || id == null || name == null) {
         return null
     }
 
     val parentId = if (parents.isNullOrEmpty()) {
-        ""
+        null
     } else {
         parents[0]
     }
 
-    return OmhFile(
-        mimeType,
-        id,
-        name,
-        modifiedTime.orEmpty(),
-        parentId
-    )
+    val modifiedTime = modifiedTime?.fromRFC3339StringToDate()
+
+    return if (isFolder(mimeType)) {
+        OmhStorageEntity.OmhFolder(
+            id,
+            name,
+            modifiedTime,
+            parentId,
+        )
+    } else {
+        OmhStorageEntity.OmhFile(
+            id,
+            name,
+            modifiedTime,
+            parentId,
+            mimeType,
+            fileExtension,
+        )
+    }
 }
 
-internal fun FileListRemoteResponse.toFileList(): List<OmhFile> =
-    files?.mapNotNull { remoteFileModel -> remoteFileModel?.toFile() }.orEmpty()
+internal fun FileListRemoteResponse.toFileList(): List<OmhStorageEntity> =
+    files?.mapNotNull { remoteFileModel -> remoteFileModel?.toOmhStorageEntity() }.orEmpty()
 
 internal fun RevisionRemoteResponse.toOmhFileVersion(fileId: String): OmhFileVersion? {
     val modifiedDate = modifiedTime?.fromRFC3339StringToDate()
@@ -63,4 +76,7 @@ internal fun RevisionRemoteResponse.toOmhFileVersion(fileId: String): OmhFileVer
 }
 
 internal fun RevisionListRemoteResponse.toOmhFileVersions(fileId: String): List<OmhFileVersion> =
-    revisions?.mapNotNull { remoteRevisionModel -> remoteRevisionModel?.toOmhFileVersion(fileId) }.orEmpty()
+    revisions?.mapNotNull { remoteRevisionModel -> remoteRevisionModel?.toOmhFileVersion(fileId) }
+        .orEmpty()
+
+internal fun isFolder(mimeType: String) = mimeType == FOLDER_MIME_TYPE

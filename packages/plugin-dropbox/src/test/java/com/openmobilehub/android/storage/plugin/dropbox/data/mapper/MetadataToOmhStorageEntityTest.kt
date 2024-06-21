@@ -1,3 +1,19 @@
+/*
+ * Copyright 2023 Open Mobile Hub
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.openmobilehub.android.storage.plugin.dropbox.data.mapper
 
 import android.webkit.MimeTypeMap
@@ -5,6 +21,7 @@ import com.dropbox.core.v2.files.FileMetadata
 import com.dropbox.core.v2.files.FolderMetadata
 import com.dropbox.core.v2.files.Metadata
 import com.openmobilehub.android.storage.core.utils.getMimeTypeFromUrl
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_EXTENSION
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_MIME_TYPE
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_NAME
@@ -28,7 +45,7 @@ import org.junit.Before
 import org.junit.Test
 import java.util.Date
 
-class MetadataToOmhFileTest {
+class MetadataToOmhStorageEntityTest {
 
     @MockK
     private lateinit var mimeTypeMap: MimeTypeMap
@@ -42,16 +59,18 @@ class MetadataToOmhFileTest {
     @MockK
     private lateinit var metadata: Metadata
 
-    private lateinit var mapper: MetadataToOmhFile
+    private lateinit var mapper: MetadataToOmhStorageEntity
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
 
         mockkStatic("com.openmobilehub.android.storage.core.utils.MimeTypeMapExtensionsKt")
+        mockkStatic(MimeTypeMap::class)
         every { mimeTypeMap.getMimeTypeFromUrl(any()) } returns TEST_FILE_MIME_TYPE
+        every { MimeTypeMap.getFileExtensionFromUrl(TEST_FILE_NAME) } returns TEST_FILE_EXTENSION
 
-        mapper = MetadataToOmhFile(mimeTypeMap)
+        mapper = MetadataToOmhStorageEntity(mimeTypeMap)
     }
 
     @After
@@ -60,7 +79,7 @@ class MetadataToOmhFileTest {
     }
 
     @Test
-    fun `given a file metadata with specific properties, when mapped, then return the expected OmhFile`() {
+    fun `given a file metadata with specific properties, when mapped, then return the expected OmhStorageEntity`() {
         // Arrange
         every { fileMetadata.name } returns TEST_FILE_NAME
         every { fileMetadata.id } returns TEST_FILE_ID
@@ -76,7 +95,7 @@ class MetadataToOmhFileTest {
     }
 
     @Test
-    fun `given a folder metadata with specific properties, when mapped, then return the expected OmhFile`() {
+    fun `given a folder metadata with specific properties, when mapped, then return the expected OmhStorageEntity`() {
         // Arrange
         every { folderMetadata.name } returns TEST_FOLDER_NAME
         every { folderMetadata.id } returns TEST_FOLDER_ID
@@ -91,6 +110,9 @@ class MetadataToOmhFileTest {
 
     @Test
     fun `given a unknown metadata, when mapped, then return null`() {
+        // Arrange
+        every { metadata.parentSharedFolderId } returns TEST_FOLDER_PARENT_ID
+
         // Act
         val result = mapper(metadata)
 
