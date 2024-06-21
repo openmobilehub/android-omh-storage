@@ -1,8 +1,12 @@
 package com.openmobilehub.android.storage.plugin.onedrive.data.repository
 
 import com.openmobilehub.android.storage.core.model.OmhFile
+import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhFile
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiService
+import com.openmobilehub.android.storage.plugin.onedrive.data.util.toByteArrayOutputStream
+import java.io.ByteArrayOutputStream
 import java.io.File
 
 class OneDriveFileRepository(
@@ -19,5 +23,15 @@ class OneDriveFileRepository(
         val driveItem = apiService.uploadFile(localFileToUpload, parentId)
 
         return driveItem?.let { driveItemToOmhFile(it) }
+    }
+
+    fun downloadFile(fileId: String): ByteArrayOutputStream {
+        val inputStream = apiService.downloadFile(fileId)
+            ?: throw OmhStorageException.DownloadException(
+                OmhStorageStatusCodes.DOWNLOAD_ERROR,
+                null
+            )
+
+        return inputStream.toByteArrayOutputStream()
     }
 }

@@ -6,4 +6,5 @@ object OneDriveConstants {
         "com.openmobilehub.android.storage.plugin.onedrive.OneDriveOmhStorageFactory"
 
     internal const val ROOT_FOLDER = "root"
+    internal const val BUFFER_SIZE = 65536
 }
