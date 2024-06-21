@@ -51,7 +51,7 @@ fun uploadFile(omhStorageClient: OmhStorageClient) {
             if (result.file == null) {
                 // Handle the file was not uploaded.
             } else {
-                val uploadedFile: OmhStorageEntity? = result.file
+                val uploadedFile: OmhFile? = result.file
                 // Handle the uploadedFile as needed.
             }
         }

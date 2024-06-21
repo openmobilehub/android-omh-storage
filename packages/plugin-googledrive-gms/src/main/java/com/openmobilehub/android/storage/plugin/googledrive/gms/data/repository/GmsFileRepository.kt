@@ -122,7 +122,7 @@ internal class GmsFileRepository(
         return outputStream
     }
 
-    fun updateFile(localFileToUpload: File, fileId: String): OmhStorageEntity? {
+    fun updateFile(localFileToUpload: File, fileId: String): OmhStorageEntity.OmhFile? {
         val localMimeType = getStringMimeTypeFromLocalFile(localFileToUpload)
 
         val file = GoogleDriveFile().apply {
@@ -135,7 +135,7 @@ internal class GmsFileRepository(
         val response: GoogleDriveFile =
             apiService.updateFile(fileId, file, mediaContent).execute()
 
-        return response.toOmhStorageEntity()
+        return response.toOmhStorageEntity() as? OmhStorageEntity.OmhFile
     }
 
     fun getFileVersions(fileId: String): List<OmhFileVersion> {

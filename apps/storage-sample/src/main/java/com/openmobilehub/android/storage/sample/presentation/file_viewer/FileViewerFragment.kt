@@ -61,7 +61,6 @@ import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.F
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewState
 import com.openmobilehub.android.storage.sample.presentation.util.displayToast
 import com.openmobilehub.android.storage.sample.presentation.util.navigateTo
-import com.openmobilehub.android.storage.sample.util.getMimeType
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -239,14 +238,14 @@ class FileViewerFragment :
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    private fun createInDownloads(file: OmhStorageEntity, bytes: ByteArrayOutputStream) {
+    private fun createInDownloads(file: OmhStorageEntity.OmhFile, bytes: ByteArrayOutputStream) {
         val resolver = context?.contentResolver ?: return
 
         val downloadsCollection = MediaStore.Downloads.EXTERNAL_CONTENT_URI
 
         val fileDetails = ContentValues().apply {
             put(MediaStore.Downloads.DISPLAY_NAME, file.name)
-            put(MediaStore.Downloads.MIME_TYPE, file.getMimeType())
+            put(MediaStore.Downloads.MIME_TYPE, file.mimeType.orEmpty())
             put(MediaStore.Downloads.IS_PENDING, 1)
         }
 

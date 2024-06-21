@@ -54,7 +54,7 @@ sealed class FileViewerViewState : ViewState {
     }
 
     data class SaveFile(
-        val file: OmhStorageEntity,
+        val file: OmhStorageEntity.OmhFile,
         val bytes: ByteArrayOutputStream
     ) : FileViewerViewState() {
 

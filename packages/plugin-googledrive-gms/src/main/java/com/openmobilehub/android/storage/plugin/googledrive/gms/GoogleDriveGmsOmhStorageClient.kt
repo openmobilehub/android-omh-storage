@@ -81,7 +81,7 @@ internal class GoogleDriveGmsOmhStorageClient private constructor(
         return fileRepository.downloadFile(fileId, mimeType)
     }
 
-    override suspend fun updateFile(localFileToUpload: File, fileId: String): OmhStorageEntity? {
+    override suspend fun updateFile(localFileToUpload: File, fileId: String): OmhStorageEntity.OmhFile? {
         return fileRepository.updateFile(localFileToUpload, fileId)
     }
 

@@ -20,20 +20,19 @@ import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.utils.fromRFC3339StringToDate
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.FOLDER_MIME_TYPE
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.ROOT_FOLDER
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileListRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.RevisionListRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.RevisionRemoteResponse
 
 @SuppressWarnings("ComplexCondition")
-internal fun FileRemoteResponse.toFile(): OmhStorageEntity? {
+internal fun FileRemoteResponse.toOmhStorageEntity(): OmhStorageEntity? {
     if (mimeType == null || id == null || name == null) {
         return null
     }
 
     val parentId = if (parents.isNullOrEmpty()) {
-        ROOT_FOLDER
+        null
     } else {
         parents[0]
     }
@@ -60,7 +59,7 @@ internal fun FileRemoteResponse.toFile(): OmhStorageEntity? {
 }
 
 internal fun FileListRemoteResponse.toFileList(): List<OmhStorageEntity> =
-    files?.mapNotNull { remoteFileModel -> remoteFileModel?.toFile() }.orEmpty()
+    files?.mapNotNull { remoteFileModel -> remoteFileModel?.toOmhStorageEntity() }.orEmpty()
 
 internal fun RevisionRemoteResponse.toOmhFileVersion(fileId: String): OmhFileVersion? {
     val modifiedDate = modifiedTime?.fromRFC3339StringToDate()

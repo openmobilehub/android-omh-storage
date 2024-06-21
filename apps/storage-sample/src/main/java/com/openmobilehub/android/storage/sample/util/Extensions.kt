@@ -18,8 +18,8 @@ package com.openmobilehub.android.storage.sample.util
 
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
-import com.openmobilehub.android.storage.sample.domain.model.FileTypeMapper
 import com.openmobilehub.android.storage.sample.domain.model.FileType
+import com.openmobilehub.android.storage.sample.domain.model.FileTypeMapper
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -35,22 +35,12 @@ private val NON_SUPPORTED_MIME_TYPES_FOR_DOWNLOAD = listOf(
     FileType.GOOGLE_UNKNOWN
 )
 
-fun OmhStorageEntity.isDownloadable(): Boolean =
-    !NON_SUPPORTED_MIME_TYPES_FOR_DOWNLOAD.contains(getFileType())
+fun OmhStorageEntity.OmhFile.isDownloadable(): Boolean = !NON_SUPPORTED_MIME_TYPES_FOR_DOWNLOAD.contains(getFileType())
+fun OmhStorageEntity.OmhFile.getFileType() = mimeType?.let {
+    FileTypeMapper.getFileTypeWithMime(it)
+} ?: FileType.GOOGLE_UNKNOWN
 
-fun OmhStorageEntity.getFileType() = when (this) {
-    is OmhStorageEntity.OmhFile -> {
-        mimeType?.let {
-            FileTypeMapper.getFileTypeWithMime(it)
-        } ?: FileType.GOOGLE_UNKNOWN
-    }
-
-    is OmhStorageEntity.OmhFolder -> {
-        FileType.OMH_FOLDER
-    }
-}
-
-fun OmhStorageEntity.normalizedMimeType(): String = when (getFileType()) {
+fun OmhStorageEntity.OmhFile.normalizedMimeType(): String = when (getFileType()) {
     FileType.GOOGLE_DOCUMENT -> FileType.MICROSOFT_WORD.mimeType
     FileType.GOOGLE_DRAWING -> FileType.PNG.mimeType
     FileType.GOOGLE_FORM -> FileType.PDF.mimeType
@@ -62,16 +52,11 @@ fun OmhStorageEntity.normalizedMimeType(): String = when (getFileType()) {
     FileType.GOOGLE_VIDEO,
     FileType.GOOGLE_AUDIO -> FileType.MP4.mimeType
 
-    else -> getMimeType()
+    else -> mimeType.orEmpty()
 }
 
 fun OmhStorageEntity.isFolder() = this is OmhStorageEntity.OmhFolder
 fun OmhStorageEntity.isFile() = this is OmhStorageEntity.OmhFile
-
-fun OmhStorageEntity.getMimeType(): String = when (this) {
-    is OmhStorageEntity.OmhFile -> mimeType.orEmpty()
-    is OmhStorageEntity.OmhFolder -> ""
-}
 
 suspend fun OmhAuthClient.isUserLoggedIn(): Boolean = suspendCoroutine { continuation ->
     getUser()

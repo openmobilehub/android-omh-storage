@@ -5,7 +5,6 @@ import com.microsoft.graph.models.DriveItem
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.utils.getMimeTypeFromUrl
 import com.openmobilehub.android.storage.core.utils.removeWhitespaces
-import com.openmobilehub.android.storage.plugin.onedrive.OneDriveConstants.ROOT_FOLDER
 import java.util.Date
 
 class DriveItemToOmhStorageEntity(private val mimeTypeMap: MimeTypeMap) {
@@ -13,7 +12,7 @@ class DriveItemToOmhStorageEntity(private val mimeTypeMap: MimeTypeMap) {
         driveItem.run {
             val isFolder = folder != null
             val modifiedTime = Date.from(lastModifiedDateTime.toInstant())
-            val parentId = parentReference.id ?: ROOT_FOLDER
+            val parentId = parentReference.id
 
             return if (isFolder) {
                 OmhStorageEntity.OmhFolder(

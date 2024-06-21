@@ -113,7 +113,7 @@ abstract class OmhStorageClient protected constructor(
     abstract suspend fun updateFile(
         localFileToUpload: File,
         fileId: String
-    ): OmhStorageEntity?
+    ): OmhStorageEntity.OmhFile?
 
     /**
      * This method get the versions of a file with a given file id

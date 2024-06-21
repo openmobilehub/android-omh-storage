@@ -23,9 +23,9 @@ import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
-import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.DisplayFileType
 import com.openmobilehub.android.storage.sample.domain.model.FileType
 import com.openmobilehub.android.storage.sample.presentation.BaseViewModel
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.DisplayFileType
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerAction
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewEvent
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewState
@@ -197,7 +197,7 @@ class FileViewerViewModel @Inject constructor(
     private fun downloadFileEvent() {
         setState(FileViewerViewState.Loading)
 
-        lastFileClicked?.let { file ->
+        (lastFileClicked as? OmhStorageEntity.OmhFile)?.let { file ->
             if (!file.isDownloadable()) {
                 toastMessage.postValue("${file.name} is not downloadable")
                 refreshFileListEvent()

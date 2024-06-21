@@ -6,7 +6,6 @@ import com.google.api.services.drive.model.Revision
 import com.google.api.services.drive.model.RevisionList
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
-import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.ROOT_FOLDER
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.extension.isFolder
 import java.util.Date
 
@@ -17,7 +16,7 @@ fun File.toOmhStorageEntity(): OmhStorageEntity? {
     }
 
     val parentId = if (parents.isNullOrEmpty()) {
-        ROOT_FOLDER
+        null
     } else {
         parents[0]
     }

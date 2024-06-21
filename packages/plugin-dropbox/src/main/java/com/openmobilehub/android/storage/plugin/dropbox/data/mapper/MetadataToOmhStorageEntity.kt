@@ -8,12 +8,11 @@ import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.utils.DateUtils
 import com.openmobilehub.android.storage.core.utils.getMimeTypeFromUrl
 import com.openmobilehub.android.storage.core.utils.removeWhitespaces
-import com.openmobilehub.android.storage.plugin.dropbox.DropboxConstants.ROOT_FOLDER
 
 class MetadataToOmhStorageEntity(private val mimeTypeMap: MimeTypeMap) {
     operator fun invoke(metadata: Metadata): OmhStorageEntity? {
         metadata.run {
-            val parentId = parentSharedFolderId ?: ROOT_FOLDER
+            val parentId = parentSharedFolderId
             return when (this) {
                 is FileMetadata -> {
                     val sanitizedName = name.removeWhitespaces()

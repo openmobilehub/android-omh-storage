@@ -110,10 +110,6 @@ enum class FileType(val mimeType: String) {
         "video/mp4",
     ),
 
-    // The majority of the providers does not provide mime type for folders
-    // So we are using our own abstract mime type for folders.
-    OMH_FOLDER("application/vnd.openmobilehub.folder"),
-
     // Other MYME type
     OTHER("")
 }

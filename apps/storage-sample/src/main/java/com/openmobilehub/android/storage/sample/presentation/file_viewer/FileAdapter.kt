@@ -57,10 +57,12 @@ class FileAdapter(
             "https://drive-thirdparty.googleusercontent.com/32/type/video/mp4"
         private const val URL_OTHER = "https://static.thenounproject.com/png/3482632-200.png"
 
-        private fun getFileIconUrl(fileType: FileType) = when (fileType) {
-            FileType.OMH_FOLDER,
-            FileType.GOOGLE_FOLDER -> URL_FOLDER
+        private fun getFileIconUrl(file: OmhStorageEntity) = when(file) {
+            is OmhStorageEntity.OmhFile -> getFileIconUrl(file.getFileType())
+            is OmhStorageEntity.OmhFolder -> URL_FOLDER
+        }
 
+        private fun getFileIconUrl(fileType: FileType) = when (fileType) {
             FileType.PDF -> URL_PDF
 
             FileType.GOOGLE_DOCUMENT,
@@ -128,7 +130,7 @@ class FileAdapter(
 
         override fun bind(file: OmhStorageEntity, listener: GridItemListener) {
             val context = binding.root.context
-            val iconLink = getFileIconUrl(file.getFileType())
+            val iconLink = getFileIconUrl(file)
 
             with(binding) {
                 fileName.text = file.name
@@ -145,7 +147,7 @@ class FileAdapter(
 
         override fun bind(file: OmhStorageEntity, listener: GridItemListener) {
             val context = binding.root.context
-            val iconLink = getFileIconUrl(file.getFileType())
+            val iconLink = getFileIconUrl(file)
 
             with(binding) {
                 fileName.text = file.name

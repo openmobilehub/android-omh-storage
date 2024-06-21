@@ -90,7 +90,7 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         return ByteArrayOutputStream()
     }
 
-    override suspend fun updateFile(localFileToUpload: File, fileId: String): OmhStorageEntity? {
+    override suspend fun updateFile(localFileToUpload: File, fileId: String): OmhStorageEntity.OmhFile? {
         // To be implemented
         return null
     }
