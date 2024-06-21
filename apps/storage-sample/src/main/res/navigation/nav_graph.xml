@@ -45,7 +45,8 @@
             android:id="@+id/action_file_viewer_fragment_to_login_fragment"
             app:destination="@id/login_fragment"
             app:popUpTo="@id/login_fragment"
-            app:popUpToInclusive="true" />
+            app:popUpToInclusive="true"
+            app:launchSingleTop="true" />
     </fragment>
 
 </navigation>

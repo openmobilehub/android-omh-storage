@@ -23,8 +23,9 @@ internal val testFileRemote = FileRemoteResponse(
     TEST_FILE_MIME_TYPE,
     TEST_FILE_ID,
     TEST_FILE_NAME,
-    TEST_FILE_MODIFIED_TIME,
+    TEST_FIRST_MAY_2024_RFC_3339,
     listOf(TEST_FILE_PARENT_ID),
+    TEST_FILE_EXTENSION
 )
 
 internal val testFileListRemote = FileListRemoteResponse(listOf(testFileRemote))

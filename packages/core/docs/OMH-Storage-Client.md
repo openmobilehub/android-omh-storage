@@ -107,7 +107,7 @@ For list files, just use the instance you created of the `omhStorageClient` and 
 val cancellable = omhStorageClient.listFiles(parentId)
             .addOnSuccess { result: GetFilesListUseCaseResult ->
                 // Get the files list
-                val filesList: List<OmhFile> = result.files
+                val filesList: List<OmhStorageEntity> = result.files
                 // TODO - Developer: Manage success
             }
             .addOnFailure { exception: Exception ->
@@ -124,8 +124,8 @@ For create files, just use the instance you created of the `omhStorageClient` an
 ```kotlin
  val cancellable = omhStorageClient.createFile(name, mimeType, parentId)
              .addOnSuccess { result: CreateFileUseCaseResult ->
-                // An instance of OmhFile with the information of the created file. In case the file was not created, will be null
-                val file: OmhFile? = result.file
+                // An instance of OmhStorageEntity with the information of the created file. In case the file was not created, will be null
+                val file: OmhStorageEntity? = result.file
                  // TODO - Developer: Manage success
              }
              .addOnFailure { exception: Exception ->

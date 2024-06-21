@@ -14,22 +14,10 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.core.model
+package com.openmobilehub.android.storage.plugin.googledrive.gms.data.extension
 
-import com.openmobilehub.android.storage.core.mapper.FileTypeMapper
+import com.google.api.services.drive.model.File
+import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.FOLDER_MIME_TYPE
 
-data class OmhFile(
-    val mimeType: String,
-    val id: String,
-    val name: String,
-    val modifiedTime: String,
-    val parentId: String
-) {
-    val fileType by lazy { FileTypeMapper.getFileTypeWithMime(mimeType) }
-
-    fun isFolder() = fileType in setOf(OmhFileType.FOLDER, OmhFileType.OMH_FOLDER)
-
-    fun isFile() = !isFolder()
-
-    fun getExtension(): String? = fileType.extension
-}
+fun File.isFolder() =
+    mimeType == FOLDER_MIME_TYPE

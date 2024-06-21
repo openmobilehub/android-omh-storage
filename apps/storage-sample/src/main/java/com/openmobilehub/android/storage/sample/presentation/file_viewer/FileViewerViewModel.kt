@@ -21,16 +21,17 @@ import android.net.Uri
 import androidx.lifecycle.viewModelScope
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
-import com.openmobilehub.android.storage.core.model.OmhFile
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
-import com.openmobilehub.android.storage.core.model.OmhFileType
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.sample.domain.model.FileType
 import com.openmobilehub.android.storage.sample.presentation.BaseViewModel
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.DisplayFileType
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerAction
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewEvent
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewState
 import com.openmobilehub.android.storage.sample.util.coSignOut
 import com.openmobilehub.android.storage.sample.util.isDownloadable
+import com.openmobilehub.android.storage.sample.util.isFolder
 import com.openmobilehub.android.storage.sample.util.normalizedMimeType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.File
@@ -60,10 +61,10 @@ class FileViewerViewModel @Inject constructor(
 
     companion object {
         val listOfFileTypes = listOf(
-            FileType("Folder", OmhFileType.FOLDER),
-            FileType("Document", OmhFileType.DOCUMENT),
-            FileType("Sheet", OmhFileType.SPREADSHEET),
-            FileType("Presentation", OmhFileType.PRESENTATION),
+            DisplayFileType("Folder", FileType.GOOGLE_FOLDER),
+            DisplayFileType("Document", FileType.GOOGLE_DOCUMENT),
+            DisplayFileType("Sheet", FileType.GOOGLE_SPREADSHEET),
+            DisplayFileType("Presentation", FileType.GOOGLE_PRESENTATION),
         )
 
         const val ANY_MIME_TYPE = "*/*"
@@ -74,11 +75,11 @@ class FileViewerViewModel @Inject constructor(
     private val _action = Channel<FileViewerAction>()
     val action = _action.receiveAsFlow()
 
-    var createFileSelectedType: OmhFileType? = null
+    var createFileSelectedType: FileType? = null
 
     var isGridLayoutManager = true
         private set
-    var lastFileClicked: OmhFile? = null
+    var lastFileClicked: OmhStorageEntity? = null
         private set
 
     private var lastFileVersionClicked: OmhFileVersion? = null
@@ -104,8 +105,8 @@ class FileViewerViewModel @Inject constructor(
                 }
 
                 return@combine files.sortedWith(
-                    compareBy<OmhFile> { !it.isFolder() }
-                        .thenBy { it.mimeType }
+                    compareBy<OmhStorageEntity> { it is OmhStorageEntity.OmhFile  }
+                        .thenBy { (it as OmhStorageEntity.OmhFile).mimeType }
                         .thenBy { it.name }
                 )
             }
@@ -196,7 +197,7 @@ class FileViewerViewModel @Inject constructor(
     private fun downloadFileEvent() {
         setState(FileViewerViewState.Loading)
 
-        lastFileClicked?.let { file ->
+        (lastFileClicked as? OmhStorageEntity.OmhFile)?.let { file ->
             if (!file.isDownloadable()) {
                 toastMessage.postValue("${file.name} is not downloadable")
                 refreshFileListEvent()
@@ -343,7 +344,7 @@ class FileViewerViewModel @Inject constructor(
         }
     }
 
-    private fun handleDeleteSuccess(isSuccessful: Boolean, file: OmhFile) {
+    private fun handleDeleteSuccess(isSuccessful: Boolean, file: OmhStorageEntity) {
         val toastText = if (isSuccessful) {
             "${file.name} was successfully deleted"
         } else {

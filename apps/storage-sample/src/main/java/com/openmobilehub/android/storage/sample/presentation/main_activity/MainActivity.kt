@@ -17,6 +17,8 @@
 package com.openmobilehub.android.storage.sample.presentation.main_activity
 
 import android.os.Bundle
+import android.util.Log
+import android.webkit.MimeTypeMap
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -28,7 +30,7 @@ import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.ActivityBaseBinding
 import com.openmobilehub.android.storage.sample.domain.repository.SessionRepository
-import com.openmobilehub.android.storage.sample.presentation.file_viewer.FileViewerFragment
+import com.openmobilehub.android.storage.sample.presentation.BaseFragment
 import com.openmobilehub.android.storage.sample.util.coInitialize
 import com.openmobilehub.android.storage.sample.util.isUserLoggedIn
 import dagger.hilt.android.AndroidEntryPoint
@@ -38,7 +40,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-open class MainActivity : AppCompatActivity(), FileViewerFragment.FileViewerFragmentListener {
+open class MainActivity : AppCompatActivity(), BaseFragment.BaseFragmentListener {
 
     private val binding: ActivityBaseBinding by lazy {
         ActivityBaseBinding.inflate(layoutInflater)
