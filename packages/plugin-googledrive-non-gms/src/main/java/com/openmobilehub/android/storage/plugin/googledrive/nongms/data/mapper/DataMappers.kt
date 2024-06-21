@@ -19,6 +19,7 @@ package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.utils.fromRFC3339StringToDate
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileListRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.RevisionListRemoteResponse
@@ -76,3 +77,5 @@ internal fun RevisionRemoteResponse.toOmhFileVersion(fileId: String): OmhFileVer
 
 internal fun RevisionListRemoteResponse.toOmhFileVersions(fileId: String): List<OmhFileVersion> =
     revisions?.mapNotNull { remoteRevisionModel -> remoteRevisionModel?.toOmhFileVersion(fileId) }.orEmpty()
+
+internal fun isFolder(mimeType: String) = mimeType == GoogleDriveNonGmsConstants.FOLDER_MIME_TYPE

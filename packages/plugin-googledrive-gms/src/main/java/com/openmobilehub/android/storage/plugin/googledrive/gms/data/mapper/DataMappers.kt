@@ -72,4 +72,3 @@ fun Revision.toOmhFileVersion(fileId: String): OmhFileVersion {
 fun RevisionList.toOmhFileVersions(fileId: String): List<OmhFileVersion> {
     return this.revisions.toList().map { revision -> revision.toOmhFileVersion(fileId) }
 }
-
