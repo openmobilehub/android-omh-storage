@@ -7,6 +7,7 @@ import com.microsoft.graph.models.DriveItem
 import com.microsoft.graph.models.UploadSession
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.utils.toInputStream
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_PARENT_ID
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
@@ -20,6 +21,7 @@ import org.junit.Before
 import org.junit.Test
 import java.io.File
 import java.io.FileInputStream
+import java.io.InputStream
 import java.net.URI
 
 class OneDriveApiServiceTest {
@@ -35,6 +37,9 @@ class OneDriveApiServiceTest {
 
     @MockK
     private lateinit var uploadSession: UploadSession
+
+    @MockK
+    private lateinit var inputStream: InputStream
 
     private lateinit var apiService: OneDriveApiService
 
@@ -123,5 +128,24 @@ class OneDriveApiServiceTest {
 
         // Assert
         Assert.assertEquals(driveItem, result)
+    }
+
+    @Test
+    fun `given apiClient successfully download the file, when downloading the file, then return InputStream`() {
+        // Arrange
+        every {
+            apiClient.graphServiceClient.drives()
+                .byDriveId(any())
+                .items()
+                .byDriveItemId(any())
+                .content()
+                .get()
+        } returns inputStream
+
+        // Act
+        val result = apiService.downloadFile(TEST_FILE_ID)
+
+        // Assert
+        Assert.assertEquals(inputStream, result)
     }
 }
