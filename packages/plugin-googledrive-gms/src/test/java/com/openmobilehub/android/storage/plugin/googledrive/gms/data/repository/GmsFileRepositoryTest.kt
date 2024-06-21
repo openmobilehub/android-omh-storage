@@ -30,7 +30,7 @@ import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_VERSION_FILE_ID
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_VERSION_ID
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.setUpMock
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.testOmhStorageEntity
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.testOmhFile
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.testOmhVersion
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.service.GoogleDriveApiService
 import io.mockk.MockKAnnotations
@@ -123,7 +123,7 @@ internal class GmsFileRepositoryTest {
 
             val result = fileRepositoryImpl.getFilesList(TEST_FILE_PARENT_ID)
 
-            assertEquals(listOf(testOmhStorageEntity), result)
+            assertEquals(listOf(testOmhFile), result)
             verify { apiService.getFilesList(TEST_FILE_PARENT_ID) }
         }
 
@@ -139,7 +139,7 @@ internal class GmsFileRepositoryTest {
                 TEST_FILE_PARENT_ID
             )
 
-            assertEquals(testOmhStorageEntity, result)
+            assertEquals(testOmhFile, result)
             verify { apiService.createFile(any()) }
         }
 
@@ -162,7 +162,7 @@ internal class GmsFileRepositoryTest {
 
             val result = fileRepositoryImpl.uploadFile(localFileUpload, TEST_FILE_PARENT_ID)
 
-            assertEquals(testOmhStorageEntity, result)
+            assertEquals(testOmhFile, result)
             verify { apiService.uploadFile(any(), any()) }
         }
 
@@ -185,7 +185,7 @@ internal class GmsFileRepositoryTest {
 
             val result = fileRepositoryImpl.updateFile(localFileUpdate, TEST_FILE_ID)
 
-            assertEquals(testOmhStorageEntity, result)
+            assertEquals(testOmhFile, result)
             verify { apiService.updateFile(any(), any(), any()) }
         }
 
@@ -198,7 +198,7 @@ internal class GmsFileRepositoryTest {
 
             val result = fileRepositoryImpl.search(TEST_FILE_NAME)
 
-            assertEquals(listOf(testOmhStorageEntity), result)
+            assertEquals(listOf(testOmhFile), result)
             verify { apiService.search(TEST_FILE_NAME) }
         }
 

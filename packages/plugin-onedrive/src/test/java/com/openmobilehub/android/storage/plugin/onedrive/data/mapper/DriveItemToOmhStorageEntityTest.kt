@@ -3,6 +3,7 @@ package com.openmobilehub.android.storage.plugin.onedrive.data.mapper
 import android.webkit.MimeTypeMap
 import com.microsoft.graph.models.DriveItem
 import com.openmobilehub.android.storage.core.utils.getMimeTypeFromUrl
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_EXTENSION
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_MIME_TYPE
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_NAME
@@ -11,8 +12,8 @@ import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FIRST_
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FOLDER_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FOLDER_NAME
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FOLDER_PARENT_ID
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.testOmhFile
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.testOmhFolder
-import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.testOmhStorageEntity
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -44,7 +45,9 @@ class DriveItemToOmhStorageEntityTest {
         MockKAnnotations.init(this)
 
         mockkStatic("com.openmobilehub.android.storage.core.utils.MimeTypeMapExtensionsKt")
+        mockkStatic(MimeTypeMap::class)
         every { mimeTypeMap.getMimeTypeFromUrl(any()) } returns TEST_FILE_MIME_TYPE
+        every { MimeTypeMap.getFileExtensionFromUrl(TEST_FILE_NAME) } returns TEST_FILE_EXTENSION
 
         mapper = DriveItemToOmhStorageEntity(mimeTypeMap)
     }
@@ -63,13 +66,16 @@ class DriveItemToOmhStorageEntityTest {
         every { fileDriveItem.parentReference.id } returns TEST_FILE_PARENT_ID
 
         val instant = Instant.ofEpochMilli(TEST_FIRST_JUNE_2024_MILLIS)
-        every { fileDriveItem.lastModifiedDateTime } returns OffsetDateTime.ofInstant(instant, ZoneOffset.UTC)
+        every { fileDriveItem.lastModifiedDateTime } returns OffsetDateTime.ofInstant(
+            instant,
+            ZoneOffset.UTC
+        )
 
         // Act
         val result = mapper(fileDriveItem)
 
         // Assert
-        Assert.assertEquals(testOmhStorageEntity, result)
+        Assert.assertEquals(testOmhFile, result)
     }
 
     @Test
@@ -81,7 +87,10 @@ class DriveItemToOmhStorageEntityTest {
         every { folderDriveItem.parentReference.id } returns TEST_FOLDER_PARENT_ID
 
         val instant = Instant.ofEpochMilli(TEST_FIRST_JUNE_2024_MILLIS)
-        every { folderDriveItem.lastModifiedDateTime } returns OffsetDateTime.ofInstant(instant, ZoneOffset.UTC)
+        every { folderDriveItem.lastModifiedDateTime } returns OffsetDateTime.ofInstant(
+            instant,
+            ZoneOffset.UTC
+        )
 
         // Act
         val result = mapper(folderDriveItem)

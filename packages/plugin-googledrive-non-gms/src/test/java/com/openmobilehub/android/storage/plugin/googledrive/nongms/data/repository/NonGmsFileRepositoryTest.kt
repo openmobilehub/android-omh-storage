@@ -28,7 +28,7 @@ import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.reposito
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_VERSION_ID
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testFileListRemote
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testFileRemote
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testOmhStorageEntity
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testOmhFile
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testOmhVersion
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testVersionListRemote
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.GoogleStorageApiService
@@ -102,7 +102,7 @@ internal class NonGmsFileRepositoryTest {
 
             val result = fileRepositoryImpl.getFilesList(TEST_FILE_PARENT_ID)
 
-            assertEquals(listOf(testOmhStorageEntity), result)
+            assertEquals(listOf(testOmhFile), result)
             coVerify { googleStorageApiService.getFilesList(any()) }
         }
 
@@ -119,7 +119,7 @@ internal class NonGmsFileRepositoryTest {
                 TEST_FILE_PARENT_ID
             )
 
-            assertEquals(testOmhStorageEntity, result)
+            assertEquals(testOmhFile, result)
             coVerify { googleStorageApiService.createFile(any(), any()) }
         }
 
@@ -145,7 +145,7 @@ internal class NonGmsFileRepositoryTest {
 
             val result = fileRepositoryImpl.uploadFile(localFileUpload, TEST_FILE_PARENT_ID)
 
-            assertEquals(testOmhStorageEntity, result)
+            assertEquals(testOmhFile, result)
             coVerify { googleStorageApiService.uploadFile(any(), any()) }
         }
 
@@ -187,7 +187,7 @@ internal class NonGmsFileRepositoryTest {
 
             val result = fileRepositoryImpl.updateFile(File(FILE_PATH), TEST_FILE_ID)
 
-            assertEquals(testOmhStorageEntity, result)
+            assertEquals(testOmhFile, result)
             coVerify { googleStorageApiService.updateFile(any(), any()) }
         }
 
@@ -304,7 +304,7 @@ internal class NonGmsFileRepositoryTest {
 
             val result = fileRepositoryImpl.search(TEST_FILE_NAME)
 
-            assertEquals(listOf(testOmhStorageEntity), result)
+            assertEquals(listOf(testOmhFile), result)
             coVerify { googleStorageApiService.getFilesList(expectedQuery) }
         }
 

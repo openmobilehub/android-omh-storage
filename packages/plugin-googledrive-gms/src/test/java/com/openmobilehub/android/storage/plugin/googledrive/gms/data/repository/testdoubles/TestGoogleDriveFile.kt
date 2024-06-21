@@ -26,4 +26,5 @@ fun File.setUpMock() {
     every { name } returns TEST_FILE_NAME
     every { parents } returns listOf(TEST_FILE_PARENT_ID)
     every { modifiedTime } returns DateTime(TEST_FILE_MODIFIED_TIME)
+    every { fileExtension } returns TEST_FILE_EXTENSION
 }

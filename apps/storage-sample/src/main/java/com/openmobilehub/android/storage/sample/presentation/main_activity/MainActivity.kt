@@ -17,6 +17,8 @@
 package com.openmobilehub.android.storage.sample.presentation.main_activity
 
 import android.os.Bundle
+import android.util.Log
+import android.webkit.MimeTypeMap
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope

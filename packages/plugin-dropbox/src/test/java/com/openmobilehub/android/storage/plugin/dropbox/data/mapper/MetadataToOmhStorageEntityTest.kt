@@ -5,6 +5,7 @@ import com.dropbox.core.v2.files.FileMetadata
 import com.dropbox.core.v2.files.FolderMetadata
 import com.dropbox.core.v2.files.Metadata
 import com.openmobilehub.android.storage.core.utils.getMimeTypeFromUrl
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_EXTENSION
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_MIME_TYPE
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_NAME
@@ -14,8 +15,8 @@ import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FIRST_M
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FOLDER_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FOLDER_NAME
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FOLDER_PARENT_ID
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhFile
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhFolder
-import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhStorageEntity
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -49,7 +50,9 @@ class MetadataToOmhStorageEntityTest {
         MockKAnnotations.init(this)
 
         mockkStatic("com.openmobilehub.android.storage.core.utils.MimeTypeMapExtensionsKt")
+        mockkStatic(MimeTypeMap::class)
         every { mimeTypeMap.getMimeTypeFromUrl(any()) } returns TEST_FILE_MIME_TYPE
+        every { MimeTypeMap.getFileExtensionFromUrl(TEST_FILE_NAME) } returns TEST_FILE_EXTENSION
 
         mapper = MetadataToOmhStorageEntity(mimeTypeMap)
     }
@@ -72,7 +75,7 @@ class MetadataToOmhStorageEntityTest {
         val result = mapper(fileMetadata)
 
         // Assert
-        assertEquals(testOmhStorageEntity, result)
+        assertEquals(testOmhFile, result)
     }
 
     @Test
@@ -91,6 +94,9 @@ class MetadataToOmhStorageEntityTest {
 
     @Test
     fun `given a unknown metadata, when mapped, then return null`() {
+        // Arrange
+        every { metadata.parentSharedFolderId } returns TEST_FOLDER_PARENT_ID
+
         // Act
         val result = mapper(metadata)
 
