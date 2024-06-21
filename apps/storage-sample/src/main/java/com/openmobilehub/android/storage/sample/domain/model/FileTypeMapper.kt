@@ -1,5 +1,3 @@
-package com.openmobilehub.android.storage.sample.domain.model
-
 /*
  * Copyright 2023 Open Mobile Hub
  *
@@ -15,6 +13,8 @@ package com.openmobilehub.android.storage.sample.domain.model
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package com.openmobilehub.android.storage.sample.domain.model
 
 object FileTypeMapper {
 
