@@ -106,7 +106,7 @@ class FileViewerViewModel @Inject constructor(
 
                 return@combine files.sortedWith(
                     compareBy<OmhStorageEntity> { it is OmhStorageEntity.OmhFile  }
-                        .thenBy { (it as OmhStorageEntity.OmhFile).mimeType }
+                        .thenBy { (it as? OmhStorageEntity.OmhFile)?.mimeType }
                         .thenBy { it.name }
                 )
             }
