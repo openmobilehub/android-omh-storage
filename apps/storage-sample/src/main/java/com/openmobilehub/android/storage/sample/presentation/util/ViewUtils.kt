@@ -16,13 +16,16 @@
 
 package com.openmobilehub.android.storage.sample.presentation.util
 
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.navOptions
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.ErrorDialogViewBinding
 
@@ -37,6 +40,10 @@ fun Fragment.displayToast(message: String?, duration: Int = Toast.LENGTH_LONG) {
 fun Fragment.navigateTo(@IdRes resId: Int) = NavHostFragment
     .findNavController(this)
     .navigate(resId)
+
+fun Fragment.navigateTo(@IdRes resId: Int, args: Bundle?, navOptions: NavOptions?) = NavHostFragment
+    .findNavController(this)
+    .navigate(resId, args, navOptions)
 
 fun View.displayErrorDialog(message: String, layoutInflater: LayoutInflater) {
     context?.let { context ->

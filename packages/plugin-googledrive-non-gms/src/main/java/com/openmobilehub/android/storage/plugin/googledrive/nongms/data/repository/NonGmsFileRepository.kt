@@ -234,7 +234,7 @@ internal class NonGmsFileRepository(
             )
 
         return if (response.isSuccessful) {
-            response.body()?.toOmhFileVersions(fileId).orEmpty()
+            response.body()?.toOmhFileVersions(fileId).orEmpty().reversed()
         } else {
             throw OmhStorageException.ApiException(response.code(), HttpException(response))
         }
