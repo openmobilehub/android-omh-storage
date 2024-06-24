@@ -19,13 +19,19 @@
 package com.openmobilehub.android.storage.plugin.onedrive.data.repository
 
 import com.microsoft.graph.models.DriveItem
+import com.microsoft.graph.models.DriveItemVersion
+import com.microsoft.graph.models.DriveItemVersionCollectionResponse
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhStorageEntity
+import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.toOmhVersion
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiService
 import com.openmobilehub.android.storage.plugin.onedrive.data.util.toByteArrayOutputStream
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_PARENT_ID
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_VERSION_FILE_ID
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_VERSION_ID
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.testOmhVersion
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -64,12 +70,19 @@ class OneDriveFileRepositoryTest {
     @MockK
     private lateinit var byteArrayOutputStream: ByteArrayOutputStream
 
+    @MockK
+    private lateinit var driveItemCollectionVersionCollectionResponse: DriveItemVersionCollectionResponse
+
+    @MockK
+    private lateinit var driveItemVersion: DriveItemVersion
+
     private lateinit var repository: OneDriveFileRepository
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
         mockkStatic("com.openmobilehub.android.storage.plugin.onedrive.data.util.InputStreamExtensionsKt")
+        mockkStatic("com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DataMappersKt")
 
         repository = OneDriveFileRepository(apiService, driveItemToOmhStorageEntity)
     }
@@ -138,6 +151,47 @@ class OneDriveFileRepositoryTest {
         // Act & Assert
         Assert.assertThrows(OmhStorageException.DownloadException::class.java) {
             repository.downloadFile(TEST_FILE_ID)
+        }
+    }
+
+    @Test
+    fun `given an api service returns a non-empty list, when getting the file versions, then return a non-empty list`() {
+        // Arrange
+        every { apiService.getFileVersions(any()) } returns driveItemCollectionVersionCollectionResponse
+        every { driveItemCollectionVersionCollectionResponse.value } returns mutableListOf(
+            driveItemVersion,
+            driveItemVersion
+        )
+        every { driveItemVersion.toOmhVersion(any()) } returns testOmhVersion
+
+        // Act
+        val result = repository.getFileVersions(TEST_VERSION_FILE_ID)
+
+        // Assert
+        assertEquals(listOf(testOmhVersion, testOmhVersion), result)
+    }
+
+    @Test
+    fun `given an api service returns InputStream, when downloading the file version, then returns ByteArrayOutputStream`() {
+        // Arrange
+        every { apiService.downloadFileVersion(any(), any()) } returns inputStream
+        every { inputStream.toByteArrayOutputStream() } returns byteArrayOutputStream
+
+        // Act
+        val result = repository.downloadFileVersion(TEST_VERSION_FILE_ID, TEST_VERSION_ID)
+
+        // Assert
+        assertEquals(byteArrayOutputStream, result)
+    }
+
+    @Test
+    fun `given an api service returns null, when downloading the file version, then throw an OmhStorageException_DownloadException`() {
+        // Arrange
+        every { apiService.downloadFileVersion(any(), any()) } returns null
+
+        // Act & Assert
+        Assert.assertThrows(OmhStorageException.DownloadException::class.java) {
+            repository.downloadFileVersion(TEST_VERSION_FILE_ID, TEST_VERSION_ID)
         }
     }
 }
