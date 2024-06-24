@@ -23,6 +23,7 @@ import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.plugin.dropbox.data.repository.DropboxFileRepository
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_PARENT_ID
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
@@ -39,6 +40,7 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
+import java.io.ByteArrayOutputStream
 import java.io.File
 
 internal class DropboxOmhStorageClientBuilderTest {
@@ -104,6 +106,9 @@ internal class DropboxOmhStorageClientTest {
     @MockK
     private lateinit var uploadedFile: OmhStorageEntity
 
+    @MockK
+    private lateinit var byteArrayOutputStream: ByteArrayOutputStream
+
     private lateinit var client: DropboxOmhStorageClient
 
     @Before
@@ -158,5 +163,17 @@ internal class DropboxOmhStorageClientTest {
         // Assert
         assertEquals(uploadedFile, result)
         verify { repository.uploadFile(fileToUpload, TEST_FILE_PARENT_ID) }
+    }
+
+    @Test
+    fun `given a repository, when downloading a file, then return ByteArrayOutputStream`() = runTest {
+        // Arrange
+        every { repository.downloadFile(any()) } returns byteArrayOutputStream
+
+        // Act
+        val result = client.downloadFile(TEST_FILE_ID, null)
+
+        // Assert
+        assertEquals(byteArrayOutputStream, result)
     }
 }

@@ -24,6 +24,7 @@ import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.utils.toInputStream
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.MetadataToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.dropbox.data.service.DropboxApiService
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_PARENT_ID
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
@@ -33,6 +34,7 @@ import io.mockk.mockk
 import io.mockk.mockkStatic
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -54,6 +56,9 @@ class DropboxFileRepositoryTest {
 
     @MockK(relaxed = true)
     private lateinit var file: File
+
+    @MockK
+    private lateinit var fileMetadata: FileMetadata
 
     private lateinit var repository: DropboxFileRepository
 
@@ -127,5 +132,17 @@ class DropboxFileRepositoryTest {
 
         // Assert
         assertEquals(omhStorageEntity, result)
+    }
+
+    @Test
+    fun `given an api service return FileMetadata, when downloading the file, then returns ByteArrayOutputStream`() {
+        // Arrange
+        every { apiService.downloadFile(any(), any()) } returns fileMetadata
+
+        // Act
+        val result = repository.downloadFile(TEST_FILE_ID)
+
+        // Assert
+        assertNotNull(result)
     }
 }
