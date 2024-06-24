@@ -31,6 +31,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import com.google.api.services.drive.model.File as GoogleDriveFile
 
+@Suppress("TooManyFunctions")
 internal class GmsFileRepository(
     private val apiService: GoogleDriveApiService
 ) {

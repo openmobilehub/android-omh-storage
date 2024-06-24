@@ -38,6 +38,7 @@ import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import java.io.ByteArrayOutputStream
 import java.io.File
 
+@Suppress("TooManyFunctions")
 abstract class OmhStorageClient protected constructor(
     protected val authClient: OmhAuthClient
 ) {

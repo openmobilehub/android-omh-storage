@@ -20,19 +20,26 @@ package com.openmobilehub.android.storage.plugin.onedrive.data.repository
 
 import com.microsoft.graph.models.DriveItem
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
+import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiService
+import com.openmobilehub.android.storage.plugin.onedrive.data.util.toByteArrayOutputStream
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_PARENT_ID
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import org.junit.After
+import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.InputStream
 
 class OneDriveFileRepositoryTest {
 
@@ -51,11 +58,18 @@ class OneDriveFileRepositoryTest {
     @MockK(relaxed = true)
     private lateinit var file: File
 
+    @MockK
+    private lateinit var inputStream: InputStream
+
+    @MockK
+    private lateinit var byteArrayOutputStream: ByteArrayOutputStream
+
     private lateinit var repository: OneDriveFileRepository
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
+        mockkStatic("com.openmobilehub.android.storage.plugin.onedrive.data.util.InputStreamExtensionsKt")
 
         repository = OneDriveFileRepository(apiService, driveItemToOmhStorageEntity)
     }
@@ -101,5 +115,29 @@ class OneDriveFileRepositoryTest {
 
         // Assert
         assertEquals(omhStorageEntity, result)
+    }
+
+    @Test
+    fun `given an api service returns InputStream, when downloading the file, then returns ByteArrayOutputStream`() {
+        // Arrange
+        every { apiService.downloadFile(any()) } returns inputStream
+        every { inputStream.toByteArrayOutputStream() } returns byteArrayOutputStream
+
+        // Act
+        val result = repository.downloadFile(TEST_FILE_ID)
+
+        // Assert
+        assertEquals(byteArrayOutputStream, result)
+    }
+
+    @Test
+    fun `given an api service returns null, when downloading the file, then throw an OmhStorageException_DownloadException`() {
+        // Arrange
+        every { apiService.downloadFile(any()) } returns null
+
+        // Act & Assert
+        Assert.assertThrows(OmhStorageException.DownloadException::class.java) {
+            repository.downloadFile(TEST_FILE_ID)
+        }
     }
 }

@@ -24,6 +24,7 @@ import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
 import com.openmobilehub.android.storage.core.utils.toInputStream
 import java.io.File
+import java.io.InputStream
 
 class OneDriveApiService(private val apiClient: OneDriveApiClient) {
     private val driveId by lazy { retrieveDriveId() }
@@ -68,5 +69,14 @@ class OneDriveApiService(private val apiClient: OneDriveApiClient) {
         )
 
         return if (uploadResult.isUploadSuccessful) uploadResult.itemResponse else null
+    }
+
+    fun downloadFile(fileId: String): InputStream? {
+        return apiClient.graphServiceClient.drives()
+            .byDriveId(driveId)
+            .items()
+            .byDriveItemId(fileId)
+            .content()
+            .get()
     }
 }
