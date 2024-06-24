@@ -35,6 +35,7 @@ import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.model.OmhFilePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
+import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import java.io.ByteArrayOutputStream
 import java.io.File
 
@@ -167,4 +168,13 @@ abstract class OmhStorageClient protected constructor(
      * @return A list of OmhFilePermission for the given file
      */
     abstract suspend fun getFilePermissions(fileId: String): List<OmhFilePermission>
+
+    /**
+     * This method retrieves the metadata of a given file
+     *
+     * @param fileId The id of the file you want to get the metadata of
+     *
+     * @return An OmhStorageMetadata with the metadata of the given file
+     */
+    abstract suspend fun getFileMetadata(fileId: String): OmhStorageMetadata
 }

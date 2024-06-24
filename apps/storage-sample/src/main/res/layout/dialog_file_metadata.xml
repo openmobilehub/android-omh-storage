@@ -15,96 +15,46 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-        <TextView
-            android:id="@+id/file_id"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/metadata_rows"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/file_id"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintTop_toBottomOf="@+id/header"
-            android:layout_marginTop="24dp" />
+            app:layout_constraintVertical_bias="0.0"
+            android:layout_marginTop="24dp">
 
-        <TextView
-            android:id="@+id/file_created_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/file_created_time"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintTop_toBottomOf="@+id/file_id"
-            android:layout_marginTop="24dp" />
+            <include
+                android:id="@+id/file_id"
+                layout="@layout/row_textview" />
 
-        <TextView
-            android:id="@+id/file_modified_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/file_modified_time"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintTop_toBottomOf="@+id/file_created_time"
-            android:layout_marginTop="24dp" />
+            <include
+                android:id="@+id/file_created_time"
+                layout="@layout/row_textview" />
 
-        <TextView
-            android:id="@+id/file_parent_id"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/file_parent_id"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintTop_toBottomOf="@+id/file_modified_time"
-            android:layout_marginTop="24dp" />
+            <include
+                android:id="@+id/file_modified_time"
+                layout="@layout/row_textview" />
 
-        <TextView
-            android:id="@+id/file_mime_type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/file_mime_type"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintTop_toBottomOf="@+id/file_parent_id"
-            android:layout_marginTop="24dp" />
+            <include
+                android:id="@+id/file_parent_id"
+                layout="@layout/row_textview" />
 
-        <TextView
-            android:id="@+id/file_extension"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/file_extension"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintTop_toBottomOf="@+id/file_mime_type"
-            android:layout_marginTop="24dp" />
+            <include
+                android:id="@+id/file_mime_type"
+                layout="@layout/row_textview" />
 
-        <TextView
-            android:id="@+id/file_size"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/file_size"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintTop_toBottomOf="@+id/file_extension"
-            android:layout_marginTop="24dp" />
+            <include
+                android:id="@+id/file_extension"
+                layout="@layout/row_textview" />
 
+            <include
+                android:id="@+id/file_size"
+                layout="@layout/row_textview" />
+
+        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

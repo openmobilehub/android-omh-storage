@@ -20,6 +20,7 @@ package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.reposit
 
 import android.webkit.MimeTypeMap
 import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_FILE_MIME_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_FILE_NAME
@@ -44,6 +45,7 @@ import io.mockk.mockk
 import io.mockk.mockkStatic
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody
 import org.junit.After
 import org.junit.Before
@@ -61,6 +63,7 @@ internal class NonGmsFileRepositoryTest {
 
     companion object {
         private const val FILE_PATH = "anyPath"
+        private const val TEST_GET_FILE_RESPONSE_BODY_CONTENT = "{\"id\": \"123\", \"name\": \"fileName.txt\", \"createdTime\": \"2024-05-01T00:00:00.000Z\", \"modifiedTime\": \"2024-06-01T00:00:00.000Z\", \"parents\": [\"parentId\"], \"mimeType\": \"test/mime-type\", \"fileExtension\": \"txt\", \"size\": 10}"
     }
 
     @MockK(relaxed = true)
@@ -323,14 +326,16 @@ internal class NonGmsFileRepositoryTest {
     fun `given a search query, when search is success, then a list of OmhStorageEntities is returned`() =
         runTest {
             val expectedQuery = "name contains '$TEST_FILE_NAME' and trashed = false"
-            coEvery { googleStorageApiService.getFilesList(expectedQuery, "*") } returns Response.success(
+            coEvery {
+                googleStorageApiService.getFilesList(expectedQuery)
+            } returns Response.success(
                 testFileListRemote
             )
 
             val result = fileRepositoryImpl.search(TEST_FILE_NAME)
 
             assertEquals(listOf(testOmhFile), result)
-            coVerify { googleStorageApiService.getFilesList(expectedQuery, "*") }
+            coVerify { googleStorageApiService.getFilesList(expectedQuery) }
         }
 
     @Test
@@ -362,9 +367,29 @@ internal class NonGmsFileRepositoryTest {
                 responseBody
             )
 
-            val result = fileRepositoryImpl.downloadFileVersion(TEST_VERSION_FILE_ID, TEST_VERSION_ID)
+            val result =
+                fileRepositoryImpl.downloadFileVersion(TEST_VERSION_FILE_ID, TEST_VERSION_ID)
 
             assertEquals(expectedResult, result)
             coVerify { googleStorageApiService.downloadFileRevision(any(), any(), any()) }
+        }
+
+    @Test
+    fun `given a file id, return OmhStorageEntity object along with it's original metadata`() =
+        runTest {
+            coEvery { googleStorageApiService.getFileMetadata(any(), any()) } returns Response.success(
+                ResponseBody.create("application/json".toMediaTypeOrNull(), TEST_GET_FILE_RESPONSE_BODY_CONTENT)
+            )
+
+            val response = fileRepositoryImpl.getFileMetadata(TEST_FILE_ID)
+
+            assertEquals(
+                OmhStorageMetadata(
+                    testOmhFile,
+                    ResponseBody.create("application/json".toMediaTypeOrNull(), TEST_GET_FILE_RESPONSE_BODY_CONTENT).string()
+                ),
+                response
+            )
+            coVerify { googleStorageApiService.getFileMetadata(any(), any()) }
         }
 }

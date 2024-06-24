@@ -37,6 +37,7 @@
     <string name="error_dialog_title">Something went wrong</string>
     <string name="error_dialog_message">Error detail:\n\n%s</string>
     <string name="error_dialog_ok">OK</string>
+    <string name="file_name">File Name: %s</string>
     <string name="file_id">ID: %s</string>
     <string name="file_created_time">Created Time: %s</string>
     <string name="file_modified_time">Modified Time: %s</string>

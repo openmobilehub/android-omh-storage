@@ -183,8 +183,6 @@ class FileViewerFragment :
 
     private fun showFileMetadata() = FileMetadataDialog().show(childFragmentManager, FILE_METADATA_DIALOG_TAG)
 
-
-
     private fun showFilePermissions() = displayToast("To be implemented")
 //    FilePermissionsDialog().show(
 //        childFragmentManager,

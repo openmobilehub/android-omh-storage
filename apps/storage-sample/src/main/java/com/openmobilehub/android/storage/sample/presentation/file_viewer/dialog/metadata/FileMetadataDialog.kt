@@ -74,20 +74,20 @@ class FileMetadataDialog : BottomSheetDialogFragment() {
         }
 
         header.title.text = resources.getString(R.string.text_metadata)
-        header.fileName.text = "File Name: ${file.name}"
+        header.fileName.text = getString(R.string.file_name, file.name)
 
-        fileId.text = getString(R.string.file_id, file.id)
-        fileCreatedTime.text = getString(R.string.file_created_time, file.createdTime?.toRFC3339String())
-        fileModifiedTime.text = getString(R.string.file_modified_time, file.modifiedTime?.toRFC3339String())
-        fileParentId.text = getString(R.string.file_parent_id, file.parentId)
-        fileMimeType.text = getString(R.string.file_mime_type, mimeType)
-        fileExtension.text = getString(R.string.file_extension, extension)
-        fileSize.text = getString(R.string.file_size, size.toString())
+        fileId.label.text = getString(R.string.file_id, file.id)
+        fileCreatedTime.label.text = getString(R.string.file_created_time, file.createdTime?.toRFC3339String())
+        fileModifiedTime.label.text = getString(R.string.file_modified_time, file.modifiedTime?.toRFC3339String())
+        fileParentId.label.text = getString(R.string.file_parent_id, file.parentId)
+        fileMimeType.label.text = getString(R.string.file_mime_type, mimeType)
+        fileExtension.label.text = getString(R.string.file_extension, extension)
+        fileSize.label.text = getString(R.string.file_size, size.toString())
 
         if (file.isFolder()) {
-            fileMimeType.visibility = View.GONE
-            fileExtension.visibility = View.GONE
-            fileSize.visibility = View.GONE
+            fileMimeType.label.visibility = View.GONE
+            fileExtension.label.visibility = View.GONE
+            fileSize.label.visibility = View.GONE
         }
     }
 }

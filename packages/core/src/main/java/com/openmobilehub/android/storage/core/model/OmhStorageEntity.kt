@@ -56,3 +56,5 @@ sealed class OmhStorageEntity(
         parentId,
     )
 }
+
+data class OmhStorageMetadata(val entity: OmhStorageEntity, val originalMetadata: Any)
