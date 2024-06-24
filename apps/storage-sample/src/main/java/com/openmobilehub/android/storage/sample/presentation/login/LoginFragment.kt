@@ -27,6 +27,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.navOptions
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.FragmentLoginBinding
 import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
@@ -48,7 +49,11 @@ class LoginFragment : BaseFragment<LoginViewModel, LoginViewState, LoginViewEven
         ActivityResultContracts.StartActivityForResult()
     ) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
-            navigateTo(R.id.action_login_fragment_to_file_viewer_fragment)
+           navigateTo(R.id.action_login_fragment_to_file_viewer_fragment, null, navOptions {
+               popUpTo(R.id.login_fragment) {
+                   inclusive = true
+               }
+           })
         } else {
             displayErrorDialog(getString(R.string.login_error, result.resultCode))
         }
