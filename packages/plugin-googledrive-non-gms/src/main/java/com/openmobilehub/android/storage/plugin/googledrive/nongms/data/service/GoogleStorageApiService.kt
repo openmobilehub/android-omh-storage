@@ -19,6 +19,7 @@ package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body.CreateFileRequestBody
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileListRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileRemoteResponse
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.PermissionsListResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.RevisionListRemoteResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -34,6 +35,7 @@ import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
+@Suppress("TooManyFunctions")
 internal interface GoogleStorageApiService {
 
     companion object {
@@ -55,6 +57,7 @@ internal interface GoogleStorageApiService {
             String.format(SEARCH_BY_NAME_Q_VALUE, query)
 
         private const val QUERY_REQUESTED_FIELDS = "id,name,mimeType,modifiedTime,parents"
+        private const val QUERY_PERMISSIONS = "permissions"
         private const val FIELDS_VALUE = "files($QUERY_REQUESTED_FIELDS)"
 
         private const val FILE_ID = "fileId"
@@ -91,6 +94,12 @@ internal interface GoogleStorageApiService {
         @Path(FILE_ID) fileId: String,
         @Query(QUERY_ALT) alt: String
     ): Response<ResponseBody>
+
+    @GET("$FILES_PARTICLE/{$FILE_ID}")
+    suspend fun getPermissions(
+        @Path(FILE_ID) fileId: String,
+        @Query(QUERY_FIELDS) fields: String = QUERY_PERMISSIONS
+    ): Response<PermissionsListResponse>
 
     @GET("$FILES_PARTICLE/{$FILE_ID}/export")
     suspend fun exportDocEditor(

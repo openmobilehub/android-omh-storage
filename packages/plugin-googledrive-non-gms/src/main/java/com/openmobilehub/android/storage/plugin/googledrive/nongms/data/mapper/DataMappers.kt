@@ -17,11 +17,15 @@
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper
 
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhPermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.utils.fromRFC3339StringToDate
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.FOLDER_MIME_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileListRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileRemoteResponse
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.PermissionResponse
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.PermissionsListResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.RevisionListRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.RevisionRemoteResponse
 
@@ -80,3 +84,72 @@ internal fun RevisionListRemoteResponse.toOmhFileVersions(fileId: String): List<
         .orEmpty()
 
 internal fun isFolder(mimeType: String) = mimeType == FOLDER_MIME_TYPE
+
+internal fun PermissionResponse.toPermission(): OmhPermission? {
+    val omhRole = role?.stringToRole()
+
+    if (id == null || type == null || omhRole == null) {
+        return null
+    }
+
+    val displayName = displayName.orEmpty()
+    val expirationTime = expirationTime?.fromRFC3339StringToDate()
+
+    return when (type) {
+        "user" -> {
+            OmhPermission.OmhUserPermission(
+                id,
+                displayName,
+                omhRole,
+                photoLink,
+                emailAddress,
+                expirationTime,
+                deleted,
+                pendingOwner
+            )
+        }
+
+        "group" -> {
+            OmhPermission.OmhGroupPermission(
+                id,
+                displayName,
+                omhRole,
+                emailAddress,
+                expirationTime,
+                deleted,
+            )
+        }
+
+        "domain" -> {
+            OmhPermission.OmhDomainPermission(
+                id,
+                displayName,
+                omhRole,
+                domain ?: ""
+            )
+        }
+
+        "anyone" -> {
+            OmhPermission.OmhAnyonePermission(
+                id,
+                displayName,
+                omhRole,
+            )
+        }
+
+        else -> null
+    }
+}
+
+internal fun String.stringToRole(): OmhPermissionRole? = when (this) {
+    "owner" -> OmhPermissionRole.OWNER
+    "organizer" -> OmhPermissionRole.ORGANIZER
+    "fileOrganizer" -> OmhPermissionRole.FILE_ORGANIZER
+    "writer" -> OmhPermissionRole.WRITER
+    "commenter" -> OmhPermissionRole.COMMENTER
+    "reader" -> OmhPermissionRole.READER
+    else -> null
+}
+
+internal fun PermissionsListResponse.toPermissions(): List<OmhPermission> =
+    permissions?.mapNotNull { permissionResponse -> permissionResponse.toPermission() }.orEmpty()

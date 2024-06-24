@@ -20,6 +20,7 @@ import com.google.api.client.http.FileContent
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.model.File
 
+@Suppress("TooManyFunctions")
 internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProvider) {
 
     fun getFilesList(parentId: String): Drive.Files.List = apiProvider
@@ -57,10 +58,18 @@ internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProv
         .files()
         .create(file, mediaContent)
 
-    fun downloadFile(fileId: String): Drive.Files.Get = apiProvider
+    fun getFile(fileId: String): Drive.Files.Get = apiProvider
         .googleDriveApiService
         .files()
         .get(fileId)
+
+    fun getPermission(fileId: String): Drive.Files.Get = apiProvider
+        .googleDriveApiService
+        .files()
+        .get(fileId)
+        .apply {
+            fields = "permissions"
+        }
 
     fun downloadGoogleDoc(fileId: String, mimeType: String): Drive.Files.Export = apiProvider
         .googleDriveApiService

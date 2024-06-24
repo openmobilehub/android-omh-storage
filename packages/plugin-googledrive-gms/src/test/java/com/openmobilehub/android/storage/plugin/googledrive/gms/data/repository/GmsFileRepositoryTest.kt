@@ -169,11 +169,11 @@ internal class GmsFileRepositoryTest {
     @Test
     fun `given a file id and a mime type, when downloadFile is success, then a ByteArrayOutputStream is returned`() =
         runTest {
-            every { apiService.downloadFile(TEST_FILE_ID) } returns driveFilesGetRequest
+            every { apiService.getFile(TEST_FILE_ID) } returns driveFilesGetRequest
 
             fileRepositoryImpl.downloadFile(TEST_FILE_ID, TEST_FILE_MIME_TYPE)
 
-            verify { apiService.downloadFile(TEST_FILE_ID) }
+            verify { apiService.getFile(TEST_FILE_ID) }
         }
 
     @Test

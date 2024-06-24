@@ -18,12 +18,14 @@ package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.reposit
 
 import android.webkit.MimeTypeMap
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toFileList
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toOmhFileVersions
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toOmhStorageEntity
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toPermissions
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.GoogleStorageApiService
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body.CreateFileRequestBody
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit.GoogleStorageApiServiceProvider
@@ -252,6 +254,20 @@ internal class NonGmsFileRepository(
                 OmhStorageStatusCodes.DOWNLOAD_ERROR,
                 HttpException(response)
             )
+        }
+    }
+
+    suspend fun getFilePermissions(fileId: String): List<OmhPermission> {
+        val response = retrofitImpl
+            .getGoogleStorageApiService()
+            .getPermissions(
+                fileId = fileId
+            )
+
+        return if (response.isSuccessful) {
+            response.body()?.toPermissions().orEmpty()
+        } else {
+            throw OmhStorageException.ApiException(response.code(), HttpException(response))
         }
     }
 }

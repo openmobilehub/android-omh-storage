@@ -18,15 +18,18 @@ package com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper
 
 import com.google.api.services.drive.model.File
 import com.google.api.services.drive.model.FileList
+import com.google.api.services.drive.model.Permission
 import com.google.api.services.drive.model.Revision
 import com.google.api.services.drive.model.RevisionList
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhPermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.extension.isFolder
 import java.util.Date
 
 @SuppressWarnings("ComplexCondition")
-fun File.toOmhStorageEntity(): OmhStorageEntity? {
+internal fun File.toOmhStorageEntity(): OmhStorageEntity? {
     if (mimeType == null || id == null || name == null) {
         return null
     }
@@ -57,11 +60,11 @@ fun File.toOmhStorageEntity(): OmhStorageEntity? {
     }
 }
 
-fun FileList.toOmhStorageEntities(): List<OmhStorageEntity> {
+internal fun FileList.toOmhStorageEntities(): List<OmhStorageEntity> {
     return this.files.toList().mapNotNull { googleFile -> googleFile.toOmhStorageEntity() }
 }
 
-fun Revision.toOmhFileVersion(fileId: String): OmhFileVersion {
+internal fun Revision.toOmhFileVersion(fileId: String): OmhFileVersion {
     return OmhFileVersion(
         fileId,
         id,
@@ -69,6 +72,72 @@ fun Revision.toOmhFileVersion(fileId: String): OmhFileVersion {
     )
 }
 
-fun RevisionList.toOmhFileVersions(fileId: String): List<OmhFileVersion> {
+internal fun RevisionList.toOmhFileVersions(fileId: String): List<OmhFileVersion> {
     return this.revisions.toList().map { revision -> revision.toOmhFileVersion(fileId) }
+}
+
+internal fun Permission.toOmhPermission(): OmhPermission? {
+    val omhRole = role.stringToRole()
+
+    if (id == null || type == null || omhRole == null) {
+        return null
+    }
+
+    val expirationTime = expirationTime?.value?.let { Date(it) }
+
+    return when (type) {
+        "user" -> {
+            OmhPermission.OmhUserPermission(
+                id,
+                displayName,
+                omhRole,
+                emailAddress,
+                photoLink,
+                expirationTime,
+                deleted,
+                // pendingOwner is not exposed in Drive API V3 Rev197 1.25.0, but is returned by REST API
+                null
+            )
+        }
+
+        "group" -> {
+            OmhPermission.OmhGroupPermission(
+                id,
+                displayName,
+                omhRole,
+                emailAddress,
+                expirationTime,
+                deleted
+            )
+        }
+
+        "domain" -> {
+            OmhPermission.OmhDomainPermission(
+                id,
+                displayName,
+                omhRole,
+                domain
+            )
+        }
+
+        "anyone" -> {
+            OmhPermission.OmhAnyonePermission(
+                id,
+                displayName,
+                omhRole,
+            )
+        }
+
+        else -> null
+    }
+}
+
+internal fun String.stringToRole(): OmhPermissionRole? = when (this) {
+    "owner" -> OmhPermissionRole.OWNER
+    "organizer" -> OmhPermissionRole.ORGANIZER
+    "fileOrganizer" -> OmhPermissionRole.FILE_ORGANIZER
+    "writer" -> OmhPermissionRole.WRITER
+    "commenter" -> OmhPermissionRole.COMMENTER
+    "reader" -> OmhPermissionRole.READER
+    else -> null
 }

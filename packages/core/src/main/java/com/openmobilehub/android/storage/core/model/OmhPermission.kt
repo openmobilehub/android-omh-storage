@@ -18,43 +18,47 @@ package com.openmobilehub.android.storage.core.model
 
 import java.util.Date
 
-sealed class OmhFilePermission(
+sealed class OmhPermission(
     open val id: String,
     open val displayName: String,
-    open val role: OmhFilePermissionRole
+    open val role: OmhPermissionRole?
 ) {
 
-    data class OmhUserFilePermission(
+    data class OmhUserPermission(
         override val id: String,
         override val displayName: String,
-        override val role: OmhFilePermissionRole,
-        val email: String,
-        val expirationTime: Date,
-    ) : OmhFilePermission(id, displayName, role)
+        override val role: OmhPermissionRole,
+        val photoLink: String?,
+        val email: String?,
+        val expirationTime: Date?,
+        val deleted: Boolean?,
+        val pendingOwner: Boolean?,
+    ) : OmhPermission(id, displayName, role)
 
-    data class OmhGroupFilePermission(
+    data class OmhGroupPermission(
         override val id: String,
         override val displayName: String,
-        override val role: OmhFilePermissionRole,
-        val email: String,
-        val expirationTime: Date,
-    ) : OmhFilePermission(id, displayName, role)
+        override val role: OmhPermissionRole,
+        val email: String?,
+        val expirationTime: Date?,
+        val deleted: Boolean?,
+    ) : OmhPermission(id, displayName, role)
 
-    data class OmhDomainFilePermission(
+    data class OmhDomainPermission(
         override val id: String,
         override val displayName: String,
-        override val role: OmhFilePermissionRole,
+        override val role: OmhPermissionRole,
         val domain: String
-    ) : OmhFilePermission(id, displayName, role)
+    ) : OmhPermission(id, displayName, role)
 
-    data class OmhAnyoneFilePermission(
+    data class OmhAnyonePermission(
         override val id: String,
         override val displayName: String,
-        override val role: OmhFilePermissionRole,
-    ) : OmhFilePermission(id, displayName, role)
+        override val role: OmhPermissionRole,
+    ) : OmhPermission(id, displayName, role)
 }
 
-enum class OmhFilePermissionRole {
+enum class OmhPermissionRole {
     OWNER,
     ORGANIZER,
     FILE_ORGANIZER,

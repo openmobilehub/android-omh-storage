@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model
+package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response
 
-import com.openmobilehub.android.storage.core.model.OmhPermission
+import androidx.annotation.Keep
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
 
-data class FilePermissionsViewState(
-    val permissions: List<OmhPermission>,
-    val isLoading: Boolean
+@Keep
+@JsonIgnoreProperties(ignoreUnknown = true)
+internal data class PermissionsListResponse(
+    @JsonProperty("permissions") val permissions: List<PermissionResponse>?
 )

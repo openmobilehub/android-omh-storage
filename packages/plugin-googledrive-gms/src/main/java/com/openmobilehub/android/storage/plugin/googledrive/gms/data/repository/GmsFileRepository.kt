@@ -20,10 +20,12 @@ import android.webkit.MimeTypeMap
 import com.google.api.client.http.FileContent
 import com.google.api.client.http.HttpResponseException
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhFileVersions
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhPermission
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhStorageEntities
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.service.GoogleDriveApiService
@@ -101,7 +103,7 @@ internal class GmsFileRepository(
         val outputStream = ByteArrayOutputStream()
 
         try {
-            apiService.downloadFile(fileId).executeMediaAndDownloadTo(outputStream)
+            apiService.getFile(fileId).executeMediaAndDownloadTo(outputStream)
         } catch (exception: HttpResponseException) {
             with(outputStream) {
                 flush()
@@ -148,5 +150,15 @@ internal class GmsFileRepository(
         apiService.downloadFileRevision(fileId, versionId).executeMediaAndDownloadTo(outputStream)
 
         return outputStream
+    }
+
+    fun getFilePermissions(fileId: String): List<OmhPermission> {
+        val file = apiService
+            .getPermission(fileId)
+            .execute()
+        val permissions = file
+            .permissions
+
+        return permissions?.mapNotNull { it.toOmhPermission() } ?: emptyList()
     }
 }
