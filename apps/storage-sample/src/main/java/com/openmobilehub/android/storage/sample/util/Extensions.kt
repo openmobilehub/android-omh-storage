@@ -38,7 +38,7 @@ private val NON_SUPPORTED_MIME_TYPES_FOR_DOWNLOAD = listOf(
 fun OmhStorageEntity.OmhFile.isDownloadable(): Boolean = !NON_SUPPORTED_MIME_TYPES_FOR_DOWNLOAD.contains(getFileType())
 fun OmhStorageEntity.OmhFile.getFileType() = mimeType?.let {
     FileTypeMapper.getFileTypeWithMime(it)
-} ?: FileType.GOOGLE_UNKNOWN
+} ?: FileType.OTHER
 
 fun OmhStorageEntity.OmhFile.normalizedMimeType(): String = when (getFileType()) {
     FileType.GOOGLE_DOCUMENT -> FileType.MICROSOFT_WORD.mimeType
