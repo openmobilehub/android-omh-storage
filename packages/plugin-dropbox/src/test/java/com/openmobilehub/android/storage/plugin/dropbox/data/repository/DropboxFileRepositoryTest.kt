@@ -29,6 +29,7 @@ import com.openmobilehub.android.storage.plugin.dropbox.data.service.DropboxApiS
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_PARENT_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_VERSION_FILE_ID
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_VERSION_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhVersion
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
@@ -173,10 +174,10 @@ class DropboxFileRepositoryTest {
     @Test
     fun `given an api service return FileMetadata, when downloading the file version, then returns ByteArrayOutputStream`() {
         // Arrange
-        every { apiService.downloadFile(any(), any()) } returns fileMetadata
+        every { apiService.downloadFileRevision(any(), any()) } returns fileMetadata
 
         // Act
-        val result = repository.downloadFile(TEST_FILE_ID)
+        val result = repository.downloadFileVersion(TEST_VERSION_ID)
 
         // Assert
         assertNotNull(result)
