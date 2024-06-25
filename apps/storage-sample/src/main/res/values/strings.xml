@@ -41,17 +41,18 @@
     <string name="permission_type_group">Group</string>
     <string name="permission_type_domain">Domain</string>
     <string name="permission_type_anyone">Anyone</string>
-    <string name="permission_label_id">Id:</string>
-    <string name="permission_label_display_name">Display name:</string>
-    <string name="permission_label_type">Type:</string>
-    <string name="permission_label_role">Role:</string>
+    <string name="permission_label_id">Id</string>
+    <string name="permission_label_display_name">Display name</string>
+    <string name="permission_label_type">Type</string>
+    <string name="permission_label_role">Role</string>
     <string name="permission_label_user_photo">User photo</string>
     <string name="permission_label_email">Email</string>
-    <string name="permission_label_expiration_time">Expiration time:</string>
-    <string name="permission_label_deleted">Deleted:</string>
-    <string name="permission_label_pending_owner">Pending owner:</string>
-    <string name="permission_label_domain">Domain:</string>
+    <string name="permission_label_expiration_time">Expiration time</string>
+    <string name="permission_label_deleted">Deleted</string>
+    <string name="permission_label_pending_owner">Pending owner</string>
+    <string name="permission_label_domain">Domain</string>
     <string name="permission_add">Add permission</string>
-
+    <string name="permission_removed">Permission was successfully removed</string>
+    <string name="permission_remove_error">Couldn\'t remove permission</string>
 
 </resources>

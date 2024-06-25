@@ -158,4 +158,15 @@ abstract class OmhStorageClient protected constructor(
      * @return A list of OmhFilePermission for the given file
      */
     abstract suspend fun getFilePermissions(fileId: String): List<OmhPermission>
+
+    /**
+     * This method delete permission with a given permission id in a given file
+     *
+     * @param fileId The file id with the permission
+     * @param permissionId The permission id of the desired permission to delete
+     *
+     *
+     * @return true if the permission was deleted, false otherwise
+     */
+    abstract suspend fun deletePermission(fileId: String, permissionId: String): Boolean
 }

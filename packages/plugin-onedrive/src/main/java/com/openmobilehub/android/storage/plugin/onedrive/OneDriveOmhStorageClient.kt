@@ -33,6 +33,7 @@ import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveAu
 import java.io.ByteArrayOutputStream
 import java.io.File
 
+@Suppress("TooManyFunctions")
 internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
     authClient: OmhAuthClient,
     private val repository: OneDriveFileRepository
@@ -113,5 +114,10 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
     override suspend fun getFilePermissions(fileId: String): List<OmhPermission> {
         // To be implemented
         return emptyList()
+    }
+
+    override suspend fun deletePermission(fileId: String, permissionId: String): Boolean {
+        // To be implemented
+        return true
     }
 }

@@ -32,6 +32,7 @@ import com.openmobilehub.android.storage.plugin.dropbox.data.service.DropboxApiS
 import java.io.ByteArrayOutputStream
 import java.io.File
 
+@Suppress("TooManyFunctions")
 internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
     authClient: OmhAuthClient,
     private val repository: DropboxFileRepository,
@@ -111,5 +112,10 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
     override suspend fun getFilePermissions(fileId: String): List<OmhPermission> {
         // To be implemented
         return emptyList()
+    }
+
+    override suspend fun deletePermission(fileId: String, permissionId: String): Boolean {
+        // To be implemented
+        return true
     }
 }

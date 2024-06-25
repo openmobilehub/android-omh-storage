@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.sample.presentation.file_viewer.model
+package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model
 
-sealed class FileViewerAction {
-    object ShowMoreOptions : FileViewerAction()
-    object ShowFilePermissions : FileViewerAction()
-    object ShowFileVersions : FileViewerAction()
-    object ShowFileMetadata : FileViewerAction()
+import androidx.annotation.StringRes
+
+sealed class FilePermissionsViewAction {
+    data class ShowToast(@StringRes val message: Int) : FilePermissionsViewAction()
 }

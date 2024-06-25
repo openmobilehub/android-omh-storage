@@ -57,7 +57,7 @@ import com.openmobilehub.android.storage.sample.presentation.BaseFragment
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.menu.FileMenuDialog
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.FilePermissionsDialog
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.versions.FileVersionsDialog
-import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerAction
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewAction
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewEvent
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewState
 import com.openmobilehub.android.storage.sample.presentation.util.displayToast
@@ -157,10 +157,10 @@ class FileViewerFragment :
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.action.collect {
                     when (it) {
-                        FileViewerAction.ShowFileMetadata -> showFileMetadata()
-                        FileViewerAction.ShowFilePermissions -> showFilePermissions()
-                        FileViewerAction.ShowFileVersions -> showFileVersions()
-                        FileViewerAction.ShowMoreOptions -> showMoreOptions()
+                        FileViewerViewAction.ShowFileMetadata -> showFileMetadata()
+                        FileViewerViewAction.ShowFilePermissions -> showFilePermissions()
+                        FileViewerViewAction.ShowFileVersions -> showFileVersions()
+                        FileViewerViewAction.ShowMoreOptions -> showMoreOptions()
                     }
                 }
             }

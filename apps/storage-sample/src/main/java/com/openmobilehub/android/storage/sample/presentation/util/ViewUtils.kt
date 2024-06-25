@@ -21,11 +21,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.IdRes
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.navOptions
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.ErrorDialogViewBinding
 
@@ -33,7 +33,15 @@ fun View.displayToast(message: String?, duration: Int = Toast.LENGTH_LONG) {
     Toast.makeText(this.context, message, duration).show()
 }
 
+fun View.displayToast(@StringRes message: Int, duration: Int = Toast.LENGTH_LONG) {
+    Toast.makeText(this.context, message, duration).show()
+}
+
 fun Fragment.displayToast(message: String?, duration: Int = Toast.LENGTH_LONG) {
+    view?.displayToast(message, duration)
+}
+
+fun Fragment.displayToast(@StringRes message: Int, duration: Int = Toast.LENGTH_LONG) {
     view?.displayToast(message, duration)
 }
 

@@ -86,4 +86,10 @@ internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProv
 
     fun downloadFileRevision(fileId: String, revisionId: String): Drive.Revisions.Get =
         apiProvider.googleDriveApiService.revisions().get(fileId, revisionId)
+
+    fun deletePermission(fileId: String, permissionId: String): Drive.Permissions.Delete =
+        apiProvider
+            .googleDriveApiService
+            .permissions()
+            .delete(fileId, permissionId)
 }

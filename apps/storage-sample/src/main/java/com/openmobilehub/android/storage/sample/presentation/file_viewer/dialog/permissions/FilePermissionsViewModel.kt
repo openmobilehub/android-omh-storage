@@ -21,12 +21,16 @@ import androidx.lifecycle.viewModelScope
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
+import com.openmobilehub.android.storage.sample.R
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model.FilePermissionsViewAction
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model.FilePermissionsViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -41,12 +45,22 @@ class FilePermissionsViewModel @Inject constructor(
     )
     val state: StateFlow<FilePermissionsViewState> = _state
 
+    private val _action = Channel<FilePermissionsViewAction>()
+    val action = _action.receiveAsFlow()
+
+    private lateinit var fileId: String
+
     fun getPermissions(fileId: String) {
+        this.fileId = fileId
+        getPermissions()
+    }
+
+    private fun getPermissions() {
         viewModelScope.launch(Dispatchers.IO) {
             _state.value = _state.value.copy(isLoading = true)
             val permissions = omhStorageClient
                 .getFilePermissions(fileId)
-                .sortedWith(compareBy( { it.orderByType() }, {it.orderRole() }))
+                .sortedWith(compareBy({ it.orderByType() }, { it.orderRole() }))
             _state.value = _state.value.copy(permissions = permissions, isLoading = false)
         }
     }
@@ -56,7 +70,15 @@ class FilePermissionsViewModel @Inject constructor(
     }
 
     fun remove(permission: OmhPermission) {
-        // TODO dn: implementation
+        viewModelScope.launch(Dispatchers.IO) {
+            val message = if (omhStorageClient.deletePermission(fileId, permission.id)) {
+                R.string.permission_removed
+            } else {
+                R.string.permission_remove_error
+            }
+            _action.send(FilePermissionsViewAction.ShowToast(message))
+            getPermissions()
+        }
     }
 
     fun add(permission: OmhPermission) {
@@ -65,7 +87,7 @@ class FilePermissionsViewModel @Inject constructor(
 }
 
 @Suppress("MagicNumber")
-private fun OmhPermission.orderByType(): Int = when(this) {
+private fun OmhPermission.orderByType(): Int = when (this) {
     is OmhPermission.OmhAnyonePermission -> 0
     is OmhPermission.OmhDomainPermission -> 1
     is OmhPermission.OmhGroupPermission -> 2
@@ -73,7 +95,7 @@ private fun OmhPermission.orderByType(): Int = when(this) {
 }
 
 @Suppress("MagicNumber")
-private fun OmhPermission.orderRole(): Int = when(this.role) {
+private fun OmhPermission.orderRole(): Int = when (this.role) {
     OmhPermissionRole.OWNER -> 0
     OmhPermissionRole.ORGANIZER -> 1
     OmhPermissionRole.FILE_ORGANIZER -> 2

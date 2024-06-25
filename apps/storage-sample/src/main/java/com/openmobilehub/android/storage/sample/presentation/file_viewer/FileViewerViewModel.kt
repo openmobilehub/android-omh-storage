@@ -26,7 +26,7 @@ import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.sample.domain.model.FileType
 import com.openmobilehub.android.storage.sample.presentation.BaseViewModel
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.DisplayFileType
-import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerAction
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewAction
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewEvent
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewState
 import com.openmobilehub.android.storage.sample.util.coSignOut
@@ -72,7 +72,7 @@ class FileViewerViewModel @Inject constructor(
         private const val SEARCH_QUERY_DEBOUNCE_MILLIS = 250L
     }
 
-    private val _action = Channel<FileViewerAction>()
+    private val _action = Channel<FileViewerViewAction>()
     val action = _action.receiveAsFlow()
 
     var createFileSelectedType: FileType? = null
@@ -390,28 +390,28 @@ class FileViewerViewModel @Inject constructor(
     private fun onFileVersions(event: FileViewerViewEvent.FileVersionsClicked) {
         lastFileClicked = event.file
         viewModelScope.launch {
-            _action.send(FileViewerAction.ShowFileVersions)
+            _action.send(FileViewerViewAction.ShowFileVersions)
         }
     }
 
     private fun onFilePermissions(event: FileViewerViewEvent.FilePermissionsClicked) {
         lastFileClicked = event.file
         viewModelScope.launch {
-            _action.send(FileViewerAction.ShowFilePermissions)
+            _action.send(FileViewerViewAction.ShowFilePermissions)
         }
     }
 
     private fun onFileMetadata(event: FileViewerViewEvent.FileMetadataClicked) {
         lastFileClicked = event.file
         viewModelScope.launch {
-            _action.send(FileViewerAction.ShowFileMetadata)
+            _action.send(FileViewerViewAction.ShowFileMetadata)
         }
     }
 
     private fun onMoreOptions(event: FileViewerViewEvent.MoreOptionsClicked) {
         lastFileClicked = event.file
         viewModelScope.launch {
-            _action.send(FileViewerAction.ShowMoreOptions)
+            _action.send(FileViewerViewAction.ShowMoreOptions)
         }
     }
 

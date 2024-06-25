@@ -161,4 +161,14 @@ internal class GmsFileRepository(
 
         return permissions?.mapNotNull { it.toOmhPermission() } ?: emptyList()
     }
+
+    @SuppressWarnings("TooGenericExceptionCaught", "SwallowedException")
+    fun deletePermission(fileId: String, permissionId: String): Boolean {
+        return try {
+            apiService.deletePermission(fileId, permissionId).execute()
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
 }
