@@ -19,6 +19,8 @@ package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.openmobilehub.android.storage.core.OmhStorageClient
+import com.openmobilehub.android.storage.core.model.OmhPermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model.FilePermissionsViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -31,7 +33,6 @@ import kotlinx.coroutines.launch
 class FilePermissionsViewModel @Inject constructor(
     private val omhStorageClient: OmhStorageClient
 ) : ViewModel() {
-
     private val _state = MutableStateFlow(
         FilePermissionsViewState(
             isLoading = false,
@@ -39,11 +40,44 @@ class FilePermissionsViewModel @Inject constructor(
         )
     )
     val state: StateFlow<FilePermissionsViewState> = _state
+
     fun getPermissions(fileId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             _state.value = _state.value.copy(isLoading = true)
-            val permissions = omhStorageClient.getFilePermissions(fileId)
+            val permissions = omhStorageClient
+                .getFilePermissions(fileId)
+                .sortedWith(compareBy( { it.orderByType() }, {it.orderRole() }))
             _state.value = _state.value.copy(permissions = permissions, isLoading = false)
         }
     }
+
+    fun edit(permission: OmhPermission) {
+        // TODO dn: implementation
+    }
+
+    fun remove(permission: OmhPermission) {
+        // TODO dn: implementation
+    }
+
+    fun add(permission: OmhPermission) {
+        // TODO dn: implementation
+    }
+}
+
+@Suppress("MagicNumber")
+private fun OmhPermission.orderByType(): Int = when(this) {
+    is OmhPermission.OmhAnyonePermission -> 0
+    is OmhPermission.OmhDomainPermission -> 1
+    is OmhPermission.OmhGroupPermission -> 2
+    is OmhPermission.OmhUserPermission -> 3
+}
+
+@Suppress("MagicNumber")
+private fun OmhPermission.orderRole(): Int = when(this.role) {
+    OmhPermissionRole.OWNER -> 0
+    OmhPermissionRole.ORGANIZER -> 1
+    OmhPermissionRole.FILE_ORGANIZER -> 2
+    OmhPermissionRole.WRITER -> 3
+    OmhPermissionRole.COMMENTER -> 4
+    OmhPermissionRole.READER -> 5
 }

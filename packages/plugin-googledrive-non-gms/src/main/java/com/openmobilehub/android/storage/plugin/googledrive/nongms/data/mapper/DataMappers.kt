@@ -101,10 +101,10 @@ internal fun PermissionResponse.toPermission(): OmhPermission? {
                 id,
                 displayName,
                 omhRole,
-                photoLink,
                 emailAddress,
                 expirationTime,
                 deleted,
+                photoLink,
                 pendingOwner
             )
         }

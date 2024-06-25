@@ -6,6 +6,7 @@
     <string name="login_microsoft">Login with Microsoft</string>
     <string name="login_error">Login failed. Result code: %d</string>
     <string name="login_title">Login</string>
+
     <string name="file_viewer_title">File Viewer</string>
     <string name="loading">Loading…</string>
     <string name="empty_folder">This folder is empty</string>
@@ -31,7 +32,24 @@
     <string name="text_delete">Delete</string>
     <string name="text_options">Options</string>
     <string name="text_search_hint">Search by file name…</string>
+
     <string name="error_dialog_title">Something went wrong</string>
     <string name="error_dialog_message">Error detail:\n\n%s</string>
     <string name="error_dialog_ok">OK</string>
+
+    <string name="permission_type_user">User</string>
+    <string name="permission_type_group">Group</string>
+    <string name="permission_type_domain">Domain</string>
+    <string name="permission_type_anyone">Anyone</string>
+    <string name="permission_label_id">Id:</string>
+    <string name="permission_label_display_name">Display name:</string>
+    <string name="permission_label_type">Type:</string>
+    <string name="permission_label_role">Role:</string>
+    <string name="permission_label_user_photo">User photo</string>
+    <string name="permission_label_email">Email</string>
+    <string name="permission_label_expiration_time">Expiration time:</string>
+    <string name="permission_label_deleted">Deleted:</string>
+    <string name="permission_label_pending_owner">Pending owner:</string>
+    <string name="permission_label_domain">Domain:</string>
+
 </resources>

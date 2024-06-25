@@ -21,17 +21,17 @@ import java.util.Date
 sealed class OmhPermission(
     open val id: String,
     open val displayName: String,
-    open val role: OmhPermissionRole?
+    open val role: OmhPermissionRole
 ) {
 
     data class OmhUserPermission(
         override val id: String,
         override val displayName: String,
         override val role: OmhPermissionRole,
-        val photoLink: String?,
         val email: String?,
         val expirationTime: Date?,
         val deleted: Boolean?,
+        val photoLink: String?,
         val pendingOwner: Boolean?,
     ) : OmhPermission(id, displayName, role)
 

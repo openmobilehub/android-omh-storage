@@ -1,0 +1,176 @@
+/*
+ * Copyright 2023 Open Mobile Hub
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions
+
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.core.view.isVisible
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.openmobilehub.android.storage.core.model.OmhPermission
+import com.openmobilehub.android.storage.sample.R
+import com.openmobilehub.android.storage.sample.databinding.PermissionsAdapterBinding
+import java.util.Date
+
+class FilePermissionAdapter(
+    private val listener: ItemListener,
+) : ListAdapter<OmhPermission, FilePermissionAdapter.PermissionViewHolder>(DiffCallBack()) {
+
+    private class DiffCallBack : DiffUtil.ItemCallback<OmhPermission>() {
+        override fun areItemsTheSame(oldItem: OmhPermission, newItem: OmhPermission) =
+            oldItem.id == newItem.id
+
+        override fun areContentsTheSame(oldItem: OmhPermission, newItem: OmhPermission) =
+            oldItem == newItem
+    }
+
+    interface ItemListener {
+        fun onEditClicked(permission: OmhPermission)
+        fun onRemoveClicked(permission: OmhPermission)
+    }
+
+    class PermissionViewHolder(
+        private val binding: PermissionsAdapterBinding,
+    ) : RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(permission: OmhPermission, listener: ItemListener) {
+            with(binding) {
+                val context = root.context
+
+                setupDefaultState(context)
+
+                id.value.text = permission.id
+                displayName.value.text = permission.displayName
+                type.value.text = permission.getType(context)
+                role.value.text = permission.role.toString()
+
+                when (permission) {
+                    is OmhPermission.OmhAnyonePermission -> {
+                        // ignore, view already setup
+                    }
+
+                    is OmhPermission.OmhDomainPermission -> {
+                        domain.root.isVisible = true
+                        domain.value.text = permission.domain
+                    }
+
+                    is OmhPermission.OmhGroupPermission -> {
+                        showEmail(permission.email)
+                        showExpirationTime(permission.expirationTime)
+                        showDeleted(permission.deleted)
+                    }
+
+                    is OmhPermission.OmhUserPermission -> {
+                        showEmail(permission.email)
+                        showExpirationTime(permission.expirationTime)
+                        showDeleted(permission.deleted)
+
+                        showPhoto(context, permission.photoLink)
+                        pendingOwner.root.isVisible = true
+                        pendingOwner.value.text = permission.pendingOwner.toString()
+                    }
+                }
+
+                buttonEdit.setOnClickListener {
+                    listener.onEditClicked(permission)
+                }
+                buttonRemove.setOnClickListener {
+                    listener.onRemoveClicked(permission)
+                }
+            }
+        }
+
+        private fun setupDefaultState(context: Context) = with(binding) {
+            photo.isVisible = false
+            email.root.isVisible = false
+            expirationTime.root.isVisible = false
+            deleted.root.isVisible = false
+            pendingOwner.root.isVisible = false
+            domain.root.isVisible = false
+
+            id.label.text = context.getString(R.string.permission_label_id)
+            displayName.label.text = context.getString(R.string.permission_label_display_name)
+            type.label.text = context.getString(R.string.permission_label_type)
+            role.label.text = context.getString(R.string.permission_label_role)
+            photoText.label.text = context.getString(R.string.permission_label_user_photo)
+            email.label.text = context.getString(R.string.permission_label_email)
+            expirationTime.label.text = context.getString(R.string.permission_label_expiration_time)
+            deleted.label.text = context.getString(R.string.permission_label_deleted)
+            pendingOwner.label.text = context.getString(R.string.permission_label_pending_owner)
+            domain.label.text = context.getString(R.string.permission_label_domain)
+        }
+
+        private fun showEmail(value: String?) = with(binding) {
+            email.root.isVisible = true
+            email.value.text = value.toString()
+        }
+
+        private fun showExpirationTime(value: Date?) = with(binding) {
+            expirationTime.root.isVisible = true
+            expirationTime.value.text = value.toString()
+        }
+
+        private fun showDeleted(value: Boolean?) = with(binding) {
+            deleted.root.isVisible = true
+            deleted.value.text = value.toString()
+        }
+
+        private fun showPhoto(context: Context, value: String?) = with(binding) {
+            photo.isVisible = true
+            photoText.value.text = value.toString()
+
+            if (value.isNullOrEmpty()) {
+                photoImage.isVisible = false
+            }
+
+            photoImage.isVisible = true
+            Glide.with(context)
+                .asBitmap()
+                .load(value)
+                .fitCenter()
+                .into(photoImage)
+        }
+    }
+
+
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ) = PermissionViewHolder(
+        PermissionsAdapterBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false
+        )
+    )
+
+    override fun onBindViewHolder(holder: PermissionViewHolder, position: Int) {
+        holder.bind(getItem(position), listener)
+    }
+}
+
+private fun OmhPermission.getType(context: Context): String = context.getString(
+    when (this) {
+        is OmhPermission.OmhAnyonePermission -> R.string.permission_type_anyone
+        is OmhPermission.OmhDomainPermission -> R.string.permission_type_domain
+        is OmhPermission.OmhGroupPermission -> R.string.permission_type_group
+        is OmhPermission.OmhUserPermission -> R.string.permission_type_user
+    }
+)
+
+

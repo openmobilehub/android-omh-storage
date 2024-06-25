@@ -92,9 +92,9 @@ internal fun Permission.toOmhPermission(): OmhPermission? {
                 displayName,
                 omhRole,
                 emailAddress,
-                photoLink,
                 expirationTime,
                 deleted,
+                photoLink,
                 // pendingOwner is not exposed in Drive API V3 Rev197 1.25.0, but is returned by REST API
                 null
             )
