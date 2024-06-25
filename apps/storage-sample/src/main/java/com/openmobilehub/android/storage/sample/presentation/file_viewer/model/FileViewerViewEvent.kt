@@ -71,7 +71,12 @@ sealed class FileViewerViewEvent : ViewEvent {
 
     class DeleteFile(val file: OmhStorageEntity) : FileViewerViewEvent() {
 
-        override fun getEventName() = "FileViewerViewEvent.CreateFile"
+        override fun getEventName() = "FileViewerViewEvent.DeleteFile"
+    }
+
+    class PermanentlyDeleteFile(val file: OmhStorageEntity) : FileViewerViewEvent() {
+
+        override fun getEventName() = "FileViewerViewEvent.PermanentlyDeleteFile"
     }
 
     class UploadFile(val context: Context, val uri: Uri, val fileName: String) : FileViewerViewEvent() {

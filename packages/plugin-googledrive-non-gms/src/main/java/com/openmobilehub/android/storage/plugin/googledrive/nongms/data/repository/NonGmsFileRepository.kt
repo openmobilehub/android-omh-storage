@@ -92,12 +92,24 @@ internal class NonGmsFileRepository(
         }
     }
 
-    suspend fun deleteFile(fileId: String): Boolean {
+    suspend fun permanentlyDeleteFile(fileId: String): Boolean {
         val response = retrofitImpl
             .getGoogleStorageApiService()
             .deleteFile(
                 fileId = fileId
             )
+
+        return response.isSuccessful
+    }
+
+    suspend fun deleteFile(fileId: String): Boolean {
+        val jsonObject = JSONObject()
+        jsonObject.put("trashed", true)
+        val body = jsonObject.toString()
+            .toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+
+        val response = retrofitImpl
+            .getGoogleStorageApiService().updateMetaData(body, fileId)
 
         return response.isSuccessful
     }

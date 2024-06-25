@@ -16,6 +16,7 @@
 
 package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.menu
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -90,6 +91,15 @@ class FileMenuDialog : BottomSheetDialogFragment() {
         delete.root.setOnClickListener {
             dismiss()
             viewModel.dispatchEvent(FileViewerViewEvent.DeleteFile(file))
+        }
+
+        permanentlyDelete.icon.setImageResource(android.R.drawable.ic_menu_delete)
+        permanentlyDelete.icon.setColorFilter(Color.RED)
+        permanentlyDelete.label.text = resources.getString(R.string.text_permanently_delete)
+        permanentlyDelete.label.setTextColor(Color.RED)
+        permanentlyDelete.root.setOnClickListener {
+            dismiss()
+            viewModel.dispatchEvent(FileViewerViewEvent.PermanentlyDeleteFile(file))
         }
     }
 }

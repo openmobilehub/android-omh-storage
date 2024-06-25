@@ -144,13 +144,23 @@ internal class GmsFileRepositoryTest {
         }
 
     @Test
-    fun `given a fileId, when deleteFile is success, then true is returned`() = runTest {
+    fun `given a fileId, when permanentlyDeleteFile is success, then true is returned`() = runTest {
         every { apiService.deleteFile(any()) } returns driveFilesDeleteRequest
+
+        val result = fileRepositoryImpl.permanentlyDeleteFile(TEST_FILE_ID)
+
+        assertTrue(result)
+        verify { apiService.deleteFile(TEST_FILE_ID) }
+    }
+
+    @Test
+    fun `given a fileId, when deleteFile is success, then true is returned`() = runTest {
+        every { apiService.updateFile(any(), any()) } returns driveFilesUpdateRequest
 
         val result = fileRepositoryImpl.deleteFile(TEST_FILE_ID)
 
         assertTrue(result)
-        verify { apiService.deleteFile(TEST_FILE_ID) }
+        verify { apiService.updateFile(TEST_FILE_ID, any()) }
     }
 
     @Test

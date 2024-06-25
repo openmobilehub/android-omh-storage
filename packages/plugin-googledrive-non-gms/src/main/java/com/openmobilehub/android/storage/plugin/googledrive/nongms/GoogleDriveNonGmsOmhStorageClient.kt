@@ -29,6 +29,7 @@ import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.
 import java.io.ByteArrayOutputStream
 import java.io.File
 
+@Suppress("TooManyFunctions")
 internal class GoogleDriveNonGmsOmhStorageClient private constructor(
     authClient: OmhAuthClient,
     private val fileRepository: NonGmsFileRepository
@@ -69,6 +70,10 @@ internal class GoogleDriveNonGmsOmhStorageClient private constructor(
 
     override suspend fun deleteFile(id: String): Boolean {
         return fileRepository.deleteFile(id)
+    }
+
+    override suspend fun permanentlyDeleteFile(id: String): Boolean {
+        return fileRepository.permanentlyDeleteFile(id)
     }
 
     override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity? {

@@ -29,6 +29,7 @@
     <string name="text_permissions">Permissions</string>
     <string name="text_versions">Versions</string>
     <string name="text_delete">Delete</string>
+    <string name="text_permanently_delete">Permanently delete</string>
     <string name="text_options">Options</string>
     <string name="text_search_hint">Search by file name…</string>
     <string name="error_dialog_title">Something went wrong</string>
