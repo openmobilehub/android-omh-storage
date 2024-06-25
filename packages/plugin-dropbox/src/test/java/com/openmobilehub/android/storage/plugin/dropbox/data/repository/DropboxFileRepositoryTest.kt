@@ -20,12 +20,17 @@ package com.openmobilehub.android.storage.plugin.dropbox.data.repository
 
 import com.dropbox.core.v2.files.FileMetadata
 import com.dropbox.core.v2.files.ListFolderResult
+import com.dropbox.core.v2.files.ListRevisionsResult
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.utils.toInputStream
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.MetadataToOmhStorageEntity
+import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.toOmhVersion
 import com.openmobilehub.android.storage.plugin.dropbox.data.service.DropboxApiService
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_PARENT_ID
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_VERSION_FILE_ID
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_VERSION_ID
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhVersion
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -49,6 +54,9 @@ class DropboxFileRepositoryTest {
     private lateinit var dropboxFiles: ListFolderResult
 
     @MockK
+    private lateinit var dropboxRevisions: ListRevisionsResult
+
+    @MockK
     private lateinit var apiService: DropboxApiService
 
     @MockK
@@ -68,6 +76,8 @@ class DropboxFileRepositoryTest {
 
         mockkStatic("com.openmobilehub.android.storage.core.utils.FileExtensionsKt")
         every { file.toInputStream() } returns mockk<FileInputStream>()
+
+        mockkStatic("com.openmobilehub.android.storage.plugin.dropbox.data.mapper.DataMappersKt")
 
         repository = DropboxFileRepository(apiService, metadataToOmhStorageEntity)
     }
@@ -141,6 +151,33 @@ class DropboxFileRepositoryTest {
 
         // Act
         val result = repository.downloadFile(TEST_FILE_ID)
+
+        // Assert
+        assertNotNull(result)
+    }
+
+    @Test
+    fun `given an api service returns a non-empty list, when getting the file versions, then return a non-empty list`() {
+        // Arrange
+        every { apiService.getFileRevisions(any()) } returns dropboxRevisions
+        every { dropboxRevisions.entries } returns listOf(fileMetadata, fileMetadata)
+
+        every { fileMetadata.toOmhVersion() } returns testOmhVersion
+
+        // Act
+        val result = repository.getFileVersions(TEST_VERSION_FILE_ID)
+
+        // Assert
+        assertEquals(listOf(testOmhVersion, testOmhVersion), result)
+    }
+
+    @Test
+    fun `given an api service return FileMetadata, when downloading the file version, then returns ByteArrayOutputStream`() {
+        // Arrange
+        every { apiService.downloadFileRevision(any(), any()) } returns fileMetadata
+
+        // Act
+        val result = repository.downloadFileVersion(TEST_VERSION_ID)
 
         // Assert
         assertNotNull(result)
