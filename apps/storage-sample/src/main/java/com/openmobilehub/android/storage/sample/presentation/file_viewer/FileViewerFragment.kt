@@ -297,16 +297,20 @@ class FileViewerFragment :
     }
 
     private fun showPermanentlyDeleteDialog(state: FileViewerViewState.ShowPermanentlyDeleteDialog) {
-        val file = state.file
+        val (file) = state
 
         context?.let { context ->
-            val downloadExceptionDialogBuilder =
+            val permanentDeleteDialogBuilder =
                 AlertDialog.Builder(context).setTitle(getString(R.string.text_delete_dialog_title))
                     .setMessage(getString(R.string.text_delete_dialog_message))
-                    .setPositiveButton(getString(R.string.text_delete)) { _, _ -> dispatchEvent(FileViewerViewEvent.PermanentlyDeleteFile(file)) }
+                    .setPositiveButton(getString(R.string.text_delete)) { _, _ ->
+                        dispatchEvent(
+                            FileViewerViewEvent.PermanentlyDeleteFile(file)
+                        )
+                    }
                     .setNegativeButton(getString(R.string.text_cancel)) { dialog, _ -> dialog.dismiss() }
 
-            val downloadExceptionDialog = downloadExceptionDialogBuilder.create().apply {
+            val downloadExceptionDialog = permanentDeleteDialogBuilder.create().apply {
                 setCancelable(false)
             }
 

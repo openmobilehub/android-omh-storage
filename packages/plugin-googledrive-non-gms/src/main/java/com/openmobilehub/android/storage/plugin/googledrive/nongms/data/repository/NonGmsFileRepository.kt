@@ -46,6 +46,7 @@ internal class NonGmsFileRepository(
     companion object {
         private const val FILE_NAME_KEY = "name"
         private const val FILE_PARENTS_KEY = "parents"
+        private const val FILE_TRASHED_KEY = "trashed"
         private const val ANY_MIME_TYPE = "*/*"
         private const val MEDIA = "media"
 
@@ -103,13 +104,13 @@ internal class NonGmsFileRepository(
     }
 
     suspend fun deleteFile(fileId: String): Boolean {
-        val jsonObject = JSONObject()
-        jsonObject.put("trashed", true)
-        val body = jsonObject.toString()
-            .toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+        val jsonMetaData = JSONObject().apply {
+            put(FILE_TRASHED_KEY, true)
+        }
+        val jsonRequestBody = jsonMetaData.toString().toRequestBody(null)
 
         val response = retrofitImpl
-            .getGoogleStorageApiService().updateMetaData(body, fileId)
+            .getGoogleStorageApiService().updateMetaData(jsonRequestBody, fileId)
 
         return response.isSuccessful
     }
