@@ -99,7 +99,7 @@ class FileMenuDialog : BottomSheetDialogFragment() {
         permanentlyDelete.label.setTextColor(Color.RED)
         permanentlyDelete.root.setOnClickListener {
             dismiss()
-            viewModel.dispatchEvent(FileViewerViewEvent.PermanentlyDeleteFile(file))
+            viewModel.dispatchEvent(FileViewerViewEvent.PermanentlyDeleteFileClicked(file))
         }
     }
 }

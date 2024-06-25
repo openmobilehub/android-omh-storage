@@ -74,6 +74,11 @@ sealed class FileViewerViewEvent : ViewEvent {
         override fun getEventName() = "FileViewerViewEvent.DeleteFile"
     }
 
+    class PermanentlyDeleteFileClicked(val file: OmhStorageEntity) : FileViewerViewEvent() {
+
+        override fun getEventName() = "FileViewerViewEvent.PermanentlyDeleteFileClicked"
+    }
+
     class PermanentlyDeleteFile(val file: OmhStorageEntity) : FileViewerViewEvent() {
 
         override fun getEventName() = "FileViewerViewEvent.PermanentlyDeleteFile"

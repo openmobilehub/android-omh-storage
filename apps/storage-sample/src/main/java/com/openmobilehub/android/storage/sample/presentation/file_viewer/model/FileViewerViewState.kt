@@ -80,4 +80,9 @@ sealed class FileViewerViewState : ViewState {
 
         override fun getName() = "FileViewerViewState.ClearSearch"
     }
+
+    data class ShowPermanentlyDeleteDialog(val file: OmhStorageEntity) : FileViewerViewState() {
+
+        override fun getName() = "FileViewerViewState.ShowPermanentlyDeleteDialog"
+    }
 }
