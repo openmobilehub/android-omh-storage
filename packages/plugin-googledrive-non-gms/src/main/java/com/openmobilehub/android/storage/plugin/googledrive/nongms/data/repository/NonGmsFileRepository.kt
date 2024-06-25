@@ -17,15 +17,21 @@
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository
 
 import android.webkit.MimeTypeMap
+import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
+import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhPermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toCreateRequestBody
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toFileList
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toOmhFileVersions
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toOmhStorageEntity
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toPermission
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toPermissions
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toUpdateRequestBody
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.GoogleStorageApiService
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body.CreateFileRequestBody
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit.GoogleStorageApiServiceProvider
@@ -266,6 +272,71 @@ internal class NonGmsFileRepository(
 
         return if (response.isSuccessful) {
             response.body()?.toPermissions().orEmpty()
+        } else {
+            throw OmhStorageException.ApiException(response.code(), HttpException(response))
+        }
+    }
+
+    suspend fun deletePermission(fileId: String, permissionId: String): Boolean {
+        val response = retrofitImpl
+            .getGoogleStorageApiService()
+            .deletePermission(
+                fileId = fileId,
+                permissionId = permissionId
+            )
+
+        return response.isSuccessful
+    }
+
+    suspend fun updatePermission(
+        fileId: String,
+        permissionId: String,
+        role: OmhPermissionRole
+    ): OmhPermission {
+        val transferOwnership = role == OmhPermissionRole.OWNER
+        val response = retrofitImpl
+            .getGoogleStorageApiService()
+            .updatePermission(
+                fileId = fileId,
+                permissionId = permissionId,
+                body = role.toUpdateRequestBody(),
+                transferOwnership = transferOwnership,
+                // need to be set to true when transfer ownership
+                sendNotificationEmail = transferOwnership,
+            )
+        if (response.isSuccessful) {
+            return response.body()?.toPermission() ?: throw OmhStorageException.UpdateException(
+                OmhAuthStatusCodes.PROVIDER_ERROR,
+                null
+            )
+        } else {
+            throw OmhStorageException.ApiException(response.code(), HttpException(response))
+        }
+    }
+
+    suspend fun createPermission(
+        fileId: String,
+        permission: OmhCreatePermission,
+        sendNotificationEmail: Boolean,
+        emailMessage: String?
+    ): OmhPermission {
+        val transferOwnership = permission.role == OmhPermissionRole.OWNER
+
+        val response = retrofitImpl
+            .getGoogleStorageApiService()
+            .createPermission(
+                fileId = fileId,
+                body = permission.toCreateRequestBody(),
+                // need to be set to true when transfer ownership
+                transferOwnership = transferOwnership || sendNotificationEmail,
+                sendNotificationEmail = sendNotificationEmail,
+                emailMessage = emailMessage,
+            )
+        if (response.isSuccessful) {
+            return response.body()?.toPermission() ?: throw OmhStorageException.CreateException(
+                OmhAuthStatusCodes.PROVIDER_ERROR,
+                null
+            )
         } else {
             throw OmhStorageException.ApiException(response.code(), HttpException(response))
         }

@@ -16,51 +16,25 @@
 
 package com.openmobilehub.android.storage.core.model
 
-import java.util.Date
-
-sealed class OmhPermission(
-    open val id: String,
+sealed class OmhCreatePermission(
     open val role: OmhPermissionRole
 ) {
-
     data class UserPermission(
-        override val id: String,
         override val role: OmhPermissionRole,
-        val displayName: String,
         val emailAddress: String,
-        val expirationTime: Date?,
-        val deleted: Boolean?,
-        val photoLink: String?,
-        val pendingOwner: Boolean?,
-    ) : OmhPermission(id, role)
+    ) : OmhCreatePermission(role)
 
     data class GroupPermission(
-        override val id: String,
         override val role: OmhPermissionRole,
-        val displayName: String,
         val emailAddress: String,
-        val expirationTime: Date?,
-        val deleted: Boolean?,
-    ) : OmhPermission(id, role)
+    ) : OmhCreatePermission(role)
 
     data class DomainPermission(
-        override val id: String,
         override val role: OmhPermissionRole,
-        val displayName: String,
         val domain: String
-    ) : OmhPermission(id, role)
+    ) : OmhCreatePermission(role)
 
     data class AnyonePermission(
-        override val id: String,
         override val role: OmhPermissionRole,
-    ) : OmhPermission(id, role)
-}
-
-enum class OmhPermissionRole {
-    OWNER,
-    ORGANIZER,
-    FILE_ORGANIZER,
-    WRITER,
-    COMMENTER,
-    READER,
+    ) : OmhCreatePermission(role)
 }

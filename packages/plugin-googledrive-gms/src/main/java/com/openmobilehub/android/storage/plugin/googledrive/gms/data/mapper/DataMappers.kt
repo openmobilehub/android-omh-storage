@@ -87,10 +87,10 @@ internal fun Permission.toOmhPermission(): OmhPermission? {
 
     return when (type) {
         "user" -> {
-            OmhPermission.OmhUserPermission(
+            OmhPermission.UserPermission(
                 id,
-                displayName,
                 omhRole,
+                displayName,
                 emailAddress,
                 expirationTime,
                 deleted,
@@ -101,10 +101,10 @@ internal fun Permission.toOmhPermission(): OmhPermission? {
         }
 
         "group" -> {
-            OmhPermission.OmhGroupPermission(
+            OmhPermission.GroupPermission(
                 id,
-                displayName,
                 omhRole,
+                displayName,
                 emailAddress,
                 expirationTime,
                 deleted
@@ -112,18 +112,17 @@ internal fun Permission.toOmhPermission(): OmhPermission? {
         }
 
         "domain" -> {
-            OmhPermission.OmhDomainPermission(
+            OmhPermission.DomainPermission(
                 id,
-                displayName,
                 omhRole,
+                displayName,
                 domain
             )
         }
 
         "anyone" -> {
-            OmhPermission.OmhAnyonePermission(
+            OmhPermission.AnyonePermission(
                 id,
-                displayName,
                 omhRole,
             )
         }
@@ -140,4 +139,19 @@ internal fun String.stringToRole(): OmhPermissionRole? = when (this) {
     "commenter" -> OmhPermissionRole.COMMENTER
     "reader" -> OmhPermissionRole.READER
     else -> null
+}
+
+internal fun OmhPermissionRole.toStringRole(): String = when (this) {
+    OmhPermissionRole.OWNER -> "owner"
+    OmhPermissionRole.ORGANIZER -> "organizer"
+    OmhPermissionRole.FILE_ORGANIZER -> "fileOrganizer"
+    OmhPermissionRole.WRITER -> "writer"
+    OmhPermissionRole.COMMENTER -> "commenter"
+    OmhPermissionRole.READER -> "reader"
+}
+
+internal fun OmhPermissionRole.toPermission(): Permission {
+    return Permission().apply {
+        role = this@toPermission.toStringRole()
+    }
 }

@@ -20,5 +20,6 @@ import com.openmobilehub.android.storage.core.model.OmhPermission
 
 data class FilePermissionsViewState(
     val permissions: List<OmhPermission>,
-    val isLoading: Boolean
+    val isLoading: Boolean,
+    val editedPermission: OmhPermission?
 )

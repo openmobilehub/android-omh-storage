@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model
+package com.openmobilehub.android.storage.sample.util
 
-import androidx.annotation.StringRes
-
-sealed class FilePermissionsViewAction {
-    data class ShowToast(@StringRes val message: Int) : FilePermissionsViewAction()
-    object ShowEditView : FilePermissionsViewAction()
+fun String?.isValidEmail(): Boolean {
+    if (isNullOrBlank()) {
+        return false
+    }
+    return android.util.Patterns.EMAIL_ADDRESS.matcher(this).matches()
 }

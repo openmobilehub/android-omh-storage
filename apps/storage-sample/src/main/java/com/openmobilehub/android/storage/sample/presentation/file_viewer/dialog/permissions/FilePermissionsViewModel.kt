@@ -16,9 +16,11 @@
 
 package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.openmobilehub.android.storage.core.OmhStorageClient
+import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.sample.R
@@ -40,7 +42,8 @@ class FilePermissionsViewModel @Inject constructor(
     private val _state = MutableStateFlow(
         FilePermissionsViewState(
             isLoading = false,
-            permissions = emptyList()
+            permissions = emptyList(),
+            editedPermission = null
         )
     )
     val state: StateFlow<FilePermissionsViewState> = _state
@@ -55,43 +58,69 @@ class FilePermissionsViewModel @Inject constructor(
         getPermissions()
     }
 
-    private fun getPermissions() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _state.value = _state.value.copy(isLoading = true)
-            val permissions = omhStorageClient
-                .getFilePermissions(fileId)
-                .sortedWith(compareBy({ it.orderByType() }, { it.orderRole() }))
-            _state.value = _state.value.copy(permissions = permissions, isLoading = false)
+    private fun getPermissions() = viewModelScope.launch(Dispatchers.IO) {
+        _state.value = _state.value.copy(isLoading = true)
+        val permissions = omhStorageClient
+            .getFilePermissions(fileId)
+            .sortedWith(compareBy({ it.orderByType() }, { it.orderRole() }))
+        _state.value = _state.value.copy(permissions = permissions, isLoading = false)
+    }
+
+    fun edit(permission: OmhPermission) = viewModelScope.launch {
+        _state.value = _state.value.copy(editedPermission = permission)
+        _action.send(FilePermissionsViewAction.ShowEditView)
+    }
+
+    fun saveEdits(selectedRole: OmhPermissionRole?) = viewModelScope.launch(Dispatchers.IO) {
+        val editedPermission = requireNotNull(_state.value.editedPermission)
+        if (selectedRole == null) {
+            _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_role_required_error))
+            return@launch
         }
-    }
 
-    fun edit(permission: OmhPermission) {
-        // TODO dn: implementation
-    }
-
-    fun remove(permission: OmhPermission) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val message = if (omhStorageClient.deletePermission(fileId, permission.id)) {
-                R.string.permission_removed
-            } else {
-                R.string.permission_remove_error
-            }
-            _action.send(FilePermissionsViewAction.ShowToast(message))
-            getPermissions()
+        @Suppress("SwallowedException", "TooGenericExceptionCaught")
+        try {
+            omhStorageClient.updatePermission(fileId, editedPermission.id, selectedRole)
+            _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_updated))
+        } catch (exception: Exception) {
+            _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_update_error))
         }
+
+        _state.value = _state.value.copy(editedPermission = null)
+        getPermissions()
     }
 
-    fun add(permission: OmhPermission) {
-        // TODO dn: implementation
+    fun remove(permission: OmhPermission) = viewModelScope.launch(Dispatchers.IO) {
+        val message = if (omhStorageClient.deletePermission(fileId, permission.id)) {
+            R.string.permission_removed
+        } else {
+            R.string.permission_remove_error
+        }
+        _action.send(FilePermissionsViewAction.ShowToast(message))
+        getPermissions()
+    }
+
+    fun create(
+        permission: OmhCreatePermission,
+        sendNotificationEmail: Boolean,
+        emailMessage: String?
+    ) = viewModelScope.launch {
+        @Suppress("SwallowedException", "TooGenericExceptionCaught")
+        try {
+            omhStorageClient.createPermission(fileId, permission, sendNotificationEmail, emailMessage)
+            _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_created))
+        } catch (exception: Exception) {
+            _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_create_error))
+        }
     }
 }
 
 @Suppress("MagicNumber")
 private fun OmhPermission.orderByType(): Int = when (this) {
-    is OmhPermission.OmhAnyonePermission -> 0
-    is OmhPermission.OmhDomainPermission -> 1
-    is OmhPermission.OmhGroupPermission -> 2
-    is OmhPermission.OmhUserPermission -> 3
+    is OmhPermission.AnyonePermission -> 0
+    is OmhPermission.DomainPermission -> 1
+    is OmhPermission.GroupPermission -> 2
+    is OmhPermission.UserPermission -> 3
 }
 
 @Suppress("MagicNumber")

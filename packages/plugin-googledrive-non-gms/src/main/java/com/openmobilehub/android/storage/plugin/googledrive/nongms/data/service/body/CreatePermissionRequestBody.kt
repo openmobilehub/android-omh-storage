@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model
+package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body
 
-import androidx.annotation.StringRes
+import androidx.annotation.Keep
+import com.fasterxml.jackson.annotation.JsonProperty
 
-sealed class FilePermissionsViewAction {
-    data class ShowToast(@StringRes val message: Int) : FilePermissionsViewAction()
-    object ShowEditView : FilePermissionsViewAction()
-}
+@Keep
+internal data class CreatePermissionRequestBody(
+    @JsonProperty("type") val type: String?,
+    @JsonProperty("role") val role: String?,
+    @JsonProperty("emailAddress") val emailAddress: String?,
+    @JsonProperty("domain") val domain: String?,
+)

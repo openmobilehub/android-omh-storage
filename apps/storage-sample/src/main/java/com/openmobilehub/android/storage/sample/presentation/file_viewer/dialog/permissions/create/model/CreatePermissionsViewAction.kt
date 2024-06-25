@@ -14,11 +14,20 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model
+package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.create.model
 
-import androidx.annotation.StringRes
+import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 
-sealed class FilePermissionsViewAction {
-    data class ShowToast(@StringRes val message: Int) : FilePermissionsViewAction()
-    object ShowEditView : FilePermissionsViewAction()
+sealed class CreatePermissionsViewAction {
+    data class ShowError(
+        val emailAddress: Boolean = false,
+        val domain: Boolean = false
+    ) : CreatePermissionsViewAction()
+
+    data class CreatePermission(
+        val permission: OmhCreatePermission,
+        val sendNotificationEmail: Boolean,
+        val emailMessage: String?
+    ) : CreatePermissionsViewAction()
+
 }

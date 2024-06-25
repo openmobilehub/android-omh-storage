@@ -19,8 +19,10 @@ package com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository
 import android.webkit.MimeTypeMap
 import com.google.api.client.http.FileContent
 import com.google.api.client.http.HttpResponseException
+import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhPermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
@@ -28,6 +30,7 @@ import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOm
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhPermission
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhStorageEntities
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhStorageEntity
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toPermission
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.service.GoogleDriveApiService
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -169,6 +172,24 @@ internal class GmsFileRepository(
             true
         } catch (e: Exception) {
             false
+        }
+    }
+
+    @SuppressWarnings("TooGenericExceptionCaught")
+    fun updatePermission(
+        fileId: String,
+        permissionId: String,
+        role: OmhPermissionRole
+    ): OmhPermission {
+        return try {
+            val result =
+                apiService.updatePermission(fileId, permissionId, role.toPermission()).execute()
+            result.toOmhPermission() ?: throw OmhStorageException.UpdateException(
+                OmhAuthStatusCodes.PROVIDER_ERROR,
+                null
+            )
+        } catch (exception: Exception) {
+            throw OmhStorageException.UpdateException(OmhAuthStatusCodes.PROVIDER_ERROR, exception)
         }
     }
 }

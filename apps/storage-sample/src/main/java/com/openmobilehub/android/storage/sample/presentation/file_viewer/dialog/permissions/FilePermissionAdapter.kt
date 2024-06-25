@@ -57,34 +57,33 @@ class FilePermissionAdapter(
                 setupDefaultState(context)
 
                 id.value.text = permission.id
-                displayName.value.text = permission.displayName
                 type.value.text = permission.getType(context)
                 role.value.text = permission.role.toString()
 
                 when (permission) {
-                    is OmhPermission.OmhAnyonePermission -> {
+                    is OmhPermission.AnyonePermission -> {
                         // ignore, view already setup
                     }
 
-                    is OmhPermission.OmhDomainPermission -> {
-                        domain.root.isVisible = true
-                        domain.value.text = permission.domain
+                    is OmhPermission.DomainPermission -> {
+                        showDisplayName(permission.displayName)
+                        showDomain(permission.domain)
                     }
 
-                    is OmhPermission.OmhGroupPermission -> {
-                        showEmail(permission.email)
+                    is OmhPermission.GroupPermission -> {
+                        showDisplayName(permission.displayName)
+                        showEmail(permission.emailAddress)
                         showExpirationTime(permission.expirationTime)
                         showDeleted(permission.deleted)
                     }
 
-                    is OmhPermission.OmhUserPermission -> {
-                        showEmail(permission.email)
+                    is OmhPermission.UserPermission -> {
+                        showDisplayName(permission.displayName)
+                        showEmail(permission.emailAddress)
                         showExpirationTime(permission.expirationTime)
                         showDeleted(permission.deleted)
-
                         showPhoto(context, permission.photoLink)
-                        pendingOwner.root.isVisible = true
-                        pendingOwner.value.text = permission.pendingOwner.toString()
+                        showPendingOwner(permission.pendingOwner)
                     }
                 }
 
@@ -104,6 +103,7 @@ class FilePermissionAdapter(
             deleted.root.isVisible = false
             pendingOwner.root.isVisible = false
             domain.root.isVisible = false
+            displayName.root.isVisible = false
 
             id.label.text = context.getString(R.string.permission_label_id)
             displayName.label.text = context.getString(R.string.permission_label_display_name)
@@ -115,6 +115,11 @@ class FilePermissionAdapter(
             deleted.label.text = context.getString(R.string.permission_label_deleted)
             pendingOwner.label.text = context.getString(R.string.permission_label_pending_owner)
             domain.label.text = context.getString(R.string.permission_label_domain)
+        }
+
+        private fun showDisplayName(value: String) = with(binding) {
+            displayName.root.isVisible = true
+            displayName.value.text = value
         }
 
         private fun showEmail(value: String?) = with(binding) {
@@ -130,6 +135,16 @@ class FilePermissionAdapter(
         private fun showDeleted(value: Boolean?) = with(binding) {
             deleted.root.isVisible = true
             deleted.value.text = value.toString()
+        }
+
+        private fun showPendingOwner(value: Boolean?) = with(binding) {
+            pendingOwner.root.isVisible = true
+            pendingOwner.value.text = value.toString()
+        }
+
+        private fun showDomain(value: String) = with(binding) {
+            domain.root.isVisible = true
+            domain.value.text = value
         }
 
         private fun showPhoto(context: Context, value: String?) = with(binding) {
@@ -149,7 +164,6 @@ class FilePermissionAdapter(
         }
     }
 
-
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -166,10 +180,10 @@ class FilePermissionAdapter(
 
 private fun OmhPermission.getType(context: Context): String = context.getString(
     when (this) {
-        is OmhPermission.OmhAnyonePermission -> R.string.permission_type_anyone
-        is OmhPermission.OmhDomainPermission -> R.string.permission_type_domain
-        is OmhPermission.OmhGroupPermission -> R.string.permission_type_group
-        is OmhPermission.OmhUserPermission -> R.string.permission_type_user
+        is OmhPermission.AnyonePermission -> R.string.permission_type_anyone
+        is OmhPermission.DomainPermission -> R.string.permission_type_domain
+        is OmhPermission.GroupPermission -> R.string.permission_type_group
+        is OmhPermission.UserPermission -> R.string.permission_type_user
     }
 )
 

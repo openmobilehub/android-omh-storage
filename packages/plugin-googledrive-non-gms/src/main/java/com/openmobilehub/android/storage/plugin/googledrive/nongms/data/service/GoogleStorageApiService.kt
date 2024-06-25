@@ -17,8 +17,11 @@
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service
 
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body.CreateFileRequestBody
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body.CreatePermissionRequestBody
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body.UpdatePermissionRequestBody
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileListRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileRemoteResponse
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.PermissionResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.PermissionsListResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.RevisionListRemoteResponse
 import okhttp3.MultipartBody
@@ -46,6 +49,9 @@ internal interface GoogleStorageApiService {
         private const val QUERY_FIELDS = "fields"
         private const val QUERY_MIME_TYPE = "mimeType"
         private const val QUERY_ALT = "alt"
+        private const val QUERY_TRANSFER_OWNERSHIP = "transferOwnership"
+        private const val QUERY_SEND_NOTIFICATION_EMAIL = "sendNotificationEmail"
+        private const val QUERY_EMAIL_MESSAGE = "emailMessage"
 
         private const val PARENT_ID_Q_VALUE = "'%s' in parents and trashed = false"
         private const val SEARCH_BY_NAME_Q_VALUE = "name contains '%s' and trashed = false"
@@ -56,13 +62,15 @@ internal interface GoogleStorageApiService {
         internal fun getSearchByNameQuery(query: String) =
             String.format(SEARCH_BY_NAME_Q_VALUE, query)
 
-        private const val QUERY_REQUESTED_FIELDS = "id,name,mimeType,modifiedTime,parents"
+        private const val QUERY_REQUESTED_FILE_FIELDS = "id,name,mimeType,modifiedTime,parents"
+        private const val QUERY_REQUESTED_FIELDS_ALL = "*"
         private const val QUERY_PERMISSIONS = "permissions"
-        private const val FIELDS_VALUE = "files($QUERY_REQUESTED_FIELDS)"
+        private const val FIELDS_VALUE = "files($QUERY_REQUESTED_FILE_FIELDS)"
 
         private const val FILE_ID = "fileId"
         private const val REVISION_ID = "revisionId"
         private const val META_DATA = "metadata"
+        private const val PERMISSION_ID = "permissionId"
     }
 
     @GET(FILES_PARTICLE)
@@ -73,7 +81,7 @@ internal interface GoogleStorageApiService {
 
     @POST(FILES_PARTICLE)
     suspend fun createFile(
-        @Query(QUERY_FIELDS) query: String = QUERY_REQUESTED_FIELDS,
+        @Query(QUERY_FIELDS) query: String = QUERY_REQUESTED_FILE_FIELDS,
         @Body body: CreateFileRequestBody
     ): Response<FileRemoteResponse>
 
@@ -130,4 +138,32 @@ internal interface GoogleStorageApiService {
         @Path(REVISION_ID) revisionId: String,
         @Query(QUERY_ALT) alt: String
     ): Response<ResponseBody>
+
+    @DELETE("$FILES_PARTICLE/{$FILE_ID}/permissions/{$PERMISSION_ID}")
+    suspend fun deletePermission(
+        @Path(FILE_ID) fileId: String,
+        @Path(PERMISSION_ID) permissionId: String
+    ): Response<ResponseBody>
+
+    @Suppress("LongParameterList")
+    @PATCH("$FILES_PARTICLE/{$FILE_ID}/permissions/{$PERMISSION_ID}")
+    suspend fun updatePermission(
+        @Path(FILE_ID) fileId: String,
+        @Path(PERMISSION_ID) permissionId: String,
+        @Body body: UpdatePermissionRequestBody,
+        @Query(QUERY_TRANSFER_OWNERSHIP) transferOwnership: Boolean = false,
+        @Query(QUERY_SEND_NOTIFICATION_EMAIL) sendNotificationEmail: Boolean = false,
+        @Query(QUERY_FIELDS) fields: String = QUERY_REQUESTED_FIELDS_ALL,
+    ): Response<PermissionResponse>
+
+    @Suppress("LongParameterList")
+    @POST("$FILES_PARTICLE/{$FILE_ID}/permissions")
+    suspend fun createPermission(
+        @Path(FILE_ID) fileId: String,
+        @Body body: CreatePermissionRequestBody,
+        @Query(QUERY_TRANSFER_OWNERSHIP) transferOwnership: Boolean = false,
+        @Query(QUERY_SEND_NOTIFICATION_EMAIL) sendNotificationEmail: Boolean = false,
+        @Query(QUERY_EMAIL_MESSAGE) emailMessage: String? = null,
+        @Query(QUERY_FIELDS) fields: String = QUERY_REQUESTED_FIELDS_ALL,
+    ): Response<PermissionResponse>
 }

@@ -36,4 +36,9 @@ sealed class OmhStorageException(private val statusCode: Int) : Exception() {
         statusCode: Int,
         override val cause: Throwable?
     ) : OmhStorageException(statusCode)
+
+    class CreateException(
+        statusCode: Int,
+        override val cause: Throwable?
+    ) : OmhStorageException(statusCode)
 }

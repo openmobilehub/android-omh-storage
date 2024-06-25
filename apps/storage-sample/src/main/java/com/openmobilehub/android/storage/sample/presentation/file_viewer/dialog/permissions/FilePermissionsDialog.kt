@@ -31,6 +31,8 @@ import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.DialogFilePermissionBinding
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.FileViewerViewModel
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.create.CreatePermissionDialog
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.edit.EditPermissionDialog
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model.FilePermissionsViewAction
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model.FilePermissionsViewState
 import com.openmobilehub.android.storage.sample.presentation.util.MarginItemDecoration
@@ -75,6 +77,10 @@ class FilePermissionsDialog : BottomSheetDialogFragment(), FilePermissionAdapter
         adapter = FilePermissionAdapter(this@FilePermissionsDialog).also {
             permissions.adapter = it
         }
+
+        binding.add.setOnClickListener {
+            showCreateView()
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -104,6 +110,7 @@ class FilePermissionsDialog : BottomSheetDialogFragment(), FilePermissionAdapter
     private fun handleAction(action: FilePermissionsViewAction) {
         when (action) {
             is FilePermissionsViewAction.ShowToast -> displayToast(action.message)
+            FilePermissionsViewAction.ShowEditView -> showEditView()
         }
     }
 
@@ -113,5 +120,17 @@ class FilePermissionsDialog : BottomSheetDialogFragment(), FilePermissionAdapter
 
     override fun onRemoveClicked(permission: OmhPermission) {
         permissionsViewModel.remove(permission)
+    }
+
+    private fun showEditView() {
+        EditPermissionDialog().show(
+            childFragmentManager, EditPermissionDialog.TAG
+        )
+    }
+
+    private fun showCreateView() {
+        CreatePermissionDialog().show(
+            childFragmentManager, CreatePermissionDialog.TAG
+        )
     }
 }

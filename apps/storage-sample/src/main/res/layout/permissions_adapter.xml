@@ -42,15 +42,15 @@
                     layout="@layout/row_label_value" />
 
             <include
-                    android:id="@+id/displayName"
-                    layout="@layout/row_label_value" />
-
-            <include
                     android:id="@+id/type"
                     layout="@layout/row_label_value" />
 
             <include
                     android:id="@+id/role"
+                    layout="@layout/row_label_value" />
+
+            <include
+                    android:id="@+id/displayName"
                     layout="@layout/row_label_value" />
 
             <include

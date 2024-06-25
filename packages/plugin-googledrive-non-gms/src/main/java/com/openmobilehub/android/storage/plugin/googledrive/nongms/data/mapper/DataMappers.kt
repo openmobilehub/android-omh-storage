@@ -14,20 +14,30 @@
  * limitations under the License.
  */
 
+@file:Suppress("TooManyFunctions")
+
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper
 
+import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.utils.fromRFC3339StringToDate
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.FOLDER_MIME_TYPE
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body.CreatePermissionRequestBody
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body.UpdatePermissionRequestBody
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileListRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.PermissionResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.PermissionsListResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.RevisionListRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.RevisionRemoteResponse
+
+private const val USER_TYPE = "user"
+private const val GROUP_TYPE = "group"
+private const val DOMAIN_TYPE = "domain"
+private const val ANYONE_TYPE = "anyone"
 
 @SuppressWarnings("ComplexCondition")
 internal fun FileRemoteResponse.toOmhStorageEntity(): OmhStorageEntity? {
@@ -93,14 +103,15 @@ internal fun PermissionResponse.toPermission(): OmhPermission? {
     }
 
     val displayName = displayName.orEmpty()
+    val emailAddress = emailAddress.orEmpty()
     val expirationTime = expirationTime?.fromRFC3339StringToDate()
 
     return when (type) {
-        "user" -> {
-            OmhPermission.OmhUserPermission(
+        USER_TYPE -> {
+            OmhPermission.UserPermission(
                 id,
-                displayName,
                 omhRole,
+                displayName,
                 emailAddress,
                 expirationTime,
                 deleted,
@@ -109,30 +120,29 @@ internal fun PermissionResponse.toPermission(): OmhPermission? {
             )
         }
 
-        "group" -> {
-            OmhPermission.OmhGroupPermission(
+        GROUP_TYPE -> {
+            OmhPermission.GroupPermission(
                 id,
-                displayName,
                 omhRole,
+                displayName,
                 emailAddress,
                 expirationTime,
                 deleted,
             )
         }
 
-        "domain" -> {
-            OmhPermission.OmhDomainPermission(
+        DOMAIN_TYPE -> {
+            OmhPermission.DomainPermission(
                 id,
-                displayName,
                 omhRole,
-                domain ?: ""
+                displayName,
+                domain.orEmpty()
             )
         }
 
-        "anyone" -> {
-            OmhPermission.OmhAnyonePermission(
+        ANYONE_TYPE -> {
+            OmhPermission.AnyonePermission(
                 id,
-                displayName,
                 omhRole,
             )
         }
@@ -151,5 +161,45 @@ internal fun String.stringToRole(): OmhPermissionRole? = when (this) {
     else -> null
 }
 
+internal fun OmhPermissionRole.toStringRole(): String = when (this) {
+    OmhPermissionRole.OWNER -> "owner"
+    OmhPermissionRole.ORGANIZER -> "organizer"
+    OmhPermissionRole.FILE_ORGANIZER -> "fileOrganizer"
+    OmhPermissionRole.WRITER -> "writer"
+    OmhPermissionRole.COMMENTER -> "commenter"
+    OmhPermissionRole.READER -> "reader"
+}
+
 internal fun PermissionsListResponse.toPermissions(): List<OmhPermission> =
     permissions?.mapNotNull { permissionResponse -> permissionResponse.toPermission() }.orEmpty()
+
+internal fun OmhPermissionRole.toUpdateRequestBody(): UpdatePermissionRequestBody {
+    return UpdatePermissionRequestBody(this.toStringRole())
+}
+
+internal fun OmhCreatePermission.toCreateRequestBody(): CreatePermissionRequestBody = when (this) {
+    is OmhCreatePermission.AnyonePermission -> CreatePermissionRequestBody(
+        type = ANYONE_TYPE,
+        role = role.toStringRole(),
+        emailAddress = null,
+        domain = null
+    )
+    is OmhCreatePermission.DomainPermission -> CreatePermissionRequestBody(
+        type = DOMAIN_TYPE,
+        role = role.toStringRole(),
+        emailAddress = null,
+        domain = domain
+    )
+    is OmhCreatePermission.GroupPermission -> CreatePermissionRequestBody(
+        type = GROUP_TYPE,
+        role = role.toStringRole(),
+        emailAddress = emailAddress,
+        domain = null
+    )
+    is OmhCreatePermission.UserPermission -> CreatePermissionRequestBody(
+        type = USER_TYPE,
+        role = role.toStringRole(),
+        emailAddress = emailAddress,
+        domain = null
+    )
+}

@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model
+package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.create.model
 
-import androidx.annotation.StringRes
-
-sealed class FilePermissionsViewAction {
-    data class ShowToast(@StringRes val message: Int) : FilePermissionsViewAction()
-    object ShowEditView : FilePermissionsViewAction()
+enum class PermissionType {
+    USER,
+    GROUP,
+    DOMAIN,
+    ANYONE,
 }

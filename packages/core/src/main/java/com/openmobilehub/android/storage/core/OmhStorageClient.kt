@@ -32,8 +32,10 @@
 package com.openmobilehub.android.storage.core
 
 import com.openmobilehub.android.auth.core.OmhAuthClient
+import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhPermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -148,7 +150,10 @@ abstract class OmhStorageClient protected constructor(
      *
      * @return A ByteArrayOutputStream with the content of the downloaded file version
      */
-    abstract suspend fun downloadFileVersion(fileId: String, versionId: String): ByteArrayOutputStream
+    abstract suspend fun downloadFileVersion(
+        fileId: String,
+        versionId: String
+    ): ByteArrayOutputStream
 
     /**
      * This method list permissions to a given file
@@ -165,8 +170,39 @@ abstract class OmhStorageClient protected constructor(
      * @param fileId The file id with the permission
      * @param permissionId The permission id of the desired permission to delete
      *
-     *
      * @return true if the permission was deleted, false otherwise
      */
     abstract suspend fun deletePermission(fileId: String, permissionId: String): Boolean
+
+    /**
+     * This method update permission role in a given file
+     *
+     * @param fileId The file id with the permission
+     * @param permissionId The id of the permission to be edited
+     * @param role The desired role value
+     *
+     * @return Updated permission
+     */
+    abstract suspend fun updatePermission(
+        fileId: String,
+        permissionId: String,
+        role: OmhPermissionRole
+    ): OmhPermission
+
+    /**
+     * This method update permission role in a given file
+     *
+     * @param fileId The file id with the permission
+     * @param permission The permission to be created
+     * @param sendNotificationEmail Whether to send a notification email when sharing to users or groups
+     * @param emailMessage A plain text custom message to include in the notification email
+     *
+     * @return Created permission
+     */
+    abstract suspend fun createPermission(
+        fileId: String,
+        permission: OmhCreatePermission,
+        sendNotificationEmail: Boolean,
+        emailMessage: String?
+    ): OmhPermission
 }

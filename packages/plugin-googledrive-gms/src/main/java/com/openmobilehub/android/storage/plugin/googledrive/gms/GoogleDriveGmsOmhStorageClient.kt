@@ -20,8 +20,10 @@ import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 import com.openmobilehub.android.auth.plugin.google.gms.GmsCredentials
 import com.openmobilehub.android.storage.core.OmhStorageClient
+import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhPermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.GmsFileRepository
@@ -82,7 +84,10 @@ internal class GoogleDriveGmsOmhStorageClient private constructor(
         return fileRepository.downloadFile(fileId, mimeType)
     }
 
-    override suspend fun updateFile(localFileToUpload: File, fileId: String): OmhStorageEntity.OmhFile? {
+    override suspend fun updateFile(
+        localFileToUpload: File,
+        fileId: String
+    ): OmhStorageEntity.OmhFile? {
         return fileRepository.updateFile(localFileToUpload, fileId)
     }
 
@@ -90,7 +95,10 @@ internal class GoogleDriveGmsOmhStorageClient private constructor(
         return fileRepository.getFileVersions(fileId)
     }
 
-    override suspend fun downloadFileVersion(fileId: String, versionId: String): ByteArrayOutputStream {
+    override suspend fun downloadFileVersion(
+        fileId: String,
+        versionId: String
+    ): ByteArrayOutputStream {
         return fileRepository.downloadFileVersion(fileId, versionId)
     }
 
@@ -100,5 +108,22 @@ internal class GoogleDriveGmsOmhStorageClient private constructor(
 
     override suspend fun deletePermission(fileId: String, permissionId: String): Boolean {
         return fileRepository.deletePermission(fileId, permissionId)
+    }
+
+    override suspend fun updatePermission(
+        fileId: String,
+        permissionId: String,
+        role: OmhPermissionRole
+    ): OmhPermission {
+        return fileRepository.updatePermission(fileId, permissionId, role)
+    }
+
+    override suspend fun createPermission(
+        fileId: String,
+        permission: OmhCreatePermission,
+        sendNotificationEmail: Boolean,
+        emailMessage: String?
+    ): OmhPermission {
+        TODO("Not yet implemented")
     }
 }

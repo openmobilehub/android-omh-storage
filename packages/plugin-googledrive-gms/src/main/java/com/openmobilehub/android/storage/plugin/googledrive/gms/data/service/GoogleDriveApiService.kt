@@ -19,6 +19,7 @@ package com.openmobilehub.android.storage.plugin.googledrive.gms.data.service
 import com.google.api.client.http.FileContent
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.model.File
+import com.google.api.services.drive.model.Permission
 
 @Suppress("TooManyFunctions")
 internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProvider) {
@@ -92,4 +93,13 @@ internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProv
             .googleDriveApiService
             .permissions()
             .delete(fileId, permissionId)
+
+    fun updatePermission(fileId: String, permissionId: String, permission: Permission): Drive.Permissions.Update =
+        apiProvider
+            .googleDriveApiService
+            .permissions()
+            .update(fileId, permissionId, permission)
+            .apply {
+                fields = "*"
+            }
 }

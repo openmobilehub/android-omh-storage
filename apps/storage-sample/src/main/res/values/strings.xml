@@ -25,6 +25,7 @@
     <string name="text_update_file_title">Update File</string>
     <string name="text_update">Update</string>
     <string name="text_cancel">Cancel</string>
+    <string name="text_create">Create</string>
     <string name="text_sign_out">Sign out</string>
     <string name="text_metadata">Metadata</string>
     <string name="text_permissions">Permissions</string>
@@ -48,11 +49,20 @@
     <string name="permission_label_user_photo">User photo</string>
     <string name="permission_label_email">Email</string>
     <string name="permission_label_expiration_time">Expiration time</string>
-    <string name="permission_label_deleted">Deleted</string>
+    <string name="permission_label_deleted">User deleted</string>
     <string name="permission_label_pending_owner">Pending owner</string>
     <string name="permission_label_domain">Domain</string>
     <string name="permission_add">Add permission</string>
-    <string name="permission_removed">Permission was successfully removed</string>
+    <string name="permission_removed">Permission removed</string>
     <string name="permission_remove_error">Couldn\'t remove permission</string>
+    <string name="permission_updated">Permission updated</string>
+    <string name="permission_update_error">Couldn\'t update permission</string>
+    <string name="permission_created">Permission added</string>
+    <string name="permission_create_error">Couldn\'t add permission</string>
+    <string name="permission_role_required_error">Error: Role is required</string>
+    <string name="permission_label_message">Optional email message</string>
+    <string name="permission_label_send_notification_email">Send notification email</string>
+    <string name="permission_email_required_error">A valid email is required.</string>
+    <string name="permission_domain_required_error">Domain is required.</string>
 
 </resources>
