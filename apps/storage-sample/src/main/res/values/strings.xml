@@ -51,5 +51,7 @@
     <string name="permission_label_deleted">Deleted:</string>
     <string name="permission_label_pending_owner">Pending owner:</string>
     <string name="permission_label_domain">Domain:</string>
+    <string name="permission_add">Add permission</string>
+
 
 </resources>
