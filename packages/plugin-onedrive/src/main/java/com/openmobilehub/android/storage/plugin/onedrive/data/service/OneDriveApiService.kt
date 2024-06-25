@@ -20,6 +20,7 @@ import androidx.annotation.VisibleForTesting
 import com.microsoft.graph.drives.item.items.item.createuploadsession.CreateUploadSessionPostRequestBody
 import com.microsoft.graph.models.DriveItem
 import com.microsoft.graph.models.DriveItemUploadableProperties
+import com.microsoft.graph.models.DriveItemVersionCollectionResponse
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
 import com.openmobilehub.android.storage.core.utils.toInputStream
@@ -76,6 +77,22 @@ class OneDriveApiService(private val apiClient: OneDriveApiClient) {
             .byDriveId(driveId)
             .items()
             .byDriveItemId(fileId)
+            .content()
+            .get()
+    }
+
+    fun getFileVersions(fileId: String): DriveItemVersionCollectionResponse {
+        return apiClient.graphServiceClient.drives().byDriveId(driveId).items()
+            .byDriveItemId(fileId).versions().get()
+    }
+
+    fun downloadFileVersion(fileId: String, versionId: String): InputStream? {
+        return apiClient.graphServiceClient.drives()
+            .byDriveId(driveId)
+            .items()
+            .byDriveItemId(fileId)
+            .versions()
+            .byDriveItemVersionId(versionId)
             .content()
             .get()
     }
