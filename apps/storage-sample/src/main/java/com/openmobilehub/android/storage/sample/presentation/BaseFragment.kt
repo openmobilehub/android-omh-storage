@@ -55,16 +55,19 @@ abstract class BaseFragment<ViewModel : BaseViewModel<State, Event>, State : Vie
                 displayErrorDialog(message)
             }
         }
-
-        val fragmentActivity: FragmentActivity = activity ?: return
-        fragmentActivity.onBackPressedDispatcher.addCallback {
-            onBackPressed()
-        }
     }
 
     protected fun finishApplication() {
         val activity = activity as? BaseFragmentListener
         activity?.finishApplication()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val fragmentActivity: FragmentActivity = activity ?: return
+        fragmentActivity.onBackPressedDispatcher.addCallback {
+            onBackPressed()
+        }
     }
 
     protected open fun onBackPressed() {
