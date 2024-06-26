@@ -91,6 +91,11 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
         )
     }
 
+    override suspend fun permanentlyDeleteFile(id: String): Boolean {
+        // To be implemented
+        return false
+    }
+
     override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity? {
         val safeParentId = parentId ?: rootFolder
         return repository.uploadFile(localFileToUpload, safeParentId)

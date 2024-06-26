@@ -18,6 +18,7 @@ package com.openmobilehub.android.storage.plugin.dropbox.data.service
 
 import com.dropbox.core.v2.files.FileMetadata
 import com.dropbox.core.v2.files.ListFolderResult
+import com.dropbox.core.v2.files.ListRevisionsResult
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 
@@ -36,5 +37,19 @@ internal class DropboxApiService(private val apiClient: DropboxApiClient) {
 
     fun downloadFile(fileId: String, outputStream: ByteArrayOutputStream): FileMetadata {
         return apiClient.dropboxApiService.files().download(fileId).download(outputStream)
+    }
+
+    fun getFileRevisions(fileId: String): ListRevisionsResult {
+        return apiClient.dropboxApiService.files().listRevisions(fileId)
+    }
+
+    fun downloadFileRevision(
+        revisionId: String,
+        outputStream: ByteArrayOutputStream
+    ): FileMetadata {
+        val path = "rev:$revisionId"
+
+        return apiClient.dropboxApiService.files().download(path)
+            .download(outputStream)
     }
 }

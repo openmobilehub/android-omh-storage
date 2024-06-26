@@ -101,16 +101,14 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
     }
 
     override suspend fun getFileVersions(fileId: String): List<OmhFileVersion> {
-        // To be implemented
-        return emptyList()
+        return repository.getFileVersions(fileId)
     }
 
     override suspend fun downloadFileVersion(
         fileId: String,
         versionId: String
     ): ByteArrayOutputStream {
-        // To be implemented
-        return ByteArrayOutputStream()
+        return repository.downloadFileVersion(versionId)
     }
 
     override suspend fun getFilePermissions(fileId: String): List<OmhFilePermission> {
