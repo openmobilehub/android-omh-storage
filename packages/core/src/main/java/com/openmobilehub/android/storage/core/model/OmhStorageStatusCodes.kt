@@ -23,6 +23,7 @@ object OmhStorageStatusCodes {
     const val UPDATE_META_DATA = 3
     const val UPDATE_CONTENT_FILE = 4
     const val GET_DRIVE_ID_ERROR = 5
+    const val NOT_SUPPORTED_ERROR = 6
 
     @JvmStatic
     fun getStatusCodeString(code: Int): String {
@@ -32,6 +33,7 @@ object OmhStorageStatusCodes {
             UPDATE_META_DATA -> "Update meta data error."
             UPDATE_CONTENT_FILE -> "Update content file error."
             GET_DRIVE_ID_ERROR -> "Get drive id error."
+            NOT_SUPPORTED_ERROR -> "Method not supported."
             else -> "Unknown status code: $code"
         }
     }

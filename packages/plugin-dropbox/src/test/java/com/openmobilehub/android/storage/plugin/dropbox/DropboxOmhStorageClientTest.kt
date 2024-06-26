@@ -204,4 +204,26 @@ internal class DropboxOmhStorageClientTest {
         // Assert
         assertEquals(byteArrayOutputStream, result)
     }
+
+    @Test
+    fun `given a repository, when deleting a file, then return delete file result`() = runTest {
+        // Arrange
+        every { repository.deleteFile(any()) } returns true
+
+        // Act
+        val result = client.deleteFile(TEST_FILE_ID)
+
+        // Assert
+        assertEquals(true, result)
+    }
+
+    @Test
+    fun `given a repository, when permanently deleting a file, then return throw OmhStorageException_NotSupportedException`() {
+        // Act & Assert
+        assertThrows(OmhStorageException.NotSupportedException::class.java) {
+            runTest {
+                client.permanentlyDeleteFile(TEST_FILE_ID)
+            }
+        }
+    }
 }
