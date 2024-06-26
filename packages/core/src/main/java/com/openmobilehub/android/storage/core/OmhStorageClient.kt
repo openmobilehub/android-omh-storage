@@ -96,6 +96,15 @@ abstract class OmhStorageClient protected constructor(
     abstract suspend fun deleteFile(id: String): Boolean
 
     /**
+     * This method permanently delete files with a given file id
+     *
+     * @param id The id of the desired file to delete
+     *
+     * @return true if the file was deleted, false otherwise
+     */
+    abstract suspend fun permanentlyDeleteFile(id: String): Boolean
+
+    /**
      * This method upload a file in an specific folder
      *
      * @param localFileToUpload The file to be uploaded

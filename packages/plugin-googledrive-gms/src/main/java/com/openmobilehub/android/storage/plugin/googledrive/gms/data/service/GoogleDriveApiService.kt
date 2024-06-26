@@ -20,6 +20,7 @@ import com.google.api.client.http.FileContent
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.model.File
 
+@Suppress("TooManyFunctions")
 internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProvider) {
 
     fun getFilesList(parentId: String): Drive.Files.List = apiProvider
@@ -67,7 +68,12 @@ internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProv
         .files()
         .export(fileId, mimeType)
 
-    fun updateFile(fileId: String, file: File, mediaContent: FileContent): Drive.Files.Update = apiProvider
+    fun updateFile(fileId: String, file: File): Drive.Files.Update = apiProvider
+        .googleDriveApiService
+        .files()
+        .update(fileId, file)
+
+    fun updateFile(fileId: String, file: File, mediaContent: FileContent?): Drive.Files.Update = apiProvider
         .googleDriveApiService
         .files()
         .update(fileId, file, mediaContent)

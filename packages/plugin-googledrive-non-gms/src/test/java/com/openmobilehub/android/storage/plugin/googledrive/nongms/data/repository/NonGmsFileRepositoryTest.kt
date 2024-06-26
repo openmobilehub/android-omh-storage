@@ -124,13 +124,25 @@ internal class NonGmsFileRepositoryTest {
         }
 
     @Test
-    fun `given a fileId, when deleteFile is success, then true is returned`() = runTest {
+    fun `given a fileId, when permanentlyDeleteFile is success, then true is returned`() = runTest {
         coEvery { googleStorageApiService.deleteFile(any()) } returns Response.success(responseBody)
+
+        val result = fileRepositoryImpl.permanentlyDeleteFile(TEST_FILE_ID)
+
+        assertTrue(result)
+        coVerify { googleStorageApiService.deleteFile(TEST_FILE_ID) }
+    }
+
+    @Test
+    fun `given a fileId, when deleteFile is success, then true is returned`() = runTest {
+        coEvery { googleStorageApiService.updateMetaData(any(), any()) } returns Response.success(
+            testFileRemote
+        )
 
         val result = fileRepositoryImpl.deleteFile(TEST_FILE_ID)
 
         assertTrue(result)
-        coVerify { googleStorageApiService.deleteFile(TEST_FILE_ID) }
+        coVerify { googleStorageApiService.updateMetaData(any(), TEST_FILE_ID) }
     }
 
     @Test
@@ -220,8 +232,21 @@ internal class NonGmsFileRepositoryTest {
         }
 
     @Test
-    fun `given a fileId, when deleteFile fails, then false is returned`() = runTest {
+    fun `given a fileId, when permanentlyDeleteFile fails, then false is returned`() = runTest {
         coEvery { googleStorageApiService.deleteFile(any()) } returns Response.error(
+            500,
+            responseBody
+        )
+
+        val result = fileRepositoryImpl.permanentlyDeleteFile(TEST_FILE_ID)
+
+        assertFalse(result)
+        coVerify { googleStorageApiService.deleteFile(TEST_FILE_ID) }
+    }
+
+    @Test
+    fun `given a fileId, when deleteFile fails, then false is returned`() = runTest {
+        coEvery { googleStorageApiService.updateMetaData(any(), any()) } returns Response.error(
             500,
             responseBody
         )
@@ -229,7 +254,7 @@ internal class NonGmsFileRepositoryTest {
         val result = fileRepositoryImpl.deleteFile(TEST_FILE_ID)
 
         assertFalse(result)
-        coVerify { googleStorageApiService.deleteFile(TEST_FILE_ID) }
+        coVerify { googleStorageApiService.updateMetaData(any(), TEST_FILE_ID) }
     }
 
     @Test

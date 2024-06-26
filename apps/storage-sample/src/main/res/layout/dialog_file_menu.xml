@@ -46,6 +46,10 @@
             <include
                     android:id="@+id/delete"
                     layout="@layout/row_menu" />
+
+            <include
+                android:id="@+id/permanently_delete"
+                layout="@layout/row_menu" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
