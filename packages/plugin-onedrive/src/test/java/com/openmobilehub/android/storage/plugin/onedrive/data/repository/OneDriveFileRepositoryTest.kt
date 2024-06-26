@@ -194,4 +194,16 @@ class OneDriveFileRepositoryTest {
             repository.downloadFileVersion(TEST_VERSION_FILE_ID, TEST_VERSION_ID)
         }
     }
+
+    @Test
+    fun `given an api service, when deleting the, then return true`() {
+        // Arrange
+        every { apiService.deleteFile(any()) } returns Unit
+
+        // Act
+        val result = repository.deleteFile(TEST_FILE_ID)
+
+        // Assert
+        assertEquals(true, result)
+    }
 }
