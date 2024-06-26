@@ -196,7 +196,7 @@ class OneDriveFileRepositoryTest {
     }
 
     @Test
-    fun `given an api service, when deleting the, then return true`() {
+    fun `given an api service, when deleting the file, then return true`() {
         // Arrange
         every { apiService.deleteFile(any()) } returns Unit
 
