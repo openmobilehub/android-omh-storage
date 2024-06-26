@@ -171,23 +171,23 @@ class CreatePermissionDialog : DialogFragment() {
     }
 
     private fun buildUserOrGroupState() = with(binding) {
-        domain.isVisible = false
-        message.isVisible = true
-        emailAddress.isVisible = true
+        domainContainer.isVisible = false
+        messageContainer.isVisible = true
+        emailAddressContainer.isVisible = true
         sendNotificationEmail.isVisible = true
     }
 
     private fun buildDomainState() = with(binding) {
-        domain.isVisible = true
-        message.isVisible = false
-        emailAddress.isVisible = false
+        domainContainer.isVisible = true
+        messageContainer.isVisible = false
+        emailAddressContainer.isVisible = false
         sendNotificationEmail.isVisible = false
     }
 
     private fun buildAnyoneState() = with(binding) {
-        domain.isVisible = false
-        message.isVisible = false
-        emailAddress.isVisible = false
+        domainContainer.isVisible = false
+        messageContainer.isVisible = false
+        emailAddressContainer.isVisible = false
         sendNotificationEmail.isVisible = false
     }
 
@@ -208,6 +208,7 @@ class CreatePermissionDialog : DialogFragment() {
                     action.sendNotificationEmail,
                     action.emailMessage
                 )
+                dismiss()
             }
 
             is CreatePermissionsViewAction.ShowError -> {
@@ -223,6 +224,13 @@ class CreatePermissionDialog : DialogFragment() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        dialog?.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+    }
 
     companion object {
         const val TAG = "CreatePermissionDialog"

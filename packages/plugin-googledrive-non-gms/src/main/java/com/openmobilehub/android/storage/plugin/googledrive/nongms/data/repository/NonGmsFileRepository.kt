@@ -321,16 +321,17 @@ internal class NonGmsFileRepository(
         emailMessage: String?
     ): OmhPermission {
         val transferOwnership = permission.role == OmhPermissionRole.OWNER
-
+        val message = emailMessage?.ifBlank { null }
+        val willSendNotificationEmail = sendNotificationEmail || transferOwnership
         val response = retrofitImpl
             .getGoogleStorageApiService()
             .createPermission(
                 fileId = fileId,
                 body = permission.toCreateRequestBody(),
+                transferOwnership = transferOwnership,
                 // need to be set to true when transfer ownership
-                transferOwnership = transferOwnership || sendNotificationEmail,
-                sendNotificationEmail = sendNotificationEmail,
-                emailMessage = emailMessage,
+                sendNotificationEmail = willSendNotificationEmail,
+                emailMessage = if (willSendNotificationEmail) message else null,
             )
         if (response.isSuccessful) {
             return response.body()?.toPermission() ?: throw OmhStorageException.CreateException(

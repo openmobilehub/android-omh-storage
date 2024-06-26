@@ -21,7 +21,6 @@ import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.OmhStorageProvider
 import com.openmobilehub.android.storage.plugin.dropbox.DropboxOmhStorageFactory
-import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants
 import com.openmobilehub.android.storage.plugin.onedrive.OneDriveOmhStorageFactory
 import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
@@ -61,7 +60,7 @@ class StorageModule {
         omhAuthClient: OmhAuthClient
     ): OmhStorageClient {
         return OmhStorageProvider.Builder()
-            .addGmsPath(GoogleDriveGmsConstants.IMPLEMENTATION_PATH)
+            .addGmsPath(GoogleDriveNonGmsConstants.IMPLEMENTATION_PATH)
             .addNonGmsPath(GoogleDriveNonGmsConstants.IMPLEMENTATION_PATH)
             .build()
             .provideStorageClient(omhAuthClient, context)

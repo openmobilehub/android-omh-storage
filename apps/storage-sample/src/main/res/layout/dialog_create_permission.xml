@@ -56,58 +56,83 @@
                 android:layout_height="wrap_content" />
 
 
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/permission_label_email"
-                style="@style/TextAppearance.Material3.BodyMedium"
-                android:layout_marginTop="16dp" />
-
-        <EditText
-                android:id="@+id/emailAddress"
+        <LinearLayout
+                android:id="@+id/emailAddressContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:labelFor="@string/permission_label_email"
-                android:autofillHints="emailAddress"
-                android:inputType="textEmailAddress"/>
+                android:orientation="vertical"
+                android:layout_marginTop="16dp">
 
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/permission_label_domain"
-                style="@style/TextAppearance.Material3.BodyMedium"
-                android:layout_marginTop="16dp" />
+            <TextView
+                    android:id="@+id/emailAddressLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/permission_label_email"
+                    style="@style/TextAppearance.Material3.BodyMedium" />
 
-        <EditText
-                android:id="@+id/domain"
+            <EditText
+                    android:id="@+id/emailAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:labelFor="@string/permission_label_email"
+                    android:autofillHints="emailAddress"
+                    android:inputType="textEmailAddress" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+                android:id="@+id/domainContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:labelFor="@string/permission_label_domain"
-                android:inputType="text"/>
+                android:orientation="vertical"
+                android:layout_marginTop="16dp">
+
+            <TextView
+                    android:id="@+id/domainLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/permission_label_domain"
+                    style="@style/TextAppearance.Material3.BodyMedium" />
+
+            <EditText
+                    android:id="@+id/domain"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:labelFor="@string/permission_label_domain"
+                    android:inputType="text" />
+
+        </LinearLayout>
 
         <CheckBox
                 android:id="@+id/sendNotificationEmail"
                 android:text="@string/permission_label_send_notification_email"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
 
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/permission_label_message"
-                style="@style/TextAppearance.Material3.BodyMedium"
-                android:layout_marginTop="16dp" />
-
-        <EditText
-                android:id="@+id/message"
+        <LinearLayout
+                android:id="@+id/messageContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:labelFor="@string/permission_label_message"
-                android:inputType="text"/>
+                android:orientation="vertical"
+                android:layout_marginTop="16dp">
 
+            <TextView
+                    android:id="@+id/messageLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/permission_label_message"
+                    style="@style/TextAppearance.Material3.BodyMedium" />
 
+            <EditText
+                    android:id="@+id/message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:labelFor="@string/permission_label_message"
+                    android:inputType="text" />
+
+        </LinearLayout>
     </LinearLayout>
-
 
     <Button
             android:id="@+id/cancelButton"

@@ -16,7 +16,6 @@
 
 package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.openmobilehub.android.storage.core.OmhStorageClient
@@ -112,6 +111,7 @@ class FilePermissionsViewModel @Inject constructor(
         } catch (exception: Exception) {
             _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_create_error))
         }
+        getPermissions()
     }
 }
 

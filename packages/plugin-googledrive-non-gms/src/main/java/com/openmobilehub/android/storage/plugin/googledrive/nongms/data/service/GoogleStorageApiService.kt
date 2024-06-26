@@ -161,8 +161,8 @@ internal interface GoogleStorageApiService {
     suspend fun createPermission(
         @Path(FILE_ID) fileId: String,
         @Body body: CreatePermissionRequestBody,
-        @Query(QUERY_TRANSFER_OWNERSHIP) transferOwnership: Boolean = false,
-        @Query(QUERY_SEND_NOTIFICATION_EMAIL) sendNotificationEmail: Boolean = false,
+        @Query(QUERY_TRANSFER_OWNERSHIP) transferOwnership: Boolean? = false,
+        @Query(QUERY_SEND_NOTIFICATION_EMAIL) sendNotificationEmail: Boolean? = false,
         @Query(QUERY_EMAIL_MESSAGE) emailMessage: String? = null,
         @Query(QUERY_FIELDS) fields: String = QUERY_REQUESTED_FIELDS_ALL,
     ): Response<PermissionResponse>
