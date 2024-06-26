@@ -20,6 +20,7 @@ import android.webkit.MimeTypeMap
 import com.google.api.client.http.FileContent
 import com.google.api.client.http.HttpResponseException
 import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
+import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
@@ -190,6 +191,31 @@ internal class GmsFileRepository(
             )
         } catch (exception: Exception) {
             throw OmhStorageException.UpdateException(OmhAuthStatusCodes.PROVIDER_ERROR, exception)
+        }
+    }
+
+    @SuppressWarnings("TooGenericExceptionCaught")
+    fun createPermission(
+        fileId: String,
+        omhCreatePermission: OmhCreatePermission,
+        sendNotificationEmail: Boolean,
+        emailMessage: String?
+    ): OmhPermission {
+        return try {
+            val result =
+                apiService.createPermission(
+                    fileId,
+                    omhCreatePermission.toPermission(),
+                    sendNotificationEmail,
+                    emailMessage
+                )
+                    .execute()
+            result.toOmhPermission() ?: throw OmhStorageException.CreateException(
+                OmhAuthStatusCodes.PROVIDER_ERROR,
+                null
+            )
+        } catch (exception: Exception) {
+            throw OmhStorageException.CreateException(OmhAuthStatusCodes.PROVIDER_ERROR, exception)
         }
     }
 }

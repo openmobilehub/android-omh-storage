@@ -103,7 +103,7 @@ class FilePermissionsViewModel @Inject constructor(
         permission: OmhCreatePermission,
         sendNotificationEmail: Boolean,
         emailMessage: String?
-    ) = viewModelScope.launch {
+    ) = viewModelScope.launch(Dispatchers.IO) {
         @Suppress("SwallowedException", "TooGenericExceptionCaught")
         try {
             omhStorageClient.createPermission(fileId, permission, sendNotificationEmail, emailMessage)

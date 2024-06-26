@@ -124,6 +124,11 @@ internal class GoogleDriveGmsOmhStorageClient private constructor(
         sendNotificationEmail: Boolean,
         emailMessage: String?
     ): OmhPermission {
-        TODO("Not yet implemented")
+        return fileRepository.createPermission(
+            fileId,
+            permission,
+            sendNotificationEmail,
+            emailMessage
+        )
     }
 }

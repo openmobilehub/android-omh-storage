@@ -21,12 +21,18 @@ import com.google.api.services.drive.model.FileList
 import com.google.api.services.drive.model.Permission
 import com.google.api.services.drive.model.Revision
 import com.google.api.services.drive.model.RevisionList
+import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.extension.isFolder
 import java.util.Date
+
+private const val USER_TYPE = "user"
+private const val GROUP_TYPE = "group"
+private const val DOMAIN_TYPE = "domain"
+private const val ANYONE_TYPE = "anyone"
 
 @SuppressWarnings("ComplexCondition")
 internal fun File.toOmhStorageEntity(): OmhStorageEntity? {
@@ -86,7 +92,7 @@ internal fun Permission.toOmhPermission(): OmhPermission? {
     val expirationTime = expirationTime?.value?.let { Date(it) }
 
     return when (type) {
-        "user" -> {
+        USER_TYPE -> {
             OmhPermission.UserPermission(
                 id,
                 omhRole,
@@ -100,7 +106,7 @@ internal fun Permission.toOmhPermission(): OmhPermission? {
             )
         }
 
-        "group" -> {
+        GROUP_TYPE -> {
             OmhPermission.GroupPermission(
                 id,
                 omhRole,
@@ -111,7 +117,7 @@ internal fun Permission.toOmhPermission(): OmhPermission? {
             )
         }
 
-        "domain" -> {
+        DOMAIN_TYPE -> {
             OmhPermission.DomainPermission(
                 id,
                 omhRole,
@@ -120,7 +126,7 @@ internal fun Permission.toOmhPermission(): OmhPermission? {
             )
         }
 
-        "anyone" -> {
+        ANYONE_TYPE -> {
             OmhPermission.AnyonePermission(
                 id,
                 omhRole,
@@ -153,5 +159,39 @@ internal fun OmhPermissionRole.toStringRole(): String = when (this) {
 internal fun OmhPermissionRole.toPermission(): Permission {
     return Permission().apply {
         role = this@toPermission.toStringRole()
+    }
+}
+
+internal fun OmhCreatePermission.toPermission(): Permission {
+    val omhCreatePermission = this
+    val role = omhCreatePermission.role.toStringRole()
+    return when (omhCreatePermission) {
+        is OmhCreatePermission.AnyonePermission -> {
+            Permission().apply {
+                this.role = role
+                type = ANYONE_TYPE
+            }
+        }
+
+        is OmhCreatePermission.DomainPermission ->
+            Permission().apply {
+                this.role = role
+                type = DOMAIN_TYPE
+                domain = omhCreatePermission.domain
+            }
+
+        is OmhCreatePermission.GroupPermission ->
+            Permission().apply {
+                this.role = role
+                type = GROUP_TYPE
+                emailAddress = omhCreatePermission.emailAddress
+            }
+
+        is OmhCreatePermission.UserPermission ->
+            Permission().apply {
+                this.role = role
+                type = USER_TYPE
+                emailAddress = omhCreatePermission.emailAddress
+            }
     }
 }

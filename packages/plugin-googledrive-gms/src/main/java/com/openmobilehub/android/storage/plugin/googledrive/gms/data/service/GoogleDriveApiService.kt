@@ -77,10 +77,11 @@ internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProv
         .files()
         .export(fileId, mimeType)
 
-    fun updateFile(fileId: String, file: File, mediaContent: FileContent): Drive.Files.Update = apiProvider
-        .googleDriveApiService
-        .files()
-        .update(fileId, file, mediaContent)
+    fun updateFile(fileId: String, file: File, mediaContent: FileContent): Drive.Files.Update =
+        apiProvider
+            .googleDriveApiService
+            .files()
+            .update(fileId, file, mediaContent)
 
     fun getFileRevisions(fileId: String): Drive.Revisions.List =
         apiProvider.googleDriveApiService.revisions().list(fileId)
@@ -94,12 +95,32 @@ internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProv
             .permissions()
             .delete(fileId, permissionId)
 
-    fun updatePermission(fileId: String, permissionId: String, permission: Permission): Drive.Permissions.Update =
+    fun updatePermission(
+        fileId: String,
+        permissionId: String,
+        permission: Permission
+    ): Drive.Permissions.Update =
         apiProvider
             .googleDriveApiService
             .permissions()
             .update(fileId, permissionId, permission)
             .apply {
                 fields = "*"
+            }
+
+    fun createPermission(
+        fileId: String,
+        permission: Permission,
+        sendNotificationEmail: Boolean,
+        emailMessage: String?
+    ): Drive.Permissions.Create =
+        apiProvider
+            .googleDriveApiService
+            .permissions()
+            .create(fileId, permission)
+            .apply {
+                this.fields = "*"
+                this.sendNotificationEmail = sendNotificationEmail
+                this.emailMessage = emailMessage
             }
 }
