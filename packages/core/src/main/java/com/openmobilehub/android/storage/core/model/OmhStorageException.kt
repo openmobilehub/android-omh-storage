@@ -16,12 +16,10 @@
 
 package com.openmobilehub.android.storage.core.model
 
-import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
-
 sealed class OmhStorageException(private val statusCode: Int) : Exception() {
 
     override val message: String?
-        get() = OmhAuthStatusCodes.getStatusCodeString(statusCode)
+        get() = OmhStorageStatusCodes.getStatusCodeString(statusCode)
 
     class InvalidCredentialsException(statusCode: Int) : OmhStorageException(statusCode)
 
@@ -33,6 +31,11 @@ sealed class OmhStorageException(private val statusCode: Int) : Exception() {
     ) : OmhStorageException(statusCode)
 
     class UpdateException(
+        statusCode: Int,
+        override val cause: Throwable?
+    ) : OmhStorageException(statusCode)
+
+    class NotSupportedException(
         statusCode: Int,
         override val cause: Throwable?
     ) : OmhStorageException(statusCode)

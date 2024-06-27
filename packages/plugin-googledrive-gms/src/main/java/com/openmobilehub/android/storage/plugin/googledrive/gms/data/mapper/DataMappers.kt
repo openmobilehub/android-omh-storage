@@ -26,22 +26,21 @@ import com.openmobilehub.android.storage.plugin.googledrive.gms.data.extension.i
 import java.util.Date
 
 @SuppressWarnings("ComplexCondition")
-fun File.toOmhStorageEntity(): OmhStorageEntity? {
-    if (mimeType == null || id == null || name == null) {
-        return null
-    }
-
+fun File.toOmhStorageEntity(): OmhStorageEntity {
     val parentId = if (parents.isNullOrEmpty()) {
         null
     } else {
         parents[0]
     }
+
+    val createdTime = createdTime?.let { Date(it.value) }
     val modifiedTime = modifiedTime?.let { Date(it.value) }
 
     return if (isFolder()) {
         OmhStorageEntity.OmhFolder(
             id,
             name,
+            createdTime,
             modifiedTime,
             parentId,
         )
@@ -49,10 +48,12 @@ fun File.toOmhStorageEntity(): OmhStorageEntity? {
         OmhStorageEntity.OmhFile(
             id,
             name,
+            createdTime,
             modifiedTime,
             parentId,
             mimeType,
             fileExtension,
+            size,
         )
     }
 }

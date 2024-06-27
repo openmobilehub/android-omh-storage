@@ -22,6 +22,7 @@ import com.google.api.client.http.HttpResponseException
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhFileVersions
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhStorageEntities
@@ -47,7 +48,7 @@ internal class GmsFileRepository(
         return apiService.search(query).execute().toOmhStorageEntities()
     }
 
-    fun createFile(name: String, mimeType: String, parentId: String?): OmhStorageEntity? {
+    fun createFile(name: String, mimeType: String, parentId: String?): OmhStorageEntity {
         val fileToBeCreated = GoogleDriveFile().apply {
             this.name = name
             this.mimeType = mimeType
@@ -84,7 +85,7 @@ internal class GmsFileRepository(
         }
     }
 
-    fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity? {
+    fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity {
         val localMimeType = getStringMimeTypeFromLocalFile(localFileToUpload)
 
         val file = GoogleDriveFile().apply {
@@ -161,5 +162,11 @@ internal class GmsFileRepository(
         apiService.downloadFileRevision(fileId, versionId).executeMediaAndDownloadTo(outputStream)
 
         return outputStream
+    }
+
+    fun getFileMetadata(fileId: String): OmhStorageMetadata {
+        val file = apiService.getFileMetadata(fileId).execute()
+
+        return OmhStorageMetadata(file.toOmhStorageEntity(), file)
     }
 }
