@@ -61,4 +61,11 @@ class OneDriveFileRepository(
 
         return inputStream.toByteArrayOutputStream()
     }
+
+    fun deleteFile(fileId: String): Boolean {
+        apiService.deleteFile(fileId)
+
+        // It returns true if the file was deleted successfully, otherwise the method will throw an exception
+        return true
+    }
 }

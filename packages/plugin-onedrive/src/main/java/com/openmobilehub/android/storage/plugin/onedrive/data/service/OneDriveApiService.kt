@@ -98,4 +98,11 @@ class OneDriveApiService(private val apiClient: OneDriveApiClient) {
             .content()
             .get()
     }
+
+    fun deleteFile(fileId: String) {
+        apiClient.graphServiceClient.drives()
+            .byDriveId(driveId)
+            .items()
+            .byDriveItemId(fileId).delete()
+    }
 }

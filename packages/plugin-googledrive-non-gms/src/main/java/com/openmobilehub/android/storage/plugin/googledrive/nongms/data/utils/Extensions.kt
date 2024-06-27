@@ -16,8 +16,13 @@
 
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils
 
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
+import com.openmobilehub.android.storage.core.utils.fromRFC3339StringToDate
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants
 import okhttp3.ResponseBody
+import org.json.JSONObject
 import retrofit2.HttpException
 import retrofit2.Response
 import java.io.ByteArrayOutputStream
@@ -34,6 +39,50 @@ fun ResponseBody?.toByteArrayOutputStream(): ByteArrayOutputStream {
     }
 
     return outputStream
+}
+
+fun ResponseBody?.toOmhStorageEntityMetadata(): OmhStorageMetadata {
+    val responseBody = this?.string().orEmpty()
+
+    val responseObject = JSONObject(responseBody)
+
+    val id = responseObject.optString("id")
+    val name = responseObject.optString("name")
+    val createdTime = responseObject.optString("createdTime").fromRFC3339StringToDate()
+    val modifiedTime = responseObject.optString("modifiedTime").fromRFC3339StringToDate()
+    val parentsArray = responseObject.optJSONArray("parents")
+    val parentId = parentsArray?.getString(0)
+    val mimeType = responseObject.optString("mimeType")
+    val fileExtension = responseObject.optString("fileExtension")
+    val size = responseObject.optInt("size")
+
+    val omhStorageEntity: OmhStorageEntity
+
+    when (mimeType) {
+        GoogleDriveNonGmsConstants.FOLDER_MIME_TYPE -> {
+            omhStorageEntity = OmhStorageEntity.OmhFolder(
+                id,
+                name,
+                createdTime,
+                modifiedTime,
+                parentId
+            )
+        }
+        else -> {
+            omhStorageEntity = OmhStorageEntity.OmhFile(
+                id,
+                name,
+                createdTime,
+                modifiedTime,
+                parentId,
+                mimeType,
+                fileExtension,
+                size
+            )
+        }
+    }
+
+    return OmhStorageMetadata(omhStorageEntity, responseBody)
 }
 
 fun <T> Response<T>.toApiException(): OmhStorageException.ApiException =

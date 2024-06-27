@@ -57,6 +57,7 @@ import com.openmobilehub.android.storage.sample.presentation.BaseFragment
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.menu.FileMenuDialog
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.FilePermissionsDialog
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.versions.FileVersionsDialog
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.metadata.FileMetadataDialog
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewAction
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewEvent
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewState
@@ -181,11 +182,7 @@ class FileViewerFragment :
     private fun uploadFile() = filePickerUpload.launch(FileViewerViewModel.ANY_MIME_TYPE)
     private fun signOut() = dispatchEvent(FileViewerViewEvent.SignOut)
 
-    private fun showFileMetadata() = displayToast("To be implemented")
-//    FileMetadataDialog().show(
-//        childFragmentManager,
-//        FILE_METADATA_DIALOG_TAG
-//    )
+    private fun showFileMetadata() = FileMetadataDialog().show(childFragmentManager, FILE_METADATA_DIALOG_TAG)
 
     private fun showFilePermissions() = FilePermissionsDialog().show(
         childFragmentManager,

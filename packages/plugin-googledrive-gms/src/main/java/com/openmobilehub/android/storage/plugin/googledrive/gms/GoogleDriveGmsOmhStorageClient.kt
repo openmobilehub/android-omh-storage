@@ -25,6 +25,7 @@ import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.GmsFileRepository
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.service.GoogleDriveApiProvider
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.service.GoogleDriveApiService
@@ -133,5 +134,9 @@ internal class GoogleDriveGmsOmhStorageClient private constructor(
             sendNotificationEmail,
             emailMessage
         )
+    }
+
+    override suspend fun getFileMetadata(fileId: String): OmhStorageMetadata? {
+        return fileRepository.getFileMetadata(fileId)
     }
 }

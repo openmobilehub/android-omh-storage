@@ -45,12 +45,15 @@ internal fun File.toOmhStorageEntity(): OmhStorageEntity? {
     } else {
         parents[0]
     }
+
+    val createdTime = createdTime?.let { Date(it.value) }
     val modifiedTime = modifiedTime?.let { Date(it.value) }
 
     return if (isFolder()) {
         OmhStorageEntity.OmhFolder(
             id,
             name,
+            createdTime,
             modifiedTime,
             parentId,
         )
@@ -58,10 +61,12 @@ internal fun File.toOmhStorageEntity(): OmhStorageEntity? {
         OmhStorageEntity.OmhFile(
             id,
             name,
+            createdTime,
             modifiedTime,
             parentId,
             mimeType,
             fileExtension,
+            size,
         )
     }
 }

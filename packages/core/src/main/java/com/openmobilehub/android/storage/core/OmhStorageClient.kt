@@ -37,6 +37,7 @@ import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
+import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import java.io.ByteArrayOutputStream
 import java.io.File
 
@@ -163,6 +164,15 @@ abstract class OmhStorageClient protected constructor(
         fileId: String,
         versionId: String
     ): ByteArrayOutputStream
+
+    /**
+     * This method retrieves the metadata of a given file
+     *
+     * @param fileId The id of the file you want to get the metadata of
+     *
+     * @return An OmhStorageMetadata with the metadata of the given file, Null in case the file was not found
+     */
+    abstract suspend fun getFileMetadata(fileId: String): OmhStorageMetadata?
 
     /**
      * This method list permissions to a given file

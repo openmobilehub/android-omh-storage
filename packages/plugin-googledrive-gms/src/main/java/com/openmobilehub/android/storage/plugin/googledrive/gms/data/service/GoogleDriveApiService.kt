@@ -24,6 +24,12 @@ import com.google.api.services.drive.model.Permission
 @Suppress("TooManyFunctions")
 internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProvider) {
 
+    companion object {
+        private const val QUERY_REQUESTED_FIELDS =
+            "id,name,createdTime,modifiedTime,parents,mimeType,fileExtension,size"
+        private const val FIELDS_VALUE = "files($QUERY_REQUESTED_FIELDS)"
+    }
+
     fun getFilesList(parentId: String): Drive.Files.List = apiProvider
         .googleDriveApiService
         .files()
@@ -32,6 +38,7 @@ internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProv
             if (parentId.isNotEmpty()) {
                 q = "'$parentId' in parents and trashed = false"
             }
+            fields = FIELDS_VALUE
         }
 
     fun search(query: String): Drive.Files.List = apiProvider
@@ -42,12 +49,16 @@ internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProv
             if (query.isNotEmpty()) {
                 q = "name contains '$query' and trashed = false"
             }
+            fields = FIELDS_VALUE
         }
 
     fun createFile(file: File): Drive.Files.Create = apiProvider
         .googleDriveApiService
         .files()
         .create(file)
+        .apply {
+            fields = QUERY_REQUESTED_FIELDS
+        }
 
     fun deleteFile(fileId: String): Drive.Files.Delete = apiProvider
         .googleDriveApiService
@@ -58,6 +69,9 @@ internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProv
         .googleDriveApiService
         .files()
         .create(file, mediaContent)
+        .apply {
+            fields = QUERY_REQUESTED_FIELDS
+        }
 
     fun getFile(fileId: String): Drive.Files.Get = apiProvider
         .googleDriveApiService
@@ -81,17 +95,31 @@ internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProv
         .googleDriveApiService
         .files()
         .update(fileId, file)
+        .apply {
+            fields = QUERY_REQUESTED_FIELDS
+        }
 
     fun updateFile(fileId: String, file: File, mediaContent: FileContent?): Drive.Files.Update = apiProvider
         .googleDriveApiService
         .files()
         .update(fileId, file, mediaContent)
+        .apply {
+            fields = QUERY_REQUESTED_FIELDS
+        }
 
     fun getFileRevisions(fileId: String): Drive.Revisions.List =
         apiProvider.googleDriveApiService.revisions().list(fileId)
 
     fun downloadFileRevision(fileId: String, revisionId: String): Drive.Revisions.Get =
         apiProvider.googleDriveApiService.revisions().get(fileId, revisionId)
+
+    fun getFileMetadata(fileId: String): Drive.Files.Get = apiProvider
+        .googleDriveApiService
+        .files()
+        .get(fileId)
+        .apply {
+            fields = "*"
+        }
 
     fun deletePermission(fileId: String, permissionId: String): Drive.Permissions.Delete =
         apiProvider

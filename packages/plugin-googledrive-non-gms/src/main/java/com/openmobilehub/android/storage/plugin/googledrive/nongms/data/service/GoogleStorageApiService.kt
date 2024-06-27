@@ -62,10 +62,11 @@ internal interface GoogleStorageApiService {
         internal fun getSearchByNameQuery(query: String) =
             String.format(SEARCH_BY_NAME_Q_VALUE, query)
 
-        private const val QUERY_REQUESTED_FILE_FIELDS = "id,name,mimeType,modifiedTime,parents"
+        internal const val QUERY_REQUESTED_FIELDS =
+            "id,name,createdTime,modifiedTime,parents,mimeType,fileExtension,size"
+        private const val FIELDS_VALUE = "files($QUERY_REQUESTED_FIELDS)"
         private const val QUERY_REQUESTED_FIELDS_ALL = "*"
         private const val QUERY_PERMISSIONS = "permissions"
-        private const val FIELDS_VALUE = "files($QUERY_REQUESTED_FILE_FIELDS)"
 
         private const val FILE_ID = "fileId"
         private const val REVISION_ID = "revisionId"
@@ -81,8 +82,8 @@ internal interface GoogleStorageApiService {
 
     @POST(FILES_PARTICLE)
     suspend fun createFile(
-        @Query(QUERY_FIELDS) query: String = QUERY_REQUESTED_FILE_FIELDS,
-        @Body body: CreateFileRequestBody
+        @Body body: CreateFileRequestBody,
+        @Query(QUERY_FIELDS) fields: String = QUERY_REQUESTED_FIELDS,
     ): Response<FileRemoteResponse>
 
     @DELETE("$FILES_PARTICLE/{$FILE_ID}")
@@ -94,7 +95,8 @@ internal interface GoogleStorageApiService {
     @POST(UPLOAD_FILES_PARTICLE)
     suspend fun uploadFile(
         @Part(META_DATA) metadata: RequestBody,
-        @Part filePart: MultipartBody.Part
+        @Part filePart: MultipartBody.Part,
+        @Query(QUERY_FIELDS) fields: String = QUERY_REQUESTED_FIELDS,
     ): Response<FileRemoteResponse>
 
     @GET("$FILES_PARTICLE/{$FILE_ID}")
@@ -118,7 +120,8 @@ internal interface GoogleStorageApiService {
     @PATCH("$UPLOAD_FILES_PARTICLE/{$FILE_ID}")
     suspend fun updateFile(
         @Body filePart: RequestBody,
-        @Path(FILE_ID) fileId: String
+        @Path(FILE_ID) fileId: String,
+        @Query(QUERY_FIELDS) fields: String = QUERY_REQUESTED_FIELDS,
     ): Response<FileRemoteResponse>
 
     @PATCH("$FILES_PARTICLE/{$FILE_ID}")
@@ -137,6 +140,12 @@ internal interface GoogleStorageApiService {
         @Path(FILE_ID) fileId: String,
         @Path(REVISION_ID) revisionId: String,
         @Query(QUERY_ALT) alt: String
+    ): Response<ResponseBody>
+
+    @GET("$FILES_PARTICLE/{$FILE_ID}")
+    suspend fun getFileMetadata(
+        @Path(FILE_ID) fileId: String,
+        @Query(QUERY_FIELDS) fields: String = "*"
     ): Response<ResponseBody>
 
     @DELETE("$FILES_PARTICLE/{$FILE_ID}/permissions/{$PERMISSION_ID}")

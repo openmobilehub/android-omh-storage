@@ -40,6 +40,14 @@
     <string name="error_dialog_title">Something went wrong</string>
     <string name="error_dialog_message">Error detail:\n\n%s</string>
     <string name="error_dialog_ok">OK</string>
+    <string name="file_name">File Name: %s</string>
+    <string name="file_id">ID: %s</string>
+    <string name="file_created_time">Created Time: %s</string>
+    <string name="file_modified_time">Modified Time: %s</string>
+    <string name="file_parent_id">Parent ID: %s</string>
+    <string name="file_mime_type">Mime Type: %s</string>
+    <string name="file_extension">Extension: %s</string>
+    <string name="file_size">File Size: %s</string>
 
     <string name="permission_type_user">User</string>
     <string name="permission_type_group">Group</string>

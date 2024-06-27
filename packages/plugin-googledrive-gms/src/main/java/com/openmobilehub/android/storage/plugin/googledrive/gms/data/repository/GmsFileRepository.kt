@@ -25,6 +25,7 @@ import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.extension.toApiException
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhFileVersions
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhPermission
@@ -163,6 +164,12 @@ internal class GmsFileRepository(
         apiService.downloadFileRevision(fileId, versionId).executeMediaAndDownloadTo(outputStream)
 
         return outputStream
+    }
+
+    fun getFileMetadata(fileId: String): OmhStorageMetadata? {
+        val file = apiService.getFileMetadata(fileId).execute()
+
+        return OmhStorageMetadata(file.toOmhStorageEntity() ?: return null, file)
     }
 
     fun getFilePermissions(fileId: String): List<OmhPermission> {

@@ -51,12 +51,14 @@ internal fun FileRemoteResponse.toOmhStorageEntity(): OmhStorageEntity? {
         parents[0]
     }
 
+    val createdTime = createdTime?.fromRFC3339StringToDate()
     val modifiedTime = modifiedTime?.fromRFC3339StringToDate()
 
     return if (isFolder(mimeType)) {
         OmhStorageEntity.OmhFolder(
             id,
             name,
+            createdTime,
             modifiedTime,
             parentId,
         )
@@ -64,10 +66,12 @@ internal fun FileRemoteResponse.toOmhStorageEntity(): OmhStorageEntity? {
         OmhStorageEntity.OmhFile(
             id,
             name,
+            createdTime,
             modifiedTime,
             parentId,
             mimeType,
             fileExtension,
+            size
         )
     }
 }

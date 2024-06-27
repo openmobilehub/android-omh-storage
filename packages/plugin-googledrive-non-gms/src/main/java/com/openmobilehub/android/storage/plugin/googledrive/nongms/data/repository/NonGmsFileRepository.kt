@@ -23,6 +23,7 @@ import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toCreateRequestBody
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toFileList
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toOmhFileVersions
@@ -35,6 +36,7 @@ import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit.GoogleStorageApiServiceProvider
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.toApiException
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.toByteArrayOutputStream
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.toOmhStorageEntityMetadata
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -71,7 +73,7 @@ internal class NonGmsFileRepository(
         val response = retrofitImpl
             .getGoogleStorageApiService()
             .getFilesList(
-                query = query
+                query = query,
             )
 
         return if (response.isSuccessful) {
@@ -330,6 +332,18 @@ internal class NonGmsFileRepository(
             return response.body()?.toPermission() ?: throw OmhStorageException.ApiException(
                 message = "Create succeeded but API failed to return expected permission"
             )
+        } else {
+            throw response.toApiException()
+        }
+    }
+
+    suspend fun getFileMetadata(fileId: String): OmhStorageMetadata {
+        val response = retrofitImpl
+            .getGoogleStorageApiService()
+            .getFileMetadata(fileId = fileId)
+
+        return if (response.isSuccessful) {
+            response.body().toOmhStorageEntityMetadata()
         } else {
             throw response.toApiException()
         }

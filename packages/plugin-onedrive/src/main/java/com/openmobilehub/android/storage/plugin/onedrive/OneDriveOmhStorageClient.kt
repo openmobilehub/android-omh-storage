@@ -26,6 +26,7 @@ import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.onedrive.data.repository.OneDriveFileRepository
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiClient
@@ -79,13 +80,11 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
     }
 
     override suspend fun deleteFile(id: String): Boolean {
-        // To be implemented
-        return true
+        return repository.deleteFile(id)
     }
 
     override suspend fun permanentlyDeleteFile(id: String): Boolean {
-        // To be implemented
-        return false
+        throw OmhStorageException.NotSupportedException()
     }
 
     override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity? {
@@ -119,6 +118,11 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
     override suspend fun getFilePermissions(fileId: String): List<OmhPermission> {
         // To be implemented
         return emptyList()
+    }
+
+    override suspend fun getFileMetadata(fileId: String): OmhStorageMetadata {
+        // To be implemented
+        return OmhStorageMetadata(OmhStorageEntity.OmhFile("", "", null, null, null, null, null, null), Any())
     }
 
     override suspend fun deletePermission(fileId: String, permissionId: String): Boolean {
