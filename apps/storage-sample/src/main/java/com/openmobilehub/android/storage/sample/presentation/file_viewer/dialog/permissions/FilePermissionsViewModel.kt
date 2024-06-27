@@ -16,12 +16,14 @@
 
 package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
+import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model.FilePermissionsViewAction
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model.FilePermissionsViewState
@@ -77,12 +79,12 @@ class FilePermissionsViewModel @Inject constructor(
             return@launch
         }
 
-        @Suppress("SwallowedException", "TooGenericExceptionCaught")
+        @Suppress("SwallowedException")
         try {
             omhStorageClient.updatePermission(fileId, editedPermission.id, selectedRole)
             _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_updated))
-        } catch (exception: Exception) {
-            _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_update_error))
+        } catch (exception: OmhStorageException.ApiException) {
+            showErrorDialog(R.string.permission_update_error, exception)
         }
 
         _state.value = _state.value.copy(editedPermission = null)
@@ -106,12 +108,26 @@ class FilePermissionsViewModel @Inject constructor(
     ) = viewModelScope.launch(Dispatchers.IO) {
         @Suppress("SwallowedException", "TooGenericExceptionCaught")
         try {
-            omhStorageClient.createPermission(fileId, permission, sendNotificationEmail, emailMessage)
+            omhStorageClient.createPermission(
+                fileId,
+                permission,
+                sendNotificationEmail,
+                emailMessage
+            )
             _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_created))
-        } catch (exception: Exception) {
-            _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_create_error))
+        } catch (exception: OmhStorageException.ApiException) {
+            showErrorDialog(R.string.permission_create_error, exception)
         }
         getPermissions()
+    }
+
+    private suspend fun showErrorDialog(@StringRes title: Int, exception: OmhStorageException) {
+        _action.send(
+            FilePermissionsViewAction.ShowErrorDialog(
+                title,
+                exception.message.orEmpty()
+            )
+        )
     }
 }
 

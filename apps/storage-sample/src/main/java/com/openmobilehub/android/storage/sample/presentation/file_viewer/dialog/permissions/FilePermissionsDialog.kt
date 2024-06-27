@@ -36,6 +36,7 @@ import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model.FilePermissionsViewAction
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model.FilePermissionsViewState
 import com.openmobilehub.android.storage.sample.presentation.util.MarginItemDecoration
+import com.openmobilehub.android.storage.sample.presentation.util.displayErrorDialog
 import com.openmobilehub.android.storage.sample.presentation.util.displayToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -111,6 +112,10 @@ class FilePermissionsDialog : BottomSheetDialogFragment(), FilePermissionAdapter
         when (action) {
             is FilePermissionsViewAction.ShowToast -> displayToast(action.message)
             FilePermissionsViewAction.ShowEditView -> showEditView()
+            is FilePermissionsViewAction.ShowErrorDialog -> displayErrorDialog(
+                action.message,
+                action.title
+            )
         }
     }
 

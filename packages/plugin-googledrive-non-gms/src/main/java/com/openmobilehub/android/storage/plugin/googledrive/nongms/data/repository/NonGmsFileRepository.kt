@@ -17,14 +17,12 @@
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository
 
 import android.webkit.MimeTypeMap
-import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
-import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toCreateRequestBody
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toFileList
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toOmhFileVersions
@@ -35,6 +33,7 @@ import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.t
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.GoogleStorageApiService
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body.CreateFileRequestBody
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit.GoogleStorageApiServiceProvider
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.toApiException
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.toByteArrayOutputStream
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -42,7 +41,6 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
-import retrofit2.HttpException
 import java.io.ByteArrayOutputStream
 import java.io.File
 
@@ -78,7 +76,7 @@ internal class NonGmsFileRepository(
         return if (response.isSuccessful) {
             response.body()?.toFileList().orEmpty()
         } else {
-            throw OmhStorageException.ApiException(response.code(), HttpException(response))
+            throw response.toApiException()
         }
     }
 
@@ -157,11 +155,7 @@ internal class NonGmsFileRepository(
             response.body().toByteArrayOutputStream()
         } else {
             if (mimeType == null) {
-                val cause = HttpException(response)
-                throw OmhStorageException.DownloadException(
-                    OmhStorageStatusCodes.DOWNLOAD_ERROR,
-                    cause
-                )
+                throw response.toApiException()
             }
 
             return exportDocEditor(fileId, mimeType)
@@ -176,11 +170,7 @@ internal class NonGmsFileRepository(
         return if (response.isSuccessful) {
             response.body().toByteArrayOutputStream()
         } else {
-            val cause = HttpException(response)
-            throw OmhStorageException.DownloadException(
-                OmhStorageStatusCodes.DOWNLOAD_GOOGLE_WORKSPACE_ERROR,
-                cause
-            )
+            throw response.toApiException()
         }
     }
 
@@ -201,10 +191,7 @@ internal class NonGmsFileRepository(
             val omhStorageEntity = response.body()?.toOmhStorageEntity() ?: return null
             updateMediaFile(localFileToUpload, omhStorageEntity)
         } else {
-            throw OmhStorageException.UpdateException(
-                OmhStorageStatusCodes.UPDATE_META_DATA,
-                HttpException(response)
-            )
+            throw response.toApiException()
         }
     }
 
@@ -227,10 +214,7 @@ internal class NonGmsFileRepository(
         return if (response.isSuccessful) {
             response.body()?.toOmhStorageEntity() as? OmhStorageEntity.OmhFile
         } else {
-            throw OmhStorageException.UpdateException(
-                OmhStorageStatusCodes.UPDATE_CONTENT_FILE,
-                HttpException(response)
-            )
+            throw response.toApiException()
         }
     }
 
@@ -244,7 +228,7 @@ internal class NonGmsFileRepository(
         return if (response.isSuccessful) {
             response.body()?.toOmhFileVersions(fileId).orEmpty().reversed()
         } else {
-            throw OmhStorageException.ApiException(response.code(), HttpException(response))
+            throw response.toApiException()
         }
     }
 
@@ -256,10 +240,7 @@ internal class NonGmsFileRepository(
         return if (response.isSuccessful) {
             response.body().toByteArrayOutputStream()
         } else {
-            throw OmhStorageException.DownloadException(
-                OmhStorageStatusCodes.DOWNLOAD_ERROR,
-                HttpException(response)
-            )
+            throw response.toApiException()
         }
     }
 
@@ -273,7 +254,7 @@ internal class NonGmsFileRepository(
         return if (response.isSuccessful) {
             response.body()?.toPermissions().orEmpty()
         } else {
-            throw OmhStorageException.ApiException(response.code(), HttpException(response))
+            throw response.toApiException()
         }
     }
 
@@ -305,12 +286,11 @@ internal class NonGmsFileRepository(
                 sendNotificationEmail = transferOwnership,
             )
         if (response.isSuccessful) {
-            return response.body()?.toPermission() ?: throw OmhStorageException.UpdateException(
-                OmhAuthStatusCodes.PROVIDER_ERROR,
-                null
+            return response.body()?.toPermission() ?: throw OmhStorageException.ApiException(
+                message = "Updated succeeded but API failed to return expected permission"
             )
         } else {
-            throw OmhStorageException.ApiException(response.code(), HttpException(response))
+            throw response.toApiException()
         }
     }
 
@@ -334,12 +314,11 @@ internal class NonGmsFileRepository(
                 emailMessage = if (willSendNotificationEmail) message else null,
             )
         if (response.isSuccessful) {
-            return response.body()?.toPermission() ?: throw OmhStorageException.CreateException(
-                OmhAuthStatusCodes.PROVIDER_ERROR,
-                null
+            return response.body()?.toPermission() ?: throw OmhStorageException.ApiException(
+                message = "Create succeeded but API failed to return expected permission"
             )
         } else {
-            throw OmhStorageException.ApiException(response.code(), HttpException(response))
+            throw response.toApiException()
         }
     }
 }

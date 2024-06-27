@@ -245,7 +245,7 @@ internal class NonGmsFileRepositoryTest {
         coVerify { googleStorageApiService.uploadFile(any(), any()) }
     }
 
-    @Test(expected = OmhStorageException.DownloadException::class)
+    @Test(expected = OmhStorageException.ApiException::class)
     fun `given a null mimeType, when downloadFile fails, then a DownloadException is thrown`() =
         runTest {
             coEvery {
@@ -261,7 +261,7 @@ internal class NonGmsFileRepositoryTest {
             fileRepositoryImpl.downloadFile(TEST_FILE_ID, null)
         }
 
-    @Test(expected = OmhStorageException.DownloadException::class)
+    @Test(expected = OmhStorageException.ApiException::class)
     fun `given a fileId and mimeType, when downloadFile fails, then a DownloadException is thrown`() =
         runTest {
             coEvery {
@@ -277,7 +277,7 @@ internal class NonGmsFileRepositoryTest {
             fileRepositoryImpl.downloadFile(TEST_FILE_ID, null)
         }
 
-    @Test(expected = OmhStorageException.UpdateException::class)
+    @Test(expected = OmhStorageException.ApiException::class)
     fun `given a File and a file id, when updateFile fails, then a UpdateException is thrown`() =
         runTest {
             val localFileUpload = File(FILE_PATH)

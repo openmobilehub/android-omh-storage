@@ -136,7 +136,7 @@ class OneDriveFileRepositoryTest {
         every { apiService.downloadFile(any()) } returns null
 
         // Act & Assert
-        Assert.assertThrows(OmhStorageException.DownloadException::class.java) {
+        Assert.assertThrows(OmhStorageException.ApiException::class.java) {
             repository.downloadFile(TEST_FILE_ID)
         }
     }

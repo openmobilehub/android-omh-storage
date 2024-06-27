@@ -53,7 +53,11 @@ fun Fragment.navigateTo(@IdRes resId: Int, args: Bundle?, navOptions: NavOptions
     .findNavController(this)
     .navigate(resId, args, navOptions)
 
-fun View.displayErrorDialog(message: String, layoutInflater: LayoutInflater) {
+fun View.displayErrorDialog(
+    @StringRes title: Int,
+    message: String,
+    layoutInflater: LayoutInflater
+) {
     context?.let { context ->
         val errorDialogView = ErrorDialogViewBinding.inflate(layoutInflater)
         errorDialogView.textError.text = String.format(
@@ -62,7 +66,7 @@ fun View.displayErrorDialog(message: String, layoutInflater: LayoutInflater) {
         )
 
         val errorDialogBuilder = AlertDialog.Builder(context)
-            .setTitle(context.getString(R.string.error_dialog_title))
+            .setTitle(context.getString(title))
             .setPositiveButton(context.getString(R.string.error_dialog_ok)) { dialog, _ ->
                 dialog.dismiss()
             }
@@ -76,6 +80,9 @@ fun View.displayErrorDialog(message: String, layoutInflater: LayoutInflater) {
     }
 }
 
-fun Fragment.displayErrorDialog(message: String) {
-    view?.displayErrorDialog(message, layoutInflater)
+fun Fragment.displayErrorDialog(
+    message: String,
+    @StringRes title: Int = R.string.error_dialog_title,
+) {
+    view?.displayErrorDialog(title, message, layoutInflater)
 }

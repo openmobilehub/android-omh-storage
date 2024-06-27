@@ -19,7 +19,6 @@ package com.openmobilehub.android.storage.plugin.dropbox
 import android.webkit.MimeTypeMap
 import androidx.annotation.VisibleForTesting
 import com.openmobilehub.android.auth.core.OmhAuthClient
-import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
@@ -44,9 +43,7 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
 
         override fun build(authClient: OmhAuthClient): OmhStorageClient {
             val accessToken = authClient.getCredentials().accessToken
-                ?: throw OmhStorageException.InvalidCredentialsException(
-                    OmhAuthStatusCodes.SIGN_IN_FAILED
-                )
+                ?: throw OmhStorageException.InvalidCredentialsException()
 
             val client = DropboxApiClient.getInstance(accessToken)
             val apiService = DropboxApiService(client)

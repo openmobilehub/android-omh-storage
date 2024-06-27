@@ -18,7 +18,6 @@ package com.openmobilehub.android.storage.plugin.onedrive.data.repository
 
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
-import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiService
 import com.openmobilehub.android.storage.plugin.onedrive.data.util.toByteArrayOutputStream
@@ -43,10 +42,7 @@ class OneDriveFileRepository(
 
     fun downloadFile(fileId: String): ByteArrayOutputStream {
         val inputStream = apiService.downloadFile(fileId)
-            ?: throw OmhStorageException.DownloadException(
-                OmhStorageStatusCodes.DOWNLOAD_ERROR,
-                null
-            )
+            ?: throw OmhStorageException.ApiException(message = "GraphServiceClient did not return InputStream")
 
         return inputStream.toByteArrayOutputStream()
     }

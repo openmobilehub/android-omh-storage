@@ -19,14 +19,13 @@ package com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository
 import android.webkit.MimeTypeMap
 import com.google.api.client.http.FileContent
 import com.google.api.client.http.HttpResponseException
-import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
-import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.extension.toApiException
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhFileVersions
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhPermission
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhStorageEntities
@@ -67,12 +66,12 @@ internal class GmsFileRepository(
         return responseFile.toOmhStorageEntity()
     }
 
-    @SuppressWarnings("TooGenericExceptionCaught", "SwallowedException")
+    @SuppressWarnings("SwallowedException")
     fun deleteFile(fileId: String): Boolean {
         return try {
             apiService.deleteFile(fileId).execute()
             true
-        } catch (e: Exception) {
+        } catch (e: HttpResponseException) {
             false
         }
     }
@@ -115,10 +114,7 @@ internal class GmsFileRepository(
             }
 
             if (mimeType.isNullOrBlank()) {
-                throw OmhStorageException.DownloadException(
-                    OmhStorageStatusCodes.DOWNLOAD_ERROR,
-                    exception
-                )
+                throw exception.toApiException()
             }
 
             apiService
@@ -166,17 +162,17 @@ internal class GmsFileRepository(
         return permissions?.mapNotNull { it.toOmhPermission() } ?: emptyList()
     }
 
-    @SuppressWarnings("TooGenericExceptionCaught", "SwallowedException")
+    @Suppress("SwallowedException")
     fun deletePermission(fileId: String, permissionId: String): Boolean {
         return try {
             apiService.deletePermission(fileId, permissionId).execute()
             true
-        } catch (e: Exception) {
+        } catch (e: HttpResponseException) {
             false
         }
     }
 
-    @SuppressWarnings("TooGenericExceptionCaught")
+    @Suppress("SwallowedException")
     fun updatePermission(
         fileId: String,
         permissionId: String,
@@ -185,16 +181,16 @@ internal class GmsFileRepository(
         return try {
             val result =
                 apiService.updatePermission(fileId, permissionId, role.toPermission()).execute()
-            result.toOmhPermission() ?: throw OmhStorageException.UpdateException(
-                OmhAuthStatusCodes.PROVIDER_ERROR,
-                null
-            )
-        } catch (exception: Exception) {
-            throw OmhStorageException.UpdateException(OmhAuthStatusCodes.PROVIDER_ERROR, exception)
+            result.toOmhPermission()
+                ?: throw OmhStorageException.ApiException(
+                    message = "Update succeeded but API failed to return expected permission"
+                )
+        } catch (exception: HttpResponseException) {
+            throw exception.toApiException()
         }
     }
 
-    @SuppressWarnings("TooGenericExceptionCaught")
+    @Suppress("SwallowedException")
     fun createPermission(
         fileId: String,
         omhCreatePermission: OmhCreatePermission,
@@ -210,12 +206,12 @@ internal class GmsFileRepository(
                     emailMessage
                 )
                     .execute()
-            result.toOmhPermission() ?: throw OmhStorageException.CreateException(
-                OmhAuthStatusCodes.PROVIDER_ERROR,
-                null
-            )
-        } catch (exception: Exception) {
-            throw OmhStorageException.CreateException(OmhAuthStatusCodes.PROVIDER_ERROR, exception)
+            result.toOmhPermission()
+                ?: throw OmhStorageException.ApiException(
+                    message = "Create succeeded but API failed to return expected permission"
+                )
+        } catch (exception: HttpResponseException) {
+            throw exception.toApiException()
         }
     }
 }

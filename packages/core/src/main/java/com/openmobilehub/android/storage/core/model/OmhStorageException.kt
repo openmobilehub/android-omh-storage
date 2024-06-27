@@ -16,29 +16,18 @@
 
 package com.openmobilehub.android.storage.core.model
 
-import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
+sealed class OmhStorageException(
+    override val message: String? = null,
+    override val cause: Throwable? = null
+) : Exception(message, cause) {
 
-sealed class OmhStorageException(private val statusCode: Int) : Exception() {
+    class InvalidCredentialsException(message: String? = "A non-recoverable sign in failure occurred") :
+        OmhStorageException(message = message)
 
-    override val message: String?
-        get() = OmhAuthStatusCodes.getStatusCodeString(statusCode)
+    class DeveloperErrorException(message: String, cause: Throwable? = null) :
+        OmhStorageException(message, cause)
 
-    class InvalidCredentialsException(statusCode: Int) : OmhStorageException(statusCode)
-
-    class ApiException(statusCode: Int, override val cause: Throwable? = null) : OmhStorageException(statusCode)
-
-    class DownloadException(
-        statusCode: Int,
-        override val cause: Throwable?
-    ) : OmhStorageException(statusCode)
-
-    class UpdateException(
-        statusCode: Int,
-        override val cause: Throwable?
-    ) : OmhStorageException(statusCode)
-
-    class CreateException(
-        statusCode: Int,
-        override val cause: Throwable?
-    ) : OmhStorageException(statusCode)
+    class NotSupportedException(message: String? = null) : OmhStorageException(message)
+    class ApiException(val code: Int? = null, message: String? = null, cause: Throwable? = null) :
+        OmhStorageException(message, cause)
 }

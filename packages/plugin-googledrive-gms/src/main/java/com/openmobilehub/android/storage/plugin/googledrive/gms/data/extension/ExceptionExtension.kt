@@ -14,27 +14,11 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils
+package com.openmobilehub.android.storage.plugin.googledrive.gms.data.extension
 
+import com.google.api.client.http.HttpResponseException
 import com.openmobilehub.android.storage.core.model.OmhStorageException
-import okhttp3.ResponseBody
-import retrofit2.HttpException
-import retrofit2.Response
-import java.io.ByteArrayOutputStream
 
-fun ResponseBody?.toByteArrayOutputStream(): ByteArrayOutputStream {
-    val outputStream = ByteArrayOutputStream()
-
-    if (this == null) {
-        return outputStream
-    }
-
-    byteStream().use { inputStream ->
-        inputStream.copyTo(outputStream)
-    }
-
-    return outputStream
+fun HttpResponseException.toApiException(): OmhStorageException.ApiException {
+    return OmhStorageException.ApiException(statusCode, content, this)
 }
-
-fun <T> Response<T>.toApiException(): OmhStorageException.ApiException =
-    OmhStorageException.ApiException(code(), message(), HttpException(this))

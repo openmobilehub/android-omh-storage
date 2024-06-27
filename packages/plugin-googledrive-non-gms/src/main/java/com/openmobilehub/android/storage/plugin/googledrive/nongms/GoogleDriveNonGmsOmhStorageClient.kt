@@ -18,7 +18,6 @@ package com.openmobilehub.android.storage.plugin.googledrive.nongms
 
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.auth.core.OmhCredentials
-import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
@@ -41,7 +40,7 @@ internal class GoogleDriveNonGmsOmhStorageClient private constructor(
 
         override fun build(authClient: OmhAuthClient): OmhStorageClient {
             val omhCredentials = authClient.getCredentials() as? OmhCredentials
-                ?: throw OmhStorageException.InvalidCredentialsException(OmhAuthStatusCodes.SIGN_IN_FAILED)
+                ?: throw OmhStorageException.InvalidCredentialsException()
 
             val retrofitImpl = GoogleStorageApiServiceProvider.getInstance(omhCredentials)
 
