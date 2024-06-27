@@ -68,4 +68,11 @@ internal class DropboxFileRepository(
 
         return outputStream
     }
+
+    fun search(query: String): List<OmhStorageEntity> {
+        val searchResults = apiService.search(query)
+        return searchResults.matches.mapNotNull {
+            metadataToOmhStorageEntity(it.metadata.metadataValue)
+        }
+    }
 }
