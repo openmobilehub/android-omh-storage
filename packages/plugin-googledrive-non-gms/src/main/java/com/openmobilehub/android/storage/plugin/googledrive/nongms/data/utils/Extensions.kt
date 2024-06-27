@@ -37,4 +37,4 @@ fun ResponseBody?.toByteArrayOutputStream(): ByteArrayOutputStream {
 }
 
 fun <T> Response<T>.toApiException(): OmhStorageException.ApiException =
-    OmhStorageException.ApiException(code(), message(), HttpException(this))
+    OmhStorageException.ApiException(code(), errorBody()?.string(), HttpException(this))

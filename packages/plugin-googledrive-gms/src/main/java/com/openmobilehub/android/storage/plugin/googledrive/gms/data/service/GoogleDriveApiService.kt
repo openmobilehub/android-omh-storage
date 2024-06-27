@@ -102,19 +102,22 @@ internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProv
     fun updatePermission(
         fileId: String,
         permissionId: String,
-        permission: Permission
+        permission: Permission,
+        transferOwnership: Boolean,
     ): Drive.Permissions.Update =
         apiProvider
             .googleDriveApiService
             .permissions()
             .update(fileId, permissionId, permission)
             .apply {
-                fields = "*"
+                this.fields = "*"
+                this.transferOwnership = transferOwnership
             }
 
     fun createPermission(
         fileId: String,
         permission: Permission,
+        transferOwnership: Boolean,
         sendNotificationEmail: Boolean,
         emailMessage: String?
     ): Drive.Permissions.Create =
@@ -126,5 +129,6 @@ internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProv
                 this.fields = "*"
                 this.sendNotificationEmail = sendNotificationEmail
                 this.emailMessage = emailMessage
+                this.transferOwnership = transferOwnership
             }
 }

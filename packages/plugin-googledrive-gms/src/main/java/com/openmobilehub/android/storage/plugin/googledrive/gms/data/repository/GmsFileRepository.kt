@@ -191,9 +191,15 @@ internal class GmsFileRepository(
         permissionId: String,
         role: OmhPermissionRole
     ): OmhPermission {
+        val transferOwnership = role == OmhPermissionRole.OWNER
         return try {
             val result =
-                apiService.updatePermission(fileId, permissionId, role.toPermission()).execute()
+                apiService.updatePermission(
+                    fileId,
+                    permissionId,
+                    role.toPermission(),
+                    transferOwnership
+                ).execute()
             result.toOmhPermission()
                 ?: throw OmhStorageException.ApiException(
                     message = "Update succeeded but API failed to return expected permission"
@@ -210,12 +216,15 @@ internal class GmsFileRepository(
         sendNotificationEmail: Boolean,
         emailMessage: String?
     ): OmhPermission {
+        val transferOwnership = omhCreatePermission.role == OmhPermissionRole.OWNER
+        val willSendNotificationEmail = sendNotificationEmail || transferOwnership
         return try {
             val result =
                 apiService.createPermission(
                     fileId,
                     omhCreatePermission.toPermission(),
-                    sendNotificationEmail,
+                    transferOwnership,
+                    willSendNotificationEmail,
                     emailMessage
                 )
                     .execute()
