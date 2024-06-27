@@ -20,6 +20,7 @@ import android.webkit.MimeTypeMap
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toFileList
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toOmhFileVersions
@@ -28,6 +29,7 @@ import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body.CreateFileRequestBody
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit.GoogleStorageApiServiceProvider
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.toByteArrayOutputStream
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.toOmhStorageEntityMetadata
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -65,7 +67,7 @@ internal class NonGmsFileRepository(
         val response = retrofitImpl
             .getGoogleStorageApiService()
             .getFilesList(
-                query = query
+                query = query,
             )
 
         return if (response.isSuccessful) {
@@ -265,6 +267,18 @@ internal class NonGmsFileRepository(
                 OmhStorageStatusCodes.DOWNLOAD_ERROR,
                 HttpException(response)
             )
+        }
+    }
+
+    suspend fun getFileMetadata(fileId: String): OmhStorageMetadata {
+        val response = retrofitImpl
+            .getGoogleStorageApiService()
+            .getFileMetadata(fileId = fileId)
+
+        return if (response.isSuccessful) {
+            response.body().toOmhStorageEntityMetadata()
+        } else {
+            throw OmhStorageException.ApiException(response.code(), HttpException(response))
         }
     }
 }

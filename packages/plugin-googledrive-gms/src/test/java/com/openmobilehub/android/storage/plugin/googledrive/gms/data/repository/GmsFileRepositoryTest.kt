@@ -23,6 +23,7 @@ import com.google.api.services.drive.Drive
 import com.google.api.services.drive.model.FileList
 import com.google.api.services.drive.model.Revision
 import com.google.api.services.drive.model.RevisionList
+import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_FILE_MIME_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_FILE_NAME
@@ -232,5 +233,16 @@ internal class GmsFileRepositoryTest {
             fileRepositoryImpl.downloadFileVersion(TEST_VERSION_FILE_ID, TEST_VERSION_ID)
 
             verify { apiService.downloadFileRevision(TEST_VERSION_FILE_ID, TEST_VERSION_ID) }
+        }
+
+    @Test
+    fun `given a file id, return OmhStorageEntity object along with it's original metadata`() =
+        runTest {
+            every { apiService.getFileMetadata(TEST_FILE_ID).execute() } returns googleDriveFile
+
+            val result = fileRepositoryImpl.getFileMetadata(TEST_FILE_ID)
+
+            assertEquals(OmhStorageMetadata(testOmhFile, googleDriveFile), result)
+            verify { apiService.getFileMetadata(TEST_FILE_ID) }
         }
 }

@@ -16,17 +16,7 @@
 
 package com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles
 
-import com.google.api.client.util.DateTime
-import com.google.api.services.drive.model.File
-import io.mockk.every
-
-fun File.setUpMock() {
-    every { id } returns TEST_FILE_ID
-    every { name } returns TEST_FILE_NAME
-    every { createdTime } returns DateTime(TEST_FILE_CREATED_TIME)
-    every { modifiedTime } returns DateTime(TEST_FILE_MODIFIED_TIME)
-    every { parents } returns listOf(TEST_FILE_PARENT_ID)
-    every { mimeType } returns TEST_FILE_MIME_TYPE
-    every { fileExtension } returns TEST_FILE_EXTENSION
-    every { size } returns TEST_FILE_SIZE
-}
+const val TEST_FIRST_MAY_2024_MILLIS = 1714521600000
+const val TEST_FIRST_JUNE_2024_MILLIS = 1717200000000
+const val TEST_FIRST_MAY_2024_RFC_3339 = "2024-05-01T00:00:00.000Z"
+const val TEST_FIRST_JUNE_2024_RFC_3339 = "2024-06-01T00:00:00.000Z"

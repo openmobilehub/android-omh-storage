@@ -27,6 +27,8 @@ class DriveItemToOmhStorageEntity(private val mimeTypeMap: MimeTypeMap) {
     operator fun invoke(driveItem: DriveItem): OmhStorageEntity {
         driveItem.run {
             val isFolder = folder != null
+
+            val createdTime = null // Microsoft does not provide a created date
             val modifiedTime = Date.from(lastModifiedDateTime.toInstant())
             val parentId = parentReference.id
 
@@ -34,6 +36,7 @@ class DriveItemToOmhStorageEntity(private val mimeTypeMap: MimeTypeMap) {
                 OmhStorageEntity.OmhFolder(
                     id,
                     name,
+                    createdTime,
                     modifiedTime,
                     parentId,
                 )
@@ -45,10 +48,12 @@ class DriveItemToOmhStorageEntity(private val mimeTypeMap: MimeTypeMap) {
                 OmhStorageEntity.OmhFile(
                     id,
                     name,
+                    createdTime,
                     modifiedTime,
                     parentId,
                     mimeType,
                     extension,
+                    size.toInt()
                 )
             }
         }

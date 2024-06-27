@@ -24,6 +24,7 @@ import com.openmobilehub.android.storage.core.model.OmhFilePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.GmsFileRepository
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.service.GoogleDriveApiProvider
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.service.GoogleDriveApiService
@@ -66,7 +67,7 @@ internal class GoogleDriveGmsOmhStorageClient private constructor(
         name: String,
         mimeType: String,
         parentId: String
-    ): OmhStorageEntity? {
+    ): OmhStorageEntity {
         return fileRepository.createFile(name, mimeType, parentId)
     }
 
@@ -78,7 +79,7 @@ internal class GoogleDriveGmsOmhStorageClient private constructor(
         return fileRepository.permanentlyDeleteFile(id)
     }
 
-    override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity? {
+    override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity {
         return fileRepository.uploadFile(localFileToUpload, parentId)
     }
 
@@ -101,5 +102,9 @@ internal class GoogleDriveGmsOmhStorageClient private constructor(
     override suspend fun getFilePermissions(fileId: String): List<OmhFilePermission> {
         // To be implemented
         return emptyList()
+    }
+
+    override suspend fun getFileMetadata(fileId: String): OmhStorageMetadata {
+        return fileRepository.getFileMetadata(fileId)
     }
 }
