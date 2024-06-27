@@ -20,11 +20,14 @@ package com.openmobilehub.android.storage.plugin.onedrive
 
 import android.webkit.MimeTypeMap
 import com.openmobilehub.android.auth.core.OmhAuthClient
+import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.plugin.onedrive.data.repository.OneDriveFileRepository
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_PARENT_ID
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_VERSION_FILE_ID
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_VERSION_ID
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -172,6 +175,31 @@ internal class OneDriveOmhStorageClientTest {
 
         // Act
         val result = client.downloadFile(TEST_FILE_ID, null)
+
+        // Assert
+        assertEquals(byteArrayOutputStream, result)
+    }
+
+    @Test
+    fun `given a repository, when listing file versions, then return versions from the repository`() = runTest {
+        // Arrange
+        val versions: List<OmhFileVersion> = mockk()
+        every { repository.getFileVersions(any()) } returns versions
+
+        // Act
+        val result = client.getFileVersions(TEST_VERSION_FILE_ID)
+
+        // Assert
+        assertEquals(versions, result)
+    }
+
+    @Test
+    fun `given a repository, when downloading a file version, then return ByteArrayOutputStream`() = runTest {
+        // Arrange
+        every { repository.downloadFileVersion(any(), any()) } returns byteArrayOutputStream
+
+        // Act
+        val result = client.downloadFileVersion(TEST_VERSION_FILE_ID, TEST_VERSION_ID)
 
         // Assert
         assertEquals(byteArrayOutputStream, result)

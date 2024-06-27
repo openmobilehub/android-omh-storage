@@ -83,6 +83,11 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
         return true
     }
 
+    override suspend fun permanentlyDeleteFile(id: String): Boolean {
+        // To be implemented
+        return false
+    }
+
     override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity? {
         val safeParentId = parentId ?: rootFolder
         return repository.uploadFile(localFileToUpload, safeParentId)
@@ -101,16 +106,14 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
     }
 
     override suspend fun getFileVersions(fileId: String): List<OmhFileVersion> {
-        // To be implemented
-        return emptyList()
+        return repository.getFileVersions(fileId)
     }
 
     override suspend fun downloadFileVersion(
         fileId: String,
         versionId: String
     ): ByteArrayOutputStream {
-        // To be implemented
-        return ByteArrayOutputStream()
+        return repository.downloadFileVersion(fileId, versionId)
     }
 
     override suspend fun getFilePermissions(fileId: String): List<OmhPermission> {

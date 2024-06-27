@@ -16,10 +16,13 @@
 
 package com.openmobilehub.android.storage.plugin.dropbox.data.repository
 
+import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.utils.toInputStream
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.MetadataToOmhStorageEntity
+import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.toOmhVersion
 import com.openmobilehub.android.storage.plugin.dropbox.data.service.DropboxApiService
+import java.io.ByteArrayOutputStream
 import java.io.File
 
 internal class DropboxFileRepository(
@@ -42,5 +45,27 @@ internal class DropboxFileRepository(
         val response = apiService.uploadFile(inputStream, path)
 
         return metadataToOmhStorageEntity(response)
+    }
+
+    fun downloadFile(fileId: String): ByteArrayOutputStream {
+        val outputStream = ByteArrayOutputStream()
+        apiService.downloadFile(fileId, outputStream)
+
+        return outputStream
+    }
+
+    fun getFileVersions(fileId: String): List<OmhFileVersion> {
+        val revisions = apiService.getFileRevisions(fileId)
+
+        return revisions.entries.map {
+            it.toOmhVersion()
+        }
+    }
+
+    fun downloadFileVersion(versionId: String): ByteArrayOutputStream {
+        val outputStream = ByteArrayOutputStream()
+        apiService.downloadFileRevision(versionId, outputStream)
+
+        return outputStream
     }
 }

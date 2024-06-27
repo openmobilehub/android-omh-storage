@@ -20,11 +20,14 @@ package com.openmobilehub.android.storage.plugin.onedrive.data.service
 
 import com.microsoft.graph.core.models.UploadResult
 import com.microsoft.graph.models.DriveItem
+import com.microsoft.graph.models.DriveItemVersionCollectionResponse
 import com.microsoft.graph.models.UploadSession
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.utils.toInputStream
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_PARENT_ID
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_VERSION_FILE_ID
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_VERSION_ID
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -56,6 +59,9 @@ class OneDriveApiServiceTest {
 
     @MockK
     private lateinit var inputStream: InputStream
+
+    @MockK
+    private lateinit var driveItemVersionCollectionResponse: DriveItemVersionCollectionResponse
 
     private lateinit var apiService: OneDriveApiService
 
@@ -160,6 +166,42 @@ class OneDriveApiServiceTest {
 
         // Act
         val result = apiService.downloadFile(TEST_FILE_ID)
+
+        // Assert
+        Assert.assertEquals(inputStream, result)
+    }
+
+    @Test
+    fun `given apiClient returns list of versions, when getting the file versions list, then return list of drive item version collection response`() {
+        // Arrange
+        every {
+            apiClient.graphServiceClient.drives().byDriveId(any()).items()
+                .byDriveItemId(any()).versions().get()
+        } returns driveItemVersionCollectionResponse
+
+        // Act
+        val result = apiService.getFileVersions(TEST_VERSION_FILE_ID)
+
+        // Assert
+        Assert.assertEquals(driveItemVersionCollectionResponse, result)
+    }
+
+    @Test
+    fun `given apiClient successfully download the file version, when downloading the file version, then return InputStream`() {
+        // Arrange
+        every {
+            apiClient.graphServiceClient.drives()
+                .byDriveId(any())
+                .items()
+                .byDriveItemId(any())
+                .versions()
+                .byDriveItemVersionId(any())
+                .content()
+                .get()
+        } returns inputStream
+
+        // Act
+        val result = apiService.downloadFileVersion(TEST_VERSION_FILE_ID, TEST_VERSION_ID)
 
         // Assert
         Assert.assertEquals(inputStream, result)

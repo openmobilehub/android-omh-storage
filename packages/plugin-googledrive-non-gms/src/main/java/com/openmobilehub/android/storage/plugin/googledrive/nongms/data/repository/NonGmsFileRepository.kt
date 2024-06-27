@@ -52,6 +52,7 @@ internal class NonGmsFileRepository(
     companion object {
         private const val FILE_NAME_KEY = "name"
         private const val FILE_PARENTS_KEY = "parents"
+        private const val FILE_TRASHED_KEY = "trashed"
         private const val ANY_MIME_TYPE = "*/*"
         private const val MEDIA = "media"
 
@@ -98,12 +99,24 @@ internal class NonGmsFileRepository(
         }
     }
 
-    suspend fun deleteFile(fileId: String): Boolean {
+    suspend fun permanentlyDeleteFile(fileId: String): Boolean {
         val response = retrofitImpl
             .getGoogleStorageApiService()
             .deleteFile(
                 fileId = fileId
             )
+
+        return response.isSuccessful
+    }
+
+    suspend fun deleteFile(fileId: String): Boolean {
+        val jsonMetaData = JSONObject().apply {
+            put(FILE_TRASHED_KEY, true)
+        }
+        val jsonRequestBody = jsonMetaData.toString().toRequestBody(null)
+
+        val response = retrofitImpl
+            .getGoogleStorageApiService().updateMetaData(jsonRequestBody, fileId)
 
         return response.isSuccessful
     }

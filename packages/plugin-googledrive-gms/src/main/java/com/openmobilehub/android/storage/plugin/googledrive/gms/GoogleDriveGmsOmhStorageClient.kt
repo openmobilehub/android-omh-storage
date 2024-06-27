@@ -75,6 +75,10 @@ internal class GoogleDriveGmsOmhStorageClient private constructor(
         return fileRepository.deleteFile(id)
     }
 
+    override suspend fun permanentlyDeleteFile(id: String): Boolean {
+        return fileRepository.permanentlyDeleteFile(id)
+    }
+
     override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity? {
         return fileRepository.uploadFile(localFileToUpload, parentId)
     }

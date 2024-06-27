@@ -68,6 +68,19 @@ internal class GmsFileRepository(
 
     @SuppressWarnings("SwallowedException")
     fun deleteFile(fileId: String): Boolean {
+        val file = GoogleDriveFile().apply {
+            trashed = true
+        }
+        return try {
+            apiService.updateFile(fileId, file).execute()
+            true
+        } catch (e: OmhStorageException.ApiException) {
+            false
+        }
+    }
+
+    @SuppressWarnings("TooGenericExceptionCaught", "SwallowedException")
+    fun permanentlyDeleteFile(fileId: String): Boolean {
         return try {
             apiService.deleteFile(fileId).execute()
             true

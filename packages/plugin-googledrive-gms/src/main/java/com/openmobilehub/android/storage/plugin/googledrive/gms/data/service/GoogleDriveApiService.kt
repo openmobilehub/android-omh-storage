@@ -77,11 +77,15 @@ internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProv
         .files()
         .export(fileId, mimeType)
 
-    fun updateFile(fileId: String, file: File, mediaContent: FileContent): Drive.Files.Update =
-        apiProvider
-            .googleDriveApiService
-            .files()
-            .update(fileId, file, mediaContent)
+    fun updateFile(fileId: String, file: File): Drive.Files.Update = apiProvider
+        .googleDriveApiService
+        .files()
+        .update(fileId, file)
+
+    fun updateFile(fileId: String, file: File, mediaContent: FileContent?): Drive.Files.Update = apiProvider
+        .googleDriveApiService
+        .files()
+        .update(fileId, file, mediaContent)
 
     fun getFileRevisions(fileId: String): Drive.Revisions.List =
         apiProvider.googleDriveApiService.revisions().list(fileId)

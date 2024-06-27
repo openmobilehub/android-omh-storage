@@ -139,6 +139,8 @@ class FileViewerViewModel @Inject constructor(
             is FileViewerViewEvent.BackPressed -> backPressedEvent()
             is FileViewerViewEvent.CreateFile -> createFileEvent(event)
             is FileViewerViewEvent.DeleteFile -> deleteFileEvent(event)
+            is FileViewerViewEvent.PermanentlyDeleteFileClicked -> permanentlyDeleteFileEventClicked(event)
+            is FileViewerViewEvent.PermanentlyDeleteFile -> permanentlyDeleteFileEvent(event)
             is FileViewerViewEvent.UploadFile -> uploadFile(event)
             is FileViewerViewEvent.UpdateFile -> updateFileEvent(event)
             is FileViewerViewEvent.SignOut -> signOut()
@@ -337,6 +339,30 @@ class FileViewerViewModel @Inject constructor(
             } catch (exception: Exception) {
                 errorDialogMessage.postValue(exception.message)
                 toastMessage.postValue("ERROR: ${file.name} was NOT deleted")
+                exception.printStackTrace()
+
+                refreshFileListEvent()
+            }
+        }
+    }
+
+    private fun permanentlyDeleteFileEventClicked(event: FileViewerViewEvent.PermanentlyDeleteFileClicked) {
+        setState(FileViewerViewState.ShowPermanentlyDeleteDialog(event.file))
+    }
+
+    private fun permanentlyDeleteFileEvent(event: FileViewerViewEvent.PermanentlyDeleteFile) {
+        setState(FileViewerViewState.Loading)
+
+        val file = event.file
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val isSuccess = omhStorageClient.permanentlyDeleteFile(file.id)
+                handleDeleteSuccess(isSuccess, file)
+                refreshFileListEvent()
+            } catch (exception: Exception) {
+                errorDialogMessage.postValue(exception.message)
+                toastMessage.postValue("ERROR: ${file.name} was NOT permanently deleted")
                 exception.printStackTrace()
 
                 refreshFileListEvent()

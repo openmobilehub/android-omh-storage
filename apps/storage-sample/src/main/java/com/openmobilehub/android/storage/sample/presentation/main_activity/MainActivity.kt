@@ -55,9 +55,6 @@ open class MainActivity : AppCompatActivity(), BaseFragment.BaseFragmentListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        onBackPressedDispatcher.addCallback {
-            finish()
-        }
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
         setupNavigation()
