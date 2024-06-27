@@ -18,12 +18,15 @@ package com.openmobilehub.android.storage.plugin.onedrive.data.service
 
 import androidx.annotation.VisibleForTesting
 import com.microsoft.graph.drives.item.items.item.createuploadsession.CreateUploadSessionPostRequestBody
+import com.microsoft.graph.drives.item.items.item.searchwithq.SearchWithQGetResponse
 import com.microsoft.graph.models.DriveItem
+import com.microsoft.graph.models.DriveItemCollectionResponse
 import com.microsoft.graph.models.DriveItemUploadableProperties
 import com.microsoft.graph.models.DriveItemVersionCollectionResponse
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
 import com.openmobilehub.android.storage.core.utils.toInputStream
+import com.openmobilehub.android.storage.plugin.onedrive.OneDriveConstants
 import java.io.File
 import java.io.InputStream
 
@@ -40,9 +43,9 @@ class OneDriveApiService(private val apiClient: OneDriveApiClient) {
         }
     }
 
-    fun getFilesList(parentId: String): MutableList<DriveItem> {
+    fun getFilesList(parentId: String): DriveItemCollectionResponse {
         return apiClient.graphServiceClient.drives().byDriveId(driveId).items()
-            .byDriveItemId(parentId).children().get().value
+            .byDriveItemId(parentId).children().get()
     }
 
     fun uploadFile(file: File, parentId: String): DriveItem? {
@@ -94,6 +97,12 @@ class OneDriveApiService(private val apiClient: OneDriveApiClient) {
             .versions()
             .byDriveItemVersionId(versionId)
             .content()
+            .get()
+    }
+
+    fun search(query: String): SearchWithQGetResponse {
+        return apiClient.graphServiceClient.drives().byDriveId(driveId).items()
+            .byDriveItemId(OneDriveConstants.ROOT_FOLDER).searchWithQ(query)
             .get()
     }
 }

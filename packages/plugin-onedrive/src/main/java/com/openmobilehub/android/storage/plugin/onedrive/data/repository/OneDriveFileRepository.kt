@@ -32,7 +32,7 @@ class OneDriveFileRepository(
     private val driveItemToOmhStorageEntity: DriveItemToOmhStorageEntity
 ) {
     fun getFilesList(parentId: String): List<OmhStorageEntity> {
-        return apiService.getFilesList(parentId).map {
+        return apiService.getFilesList(parentId).value.map {
             driveItemToOmhStorageEntity(it)
         }
     }
@@ -67,5 +67,11 @@ class OneDriveFileRepository(
             )
 
         return inputStream.toByteArrayOutputStream()
+    }
+
+    fun search(query: String): List<OmhStorageEntity> {
+        return apiService.search(query).value.map {
+            driveItemToOmhStorageEntity(it)
+        }
     }
 }

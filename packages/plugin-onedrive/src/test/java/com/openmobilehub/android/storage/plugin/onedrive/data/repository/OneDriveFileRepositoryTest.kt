@@ -18,7 +18,9 @@
 
 package com.openmobilehub.android.storage.plugin.onedrive.data.repository
 
+import com.microsoft.graph.drives.item.items.item.searchwithq.SearchWithQGetResponse
 import com.microsoft.graph.models.DriveItem
+import com.microsoft.graph.models.DriveItemCollectionResponse
 import com.microsoft.graph.models.DriveItemVersion
 import com.microsoft.graph.models.DriveItemVersionCollectionResponse
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
@@ -74,6 +76,12 @@ class OneDriveFileRepositoryTest {
     private lateinit var driveItemCollectionVersionCollectionResponse: DriveItemVersionCollectionResponse
 
     @MockK
+    private lateinit var driveItemCollectionResponse: DriveItemCollectionResponse
+
+    @MockK
+    private lateinit var searchWithQGetResponse: SearchWithQGetResponse
+
+    @MockK
     private lateinit var driveItemVersion: DriveItemVersion
 
     private lateinit var repository: OneDriveFileRepository
@@ -95,7 +103,8 @@ class OneDriveFileRepositoryTest {
     @Test
     fun `given an apiService returns a non-empty list, when getting the files list, then return a non-empty list`() {
         // Arrange
-        every { apiService.getFilesList(TEST_FILE_PARENT_ID) } returns mutableListOf(driveItem, driveItem)
+        every { apiService.getFilesList(TEST_FILE_PARENT_ID) } returns driveItemCollectionResponse
+        every { driveItemCollectionResponse.value } returns mutableListOf(driveItem, driveItem)
         every { driveItemToOmhStorageEntity(any()) } returns omhStorageEntity
 
         // Act
@@ -108,7 +117,8 @@ class OneDriveFileRepositoryTest {
     @Test
     fun `given an apiService returns an empty list, when getting the files list, then return an empty list`() {
         // Arrange
-        every { apiService.getFilesList(TEST_FILE_PARENT_ID) } returns mutableListOf()
+        every { apiService.getFilesList(TEST_FILE_PARENT_ID) } returns driveItemCollectionResponse
+        every { driveItemCollectionResponse.value } returns emptyList()
 
         // Act
         val result = repository.getFilesList(TEST_FILE_PARENT_ID)
@@ -193,5 +203,32 @@ class OneDriveFileRepositoryTest {
         Assert.assertThrows(OmhStorageException.DownloadException::class.java) {
             repository.downloadFileVersion(TEST_VERSION_FILE_ID, TEST_VERSION_ID)
         }
+    }
+
+    @Test
+    fun `given an apiService returns a non-empty list, when searching the files, then return a non-empty list`() {
+        // Arrange
+        every { apiService.search(any()) } returns searchWithQGetResponse
+        every { searchWithQGetResponse.value } returns mutableListOf(driveItem, driveItem)
+        every { driveItemToOmhStorageEntity(any()) } returns omhStorageEntity
+
+        // Act
+        val result = repository.search("test")
+
+        // Assert
+        assertEquals(listOf(omhStorageEntity, omhStorageEntity), result)
+    }
+
+    @Test
+    fun `given an apiService returns an empty list, when searching the files, then return an empty list`() {
+        // Arrange
+        every { apiService.search(any()) } returns searchWithQGetResponse
+        every { searchWithQGetResponse.value } returns emptyList()
+
+        // Act
+        val result = repository.search("test")
+
+        // Assert
+        assertEquals(emptyList<OmhStorageEntity>(), result)
     }
 }

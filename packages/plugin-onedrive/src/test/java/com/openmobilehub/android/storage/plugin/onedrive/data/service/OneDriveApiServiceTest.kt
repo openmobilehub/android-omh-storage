@@ -19,7 +19,9 @@
 package com.openmobilehub.android.storage.plugin.onedrive.data.service
 
 import com.microsoft.graph.core.models.UploadResult
+import com.microsoft.graph.drives.item.items.item.searchwithq.SearchWithQGetResponse
 import com.microsoft.graph.models.DriveItem
+import com.microsoft.graph.models.DriveItemCollectionResponse
 import com.microsoft.graph.models.DriveItemVersionCollectionResponse
 import com.microsoft.graph.models.UploadSession
 import com.openmobilehub.android.storage.core.model.OmhStorageException
@@ -62,6 +64,12 @@ class OneDriveApiServiceTest {
 
     @MockK
     private lateinit var driveItemVersionCollectionResponse: DriveItemVersionCollectionResponse
+
+    @MockK
+    private lateinit var driveItemCollectionResponse: DriveItemCollectionResponse
+
+    @MockK
+    private lateinit var searchWithQGetResponse: SearchWithQGetResponse
 
     private lateinit var apiService: OneDriveApiService
 
@@ -107,16 +115,14 @@ class OneDriveApiServiceTest {
         // Arrange
         every {
             apiClient.graphServiceClient.drives().byDriveId(any()).items().byDriveItemId(any())
-                .children().get().value
-        } returns mutableListOf(
-            driveItem
-        )
+                .children().get()
+        } returns driveItemCollectionResponse
 
         // Act
         val result = apiService.getFilesList(TEST_FILE_PARENT_ID)
 
         // Assert
-        Assert.assertEquals(mutableListOf(driveItem), result)
+        Assert.assertEquals(driveItemCollectionResponse, result)
     }
 
     @Test
@@ -205,5 +211,19 @@ class OneDriveApiServiceTest {
 
         // Assert
         Assert.assertEquals(inputStream, result)
+    }
+
+    @Test
+    fun `given apiClient returns list of drive items, when searching the files, then return list of drive items`() {
+        // Arrange
+        every {
+            apiClient.graphServiceClient.drives().byDriveId(any()).items().byDriveItemId(any()).searchWithQ(any()).get()
+        } returns searchWithQGetResponse
+
+        // Act
+        val result = apiService.search("test")
+
+        // Assert
+        Assert.assertEquals(searchWithQGetResponse, result)
     }
 }
