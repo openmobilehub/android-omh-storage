@@ -24,6 +24,7 @@ import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_I
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_MIME_TYPE
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_NAME
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_PARENT_ID
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_SIZE
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FIRST_JUNE_2024_MILLIS
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FOLDER_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FOLDER_NAME
@@ -77,9 +78,10 @@ class DriveItemToOmhStorageEntityTest {
     fun `given a file with specific properties, when mapped, then return the expected OmhStorageEntity`() {
         // Arrange
         every { fileDriveItem.folder } returns null
-        every { fileDriveItem.name } returns TEST_FILE_NAME
         every { fileDriveItem.id } returns TEST_FILE_ID
+        every { fileDriveItem.name } returns TEST_FILE_NAME
         every { fileDriveItem.parentReference.id } returns TEST_FILE_PARENT_ID
+        every { fileDriveItem.size } returns TEST_FILE_SIZE
 
         val instant = Instant.ofEpochMilli(TEST_FIRST_JUNE_2024_MILLIS)
         every { fileDriveItem.lastModifiedDateTime } returns OffsetDateTime.ofInstant(

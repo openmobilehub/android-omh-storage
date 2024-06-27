@@ -29,32 +29,37 @@ class MetadataToOmhStorageEntity(private val mimeTypeMap: MimeTypeMap) {
     operator fun invoke(metadata: Metadata): OmhStorageEntity? {
         metadata.run {
             val parentId = parentSharedFolderId
+
             return when (this) {
                 is FileMetadata -> {
                     val sanitizedName = name.removeWhitespaces()
                     val mimeType = mimeTypeMap.getMimeTypeFromUrl(sanitizedName)
                     val extension = MimeTypeMap.getFileExtensionFromUrl(sanitizedName)?.ifEmpty { null }
 
-                    val lastModifiedDate = DateUtils.getNewerDate(clientModified, serverModified)
+                    val createdDate = null // Dropbox does not provide a created date for files
+                    val modifiedDate = DateUtils.getNewerDate(clientModified, serverModified)
 
                     OmhStorageEntity.OmhFile(
                         id,
                         name,
-                        lastModifiedDate,
+                        createdDate,
+                        modifiedDate,
                         parentId,
                         mimeType,
                         extension,
+                        size.toInt()
                     )
                 }
 
                 is FolderMetadata -> {
-                    // Dropbox does not provide a last modified date for folders, so we use an empty string
-                    val lastModifiedDate = null
+                    val createdDate = null // Dropbox does not provide a created date for folders
+                    val modifiedDate = null // Dropbox does not provide a modified date for folders
 
                     OmhStorageEntity.OmhFolder(
                         id,
                         name,
-                        lastModifiedDate,
+                        createdDate,
+                        modifiedDate,
                         parentId,
                     )
                 }

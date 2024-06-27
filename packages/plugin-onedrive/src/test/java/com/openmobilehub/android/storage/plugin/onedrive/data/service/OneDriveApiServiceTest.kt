@@ -34,6 +34,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.mockkStatic
+import io.mockk.verify
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
@@ -205,5 +206,26 @@ class OneDriveApiServiceTest {
 
         // Assert
         Assert.assertEquals(inputStream, result)
+    }
+
+    @Test
+    fun `given api client, when deleting the file, then client is called with correct fileId`() {
+        // Arrange
+        every {
+            apiClient.graphServiceClient.drives()
+                .byDriveId(any())
+                .items()
+                .byDriveItemId(TEST_FILE_ID).delete()
+        } returns Unit
+
+        // Act
+        apiService.deleteFile(TEST_FILE_ID)
+
+        // Assert
+        verify {
+            apiClient.graphServiceClient.drives().byDriveId(any()).items().byDriveItemId(
+                TEST_FILE_ID
+            ).delete()
+        }
     }
 }
