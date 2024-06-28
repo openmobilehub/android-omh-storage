@@ -352,7 +352,7 @@ internal class GmsFileRepositoryTest {
         }
 
     @Test(expected = OmhStorageException.ApiException::class)
-    fun `given a role, when updatePermission fails, then a ApiException is thrown`() =
+    fun `given a role, when updatePermission fails, then an ApiException is thrown`() =
         runTest {
             every {
                 apiService.updatePermission(
@@ -371,7 +371,7 @@ internal class GmsFileRepositoryTest {
         }
 
     @Test(expected = OmhStorageException.ApiException::class)
-    fun `given a role, when updatePermission does not returns expected permission, then a ApiException is thrown`() =
+    fun `given a role, when updatePermission does not returns expected permission, then an ApiException is thrown`() =
         runTest {
             every { permission.role } returns ""
             every { drivePermissionsUpdateRequest.execute() } returns permission
@@ -502,7 +502,7 @@ internal class GmsFileRepositoryTest {
         }
 
     @Test(expected = OmhStorageException.ApiException::class)
-    fun `given a permission, when createPermission fails, then a ApiException is thrown`() =
+    fun `given a permission, when createPermission fails, then an ApiException is thrown`() =
         runTest {
             every {
                 apiService.createPermission(
@@ -523,7 +523,7 @@ internal class GmsFileRepositoryTest {
         }
 
     @Test(expected = OmhStorageException.ApiException::class)
-    fun `given a permission, when createPermission does not return expected permission, then a ApiException is thrown`() =
+    fun `given a permission, when createPermission does not return expected permission, then an ApiException is thrown`() =
         runTest {
             every { permission.role } returns ""
             every { drivePermissionsCreateRequest.execute() } returns permission
