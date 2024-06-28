@@ -16,6 +16,7 @@
 
 package com.openmobilehub.android.storage.plugin.dropbox.data.service
 
+import com.dropbox.core.v2.files.DeleteResult
 import com.dropbox.core.v2.files.FileMetadata
 import com.dropbox.core.v2.files.ListFolderResult
 import com.dropbox.core.v2.files.ListRevisionsResult
@@ -52,6 +53,10 @@ internal class DropboxApiService(private val apiClient: DropboxApiClient) {
 
         return apiClient.dropboxApiService.files().download(path)
             .download(outputStream)
+    }
+
+    fun deleteFile(fileId: String): DeleteResult {
+        return apiClient.dropboxApiService.files().deleteV2(fileId)
     }
 
     fun search(query: String): SearchV2Result {

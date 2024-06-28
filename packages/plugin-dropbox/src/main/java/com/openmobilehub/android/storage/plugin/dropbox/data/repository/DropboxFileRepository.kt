@@ -69,6 +69,13 @@ internal class DropboxFileRepository(
         return outputStream
     }
 
+    fun deleteFile(fileId: String): Boolean {
+        apiService.deleteFile(fileId)
+
+        // It returns true if the file was deleted successfully, otherwise the method will throw an exception
+        return true
+    }
+
     fun search(query: String): List<OmhStorageEntity> {
         val searchResults = apiService.search(query)
         return searchResults.matches.mapNotNull {
