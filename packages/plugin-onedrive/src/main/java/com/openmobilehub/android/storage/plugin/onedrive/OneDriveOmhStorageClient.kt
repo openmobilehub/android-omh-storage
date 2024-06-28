@@ -135,7 +135,8 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
         permissionId: String,
         role: OmhPermissionRole
     ): OmhPermission {
-        TODO("Not yet implemented")
+        // To be implemented
+        return OmhPermission.AnyonePermission("", OmhPermissionRole.READER)
     }
 
     override suspend fun createPermission(
@@ -144,6 +145,7 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
         sendNotificationEmail: Boolean,
         emailMessage: String?
     ): OmhPermission {
-        TODO("Not yet implemented")
+        // To be implemented
+        return OmhPermission.AnyonePermission("", OmhPermissionRole.READER)
     }
 }

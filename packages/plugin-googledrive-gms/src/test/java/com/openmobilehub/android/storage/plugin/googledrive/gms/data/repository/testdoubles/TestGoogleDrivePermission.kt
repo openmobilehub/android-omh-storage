@@ -18,8 +18,8 @@ package com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository
 
 import com.google.api.client.util.DateTime
 import com.google.api.services.drive.model.Permission
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.OWNER_ROLE
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.USER_TYPE
+import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.OWNER_ROLE
+import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.USER_TYPE
 import io.mockk.every
 
 fun Permission.setUpMock() {

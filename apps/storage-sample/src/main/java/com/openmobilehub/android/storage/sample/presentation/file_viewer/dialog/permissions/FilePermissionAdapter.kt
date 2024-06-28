@@ -186,5 +186,3 @@ private fun OmhPermission.getType(context: Context): String = context.getString(
         is OmhPermission.UserPermission -> R.string.permission_type_user
     }
 )
-
-

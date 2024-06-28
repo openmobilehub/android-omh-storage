@@ -29,5 +29,4 @@ sealed class CreatePermissionsViewAction {
         val sendNotificationEmail: Boolean,
         val emailMessage: String?
     ) : CreatePermissionsViewAction()
-
 }

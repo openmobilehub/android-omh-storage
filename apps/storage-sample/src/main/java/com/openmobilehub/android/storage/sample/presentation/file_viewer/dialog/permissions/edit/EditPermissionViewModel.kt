@@ -21,7 +21,6 @@ import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
-
 @HiltViewModel
 class EditPermissionViewModel @Inject constructor() : ViewModel() {
     val roles = OmhPermissionRole.values()
