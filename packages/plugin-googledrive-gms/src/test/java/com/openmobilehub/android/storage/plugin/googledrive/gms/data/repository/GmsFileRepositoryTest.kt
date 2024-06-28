@@ -19,13 +19,17 @@
 package com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository
 
 import android.webkit.MimeTypeMap
+import com.google.api.client.http.HttpResponseException
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.model.FileList
 import com.google.api.services.drive.model.Permission
 import com.google.api.services.drive.model.PermissionList
 import com.google.api.services.drive.model.Revision
 import com.google.api.services.drive.model.RevisionList
+import com.openmobilehub.android.storage.core.model.OmhPermissionRole
+import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_EMAIL_MESSAGE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_FILE_MIME_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_FILE_NAME
@@ -34,6 +38,7 @@ import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_VERSION_FILE_ID
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_VERSION_ID
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.setUpMock
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.testOmhCreatePermission
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.testOmhFile
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.testOmhPermission
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.testOmhVersion
@@ -51,6 +56,7 @@ import org.junit.Before
 import org.junit.Test
 import java.io.File
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import com.google.api.services.drive.model.File as GoogleDriveFile
 
@@ -107,10 +113,19 @@ internal class GmsFileRepositoryTest {
     private lateinit var drivePermissionsListRequest: Drive.Permissions.List
 
     @MockK(relaxed = true)
+    private lateinit var drivePermissionsUpdateRequest: Drive.Permissions.Update
+
+    @MockK(relaxed = true)
+    private lateinit var drivePermissionsCreateRequest: Drive.Permissions.Create
+
+    @MockK(relaxed = true)
     private lateinit var permissionList: PermissionList
 
     @MockK(relaxed = true)
     private lateinit var permission: Permission
+
+    @MockK(relaxed = true)
+    private lateinit var responseException: HttpResponseException
 
     private lateinit var fileRepositoryImpl: GmsFileRepository
 
@@ -245,7 +260,12 @@ internal class GmsFileRepositoryTest {
     @Test
     fun `given a file id and a version id, when downloadFileVersion is success, then a ByteArrayOutputStream is returned`() =
         runTest {
-            every { apiService.downloadFileRevision(TEST_VERSION_FILE_ID, TEST_VERSION_ID) } returns driveRevisionsGetRequest
+            every {
+                apiService.downloadFileRevision(
+                    TEST_VERSION_FILE_ID,
+                    TEST_VERSION_ID
+                )
+            } returns driveRevisionsGetRequest
 
             fileRepositoryImpl.downloadFileVersion(TEST_VERSION_FILE_ID, TEST_VERSION_ID)
 
@@ -280,6 +300,22 @@ internal class GmsFileRepositoryTest {
         }
 
     @Test
+    fun `given a fileId and permissionId, when deletePermission fails, then false is returned`() =
+        runTest {
+            every {
+                apiService.deletePermission(
+                    TEST_FILE_ID,
+                    TEST_PERMISSION_ID
+                )
+            }.throws(responseException)
+
+            val result = fileRepositoryImpl.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
+
+            assertFalse(result)
+            verify { apiService.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID) }
+        }
+
+    @Test
     fun `given a fileId, when getPermission is success, then a list of OmhPermissions is returned`() =
         runTest {
             every { permissionList.permissions } returns listOf(permission)
@@ -290,5 +326,222 @@ internal class GmsFileRepositoryTest {
 
             assertEquals(listOf(testOmhPermission), result)
             verify { apiService.getPermission(TEST_FILE_ID) }
+        }
+
+    @Test
+    fun `given a role, when updatePermission is success, then a OmhPermissions is returned`() =
+        runTest {
+            every { drivePermissionsUpdateRequest.execute() } returns permission
+            every {
+                apiService.updatePermission(
+                    TEST_FILE_ID,
+                    TEST_PERMISSION_ID,
+                    any(),
+                    false
+                )
+            } returns drivePermissionsUpdateRequest
+
+            val result = fileRepositoryImpl.updatePermission(
+                TEST_FILE_ID,
+                TEST_PERMISSION_ID,
+                OmhPermissionRole.COMMENTER
+            )
+
+            assertEquals(testOmhPermission, result)
+            verify { apiService.updatePermission(TEST_FILE_ID, TEST_PERMISSION_ID, any(), false) }
+        }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given a role, when updatePermission fails, then a ApiException is thrown`() =
+        runTest {
+            every {
+                apiService.updatePermission(
+                    TEST_FILE_ID,
+                    TEST_PERMISSION_ID,
+                    any(),
+                    any(),
+                )
+            }.throws(responseException)
+
+            fileRepositoryImpl.updatePermission(
+                TEST_FILE_ID,
+                TEST_PERMISSION_ID,
+                OmhPermissionRole.COMMENTER
+            )
+        }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given a role, when updatePermission does not returns expected permission, then a ApiException is thrown`() =
+        runTest {
+            every { permission.role } returns ""
+            every { drivePermissionsUpdateRequest.execute() } returns permission
+            every {
+                apiService.updatePermission(
+                    TEST_FILE_ID,
+                    TEST_PERMISSION_ID,
+                    any(),
+                    false
+                )
+            } returns drivePermissionsUpdateRequest
+
+            fileRepositoryImpl.updatePermission(
+                TEST_FILE_ID,
+                TEST_PERMISSION_ID,
+                OmhPermissionRole.COMMENTER
+            )
+        }
+
+    @Test
+    fun `given a owner role, when updatePermission is called, then transferOwnership should be true`() =
+        runTest {
+            every { drivePermissionsUpdateRequest.execute() } returns permission
+            every {
+                apiService.updatePermission(
+                    TEST_FILE_ID,
+                    TEST_PERMISSION_ID,
+                    any(),
+                    true
+                )
+            } returns drivePermissionsUpdateRequest
+
+            fileRepositoryImpl.updatePermission(
+                TEST_FILE_ID,
+                TEST_PERMISSION_ID,
+                OmhPermissionRole.OWNER
+            )
+
+            verify { apiService.updatePermission(TEST_FILE_ID, TEST_PERMISSION_ID, any(), true) }
+        }
+
+    @Test
+    fun `given a new permission, when createPermission is called, then a OmhPermissions is returned`() =
+        runTest {
+            every { drivePermissionsCreateRequest.execute() } returns permission
+            every {
+                apiService.createPermission(
+                    TEST_FILE_ID,
+                    any(),
+                    transferOwnership = any(),
+                    sendNotificationEmail = any(),
+                    emailMessage = any(),
+                )
+            } returns drivePermissionsCreateRequest
+
+            val result = fileRepositoryImpl.createPermission(
+                TEST_FILE_ID,
+                testOmhCreatePermission,
+                false,
+                null
+            )
+
+            assertEquals(testOmhPermission, result)
+        }
+
+    @Test
+    fun `given a new owner permission, when createPermission is called, then transferOwnership should be true`() =
+        runTest {
+            every { drivePermissionsCreateRequest.execute() } returns permission
+            every {
+                apiService.createPermission(
+                    TEST_FILE_ID,
+                    any(),
+                    transferOwnership = any(),
+                    sendNotificationEmail = any(),
+                    emailMessage = any(),
+                )
+            } returns drivePermissionsCreateRequest
+
+            fileRepositoryImpl.createPermission(
+                TEST_FILE_ID,
+                testOmhCreatePermission,
+                true,
+                TEST_EMAIL_MESSAGE,
+            )
+
+            verify {
+                apiService.createPermission(
+                    TEST_FILE_ID,
+                    any(),
+                    transferOwnership = true,
+                    sendNotificationEmail = true,
+                    emailMessage = TEST_EMAIL_MESSAGE,
+                )
+            }
+        }
+
+    @Test
+    fun `given a new owner permission, when createPermission is called, then sendNotificationEmail should be true even when false was provided`() =
+        runTest {
+            every { drivePermissionsCreateRequest.execute() } returns permission
+            every {
+                apiService.createPermission(
+                    TEST_FILE_ID,
+                    any(),
+                    transferOwnership = any(),
+                    sendNotificationEmail = any(),
+                    emailMessage = any(),
+                )
+            } returns drivePermissionsCreateRequest
+
+            fileRepositoryImpl.createPermission(
+                TEST_FILE_ID,
+                testOmhCreatePermission,
+                false,
+                TEST_EMAIL_MESSAGE,
+            )
+
+            verify {
+                apiService.createPermission(
+                    TEST_FILE_ID,
+                    any(),
+                    transferOwnership = true,
+                    sendNotificationEmail = true,
+                    emailMessage = TEST_EMAIL_MESSAGE,
+                )
+            }
+        }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given a permission, when createPermission fails, then a ApiException is thrown`() =
+        runTest {
+            every {
+                apiService.createPermission(
+                    TEST_FILE_ID,
+                    any(),
+                    transferOwnership = any(),
+                    sendNotificationEmail = any(),
+                    emailMessage = any(),
+                )
+            }.throws(responseException)
+
+            fileRepositoryImpl.createPermission(
+                TEST_FILE_ID,
+                testOmhCreatePermission,
+                false,
+                TEST_EMAIL_MESSAGE,
+            )
+        }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given a permission, when createPermission does not return expected permission, then a ApiException is thrown`() =
+        runTest {
+            every { permission.role } returns ""
+            every { drivePermissionsCreateRequest.execute() } returns permission
+            every {
+                apiService.createPermission(
+                    TEST_FILE_ID,
+                    any(),
+                    transferOwnership = any(),
+                    sendNotificationEmail = any(),
+                    emailMessage = any(),
+                )
+            } returns drivePermissionsCreateRequest
+
+            fileRepositoryImpl.createPermission(
+                TEST_FILE_ID,
+                testOmhCreatePermission,
+                false,
+                TEST_EMAIL_MESSAGE,
+            )
         }
 }
