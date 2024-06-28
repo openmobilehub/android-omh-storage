@@ -28,6 +28,7 @@ internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProv
         private const val QUERY_REQUESTED_FIELDS =
             "id,name,createdTime,modifiedTime,parents,mimeType,fileExtension,size"
         private const val FIELDS_VALUE = "files($QUERY_REQUESTED_FIELDS)"
+        private const val ALL_FIELDS = "*"
     }
 
     fun getFilesList(parentId: String): Drive.Files.List = apiProvider
@@ -78,12 +79,12 @@ internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProv
         .files()
         .get(fileId)
 
-    fun getPermission(fileId: String): Drive.Files.Get = apiProvider
+    fun getPermission(fileId: String): Drive.Permissions.List = apiProvider
         .googleDriveApiService
-        .files()
-        .get(fileId)
+        .permissions()
+        .list(fileId)
         .apply {
-            fields = "permissions"
+            fields = ALL_FIELDS
         }
 
     fun downloadGoogleDoc(fileId: String, mimeType: String): Drive.Files.Export = apiProvider
@@ -118,7 +119,7 @@ internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProv
         .files()
         .get(fileId)
         .apply {
-            fields = "*"
+            fields = ALL_FIELDS
         }
 
     fun deletePermission(fileId: String, permissionId: String): Drive.Permissions.Delete =
@@ -138,7 +139,7 @@ internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProv
             .permissions()
             .update(fileId, permissionId, permission)
             .apply {
-                this.fields = "*"
+                this.fields = ALL_FIELDS
                 this.transferOwnership = transferOwnership
             }
 
@@ -154,7 +155,7 @@ internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProv
             .permissions()
             .create(fileId, permission)
             .apply {
-                this.fields = "*"
+                this.fields = ALL_FIELDS
                 this.sendNotificationEmail = sendNotificationEmail
                 this.emailMessage = emailMessage
                 this.transferOwnership = transferOwnership

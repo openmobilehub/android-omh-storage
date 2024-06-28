@@ -16,15 +16,23 @@
 
 package com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles
 
-import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhPermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.utils.fromRFC3339StringToDate
 
-const val TEST_VERSION_FILE_ID = "123"
-const val TEST_VERSION_ID = "456"
-val TEST_VERSION_FILE_MODIFIED_TIME = TEST_FIRST_MAY_2024_RFC_3339.fromRFC3339StringToDate()!!
+const val TEST_PERMISSION_ID = "123"
+const val TEST_PERMISSION_DISPLAY_NAME = "Tester"
+const val TEST_PERMISSION_EMAIL_ADDRESS = "test@test.com"
+val TEST_PERMISSION_EXPIRATION_TIME = TEST_FIRST_MAY_2024_RFC_3339.fromRFC3339StringToDate()
+const val TEST_PERMISSION_PHOTO_LINK = "https://test.com/image"
 
-val testOmhVersion = OmhFileVersion(
-    TEST_VERSION_FILE_ID,
-    TEST_VERSION_ID,
-    TEST_VERSION_FILE_MODIFIED_TIME
+val testOmhPermission = OmhPermission.UserPermission(
+    TEST_PERMISSION_ID,
+    OmhPermissionRole.OWNER,
+    TEST_PERMISSION_DISPLAY_NAME,
+    TEST_PERMISSION_EMAIL_ADDRESS,
+    TEST_PERMISSION_EXPIRATION_TIME,
+    false,
+    TEST_PERMISSION_PHOTO_LINK,
+    null
 )

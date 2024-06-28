@@ -29,10 +29,17 @@ import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.extension.isFolder
 import java.util.Date
 
-private const val USER_TYPE = "user"
-private const val GROUP_TYPE = "group"
-private const val DOMAIN_TYPE = "domain"
-private const val ANYONE_TYPE = "anyone"
+internal const val USER_TYPE = "user"
+internal const val GROUP_TYPE = "group"
+internal const val DOMAIN_TYPE = "domain"
+internal const val ANYONE_TYPE = "anyone"
+
+internal const val OWNER_ROLE = "owner"
+internal const val ORGANIZER_ROLE = "organizer"
+internal const val FILE_ORGANIZER_ROLE = "fileOrganizer"
+internal const val WRITER_ROLE = "writer"
+internal const val COMMENTER_ROLE = "commenter"
+internal const val READER_ROLE = "reader"
 
 @SuppressWarnings("ComplexCondition")
 internal fun File.toOmhStorageEntity(): OmhStorageEntity? {
@@ -143,22 +150,22 @@ internal fun Permission.toOmhPermission(): OmhPermission? {
 }
 
 internal fun String.stringToRole(): OmhPermissionRole? = when (this) {
-    "owner" -> OmhPermissionRole.OWNER
-    "organizer" -> OmhPermissionRole.ORGANIZER
-    "fileOrganizer" -> OmhPermissionRole.FILE_ORGANIZER
-    "writer" -> OmhPermissionRole.WRITER
-    "commenter" -> OmhPermissionRole.COMMENTER
-    "reader" -> OmhPermissionRole.READER
+    OWNER_ROLE -> OmhPermissionRole.OWNER
+    ORGANIZER_ROLE -> OmhPermissionRole.ORGANIZER
+    FILE_ORGANIZER_ROLE -> OmhPermissionRole.FILE_ORGANIZER
+    WRITER_ROLE -> OmhPermissionRole.WRITER
+    COMMENTER_ROLE -> OmhPermissionRole.COMMENTER
+    READER_ROLE -> OmhPermissionRole.READER
     else -> null
 }
 
 internal fun OmhPermissionRole.toStringRole(): String = when (this) {
-    OmhPermissionRole.OWNER -> "owner"
-    OmhPermissionRole.ORGANIZER -> "organizer"
-    OmhPermissionRole.FILE_ORGANIZER -> "fileOrganizer"
-    OmhPermissionRole.WRITER -> "writer"
-    OmhPermissionRole.COMMENTER -> "commenter"
-    OmhPermissionRole.READER -> "reader"
+    OmhPermissionRole.OWNER -> OWNER_ROLE
+    OmhPermissionRole.ORGANIZER -> ORGANIZER_ROLE
+    OmhPermissionRole.FILE_ORGANIZER -> FILE_ORGANIZER_ROLE
+    OmhPermissionRole.WRITER -> WRITER_ROLE
+    OmhPermissionRole.COMMENTER -> COMMENTER_ROLE
+    OmhPermissionRole.READER -> READER_ROLE
 }
 
 internal fun OmhPermissionRole.toPermission(): Permission {

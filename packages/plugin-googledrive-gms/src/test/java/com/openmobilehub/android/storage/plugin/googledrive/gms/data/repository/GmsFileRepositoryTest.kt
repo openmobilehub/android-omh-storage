@@ -21,6 +21,8 @@ package com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository
 import android.webkit.MimeTypeMap
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.model.FileList
+import com.google.api.services.drive.model.Permission
+import com.google.api.services.drive.model.PermissionList
 import com.google.api.services.drive.model.Revision
 import com.google.api.services.drive.model.RevisionList
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
@@ -28,10 +30,12 @@ import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_FILE_MIME_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_FILE_NAME
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_FILE_PARENT_ID
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_PERMISSION_ID
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_VERSION_FILE_ID
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_VERSION_ID
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.setUpMock
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.testOmhFile
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.testOmhPermission
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.testOmhVersion
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.service.GoogleDriveApiService
 import io.mockk.MockKAnnotations
@@ -96,6 +100,18 @@ internal class GmsFileRepositoryTest {
     @MockK(relaxed = true)
     private lateinit var driveRevisionsListRequest: Drive.Revisions.List
 
+    @MockK(relaxed = true)
+    private lateinit var drivePermissionsDeleteRequest: Drive.Permissions.Delete
+
+    @MockK(relaxed = true)
+    private lateinit var drivePermissionsListRequest: Drive.Permissions.List
+
+    @MockK(relaxed = true)
+    private lateinit var permissionList: PermissionList
+
+    @MockK(relaxed = true)
+    private lateinit var permission: Permission
+
     private lateinit var fileRepositoryImpl: GmsFileRepository
 
     @Before
@@ -104,6 +120,7 @@ internal class GmsFileRepositoryTest {
         fileRepositoryImpl = GmsFileRepository(apiService)
         googleDriveFile.setUpMock()
         googleDriveRevision.setUpMock()
+        permission.setUpMock()
 
         mockkStatic(MimeTypeMap::class)
         every { MimeTypeMap.getSingleton() } returns mimeTypeMap
@@ -244,5 +261,34 @@ internal class GmsFileRepositoryTest {
 
             assertEquals(OmhStorageMetadata(testOmhFile, googleDriveFile), result)
             verify { apiService.getFileMetadata(TEST_FILE_ID) }
+        }
+
+    @Test
+    fun `given a fileId and permissionId, when deletePermission is success, then true is returned`() =
+        runTest {
+            every {
+                apiService.deletePermission(
+                    TEST_FILE_ID,
+                    TEST_PERMISSION_ID
+                )
+            } returns drivePermissionsDeleteRequest
+
+            val result = fileRepositoryImpl.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
+
+            assertTrue(result)
+            verify { apiService.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID) }
+        }
+
+    @Test
+    fun `given a fileId, when getPermission is success, then a list of OmhPermissions is returned`() =
+        runTest {
+            every { permissionList.permissions } returns listOf(permission)
+            every { drivePermissionsListRequest.execute() } returns permissionList
+            every { apiService.getPermission(TEST_FILE_ID) } returns drivePermissionsListRequest
+
+            val result = fileRepositoryImpl.getFilePermissions(TEST_FILE_ID)
+
+            assertEquals(listOf(testOmhPermission), result)
+            verify { apiService.getPermission(TEST_FILE_ID) }
         }
 }
