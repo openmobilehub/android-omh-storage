@@ -18,6 +18,7 @@
 
 package com.openmobilehub.android.storage.plugin.dropbox.data.service
 
+import com.dropbox.core.v2.files.DeleteResult
 import com.dropbox.core.v2.files.FileMetadata
 import com.dropbox.core.v2.files.ListFolderResult
 import com.dropbox.core.v2.files.ListRevisionsResult
@@ -43,6 +44,9 @@ class DropboxApiServiceTest {
 
     @MockK
     private lateinit var listRevisionsResult: ListRevisionsResult
+
+    @MockK
+    private lateinit var deleteResult: DeleteResult
 
     @MockK
     private lateinit var apiClient: DropboxApiClient
@@ -141,5 +145,19 @@ class DropboxApiServiceTest {
 
         // Assert
         assertEquals(metadata, result)
+    }
+
+    @Test
+    fun `given api client return DeleteResult, when deleting the file, then return DeleteResult`() {
+        // Arrange
+        every {
+            apiClient.dropboxApiService.files().deleteV2(any())
+        } returns deleteResult
+
+        // Act
+        val result = apiService.deleteFile(TEST_FILE_ID)
+
+        // Assert
+        assertEquals(deleteResult, result)
     }
 }
