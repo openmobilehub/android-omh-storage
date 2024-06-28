@@ -26,6 +26,7 @@ import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
+import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.MetadataToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.dropbox.data.repository.DropboxFileRepository
 import com.openmobilehub.android.storage.plugin.dropbox.data.service.DropboxApiClient
@@ -78,13 +79,14 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
     }
 
     override suspend fun deleteFile(id: String): Boolean {
-        // To be implemented
-        return true
+        return repository.deleteFile(id)
     }
 
     override suspend fun permanentlyDeleteFile(id: String): Boolean {
-        // To be implemented
-        return false
+        throw OmhStorageException.NotSupportedException(
+            OmhStorageStatusCodes.NOT_SUPPORTED_ERROR,
+            null
+        )
     }
 
     override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity? {
@@ -96,7 +98,10 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         return repository.downloadFile(fileId)
     }
 
-    override suspend fun updateFile(localFileToUpload: File, fileId: String): OmhStorageEntity.OmhFile? {
+    override suspend fun updateFile(
+        localFileToUpload: File,
+        fileId: String
+    ): OmhStorageEntity.OmhFile? {
         // To be implemented
         return null
     }
