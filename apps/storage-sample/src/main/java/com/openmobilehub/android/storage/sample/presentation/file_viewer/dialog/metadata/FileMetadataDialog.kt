@@ -21,22 +21,31 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.microsoft.graph.models.DriveItem
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
+import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.core.utils.toRFC3339String
+import com.openmobilehub.android.storage.plugin.onedrive.data.util.serializeToString
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.DialogFileMetadataBinding
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.FileViewerViewModel
-import com.openmobilehub.android.storage.sample.util.isFile
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.metadata.model.FileMetadataViewModel
 import com.openmobilehub.android.storage.sample.util.isFolder
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.Date
+import kotlinx.coroutines.launch
+import com.google.api.services.drive.model.File as GoogleDriveFile
+
 
 @AndroidEntryPoint
 class FileMetadataDialog : BottomSheetDialogFragment() {
 
     private lateinit var binding: DialogFileMetadataBinding
-    private val viewModel: FileViewerViewModel by viewModels({ requireParentFragment() })
+    private val parentViewModel: FileViewerViewModel by viewModels({ requireParentFragment() })
+    private val viewModel: FileMetadataViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,40 +63,103 @@ class FileMetadataDialog : BottomSheetDialogFragment() {
     }
 
     private fun setupBinding() = with(binding) {
-        val file = requireNotNull(viewModel.lastFileClicked)
+        header.title.text = resources.getString(R.string.text_metadata)
 
-        val mimeType: String?
-        val extension: String?
-        val size: Int?
-
-        when (file) {
-            is OmhStorageEntity.OmhFile -> {
-                mimeType = file.mimeType
-                extension = file.extension
-                size = file.size
+        checkboxShowOriginalMetadata.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                viewModel.showOriginalMetadata()
+            } else {
+                viewModel.hideOriginalMetadata()
             }
-            else -> {
-                mimeType = null
-                extension = null
-                size = null
+        }
+    }
+
+    private fun buildLoadingState() = with(binding) {
+        progressBar.visibility = View.VISIBLE
+        metadataRows.visibility = View.GONE
+    }
+
+    private fun buildLoadedState(metadata: OmhStorageMetadata, originalMetadataShown: Boolean) =
+        with(binding) {
+            progressBar.visibility = View.GONE
+            metadataRows.visibility = View.VISIBLE
+            extraMetadataScrollView.visibility =
+                if (originalMetadataShown) View.VISIBLE else View.GONE
+
+            val file = metadata.entity
+            val originalMetadata = metadata.originalMetadata
+
+            val mimeType: String?
+            val extension: String?
+            val size: Int?
+
+            when (file) {
+                is OmhStorageEntity.OmhFile -> {
+                    mimeType = file.mimeType
+                    extension = file.extension
+                    size = file.size
+                }
+
+                else -> {
+                    mimeType = null
+                    extension = null
+                    size = null
+                }
+            }
+
+            header.fileName.text = getString(R.string.file_name, file.name)
+
+            fileId.label.text = getString(R.string.file_id, file.id)
+            fileCreatedTime.label.text =
+                getString(R.string.file_created_time, file.createdTime?.toRFC3339String())
+            fileModifiedTime.label.text =
+                getString(R.string.file_modified_time, file.modifiedTime?.toRFC3339String())
+            fileParentId.label.text = getString(R.string.file_parent_id, file.parentId)
+            fileMimeType.label.text = getString(R.string.file_mime_type, mimeType)
+            fileExtension.label.text = getString(R.string.file_extension, extension)
+            fileSize.label.text = getString(R.string.file_size, size.toString())
+
+            when (originalMetadata) {
+                is GoogleDriveFile -> { // Google Drive GMS
+                    extraMetadata.label.text = originalMetadata.toString()
+                }
+
+                is String -> { // Google Drive Non-GMS
+                    extraMetadata.label.text = originalMetadata
+                }
+
+                is DriveItem -> { // OneDrive
+                    extraMetadata.label.text = originalMetadata.serializeToString()
+                }
+            }
+
+            if (file.isFolder()) {
+                fileMimeType.label.visibility = View.GONE
+                fileExtension.label.visibility = View.GONE
+                fileSize.label.visibility = View.GONE
             }
         }
 
-        header.title.text = resources.getString(R.string.text_metadata)
-        header.fileName.text = getString(R.string.file_name, file.name)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        fileId.label.text = getString(R.string.file_id, file.id)
-        fileCreatedTime.label.text = getString(R.string.file_created_time, file.createdTime?.toRFC3339String())
-        fileModifiedTime.label.text = getString(R.string.file_modified_time, file.modifiedTime?.toRFC3339String())
-        fileParentId.label.text = getString(R.string.file_parent_id, file.parentId)
-        fileMimeType.label.text = getString(R.string.file_mime_type, mimeType)
-        fileExtension.label.text = getString(R.string.file_extension, extension)
-        fileSize.label.text = getString(R.string.file_size, size.toString())
+        val file = requireNotNull(parentViewModel.lastFileClicked)
 
-        if (file.isFolder()) {
-            fileMimeType.label.visibility = View.GONE
-            fileExtension.label.visibility = View.GONE
-            fileSize.label.visibility = View.GONE
+
+        viewModel.getFileMetadata(file.id)
+
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.state.collect {
+                    if (it.isLoading) {
+                        buildLoadingState()
+                    }
+
+                    if (it.metadata != null) {
+                        buildLoadedState(it.metadata, it.isOriginalMetadataShown)
+                    }
+                }
+            }
         }
     }
 }

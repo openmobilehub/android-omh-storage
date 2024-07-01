@@ -41,7 +41,7 @@ dependencies {
     implementation(Libs.googleAndroidApiClient) {
         exclude("org.apache.httpcomponents")
     }
-    implementation(Libs.googleDrive) {
+    api(Libs.googleDrive) {
         exclude("org.apache.httpcomponents")
     }
     implementation(Libs.avoidGuavaConflict)
