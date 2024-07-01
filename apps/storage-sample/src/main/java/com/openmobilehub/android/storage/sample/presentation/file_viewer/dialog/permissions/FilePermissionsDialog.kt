@@ -16,6 +16,10 @@
 
 package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context.CLIPBOARD_SERVICE
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -82,6 +86,10 @@ class FilePermissionsDialog : BottomSheetDialogFragment(), FilePermissionAdapter
         binding.add.setOnClickListener {
             showCreateView()
         }
+
+        binding.getUrl.setOnClickListener {
+            permissionsViewModel.getShareUrl()
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -116,6 +124,8 @@ class FilePermissionsDialog : BottomSheetDialogFragment(), FilePermissionAdapter
                 action.message,
                 action.title
             )
+
+            is FilePermissionsViewAction.CopyUrlToClipboard -> copyUrlToClipboard(action.shareUrl)
         }
     }
 
@@ -137,5 +147,19 @@ class FilePermissionsDialog : BottomSheetDialogFragment(), FilePermissionAdapter
         CreatePermissionDialog().show(
             childFragmentManager, CreatePermissionDialog.TAG
         )
+    }
+
+    private fun copyUrlToClipboard(url: String) {
+        val clipboardManager =
+            requireContext().getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+
+        clipboardManager.setPrimaryClip(
+            ClipData.newPlainText(
+                getString(R.string.permission_url_to_file),
+                url
+            )
+        )
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2)
+            displayToast(R.string.permission_url_copied)
     }
 }

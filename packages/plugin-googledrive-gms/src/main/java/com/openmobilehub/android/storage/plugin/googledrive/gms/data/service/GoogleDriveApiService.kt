@@ -29,6 +29,7 @@ internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProv
             "id,name,createdTime,modifiedTime,parents,mimeType,fileExtension,size"
         private const val FIELDS_VALUE = "files($QUERY_REQUESTED_FIELDS)"
         private const val ALL_FIELDS = "*"
+        private const val SHARE_URL_LINK = "webViewLink"
     }
 
     fun getFilesList(parentId: String): Drive.Files.List = apiProvider
@@ -100,13 +101,14 @@ internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProv
             fields = QUERY_REQUESTED_FIELDS
         }
 
-    fun updateFile(fileId: String, file: File, mediaContent: FileContent?): Drive.Files.Update = apiProvider
-        .googleDriveApiService
-        .files()
-        .update(fileId, file, mediaContent)
-        .apply {
-            fields = QUERY_REQUESTED_FIELDS
-        }
+    fun updateFile(fileId: String, file: File, mediaContent: FileContent?): Drive.Files.Update =
+        apiProvider
+            .googleDriveApiService
+            .files()
+            .update(fileId, file, mediaContent)
+            .apply {
+                fields = QUERY_REQUESTED_FIELDS
+            }
 
     fun getFileRevisions(fileId: String): Drive.Revisions.List =
         apiProvider.googleDriveApiService.revisions().list(fileId)
@@ -160,4 +162,12 @@ internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProv
                 this.emailMessage = emailMessage
                 this.transferOwnership = transferOwnership
             }
+
+    fun getShareUrl(fileId: String): Drive.Files.Get = apiProvider
+        .googleDriveApiService
+        .files()
+        .get(fileId)
+        .apply {
+            fields = SHARE_URL_LINK
+        }
 }

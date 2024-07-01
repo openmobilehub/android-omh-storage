@@ -93,6 +93,11 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         return repository.downloadFile(fileId)
     }
 
+    override suspend fun getShareUrl(fileId: String): String? {
+        // To be implemented
+        return null
+    }
+
     override suspend fun updateFile(
         localFileToUpload: File,
         fileId: String

@@ -106,7 +106,7 @@ class FilePermissionsViewModel @Inject constructor(
         sendNotificationEmail: Boolean,
         emailMessage: String?
     ) = viewModelScope.launch(Dispatchers.IO) {
-        @Suppress("SwallowedException", "TooGenericExceptionCaught")
+        @Suppress("SwallowedException")
         try {
             omhStorageClient.createPermission(
                 fileId,
@@ -115,6 +115,20 @@ class FilePermissionsViewModel @Inject constructor(
                 emailMessage
             )
             _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_created))
+        } catch (exception: OmhStorageException.ApiException) {
+            showErrorDialog(R.string.permission_create_error, exception)
+        }
+        getPermissions()
+    }
+
+    fun getShareUrl() = viewModelScope.launch(Dispatchers.IO) {
+        @Suppress("SwallowedException")
+        try {
+            val shareUrl = omhStorageClient.getShareUrl(fileId) ?: run {
+                _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_no_url))
+                return@launch
+            }
+            _action.send(FilePermissionsViewAction.CopyUrlToClipboard(shareUrl))
         } catch (exception: OmhStorageException.ApiException) {
             showErrorDialog(R.string.permission_create_error, exception)
         }

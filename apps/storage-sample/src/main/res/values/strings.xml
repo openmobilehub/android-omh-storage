@@ -64,6 +64,10 @@
     <string name="permission_label_pending_owner">Pending owner</string>
     <string name="permission_label_domain">Domain</string>
     <string name="permission_add">Add permission</string>
+    <string name="permission_get_url">Get URL</string>
+    <string name="permission_no_url">There is no URL</string>
+    <string name="permission_url_copied">URL copied to clipboard</string>
+    <string name="permission_url_to_file">URL to file</string>
     <string name="permission_removed">Permission removed</string>
     <string name="permission_remove_error">Couldn\'t remove permission</string>
     <string name="permission_updated">Permission updated</string>

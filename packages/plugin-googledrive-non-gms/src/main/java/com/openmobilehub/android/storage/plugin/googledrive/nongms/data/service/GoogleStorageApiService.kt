@@ -67,6 +67,7 @@ internal interface GoogleStorageApiService {
         private const val FIELDS_VALUE = "files($QUERY_REQUESTED_FIELDS)"
         private const val QUERY_REQUESTED_FIELDS_ALL = "*"
         private const val QUERY_PERMISSIONS = "permissions"
+        private const val QUERY_SHARE_URL_LINK = "webViewLink"
 
         private const val FILE_ID = "fileId"
         private const val REVISION_ID = "revisionId"
@@ -174,5 +175,11 @@ internal interface GoogleStorageApiService {
         @Query(QUERY_SEND_NOTIFICATION_EMAIL) sendNotificationEmail: Boolean? = false,
         @Query(QUERY_EMAIL_MESSAGE) emailMessage: String? = null,
         @Query(QUERY_FIELDS) fields: String = QUERY_REQUESTED_FIELDS_ALL,
+    ): Response<PermissionResponse>
+
+    @GET("$FILES_PARTICLE/{$FILE_ID}")
+    suspend fun getShareUrl(
+        @Path(FILE_ID) fileId: String,
+        @Query(QUERY_FIELDS) fields: String = QUERY_SHARE_URL_LINK,
     ): Response<PermissionResponse>
 }

@@ -348,4 +348,17 @@ internal class NonGmsFileRepository(
             throw response.toApiException()
         }
     }
+
+    @Suppress("SwallowedException")
+    suspend fun getShareUrl(fileId: String): String? {
+        val response = retrofitImpl
+            .getGoogleStorageApiService()
+            .getShareUrl(fileId = fileId)
+
+        return if (response.isSuccessful) {
+            response.body()?.webViewLink
+        } else {
+            throw response.toApiException()
+        }
+    }
 }

@@ -32,5 +32,6 @@ internal data class PermissionResponse(
     @JsonProperty("photoLink") val photoLink: String?,
     @JsonProperty("deleted") val deleted: Boolean?,
     @JsonProperty("pendingOwner") val pendingOwner: Boolean?,
-    @JsonProperty("expirationTime") val expirationTime: String?
+    @JsonProperty("expirationTime") val expirationTime: String?,
+    @JsonProperty("webViewLink") val webViewLink: String?
 )

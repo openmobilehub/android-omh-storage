@@ -61,7 +61,7 @@ class StorageModule {
         omhAuthClient: OmhAuthClient
     ): OmhStorageClient {
         return OmhStorageProvider.Builder()
-            .addGmsPath(GoogleDriveNonGmsConstants.IMPLEMENTATION_PATH)
+            .addGmsPath(GoogleDriveGmsConstants.IMPLEMENTATION_PATH)
             .addNonGmsPath(GoogleDriveNonGmsConstants.IMPLEMENTATION_PATH)
             .build()
             .provideStorageClient(omhAuthClient, context)

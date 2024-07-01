@@ -148,4 +148,9 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
         // To be implemented
         return OmhPermission.AnyonePermission("", OmhPermissionRole.READER)
     }
+
+    override suspend fun getShareUrl(fileId: String): String? {
+        // To be implemented
+        return null
+    }
 }

@@ -224,4 +224,15 @@ abstract class OmhStorageClient protected constructor(
         sendNotificationEmail: Boolean,
         emailMessage: String?
     ): OmhPermission
+
+    /**
+     * This method update permission role in a given file
+     *
+     * @param fileId The id of the file you want to get the share URL for
+     *
+     * @return URL or null for none
+     */
+    abstract suspend fun getShareUrl(
+        fileId: String,
+    ): String?
 }
