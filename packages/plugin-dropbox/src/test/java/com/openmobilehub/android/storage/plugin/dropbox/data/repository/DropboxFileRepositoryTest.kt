@@ -22,6 +22,8 @@ import com.dropbox.core.v2.files.DeleteResult
 import com.dropbox.core.v2.files.FileMetadata
 import com.dropbox.core.v2.files.ListFolderResult
 import com.dropbox.core.v2.files.ListRevisionsResult
+import com.dropbox.core.v2.files.SearchMatchV2
+import com.dropbox.core.v2.files.SearchV2Result
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.utils.toInputStream
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.MetadataToOmhStorageEntity
@@ -61,6 +63,9 @@ class DropboxFileRepositoryTest {
     private lateinit var deleteResult: DeleteResult
 
     @MockK
+    lateinit var searchResult: SearchV2Result
+
+    @MockK
     private lateinit var apiService: DropboxApiService
 
     @MockK
@@ -71,6 +76,9 @@ class DropboxFileRepositoryTest {
 
     @MockK
     private lateinit var fileMetadata: FileMetadata
+
+    @MockK
+    private lateinit var searchMatch: SearchMatchV2
 
     private lateinit var repository: DropboxFileRepository
 
@@ -197,5 +205,21 @@ class DropboxFileRepositoryTest {
 
         // Assert
         assertEquals(true, result)
+    }
+
+    @Test
+    fun `given an apiService returns a non-empty list, when searching the files, then return a non-empty list`() {
+        // Arrange
+        every { apiService.search(any()) } returns searchResult
+        every { searchResult.matches } returns listOf(searchMatch)
+        every { searchMatch.metadata.metadataValue } returns fileMetadata
+
+        every { metadataToOmhStorageEntity(any()) } returns omhStorageEntity
+
+        // Act
+        val result = repository.search("test")
+
+        // Assert
+        assertEquals(listOf(omhStorageEntity), result)
     }
 }
