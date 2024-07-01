@@ -19,14 +19,14 @@ package com.openmobilehub.android.storage.plugin.onedrive
 import android.webkit.MimeTypeMap
 import androidx.annotation.VisibleForTesting
 import com.openmobilehub.android.auth.core.OmhAuthClient
-import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 import com.openmobilehub.android.storage.core.OmhStorageClient
-import com.openmobilehub.android.storage.core.model.OmhFilePermission
+import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhPermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
-import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.onedrive.data.repository.OneDriveFileRepository
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiClient
@@ -45,9 +45,7 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
 
         override fun build(authClient: OmhAuthClient): OmhStorageClient {
             val accessToken = authClient.getCredentials().accessToken
-                ?: throw OmhStorageException.InvalidCredentialsException(
-                    OmhAuthStatusCodes.SIGN_IN_FAILED
-                )
+                ?: throw OmhStorageException.InvalidCredentialsException()
 
             val authProvider = OneDriveAuthProvider(accessToken)
             val apiClient = OneDriveApiClient.getInstance(authProvider)
@@ -86,10 +84,7 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
     }
 
     override suspend fun permanentlyDeleteFile(id: String): Boolean {
-        throw OmhStorageException.NotSupportedException(
-            OmhStorageStatusCodes.NOT_SUPPORTED_ERROR,
-            null
-        )
+        throw OmhStorageException.NotSupportedException()
     }
 
     override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity? {
@@ -101,7 +96,10 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
         return repository.downloadFile(fileId)
     }
 
-    override suspend fun updateFile(localFileToUpload: File, fileId: String): OmhStorageEntity.OmhFile? {
+    override suspend fun updateFile(
+        localFileToUpload: File,
+        fileId: String
+    ): OmhStorageEntity.OmhFile? {
         // To be implemented
         return null
     }
@@ -117,7 +115,7 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
         return repository.downloadFileVersion(fileId, versionId)
     }
 
-    override suspend fun getFilePermissions(fileId: String): List<OmhFilePermission> {
+    override suspend fun getFilePermissions(fileId: String): List<OmhPermission> {
         // To be implemented
         return emptyList()
     }
@@ -125,5 +123,34 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
     override suspend fun getFileMetadata(fileId: String): OmhStorageMetadata {
         // To be implemented
         return OmhStorageMetadata(OmhStorageEntity.OmhFile("", "", null, null, null, null, null, null), Any())
+    }
+
+    override suspend fun deletePermission(fileId: String, permissionId: String): Boolean {
+        // To be implemented
+        return true
+    }
+
+    override suspend fun updatePermission(
+        fileId: String,
+        permissionId: String,
+        role: OmhPermissionRole
+    ): OmhPermission {
+        // To be implemented
+        return OmhPermission.AnyonePermission("", OmhPermissionRole.READER)
+    }
+
+    override suspend fun createPermission(
+        fileId: String,
+        permission: OmhCreatePermission,
+        sendNotificationEmail: Boolean,
+        emailMessage: String?
+    ): OmhPermission {
+        // To be implemented
+        return OmhPermission.AnyonePermission("", OmhPermissionRole.READER)
+    }
+
+    override suspend fun getWebUrl(fileId: String): String? {
+        // To be implemented
+        return null
     }
 }

@@ -22,7 +22,6 @@ import com.microsoft.graph.models.DriveItem
 import com.microsoft.graph.models.DriveItemUploadableProperties
 import com.microsoft.graph.models.DriveItemVersionCollectionResponse
 import com.openmobilehub.android.storage.core.model.OmhStorageException
-import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
 import com.openmobilehub.android.storage.core.utils.toInputStream
 import java.io.File
 import java.io.InputStream
@@ -30,13 +29,16 @@ import java.io.InputStream
 class OneDriveApiService(private val apiClient: OneDriveApiClient) {
     private val driveId by lazy { retrieveDriveId() }
 
-    @Suppress("TooGenericExceptionCaught", "SwallowedException")
+    @Suppress("TooGenericExceptionCaught")
     @VisibleForTesting
     internal fun retrieveDriveId(): String {
         try {
             return apiClient.graphServiceClient.me().drive().get().id
-        } catch (e: Exception) {
-            throw OmhStorageException.ApiException(OmhStorageStatusCodes.GET_DRIVE_ID_ERROR)
+        } catch (exception: Exception) {
+            throw OmhStorageException.ApiException(
+                message = "Couldn't get drive id",
+                cause = exception
+            )
         }
     }
 

@@ -14,14 +14,33 @@
  * limitations under the License.
  */
 
+@file:Suppress("TooManyFunctions")
+
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper
 
+import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhPermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.utils.fromRFC3339StringToDate
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.ANYONE_TYPE
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.COMMENTER_ROLE
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.DOMAIN_TYPE
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.FILE_ORGANIZER_ROLE
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.FOLDER_MIME_TYPE
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.GROUP_TYPE
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.ORGANIZER_ROLE
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.OWNER_ROLE
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.READER_ROLE
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.USER_TYPE
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.WRITER_ROLE
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body.CreatePermissionRequestBody
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body.UpdatePermissionRequestBody
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileListRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileRemoteResponse
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.PermissionResponse
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.PermissionsListResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.RevisionListRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.RevisionRemoteResponse
 
@@ -84,3 +103,112 @@ internal fun RevisionListRemoteResponse.toOmhFileVersions(fileId: String): List<
         .orEmpty()
 
 internal fun isFolder(mimeType: String) = mimeType == FOLDER_MIME_TYPE
+
+internal fun PermissionResponse.toPermission(): OmhPermission? {
+    val omhRole = role?.stringToRole()
+
+    if (id == null || type == null || omhRole == null) {
+        return null
+    }
+
+    val displayName = displayName.orEmpty()
+    val emailAddress = emailAddress.orEmpty()
+    val expirationTime = expirationTime?.fromRFC3339StringToDate()
+
+    return when (type) {
+        USER_TYPE -> {
+            OmhPermission.UserPermission(
+                id,
+                omhRole,
+                displayName,
+                emailAddress,
+                expirationTime,
+                deleted,
+                photoLink,
+                pendingOwner
+            )
+        }
+
+        GROUP_TYPE -> {
+            OmhPermission.GroupPermission(
+                id,
+                omhRole,
+                displayName,
+                emailAddress,
+                expirationTime,
+                deleted,
+            )
+        }
+
+        DOMAIN_TYPE -> {
+            OmhPermission.DomainPermission(
+                id,
+                omhRole,
+                displayName,
+                domain.orEmpty()
+            )
+        }
+
+        ANYONE_TYPE -> {
+            OmhPermission.AnyonePermission(
+                id,
+                omhRole,
+            )
+        }
+
+        else -> null
+    }
+}
+
+internal fun String.stringToRole(): OmhPermissionRole? = when (this) {
+    OWNER_ROLE -> OmhPermissionRole.OWNER
+    ORGANIZER_ROLE -> OmhPermissionRole.ORGANIZER
+    FILE_ORGANIZER_ROLE -> OmhPermissionRole.FILE_ORGANIZER
+    WRITER_ROLE -> OmhPermissionRole.WRITER
+    COMMENTER_ROLE -> OmhPermissionRole.COMMENTER
+    READER_ROLE -> OmhPermissionRole.READER
+    else -> null
+}
+
+internal fun OmhPermissionRole.toStringRole(): String = when (this) {
+    OmhPermissionRole.OWNER -> OWNER_ROLE
+    OmhPermissionRole.ORGANIZER -> ORGANIZER_ROLE
+    OmhPermissionRole.FILE_ORGANIZER -> FILE_ORGANIZER_ROLE
+    OmhPermissionRole.WRITER -> WRITER_ROLE
+    OmhPermissionRole.COMMENTER -> COMMENTER_ROLE
+    OmhPermissionRole.READER -> READER_ROLE
+}
+
+internal fun PermissionsListResponse.toPermissions(): List<OmhPermission> =
+    permissions?.mapNotNull { permissionResponse -> permissionResponse.toPermission() }.orEmpty()
+
+internal fun OmhPermissionRole.toUpdateRequestBody(): UpdatePermissionRequestBody {
+    return UpdatePermissionRequestBody(this.toStringRole())
+}
+
+internal fun OmhCreatePermission.toCreateRequestBody(): CreatePermissionRequestBody = when (this) {
+    is OmhCreatePermission.AnyonePermission -> CreatePermissionRequestBody(
+        type = ANYONE_TYPE,
+        role = role.toStringRole(),
+        emailAddress = null,
+        domain = null
+    )
+    is OmhCreatePermission.DomainPermission -> CreatePermissionRequestBody(
+        type = DOMAIN_TYPE,
+        role = role.toStringRole(),
+        emailAddress = null,
+        domain = domain
+    )
+    is OmhCreatePermission.GroupPermission -> CreatePermissionRequestBody(
+        type = GROUP_TYPE,
+        role = role.toStringRole(),
+        emailAddress = emailAddress,
+        domain = null
+    )
+    is OmhCreatePermission.UserPermission -> CreatePermissionRequestBody(
+        type = USER_TYPE,
+        role = role.toStringRole(),
+        emailAddress = emailAddress,
+        domain = null
+    )
+}

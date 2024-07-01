@@ -19,14 +19,19 @@ package com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository
 import android.webkit.MimeTypeMap
 import com.google.api.client.http.FileContent
 import com.google.api.client.http.HttpResponseException
+import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhPermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
-import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.extension.toApiException
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhFileVersions
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhPermission
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhStorageEntities
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhStorageEntity
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toPermission
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.service.GoogleDriveApiService
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -48,7 +53,7 @@ internal class GmsFileRepository(
         return apiService.search(query).execute().toOmhStorageEntities()
     }
 
-    fun createFile(name: String, mimeType: String, parentId: String?): OmhStorageEntity {
+    fun createFile(name: String, mimeType: String, parentId: String?): OmhStorageEntity? {
         val fileToBeCreated = GoogleDriveFile().apply {
             this.name = name
             this.mimeType = mimeType
@@ -62,7 +67,7 @@ internal class GmsFileRepository(
         return responseFile.toOmhStorageEntity()
     }
 
-    @SuppressWarnings("TooGenericExceptionCaught", "SwallowedException")
+    @SuppressWarnings("SwallowedException")
     fun deleteFile(fileId: String): Boolean {
         val file = GoogleDriveFile().apply {
             trashed = true
@@ -70,7 +75,7 @@ internal class GmsFileRepository(
         return try {
             apiService.updateFile(fileId, file).execute()
             true
-        } catch (e: Exception) {
+        } catch (e: OmhStorageException.ApiException) {
             false
         }
     }
@@ -80,12 +85,12 @@ internal class GmsFileRepository(
         return try {
             apiService.deleteFile(fileId).execute()
             true
-        } catch (e: Exception) {
+        } catch (e: HttpResponseException) {
             false
         }
     }
 
-    fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity {
+    fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity? {
         val localMimeType = getStringMimeTypeFromLocalFile(localFileToUpload)
 
         val file = GoogleDriveFile().apply {
@@ -115,7 +120,7 @@ internal class GmsFileRepository(
         val outputStream = ByteArrayOutputStream()
 
         try {
-            apiService.downloadFile(fileId).executeMediaAndDownloadTo(outputStream)
+            apiService.getFile(fileId).executeMediaAndDownloadTo(outputStream)
         } catch (exception: HttpResponseException) {
             with(outputStream) {
                 flush()
@@ -123,10 +128,7 @@ internal class GmsFileRepository(
             }
 
             if (mimeType.isNullOrBlank()) {
-                throw OmhStorageException.DownloadException(
-                    OmhStorageStatusCodes.DOWNLOAD_ERROR,
-                    exception
-                )
+                throw exception.toApiException()
             }
 
             apiService
@@ -164,9 +166,90 @@ internal class GmsFileRepository(
         return outputStream
     }
 
-    fun getFileMetadata(fileId: String): OmhStorageMetadata {
+    fun getFileMetadata(fileId: String): OmhStorageMetadata? {
         val file = apiService.getFileMetadata(fileId).execute()
 
-        return OmhStorageMetadata(file.toOmhStorageEntity(), file)
+        return OmhStorageMetadata(file.toOmhStorageEntity() ?: return null, file)
+    }
+
+    fun getFilePermissions(fileId: String): List<OmhPermission> {
+        val file = apiService
+            .getPermission(fileId)
+            .execute()
+        val permissions = file
+            .permissions
+
+        return permissions?.mapNotNull { it.toOmhPermission() } ?: emptyList()
+    }
+
+    @Suppress("SwallowedException")
+    fun deletePermission(fileId: String, permissionId: String): Boolean {
+        return try {
+            apiService.deletePermission(fileId, permissionId).execute()
+            true
+        } catch (e: HttpResponseException) {
+            false
+        }
+    }
+
+    @Suppress("SwallowedException")
+    fun updatePermission(
+        fileId: String,
+        permissionId: String,
+        role: OmhPermissionRole
+    ): OmhPermission {
+        val transferOwnership = role == OmhPermissionRole.OWNER
+        return try {
+            val result =
+                apiService.updatePermission(
+                    fileId,
+                    permissionId,
+                    role.toPermission(),
+                    transferOwnership
+                ).execute()
+            result.toOmhPermission()
+                ?: throw OmhStorageException.ApiException(
+                    message = "Update succeeded but API failed to return expected permission"
+                )
+        } catch (exception: HttpResponseException) {
+            throw exception.toApiException()
+        }
+    }
+
+    @Suppress("SwallowedException")
+    fun createPermission(
+        fileId: String,
+        omhCreatePermission: OmhCreatePermission,
+        sendNotificationEmail: Boolean,
+        emailMessage: String?
+    ): OmhPermission {
+        val transferOwnership = omhCreatePermission.role == OmhPermissionRole.OWNER
+        val willSendNotificationEmail = sendNotificationEmail || transferOwnership
+        return try {
+            val result =
+                apiService.createPermission(
+                    fileId,
+                    omhCreatePermission.toPermission(),
+                    transferOwnership,
+                    willSendNotificationEmail,
+                    emailMessage
+                )
+                    .execute()
+            result.toOmhPermission()
+                ?: throw OmhStorageException.ApiException(
+                    message = "Create succeeded but API failed to return expected permission"
+                )
+        } catch (exception: HttpResponseException) {
+            throw exception.toApiException()
+        }
+    }
+
+    @Suppress("SwallowedException")
+    fun getWebUrl(fileId: String): String? {
+        return try {
+            apiService.getWebUrl(fileId).execute()?.webViewLink
+        } catch (exception: HttpResponseException) {
+            throw exception.toApiException()
+        }
     }
 }

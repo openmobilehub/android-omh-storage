@@ -21,11 +21,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.IdRes
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.navOptions
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.ErrorDialogViewBinding
 
@@ -33,7 +33,15 @@ fun View.displayToast(message: String?, duration: Int = Toast.LENGTH_LONG) {
     Toast.makeText(this.context, message, duration).show()
 }
 
+fun View.displayToast(@StringRes message: Int, duration: Int = Toast.LENGTH_LONG) {
+    Toast.makeText(this.context, message, duration).show()
+}
+
 fun Fragment.displayToast(message: String?, duration: Int = Toast.LENGTH_LONG) {
+    view?.displayToast(message, duration)
+}
+
+fun Fragment.displayToast(@StringRes message: Int, duration: Int = Toast.LENGTH_LONG) {
     view?.displayToast(message, duration)
 }
 
@@ -45,7 +53,11 @@ fun Fragment.navigateTo(@IdRes resId: Int, args: Bundle?, navOptions: NavOptions
     .findNavController(this)
     .navigate(resId, args, navOptions)
 
-fun View.displayErrorDialog(message: String, layoutInflater: LayoutInflater) {
+fun View.displayErrorDialog(
+    @StringRes title: Int,
+    message: String,
+    layoutInflater: LayoutInflater
+) {
     context?.let { context ->
         val errorDialogView = ErrorDialogViewBinding.inflate(layoutInflater)
         errorDialogView.textError.text = String.format(
@@ -54,7 +66,7 @@ fun View.displayErrorDialog(message: String, layoutInflater: LayoutInflater) {
         )
 
         val errorDialogBuilder = AlertDialog.Builder(context)
-            .setTitle(context.getString(R.string.error_dialog_title))
+            .setTitle(context.getString(title))
             .setPositiveButton(context.getString(R.string.error_dialog_ok)) { dialog, _ ->
                 dialog.dismiss()
             }
@@ -68,6 +80,9 @@ fun View.displayErrorDialog(message: String, layoutInflater: LayoutInflater) {
     }
 }
 
-fun Fragment.displayErrorDialog(message: String) {
-    view?.displayErrorDialog(message, layoutInflater)
+fun Fragment.displayErrorDialog(
+    message: String,
+    @StringRes title: Int = R.string.error_dialog_title,
+) {
+    view?.displayErrorDialog(title, message, layoutInflater)
 }

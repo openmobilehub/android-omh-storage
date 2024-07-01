@@ -17,9 +17,14 @@
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service
 
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body.CreateFileRequestBody
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body.CreatePermissionRequestBody
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body.UpdatePermissionRequestBody
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileListRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileRemoteResponse
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.PermissionResponse
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.PermissionsListResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.RevisionListRemoteResponse
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.WebUrlResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
@@ -45,6 +50,9 @@ internal interface GoogleStorageApiService {
         private const val QUERY_FIELDS = "fields"
         private const val QUERY_MIME_TYPE = "mimeType"
         private const val QUERY_ALT = "alt"
+        private const val QUERY_TRANSFER_OWNERSHIP = "transferOwnership"
+        private const val QUERY_SEND_NOTIFICATION_EMAIL = "sendNotificationEmail"
+        private const val QUERY_EMAIL_MESSAGE = "emailMessage"
 
         private const val PARENT_ID_Q_VALUE = "'%s' in parents and trashed = false"
         private const val SEARCH_BY_NAME_Q_VALUE = "name contains '%s' and trashed = false"
@@ -58,10 +66,14 @@ internal interface GoogleStorageApiService {
         internal const val QUERY_REQUESTED_FIELDS =
             "id,name,createdTime,modifiedTime,parents,mimeType,fileExtension,size"
         private const val FIELDS_VALUE = "files($QUERY_REQUESTED_FIELDS)"
+        private const val QUERY_REQUESTED_FIELDS_ALL = "*"
+        private const val QUERY_PERMISSIONS = "permissions"
+        private const val QUERY_WEB_URL = "webViewLink"
 
         private const val FILE_ID = "fileId"
         private const val REVISION_ID = "revisionId"
         private const val META_DATA = "metadata"
+        private const val PERMISSION_ID = "permissionId"
     }
 
     @GET(FILES_PARTICLE)
@@ -94,6 +106,12 @@ internal interface GoogleStorageApiService {
         @Path(FILE_ID) fileId: String,
         @Query(QUERY_ALT) alt: String
     ): Response<ResponseBody>
+
+    @GET("$FILES_PARTICLE/{$FILE_ID}")
+    suspend fun getPermissions(
+        @Path(FILE_ID) fileId: String,
+        @Query(QUERY_FIELDS) fields: String = QUERY_PERMISSIONS
+    ): Response<PermissionsListResponse>
 
     @GET("$FILES_PARTICLE/{$FILE_ID}/export")
     suspend fun exportDocEditor(
@@ -131,4 +149,38 @@ internal interface GoogleStorageApiService {
         @Path(FILE_ID) fileId: String,
         @Query(QUERY_FIELDS) fields: String = "*"
     ): Response<ResponseBody>
+
+    @DELETE("$FILES_PARTICLE/{$FILE_ID}/permissions/{$PERMISSION_ID}")
+    suspend fun deletePermission(
+        @Path(FILE_ID) fileId: String,
+        @Path(PERMISSION_ID) permissionId: String
+    ): Response<ResponseBody>
+
+    @Suppress("LongParameterList")
+    @PATCH("$FILES_PARTICLE/{$FILE_ID}/permissions/{$PERMISSION_ID}")
+    suspend fun updatePermission(
+        @Path(FILE_ID) fileId: String,
+        @Path(PERMISSION_ID) permissionId: String,
+        @Body body: UpdatePermissionRequestBody,
+        @Query(QUERY_TRANSFER_OWNERSHIP) transferOwnership: Boolean = false,
+        @Query(QUERY_SEND_NOTIFICATION_EMAIL) sendNotificationEmail: Boolean = false,
+        @Query(QUERY_FIELDS) fields: String = QUERY_REQUESTED_FIELDS_ALL,
+    ): Response<PermissionResponse>
+
+    @Suppress("LongParameterList")
+    @POST("$FILES_PARTICLE/{$FILE_ID}/permissions")
+    suspend fun createPermission(
+        @Path(FILE_ID) fileId: String,
+        @Body body: CreatePermissionRequestBody,
+        @Query(QUERY_TRANSFER_OWNERSHIP) transferOwnership: Boolean? = false,
+        @Query(QUERY_SEND_NOTIFICATION_EMAIL) sendNotificationEmail: Boolean? = false,
+        @Query(QUERY_EMAIL_MESSAGE) emailMessage: String? = null,
+        @Query(QUERY_FIELDS) fields: String = QUERY_REQUESTED_FIELDS_ALL,
+    ): Response<PermissionResponse>
+
+    @GET("$FILES_PARTICLE/{$FILE_ID}")
+    suspend fun getWebUrl(
+        @Path(FILE_ID) fileId: String,
+        @Query(QUERY_FIELDS) fields: String = QUERY_WEB_URL,
+    ): Response<WebUrlResponse>
 }

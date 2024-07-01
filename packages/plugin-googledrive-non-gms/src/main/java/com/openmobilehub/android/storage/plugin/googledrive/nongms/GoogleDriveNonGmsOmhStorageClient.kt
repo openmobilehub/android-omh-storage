@@ -18,10 +18,11 @@ package com.openmobilehub.android.storage.plugin.googledrive.nongms
 
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.auth.core.OmhCredentials
-import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 import com.openmobilehub.android.storage.core.OmhStorageClient
-import com.openmobilehub.android.storage.core.model.OmhFilePermission
+import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhPermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
@@ -40,7 +41,7 @@ internal class GoogleDriveNonGmsOmhStorageClient private constructor(
 
         override fun build(authClient: OmhAuthClient): OmhStorageClient {
             val omhCredentials = authClient.getCredentials() as? OmhCredentials
-                ?: throw OmhStorageException.InvalidCredentialsException(OmhAuthStatusCodes.SIGN_IN_FAILED)
+                ?: throw OmhStorageException.InvalidCredentialsException()
 
             val retrofitImpl = GoogleStorageApiServiceProvider.getInstance(omhCredentials)
 
@@ -85,7 +86,10 @@ internal class GoogleDriveNonGmsOmhStorageClient private constructor(
         return fileRepository.downloadFile(fileId, mimeType)
     }
 
-    override suspend fun updateFile(localFileToUpload: File, fileId: String): OmhStorageEntity.OmhFile? {
+    override suspend fun updateFile(
+        localFileToUpload: File,
+        fileId: String
+    ): OmhStorageEntity.OmhFile? {
         return fileRepository.updateFile(localFileToUpload, fileId)
     }
 
@@ -100,9 +104,33 @@ internal class GoogleDriveNonGmsOmhStorageClient private constructor(
         return fileRepository.downloadFileVersion(fileId, versionId)
     }
 
-    override suspend fun getFilePermissions(fileId: String): List<OmhFilePermission> {
-        // To be implemented
-        return emptyList()
+    override suspend fun getFilePermissions(fileId: String): List<OmhPermission> {
+        return fileRepository.getFilePermissions(fileId)
+    }
+
+    override suspend fun deletePermission(fileId: String, permissionId: String): Boolean {
+        return fileRepository.deletePermission(fileId, permissionId)
+    }
+
+    override suspend fun updatePermission(
+        fileId: String,
+        permissionId: String,
+        role: OmhPermissionRole
+    ): OmhPermission {
+        return fileRepository.updatePermission(fileId, permissionId, role)
+    }
+
+    override suspend fun createPermission(
+        fileId: String,
+        permission: OmhCreatePermission,
+        sendNotificationEmail: Boolean,
+        emailMessage: String?
+    ): OmhPermission {
+        return fileRepository.createPermission(fileId, permission, sendNotificationEmail, emailMessage)
+    }
+
+    override suspend fun getWebUrl(fileId: String): String? {
+        return fileRepository.getWebUrl(fileId)
     }
 
     override suspend fun getFileMetadata(fileId: String): OmhStorageMetadata {

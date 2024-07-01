@@ -6,6 +6,7 @@
     <string name="login_microsoft">Login with Microsoft</string>
     <string name="login_error">Login failed. Result code: %d</string>
     <string name="login_title">Login</string>
+
     <string name="file_viewer_title">File Viewer</string>
     <string name="loading">Loading…</string>
     <string name="empty_folder">This folder is empty</string>
@@ -24,6 +25,7 @@
     <string name="text_update_file_title">Update File</string>
     <string name="text_update">Update</string>
     <string name="text_cancel">Cancel</string>
+    <string name="text_create">Create</string>
     <string name="text_sign_out">Sign out</string>
     <string name="text_metadata">Metadata</string>
     <string name="text_permissions">Permissions</string>
@@ -34,6 +36,7 @@
     <string name="text_search_hint">Search by file name…</string>
     <string name="text_delete_dialog_title">Are you sure?</string>
     <string name="text_delete_dialog_message">This action cannot be undone. If you want to move file to trash, use regular delete.</string>
+
     <string name="error_dialog_title">Something went wrong</string>
     <string name="error_dialog_message">Error detail:\n\n%s</string>
     <string name="error_dialog_ok">OK</string>
@@ -45,4 +48,37 @@
     <string name="file_mime_type">Mime Type: %s</string>
     <string name="file_extension">Extension: %s</string>
     <string name="file_size">File Size: %s</string>
+
+    <string name="permission_type_user">User</string>
+    <string name="permission_type_group">Group</string>
+    <string name="permission_type_domain">Domain</string>
+    <string name="permission_type_anyone">Anyone</string>
+    <string name="permission_label_id">Id</string>
+    <string name="permission_label_display_name">Display name</string>
+    <string name="permission_label_type">Type</string>
+    <string name="permission_label_role">Role</string>
+    <string name="permission_label_user_photo">User photo</string>
+    <string name="permission_label_email">Email</string>
+    <string name="permission_label_expiration_time">Expiration time</string>
+    <string name="permission_label_deleted">User deleted</string>
+    <string name="permission_label_pending_owner">Pending owner</string>
+    <string name="permission_label_domain">Domain</string>
+    <string name="permission_add">Add permission</string>
+    <string name="permission_get_url">Get URL</string>
+    <string name="permission_no_url">There is no URL</string>
+    <string name="permission_url_copied">URL copied to clipboard</string>
+    <string name="permission_url_to_file">URL to file</string>
+    <string name="permission_url_error">Couldn\'t get url</string>
+    <string name="permission_removed">Permission removed</string>
+    <string name="permission_remove_error">Couldn\'t remove permission</string>
+    <string name="permission_updated">Permission updated</string>
+    <string name="permission_update_error">Couldn\'t update permission</string>
+    <string name="permission_created">Permission added</string>
+    <string name="permission_create_error">Couldn\'t add permission</string>
+    <string name="permission_role_required_error">Error: Role is required</string>
+    <string name="permission_label_message">Optional email message</string>
+    <string name="permission_label_send_notification_email">Send notification email</string>
+    <string name="permission_email_required_error">A valid email is required.</string>
+    <string name="permission_domain_required_error">Domain is required.</string>
+
 </resources>

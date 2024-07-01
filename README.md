@@ -54,7 +54,7 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 | File searching          | ✅               | ✅                   | ❌       | ✅      |
 | File metadata           | ✅               | ✅                   | ❌       | ❌      |
 | File versioning         | ✅               | ✅                   | ✅       | ✅      |
-| File sharing            | ❌               | ❌                   | ❌       | ❌      |
+| File permissions        | ✅               | ✅                   | ❌        | ❌       |
 
 ## Documentation
 
