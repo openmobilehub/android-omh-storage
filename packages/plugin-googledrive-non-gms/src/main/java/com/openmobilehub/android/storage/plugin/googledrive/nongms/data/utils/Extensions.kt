@@ -17,11 +17,14 @@
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils
 
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
+import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.core.utils.fromRFC3339StringToDate
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants
 import okhttp3.ResponseBody
 import org.json.JSONObject
+import retrofit2.HttpException
+import retrofit2.Response
 import java.io.ByteArrayOutputStream
 
 fun ResponseBody?.toByteArrayOutputStream(): ByteArrayOutputStream {
@@ -81,3 +84,6 @@ fun ResponseBody?.toOmhStorageEntityMetadata(): OmhStorageMetadata {
 
     return OmhStorageMetadata(omhStorageEntity, responseBody)
 }
+
+fun <T> Response<T>.toApiException(): OmhStorageException.ApiException =
+    OmhStorageException.ApiException(code(), errorBody()?.string(), HttpException(this))

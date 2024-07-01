@@ -19,14 +19,14 @@ package com.openmobilehub.android.storage.plugin.dropbox
 import android.webkit.MimeTypeMap
 import androidx.annotation.VisibleForTesting
 import com.openmobilehub.android.auth.core.OmhAuthClient
-import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 import com.openmobilehub.android.storage.core.OmhStorageClient
-import com.openmobilehub.android.storage.core.model.OmhFilePermission
+import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhPermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
-import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.MetadataToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.dropbox.data.repository.DropboxFileRepository
 import com.openmobilehub.android.storage.plugin.dropbox.data.service.DropboxApiClient
@@ -44,9 +44,7 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
 
         override fun build(authClient: OmhAuthClient): OmhStorageClient {
             val accessToken = authClient.getCredentials().accessToken
-                ?: throw OmhStorageException.InvalidCredentialsException(
-                    OmhAuthStatusCodes.SIGN_IN_FAILED
-                )
+                ?: throw OmhStorageException.InvalidCredentialsException()
 
             val client = DropboxApiClient.getInstance(accessToken)
             val apiService = DropboxApiService(client)
@@ -65,8 +63,7 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
     }
 
     override suspend fun search(query: String): List<OmhStorageEntity> {
-        // To be implemented
-        return emptyList()
+        return repository.search(query)
     }
 
     override suspend fun createFile(
@@ -83,10 +80,7 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
     }
 
     override suspend fun permanentlyDeleteFile(id: String): Boolean {
-        throw OmhStorageException.NotSupportedException(
-            OmhStorageStatusCodes.NOT_SUPPORTED_ERROR,
-            null
-        )
+        throw OmhStorageException.NotSupportedException()
     }
 
     override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity? {
@@ -96,6 +90,11 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
 
     override suspend fun downloadFile(fileId: String, mimeType: String?): ByteArrayOutputStream {
         return repository.downloadFile(fileId)
+    }
+
+    override suspend fun getWebUrl(fileId: String): String? {
+        // To be implemented
+        return null
     }
 
     override suspend fun updateFile(
@@ -117,7 +116,7 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         return repository.downloadFileVersion(versionId)
     }
 
-    override suspend fun getFilePermissions(fileId: String): List<OmhFilePermission> {
+    override suspend fun getFilePermissions(fileId: String): List<OmhPermission> {
         // To be implemented
         return emptyList()
     }
@@ -125,5 +124,29 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
     override suspend fun getFileMetadata(fileId: String): OmhStorageMetadata {
         // To be implemented
         return OmhStorageMetadata(OmhStorageEntity.OmhFile("", "", null, null, null, null, null, null), Any())
+    }
+
+    override suspend fun deletePermission(fileId: String, permissionId: String): Boolean {
+        // To be implemented
+        return true
+    }
+
+    override suspend fun createPermission(
+        fileId: String,
+        permission: OmhCreatePermission,
+        sendNotificationEmail: Boolean,
+        emailMessage: String?
+    ): OmhPermission {
+        // To be implemented
+        return OmhPermission.AnyonePermission("", OmhPermissionRole.READER)
+    }
+
+    override suspend fun updatePermission(
+        fileId: String,
+        permissionId: String,
+        role: OmhPermissionRole
+    ): OmhPermission {
+        // To be implemented
+        return OmhPermission.AnyonePermission("", OmhPermissionRole.READER)
     }
 }

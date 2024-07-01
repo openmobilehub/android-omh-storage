@@ -16,9 +16,10 @@
 
 package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model
 
-import com.openmobilehub.android.storage.core.model.OmhFilePermission
+import com.openmobilehub.android.storage.core.model.OmhPermission
 
 data class FilePermissionsViewState(
-    val permissions: List<OmhFilePermission>,
-    val isLoading: Boolean
+    val permissions: List<OmhPermission>,
+    val isLoading: Boolean,
+    val editedPermission: OmhPermission?
 )

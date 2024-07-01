@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.sample.presentation.file_viewer.model
+package com.openmobilehub.android.storage.sample.util
 
-sealed class FileViewerAction {
-    object ShowMoreOptions : FileViewerAction()
-    object ShowFilePermissions : FileViewerAction()
-    object ShowFileVersions : FileViewerAction()
-    object ShowFileMetadata : FileViewerAction()
+fun String?.isValidEmail(): Boolean {
+    if (isNullOrBlank()) {
+        return false
+    }
+    return android.util.Patterns.EMAIL_ADDRESS.matcher(this).matches()
 }

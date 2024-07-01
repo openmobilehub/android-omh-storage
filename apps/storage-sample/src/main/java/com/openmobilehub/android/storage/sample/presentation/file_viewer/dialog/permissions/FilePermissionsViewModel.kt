@@ -16,33 +16,148 @@
 
 package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.openmobilehub.android.storage.core.OmhStorageClient
+import com.openmobilehub.android.storage.core.model.OmhCreatePermission
+import com.openmobilehub.android.storage.core.model.OmhPermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRole
+import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.sample.R
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model.FilePermissionsViewAction
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model.FilePermissionsViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @HiltViewModel
 class FilePermissionsViewModel @Inject constructor(
     private val omhStorageClient: OmhStorageClient
 ) : ViewModel() {
-
     private val _state = MutableStateFlow(
         FilePermissionsViewState(
             isLoading = false,
-            permissions = emptyList()
+            permissions = emptyList(),
+            editedPermission = null
         )
     )
     val state: StateFlow<FilePermissionsViewState> = _state
+
+    private val _action = Channel<FilePermissionsViewAction>()
+    val action = _action.receiveAsFlow()
+
+    private lateinit var fileId: String
+
     fun getPermissions(fileId: String) {
-        viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true)
-            val permissions = omhStorageClient.getFilePermissions(fileId)
-            _state.value = _state.value.copy(permissions = permissions, isLoading = false)
+        this.fileId = fileId
+        getPermissions()
+    }
+
+    private fun getPermissions() = viewModelScope.launch(Dispatchers.IO) {
+        _state.value = _state.value.copy(isLoading = true)
+        val permissions = omhStorageClient
+            .getFilePermissions(fileId)
+            .sortedWith(compareBy({ it.orderByType() }, { it.orderRole() }))
+        _state.value = _state.value.copy(permissions = permissions, isLoading = false)
+    }
+
+    fun edit(permission: OmhPermission) = viewModelScope.launch {
+        _state.value = _state.value.copy(editedPermission = permission)
+        _action.send(FilePermissionsViewAction.ShowEditView)
+    }
+
+    fun saveEdits(selectedRole: OmhPermissionRole?) = viewModelScope.launch(Dispatchers.IO) {
+        val editedPermission = requireNotNull(_state.value.editedPermission)
+        if (selectedRole == null) {
+            _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_role_required_error))
+            return@launch
+        }
+
+        @Suppress("SwallowedException")
+        try {
+            omhStorageClient.updatePermission(fileId, editedPermission.id, selectedRole)
+            _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_updated))
+        } catch (exception: OmhStorageException.ApiException) {
+            showErrorDialog(R.string.permission_update_error, exception)
+        }
+
+        _state.value = _state.value.copy(editedPermission = null)
+        getPermissions()
+    }
+
+    fun remove(permission: OmhPermission) = viewModelScope.launch(Dispatchers.IO) {
+        val message = if (omhStorageClient.deletePermission(fileId, permission.id)) {
+            R.string.permission_removed
+        } else {
+            R.string.permission_remove_error
+        }
+        _action.send(FilePermissionsViewAction.ShowToast(message))
+        getPermissions()
+    }
+
+    fun create(
+        permission: OmhCreatePermission,
+        sendNotificationEmail: Boolean,
+        emailMessage: String?
+    ) = viewModelScope.launch(Dispatchers.IO) {
+        @Suppress("SwallowedException")
+        try {
+            omhStorageClient.createPermission(
+                fileId,
+                permission,
+                sendNotificationEmail,
+                emailMessage
+            )
+            _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_created))
+        } catch (exception: OmhStorageException.ApiException) {
+            showErrorDialog(R.string.permission_create_error, exception)
+        }
+        getPermissions()
+    }
+
+    fun getWebUrl() = viewModelScope.launch(Dispatchers.IO) {
+        @Suppress("SwallowedException")
+        try {
+            val webUrl = omhStorageClient.getWebUrl(fileId) ?: run {
+                _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_no_url))
+                return@launch
+            }
+            _action.send(FilePermissionsViewAction.CopyUrlToClipboard(webUrl))
+        } catch (exception: OmhStorageException.ApiException) {
+            showErrorDialog(R.string.permission_url_error, exception)
         }
     }
+
+    private suspend fun showErrorDialog(@StringRes title: Int, exception: OmhStorageException) {
+        _action.send(
+            FilePermissionsViewAction.ShowErrorDialog(
+                title,
+                exception.message.orEmpty()
+            )
+        )
+    }
+}
+
+@Suppress("MagicNumber")
+private fun OmhPermission.orderByType(): Int = when (this) {
+    is OmhPermission.AnyonePermission -> 0
+    is OmhPermission.DomainPermission -> 1
+    is OmhPermission.GroupPermission -> 2
+    is OmhPermission.UserPermission -> 3
+}
+
+@Suppress("MagicNumber")
+private fun OmhPermission.orderRole(): Int = when (this.role) {
+    OmhPermissionRole.OWNER -> 0
+    OmhPermissionRole.ORGANIZER -> 1
+    OmhPermissionRole.FILE_ORGANIZER -> 2
+    OmhPermissionRole.WRITER -> 3
+    OmhPermissionRole.COMMENTER -> 4
+    OmhPermissionRole.READER -> 5
 }

@@ -149,7 +149,7 @@ class OneDriveFileRepositoryTest {
         every { apiService.downloadFile(any()) } returns null
 
         // Act & Assert
-        Assert.assertThrows(OmhStorageException.DownloadException::class.java) {
+        Assert.assertThrows(OmhStorageException.ApiException::class.java) {
             repository.downloadFile(TEST_FILE_ID)
         }
     }
@@ -190,7 +190,7 @@ class OneDriveFileRepositoryTest {
         every { apiService.downloadFileVersion(any(), any()) } returns null
 
         // Act & Assert
-        Assert.assertThrows(OmhStorageException.DownloadException::class.java) {
+        Assert.assertThrows(OmhStorageException.ApiException::class.java) {
             repository.downloadFileVersion(TEST_VERSION_FILE_ID, TEST_VERSION_ID)
         }
     }

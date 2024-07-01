@@ -22,6 +22,7 @@ import com.dropbox.core.v2.files.DeleteResult
 import com.dropbox.core.v2.files.FileMetadata
 import com.dropbox.core.v2.files.ListFolderResult
 import com.dropbox.core.v2.files.ListRevisionsResult
+import com.dropbox.core.v2.files.SearchV2Result
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_PARENT_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_VERSION_FILE_ID
@@ -47,6 +48,9 @@ class DropboxApiServiceTest {
 
     @MockK
     private lateinit var deleteResult: DeleteResult
+
+    @MockK
+    private lateinit var searchResult: SearchV2Result
 
     @MockK
     private lateinit var apiClient: DropboxApiClient
@@ -159,5 +163,19 @@ class DropboxApiServiceTest {
 
         // Assert
         assertEquals(deleteResult, result)
+    }
+
+    @Test
+    fun `given apiClient returns SearchResultV2, when searching the files, then return SearchResultV2`() {
+        // Arrange
+        every {
+            apiClient.dropboxApiService.files().searchV2(any())
+        } returns searchResult
+
+        // Act
+        val result = apiService.search("test")
+
+        // Assert
+        assertEquals(searchResult, result)
     }
 }

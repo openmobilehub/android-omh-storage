@@ -20,6 +20,7 @@ import com.dropbox.core.v2.files.DeleteResult
 import com.dropbox.core.v2.files.FileMetadata
 import com.dropbox.core.v2.files.ListFolderResult
 import com.dropbox.core.v2.files.ListRevisionsResult
+import com.dropbox.core.v2.files.SearchV2Result
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 
@@ -56,5 +57,9 @@ internal class DropboxApiService(private val apiClient: DropboxApiClient) {
 
     fun deleteFile(fileId: String): DeleteResult {
         return apiClient.dropboxApiService.files().deleteV2(fileId)
+    }
+
+    fun search(query: String): SearchV2Result {
+        return apiClient.dropboxApiService.files().searchV2(query)
     }
 }

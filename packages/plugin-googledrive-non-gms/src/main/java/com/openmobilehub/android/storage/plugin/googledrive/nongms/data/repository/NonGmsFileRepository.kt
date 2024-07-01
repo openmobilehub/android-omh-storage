@@ -17,17 +17,24 @@
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository
 
 import android.webkit.MimeTypeMap
+import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhPermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
-import com.openmobilehub.android.storage.core.model.OmhStorageStatusCodes
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toCreateRequestBody
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toFileList
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toOmhFileVersions
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toOmhStorageEntity
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toPermission
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toPermissions
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toUpdateRequestBody
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.GoogleStorageApiService
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body.CreateFileRequestBody
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit.GoogleStorageApiServiceProvider
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.toApiException
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.toByteArrayOutputStream
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.toOmhStorageEntityMetadata
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -36,7 +43,6 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
-import retrofit2.HttpException
 import java.io.ByteArrayOutputStream
 import java.io.File
 
@@ -73,7 +79,7 @@ internal class NonGmsFileRepository(
         return if (response.isSuccessful) {
             response.body()?.toFileList().orEmpty()
         } else {
-            throw OmhStorageException.ApiException(response.code(), HttpException(response))
+            throw response.toApiException()
         }
     }
 
@@ -164,11 +170,7 @@ internal class NonGmsFileRepository(
             response.body().toByteArrayOutputStream()
         } else {
             if (mimeType == null) {
-                val cause = HttpException(response)
-                throw OmhStorageException.DownloadException(
-                    OmhStorageStatusCodes.DOWNLOAD_ERROR,
-                    cause
-                )
+                throw response.toApiException()
             }
 
             return exportDocEditor(fileId, mimeType)
@@ -183,11 +185,7 @@ internal class NonGmsFileRepository(
         return if (response.isSuccessful) {
             response.body().toByteArrayOutputStream()
         } else {
-            val cause = HttpException(response)
-            throw OmhStorageException.DownloadException(
-                OmhStorageStatusCodes.DOWNLOAD_GOOGLE_WORKSPACE_ERROR,
-                cause
-            )
+            throw response.toApiException()
         }
     }
 
@@ -208,10 +206,7 @@ internal class NonGmsFileRepository(
             val omhStorageEntity = response.body()?.toOmhStorageEntity() ?: return null
             updateMediaFile(localFileToUpload, omhStorageEntity)
         } else {
-            throw OmhStorageException.UpdateException(
-                OmhStorageStatusCodes.UPDATE_META_DATA,
-                HttpException(response)
-            )
+            throw response.toApiException()
         }
     }
 
@@ -234,10 +229,7 @@ internal class NonGmsFileRepository(
         return if (response.isSuccessful) {
             response.body()?.toOmhStorageEntity() as? OmhStorageEntity.OmhFile
         } else {
-            throw OmhStorageException.UpdateException(
-                OmhStorageStatusCodes.UPDATE_CONTENT_FILE,
-                HttpException(response)
-            )
+            throw response.toApiException()
         }
     }
 
@@ -251,7 +243,7 @@ internal class NonGmsFileRepository(
         return if (response.isSuccessful) {
             response.body()?.toOmhFileVersions(fileId).orEmpty().reversed()
         } else {
-            throw OmhStorageException.ApiException(response.code(), HttpException(response))
+            throw response.toApiException()
         }
     }
 
@@ -263,10 +255,85 @@ internal class NonGmsFileRepository(
         return if (response.isSuccessful) {
             response.body().toByteArrayOutputStream()
         } else {
-            throw OmhStorageException.DownloadException(
-                OmhStorageStatusCodes.DOWNLOAD_ERROR,
-                HttpException(response)
+            throw response.toApiException()
+        }
+    }
+
+    suspend fun getFilePermissions(fileId: String): List<OmhPermission> {
+        val response = retrofitImpl
+            .getGoogleStorageApiService()
+            .getPermissions(
+                fileId = fileId
             )
+
+        return if (response.isSuccessful) {
+            response.body()?.toPermissions().orEmpty()
+        } else {
+            throw response.toApiException()
+        }
+    }
+
+    suspend fun deletePermission(fileId: String, permissionId: String): Boolean {
+        val response = retrofitImpl
+            .getGoogleStorageApiService()
+            .deletePermission(
+                fileId = fileId,
+                permissionId = permissionId
+            )
+
+        return response.isSuccessful
+    }
+
+    suspend fun updatePermission(
+        fileId: String,
+        permissionId: String,
+        role: OmhPermissionRole
+    ): OmhPermission {
+        val transferOwnership = role == OmhPermissionRole.OWNER
+        val response = retrofitImpl
+            .getGoogleStorageApiService()
+            .updatePermission(
+                fileId = fileId,
+                permissionId = permissionId,
+                body = role.toUpdateRequestBody(),
+                transferOwnership = transferOwnership,
+                // need to be set to true when transfer ownership
+                sendNotificationEmail = transferOwnership,
+            )
+        if (response.isSuccessful) {
+            return response.body()?.toPermission() ?: throw OmhStorageException.ApiException(
+                message = "Updated succeeded but API failed to return expected permission"
+            )
+        } else {
+            throw response.toApiException()
+        }
+    }
+
+    suspend fun createPermission(
+        fileId: String,
+        permission: OmhCreatePermission,
+        sendNotificationEmail: Boolean,
+        emailMessage: String?
+    ): OmhPermission {
+        val transferOwnership = permission.role == OmhPermissionRole.OWNER
+        val message = emailMessage?.ifBlank { null }
+        val willSendNotificationEmail = sendNotificationEmail || transferOwnership
+        val response = retrofitImpl
+            .getGoogleStorageApiService()
+            .createPermission(
+                fileId = fileId,
+                body = permission.toCreateRequestBody(),
+                transferOwnership = transferOwnership,
+                // need to be set to true when transfer ownership
+                sendNotificationEmail = willSendNotificationEmail,
+                emailMessage = if (willSendNotificationEmail) message else null,
+            )
+        if (response.isSuccessful) {
+            return response.body()?.toPermission() ?: throw OmhStorageException.ApiException(
+                message = "Create succeeded but API failed to return expected permission"
+            )
+        } else {
+            throw response.toApiException()
         }
     }
 
@@ -278,7 +345,20 @@ internal class NonGmsFileRepository(
         return if (response.isSuccessful) {
             response.body().toOmhStorageEntityMetadata()
         } else {
-            throw OmhStorageException.ApiException(response.code(), HttpException(response))
+            throw response.toApiException()
+        }
+    }
+
+    @Suppress("SwallowedException")
+    suspend fun getWebUrl(fileId: String): String? {
+        val response = retrofitImpl
+            .getGoogleStorageApiService()
+            .getWebUrl(fileId = fileId)
+
+        return if (response.isSuccessful) {
+            response.body()?.webViewLink
+        } else {
+            throw response.toApiException()
         }
     }
 }

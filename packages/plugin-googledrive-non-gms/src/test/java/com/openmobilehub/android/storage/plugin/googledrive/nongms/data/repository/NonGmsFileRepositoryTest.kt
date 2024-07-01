@@ -19,19 +19,32 @@
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository
 
 import android.webkit.MimeTypeMap
+import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_EMAIL_MESSAGE
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_FILE_MIME_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_FILE_NAME
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_FILE_PARENT_ID
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_PERMISSION_ID
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_VERSION_FILE_ID
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_VERSION_ID
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.commenterUpdatePermission
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.createCommenterPermission
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.createCommenterPermissionRequestBody
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.createOwnerPermission
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.createOwnerPermissionRequestBody
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.ownerUpdatePermission
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testFileListRemote
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testFileRemote
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testOmhFile
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testOmhPermission
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testOmhVersion
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testPermissionResponse
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testPermissionsListResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testVersionListRemote
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testWebUrlResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.GoogleStorageApiService
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit.GoogleStorageApiServiceProvider
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.toByteArrayOutputStream
@@ -63,7 +76,8 @@ internal class NonGmsFileRepositoryTest {
 
     companion object {
         private const val FILE_PATH = "anyPath"
-        private const val TEST_GET_FILE_RESPONSE_BODY_CONTENT = "{\"id\": \"123\", \"name\": \"fileName.txt\", \"createdTime\": \"2024-05-01T00:00:00.000Z\", \"modifiedTime\": \"2024-06-01T00:00:00.000Z\", \"parents\": [\"parentId\"], \"mimeType\": \"test/mime-type\", \"fileExtension\": \"txt\", \"size\": 10}"
+        private const val TEST_GET_FILE_RESPONSE_BODY_CONTENT =
+            "{\"id\": \"123\", \"name\": \"fileName.txt\", \"createdTime\": \"2024-05-01T00:00:00.000Z\", \"modifiedTime\": \"2024-06-01T00:00:00.000Z\", \"parents\": [\"parentId\"], \"mimeType\": \"test/mime-type\", \"fileExtension\": \"txt\", \"size\": 10}"
     }
 
     @MockK(relaxed = true)
@@ -273,7 +287,7 @@ internal class NonGmsFileRepositoryTest {
         coVerify { googleStorageApiService.uploadFile(any(), any()) }
     }
 
-    @Test(expected = OmhStorageException.DownloadException::class)
+    @Test(expected = OmhStorageException.ApiException::class)
     fun `given a null mimeType, when downloadFile fails, then a DownloadException is thrown`() =
         runTest {
             coEvery {
@@ -289,7 +303,7 @@ internal class NonGmsFileRepositoryTest {
             fileRepositoryImpl.downloadFile(TEST_FILE_ID, null)
         }
 
-    @Test(expected = OmhStorageException.DownloadException::class)
+    @Test(expected = OmhStorageException.ApiException::class)
     fun `given a fileId and mimeType, when downloadFile fails, then a DownloadException is thrown`() =
         runTest {
             coEvery {
@@ -305,7 +319,7 @@ internal class NonGmsFileRepositoryTest {
             fileRepositoryImpl.downloadFile(TEST_FILE_ID, null)
         }
 
-    @Test(expected = OmhStorageException.UpdateException::class)
+    @Test(expected = OmhStorageException.ApiException::class)
     fun `given a File and a file id, when updateFile fails, then a UpdateException is thrown`() =
         runTest {
             val localFileUpload = File(FILE_PATH)
@@ -377,8 +391,16 @@ internal class NonGmsFileRepositoryTest {
     @Test
     fun `given a file id, return OmhStorageEntity object along with it's original metadata`() =
         runTest {
-            coEvery { googleStorageApiService.getFileMetadata(any(), any()) } returns Response.success(
-                ResponseBody.create("application/json".toMediaTypeOrNull(), TEST_GET_FILE_RESPONSE_BODY_CONTENT)
+            coEvery {
+                googleStorageApiService.getFileMetadata(
+                    any(),
+                    any()
+                )
+            } returns Response.success(
+                ResponseBody.create(
+                    "application/json".toMediaTypeOrNull(),
+                    TEST_GET_FILE_RESPONSE_BODY_CONTENT
+                )
             )
 
             val response = fileRepositoryImpl.getFileMetadata(TEST_FILE_ID)
@@ -386,10 +408,329 @@ internal class NonGmsFileRepositoryTest {
             assertEquals(
                 OmhStorageMetadata(
                     testOmhFile,
-                    ResponseBody.create("application/json".toMediaTypeOrNull(), TEST_GET_FILE_RESPONSE_BODY_CONTENT).string()
+                    ResponseBody.create(
+                        "application/json".toMediaTypeOrNull(),
+                        TEST_GET_FILE_RESPONSE_BODY_CONTENT
+                    ).string()
                 ),
                 response
             )
             coVerify { googleStorageApiService.getFileMetadata(any(), any()) }
+        }
+
+    @Test
+    fun `given a fileId, when getPermissions is success, then a list of OmhPermission is returned`() =
+        runTest {
+            coEvery {
+                googleStorageApiService.getPermissions(
+                    any(),
+                    any()
+                )
+            } returns Response.success(
+                testPermissionsListResponse
+            )
+
+            val result = fileRepositoryImpl.getFilePermissions(TEST_FILE_ID)
+
+            assertEquals(listOf(testOmhPermission), result)
+            coVerify { googleStorageApiService.getPermissions(any(), any()) }
+        }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given a fileId, when getPermissions fails, then an ApiException is thrown`() =
+        runTest {
+            coEvery { googleStorageApiService.getPermissions(any(), any()) } returns Response.error(
+                500,
+                responseBody
+            )
+
+            fileRepositoryImpl.getFilePermissions(TEST_FILE_ID)
+        }
+
+    @Test
+    fun `given a fileId and permissionId, when deletePermission is success, then true is returned`() =
+        runTest {
+            coEvery {
+                googleStorageApiService.deletePermission(
+                    TEST_FILE_ID,
+                    TEST_PERMISSION_ID
+                )
+            } returns Response.success(responseBody)
+
+            val result = fileRepositoryImpl.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
+
+            assertTrue(result)
+            coVerify { googleStorageApiService.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID) }
+        }
+
+    @Test
+    fun `given a fileId and permissionId, when deletePermission fails, then false is returned`() =
+        runTest {
+            coEvery {
+                googleStorageApiService.deletePermission(
+                    TEST_FILE_ID,
+                    TEST_PERMISSION_ID
+                )
+            } returns Response.error(500, responseBody)
+
+            val result = fileRepositoryImpl.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
+
+            assertFalse(result)
+            coVerify { googleStorageApiService.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID) }
+        }
+
+    @Test
+    fun `given a role, when updatePermission is success, then a OmhPermissions is returned`() =
+        runTest {
+            coEvery {
+                googleStorageApiService.updatePermission(
+                    TEST_FILE_ID,
+                    TEST_PERMISSION_ID,
+                    commenterUpdatePermission,
+                )
+            } returns Response.success(testPermissionResponse)
+
+            val result = fileRepositoryImpl.updatePermission(
+                TEST_FILE_ID,
+                TEST_PERMISSION_ID,
+                OmhPermissionRole.COMMENTER
+            )
+
+            assertEquals(testOmhPermission, result)
+
+            coVerify {
+                googleStorageApiService.updatePermission(
+                    TEST_FILE_ID,
+                    TEST_PERMISSION_ID,
+                    commenterUpdatePermission,
+                )
+            }
+        }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given a role, when updatePermission fails, then an ApiException is thrown`() =
+        runTest {
+            coEvery {
+                googleStorageApiService.updatePermission(
+                    TEST_FILE_ID,
+                    TEST_PERMISSION_ID,
+                    commenterUpdatePermission,
+                )
+            } returns Response.error(500, responseBody)
+
+            fileRepositoryImpl.updatePermission(
+                TEST_FILE_ID,
+                TEST_PERMISSION_ID,
+                OmhPermissionRole.COMMENTER
+            )
+        }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given a role, when updatePermission does not returns expected permission, then an ApiException is thrown`() =
+        runTest {
+            coEvery {
+                googleStorageApiService.updatePermission(
+                    TEST_FILE_ID,
+                    TEST_PERMISSION_ID,
+                    commenterUpdatePermission,
+                )
+            } returns Response.success(null)
+
+            fileRepositoryImpl.updatePermission(
+                TEST_FILE_ID,
+                TEST_PERMISSION_ID,
+                OmhPermissionRole.COMMENTER
+            )
+        }
+
+    @Test
+    fun `given a owner role, when updatePermission is called, then transferOwnership and sendNotificationEmail should be true`() =
+        runTest {
+            coEvery {
+                googleStorageApiService.updatePermission(
+                    TEST_FILE_ID,
+                    TEST_PERMISSION_ID,
+                    ownerUpdatePermission,
+                    transferOwnership = true,
+                    sendNotificationEmail = true
+                )
+            } returns Response.success(testPermissionResponse)
+
+            fileRepositoryImpl.updatePermission(
+                TEST_FILE_ID,
+                TEST_PERMISSION_ID,
+                OmhPermissionRole.OWNER,
+            )
+
+            coVerify {
+                googleStorageApiService.updatePermission(
+                    TEST_FILE_ID,
+                    TEST_PERMISSION_ID,
+                    ownerUpdatePermission,
+                    transferOwnership = true,
+                    sendNotificationEmail = true
+                )
+            }
+        }
+
+    @Test
+    fun `given a new permission, when createPermission is called, then a OmhPermissions is returned`() =
+        runTest {
+            coEvery {
+                googleStorageApiService.createPermission(
+                    TEST_FILE_ID,
+                    any(),
+                    transferOwnership = any(),
+                    sendNotificationEmail = any(),
+                    emailMessage = any(),
+                )
+            } returns Response.success(testPermissionResponse)
+
+            val result = fileRepositoryImpl.createPermission(
+                TEST_FILE_ID,
+                createCommenterPermission,
+                sendNotificationEmail = false,
+                null
+            )
+
+            assertEquals(testOmhPermission, result)
+
+            coVerify {
+                googleStorageApiService.createPermission(
+                    TEST_FILE_ID,
+                    createCommenterPermissionRequestBody,
+                    transferOwnership = false,
+                    sendNotificationEmail = false,
+                    emailMessage = null,
+                )
+            }
+        }
+
+    @Test
+    fun `given a new owner permission, when createPermission is called, then transferOwnership should be true`() =
+        runTest {
+            coEvery {
+                googleStorageApiService.createPermission(
+                    TEST_FILE_ID,
+                    any(),
+                    transferOwnership = any(),
+                    sendNotificationEmail = any(),
+                    emailMessage = any(),
+                )
+            } returns Response.success(testPermissionResponse)
+
+            fileRepositoryImpl.createPermission(
+                TEST_FILE_ID,
+                createOwnerPermission,
+                sendNotificationEmail = true,
+                TEST_EMAIL_MESSAGE
+            )
+
+            coVerify {
+                googleStorageApiService.createPermission(
+                    TEST_FILE_ID,
+                    createOwnerPermissionRequestBody,
+                    transferOwnership = true,
+                    sendNotificationEmail = true,
+                    emailMessage = TEST_EMAIL_MESSAGE,
+                )
+            }
+        }
+
+    @Test
+    fun `given a new owner permission, when createPermission is called, then sendNotificationEmail should be true even when false was provided`() =
+        runTest {
+            coEvery {
+                googleStorageApiService.createPermission(
+                    TEST_FILE_ID,
+                    any(),
+                    transferOwnership = any(),
+                    sendNotificationEmail = any(),
+                    emailMessage = any(),
+                )
+            } returns Response.success(testPermissionResponse)
+
+            fileRepositoryImpl.createPermission(
+                TEST_FILE_ID,
+                createOwnerPermission,
+                sendNotificationEmail = false,
+                TEST_EMAIL_MESSAGE
+            )
+
+            coVerify {
+                googleStorageApiService.createPermission(
+                    TEST_FILE_ID,
+                    createOwnerPermissionRequestBody,
+                    transferOwnership = true,
+                    sendNotificationEmail = true,
+                    emailMessage = TEST_EMAIL_MESSAGE,
+                )
+            }
+        }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given a permission, when createPermission fails, then an ApiException is thrown`() =
+        runTest {
+            coEvery {
+                googleStorageApiService.createPermission(
+                    TEST_FILE_ID,
+                    any(),
+                    transferOwnership = any(),
+                    sendNotificationEmail = any(),
+                    emailMessage = any(),
+                )
+            } returns Response.error(500, responseBody)
+
+            fileRepositoryImpl.createPermission(
+                TEST_FILE_ID,
+                createOwnerPermission,
+                sendNotificationEmail = false,
+                TEST_EMAIL_MESSAGE
+            )
+        }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given a permission, when createPermission does not return expected permission, then an ApiException is thrown`() =
+        runTest {
+            coEvery {
+                googleStorageApiService.createPermission(
+                    TEST_FILE_ID,
+                    any(),
+                    transferOwnership = any(),
+                    sendNotificationEmail = any(),
+                    emailMessage = any(),
+                )
+            } returns Response.success(null)
+
+            fileRepositoryImpl.createPermission(
+                TEST_FILE_ID,
+                createOwnerPermission,
+                sendNotificationEmail = false,
+                TEST_EMAIL_MESSAGE
+            )
+        }
+
+    @Test
+    fun `given a file id, when getWebUrl is success, then an URL to the file is returned`() =
+        runTest {
+            coEvery { googleStorageApiService.getWebUrl(any()) } returns Response.success(
+                testWebUrlResponse
+            )
+
+            val result = fileRepositoryImpl.getWebUrl(TEST_VERSION_FILE_ID)
+
+            assertEquals(testWebUrlResponse.webViewLink, result)
+            coVerify { googleStorageApiService.getWebUrl(TEST_FILE_ID) }
+        }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given a file id, when getWebUrl fails, then an ApiException is thrown`() =
+        runTest {
+            coEvery { googleStorageApiService.getWebUrl(any()) } returns Response.error(
+                500,
+                responseBody
+            )
+
+            fileRepositoryImpl.getWebUrl(TEST_VERSION_FILE_ID)
         }
 }

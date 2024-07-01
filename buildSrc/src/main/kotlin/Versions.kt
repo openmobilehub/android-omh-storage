@@ -26,7 +26,7 @@ object Versions {
     const val googlePlayServicesAuth = "20.4.1"
     const val googleJacksonClient = "1.29.2"
     const val googleAndroidApiClient = "1.26.0"
-    const val googleDriveServices = "v3-rev136-1.25.0"
+    const val googleDriveServices = "v3-rev197-1.25.0"
     const val avoidGuavaConflict = "9999.0-empty-to-avoid-conflict-with-guava"
     const val guava = "33.2.1-android"
 
