@@ -206,4 +206,18 @@ class OneDriveFileRepositoryTest {
         // Assert
         assertEquals(true, result)
     }
+
+    @Test
+    fun `given an apiService returns drive item, when getting the file, then return OmhStorageMetadata`() {
+        // Arrange
+        every { apiService.getFile(any()) } returns driveItem
+        every { driveItemToOmhStorageEntity(any()) } returns omhStorageEntity
+
+        // Act
+        val result = repository.getFileMetadata(TEST_FILE_ID)
+
+        // Assert
+        assertEquals(omhStorageEntity, result.entity)
+        assertEquals(driveItem, result.originalMetadata)
+    }
 }

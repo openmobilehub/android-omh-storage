@@ -228,4 +228,19 @@ class OneDriveApiServiceTest {
             ).delete()
         }
     }
+
+    @Test
+    fun `given apiClient returns drive item, when getting the file, then return drive item`() {
+        // Arrange
+        every {
+            apiClient.graphServiceClient.drives().byDriveId(any()).items().byDriveItemId(any())
+                .get()
+        } returns driveItem
+
+        // Act
+        val result = apiService.getFile(TEST_FILE_ID)
+
+        // Assert
+        Assert.assertEquals(driveItem, result)
+    }
 }

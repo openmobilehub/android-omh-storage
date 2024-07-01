@@ -123,7 +123,6 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
     }
 
     override suspend fun getFileMetadata(fileId: String): OmhStorageMetadata {
-        // To be implemented
-        return OmhStorageMetadata(OmhStorageEntity.OmhFile("", "", null, null, null, null, null, null), Any())
+        return repository.getFileMetadata(fileId)
     }
 }
