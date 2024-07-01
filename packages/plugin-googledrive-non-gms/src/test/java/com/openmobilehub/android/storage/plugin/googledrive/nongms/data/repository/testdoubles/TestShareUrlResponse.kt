@@ -16,8 +16,8 @@
 
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles
 
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.ShareUrlResponse
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.WebUrlResponse
 
-const val TEST_SHARE_URL = "https://test.com/file_123"
+const val TEST_WEB_URL = "https://test.com/file_123"
 
-internal val testShareUrlResponse = ShareUrlResponse(TEST_SHARE_URL)
+internal val testWebUrlResponse = WebUrlResponse(TEST_WEB_URL)

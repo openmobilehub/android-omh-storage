@@ -26,5 +26,5 @@ sealed class FilePermissionsViewAction {
 
     object ShowEditView : FilePermissionsViewAction()
 
-    data class CopyUrlToClipboard(val shareUrl: String) : FilePermissionsViewAction()
+    data class CopyUrlToClipboard(val url: String) : FilePermissionsViewAction()
 }

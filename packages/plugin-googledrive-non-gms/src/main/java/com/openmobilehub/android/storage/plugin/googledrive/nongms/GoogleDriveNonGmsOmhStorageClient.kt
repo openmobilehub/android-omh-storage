@@ -129,8 +129,8 @@ internal class GoogleDriveNonGmsOmhStorageClient private constructor(
         return fileRepository.createPermission(fileId, permission, sendNotificationEmail, emailMessage)
     }
 
-    override suspend fun getShareUrl(fileId: String): String? {
-        return fileRepository.getShareUrl(fileId)
+    override suspend fun getWebUrl(fileId: String): String? {
+        return fileRepository.getWebUrl(fileId)
     }
 
     override suspend fun getFileMetadata(fileId: String): OmhStorageMetadata {

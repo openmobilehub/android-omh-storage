@@ -24,7 +24,7 @@ import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.PermissionResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.PermissionsListResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.RevisionListRemoteResponse
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.ShareUrlResponse
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.WebUrlResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
@@ -68,7 +68,7 @@ internal interface GoogleStorageApiService {
         private const val FIELDS_VALUE = "files($QUERY_REQUESTED_FIELDS)"
         private const val QUERY_REQUESTED_FIELDS_ALL = "*"
         private const val QUERY_PERMISSIONS = "permissions"
-        private const val QUERY_SHARE_URL_LINK = "webViewLink"
+        private const val QUERY_WEB_URL = "webViewLink"
 
         private const val FILE_ID = "fileId"
         private const val REVISION_ID = "revisionId"
@@ -179,8 +179,8 @@ internal interface GoogleStorageApiService {
     ): Response<PermissionResponse>
 
     @GET("$FILES_PARTICLE/{$FILE_ID}")
-    suspend fun getShareUrl(
+    suspend fun getWebUrl(
         @Path(FILE_ID) fileId: String,
-        @Query(QUERY_FIELDS) fields: String = QUERY_SHARE_URL_LINK,
-    ): Response<ShareUrlResponse>
+        @Query(QUERY_FIELDS) fields: String = QUERY_WEB_URL,
+    ): Response<WebUrlResponse>
 }

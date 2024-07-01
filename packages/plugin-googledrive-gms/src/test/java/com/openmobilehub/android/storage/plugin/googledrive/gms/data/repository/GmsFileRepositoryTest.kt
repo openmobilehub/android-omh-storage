@@ -35,9 +35,9 @@ import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_FILE_NAME
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_FILE_PARENT_ID
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_PERMISSION_ID
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_SHARE_URL
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_VERSION_FILE_ID
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_VERSION_ID
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_WEB_URL
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.setUpMock
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.testOmhCreatePermission
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.testOmhFile
@@ -547,23 +547,23 @@ internal class GmsFileRepositoryTest {
         }
 
     @Test
-    fun `given a file id, when getShareUrl is success, then an URL to the file is returned`() {
-        every { googleDriveFile.webViewLink } returns TEST_SHARE_URL
+    fun `given a file id, when getWebUrl is success, then an URL to the file is returned`() {
+        every { googleDriveFile.webViewLink } returns TEST_WEB_URL
         every { driveFilesGetRequest.execute() } returns googleDriveFile
-        every { apiService.getShareUrl(any()) } returns driveFilesGetRequest
+        every { apiService.getWebUrl(any()) } returns driveFilesGetRequest
 
-        val result = fileRepositoryImpl.getShareUrl(TEST_VERSION_FILE_ID)
+        val result = fileRepositoryImpl.getWebUrl(TEST_VERSION_FILE_ID)
 
-        assertEquals(TEST_SHARE_URL, result)
-        verify { apiService.getShareUrl(TEST_FILE_ID) }
+        assertEquals(TEST_WEB_URL, result)
+        verify { apiService.getWebUrl(TEST_FILE_ID) }
     }
 
     @Test(expected = OmhStorageException.ApiException::class)
-    fun `given a file id, when getShareUrl fails, then an ApiException is thrown`() {
+    fun `given a file id, when getWebUrl fails, then an ApiException is thrown`() {
         every { googleDriveFile.webViewLink }.throws(responseException)
         every { driveFilesGetRequest.execute() } returns googleDriveFile
-        every { apiService.getShareUrl(any()) } returns driveFilesGetRequest
+        every { apiService.getWebUrl(any()) } returns driveFilesGetRequest
 
-        fileRepositoryImpl.getShareUrl(TEST_VERSION_FILE_ID)
+        fileRepositoryImpl.getWebUrl(TEST_VERSION_FILE_ID)
     }
 }

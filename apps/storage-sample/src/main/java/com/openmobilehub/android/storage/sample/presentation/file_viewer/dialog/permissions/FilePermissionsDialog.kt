@@ -88,7 +88,7 @@ class FilePermissionsDialog : BottomSheetDialogFragment(), FilePermissionAdapter
         }
 
         binding.getUrl.setOnClickListener {
-            permissionsViewModel.getShareUrl()
+            permissionsViewModel.getWebUrl()
         }
     }
 
@@ -125,7 +125,7 @@ class FilePermissionsDialog : BottomSheetDialogFragment(), FilePermissionAdapter
                 action.title
             )
 
-            is FilePermissionsViewAction.CopyUrlToClipboard -> copyUrlToClipboard(action.shareUrl)
+            is FilePermissionsViewAction.CopyUrlToClipboard -> copyUrlToClipboard(action.url)
         }
     }
 

@@ -43,8 +43,8 @@ import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.reposito
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testOmhVersion
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testPermissionResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testPermissionsListResponse
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testShareUrlResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testVersionListRemote
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testWebUrlResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.GoogleStorageApiService
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit.GoogleStorageApiServiceProvider
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.toByteArrayOutputStream
@@ -711,26 +711,26 @@ internal class NonGmsFileRepositoryTest {
         }
 
     @Test
-    fun `given a file id, when getShareUrl is success, then an URL to the file is returned`() =
+    fun `given a file id, when getWebUrl is success, then an URL to the file is returned`() =
         runTest {
-            coEvery { googleStorageApiService.getShareUrl(any()) } returns Response.success(
-                testShareUrlResponse
+            coEvery { googleStorageApiService.getWebUrl(any()) } returns Response.success(
+                testWebUrlResponse
             )
 
-            val result = fileRepositoryImpl.getShareUrl(TEST_VERSION_FILE_ID)
+            val result = fileRepositoryImpl.getWebUrl(TEST_VERSION_FILE_ID)
 
-            assertEquals(testShareUrlResponse.webViewLink, result)
-            coVerify { googleStorageApiService.getShareUrl(TEST_FILE_ID) }
+            assertEquals(testWebUrlResponse.webViewLink, result)
+            coVerify { googleStorageApiService.getWebUrl(TEST_FILE_ID) }
         }
 
     @Test(expected = OmhStorageException.ApiException::class)
-    fun `given a file id, when getShareUrl fails, then an ApiException is thrown`() =
+    fun `given a file id, when getWebUrl fails, then an ApiException is thrown`() =
         runTest {
-            coEvery { googleStorageApiService.getShareUrl(any()) } returns Response.error(
+            coEvery { googleStorageApiService.getWebUrl(any()) } returns Response.error(
                 500,
                 responseBody
             )
 
-            fileRepositoryImpl.getShareUrl(TEST_VERSION_FILE_ID)
+            fileRepositoryImpl.getWebUrl(TEST_VERSION_FILE_ID)
         }
 }

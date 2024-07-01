@@ -29,7 +29,7 @@ internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProv
             "id,name,createdTime,modifiedTime,parents,mimeType,fileExtension,size"
         private const val FIELDS_VALUE = "files($QUERY_REQUESTED_FIELDS)"
         private const val ALL_FIELDS = "*"
-        private const val SHARE_URL_LINK = "webViewLink"
+        private const val WEB_URL_FIELD = "webViewLink"
     }
 
     fun getFilesList(parentId: String): Drive.Files.List = apiProvider
@@ -163,11 +163,11 @@ internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProv
                 this.transferOwnership = transferOwnership
             }
 
-    fun getShareUrl(fileId: String): Drive.Files.Get = apiProvider
+    fun getWebUrl(fileId: String): Drive.Files.Get = apiProvider
         .googleDriveApiService
         .files()
         .get(fileId)
         .apply {
-            fields = SHARE_URL_LINK
+            fields = WEB_URL_FIELD
         }
 }

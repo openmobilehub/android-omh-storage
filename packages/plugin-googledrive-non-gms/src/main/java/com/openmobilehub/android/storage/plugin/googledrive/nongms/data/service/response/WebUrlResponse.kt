@@ -22,6 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 @Keep
 @JsonIgnoreProperties(ignoreUnknown = true)
-internal data class ShareUrlResponse(
+internal data class WebUrlResponse(
     @JsonProperty("webViewLink") val webViewLink: String?
 )

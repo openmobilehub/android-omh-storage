@@ -245,9 +245,9 @@ internal class GmsFileRepository(
     }
 
     @Suppress("SwallowedException")
-    fun getShareUrl(fileId: String): String? {
+    fun getWebUrl(fileId: String): String? {
         return try {
-            apiService.getShareUrl(fileId).execute()?.webViewLink
+            apiService.getWebUrl(fileId).execute()?.webViewLink
         } catch (exception: HttpResponseException) {
             throw exception.toApiException()
         }

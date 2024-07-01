@@ -68,6 +68,7 @@
     <string name="permission_no_url">There is no URL</string>
     <string name="permission_url_copied">URL copied to clipboard</string>
     <string name="permission_url_to_file">URL to file</string>
+    <string name="permission_url_error">Couldn\'t get url</string>
     <string name="permission_removed">Permission removed</string>
     <string name="permission_remove_error">Couldn\'t remove permission</string>
     <string name="permission_updated">Permission updated</string>

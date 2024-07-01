@@ -121,18 +121,17 @@ class FilePermissionsViewModel @Inject constructor(
         getPermissions()
     }
 
-    fun getShareUrl() = viewModelScope.launch(Dispatchers.IO) {
+    fun getWebUrl() = viewModelScope.launch(Dispatchers.IO) {
         @Suppress("SwallowedException")
         try {
-            val shareUrl = omhStorageClient.getShareUrl(fileId) ?: run {
+            val webUrl = omhStorageClient.getWebUrl(fileId) ?: run {
                 _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_no_url))
                 return@launch
             }
-            _action.send(FilePermissionsViewAction.CopyUrlToClipboard(shareUrl))
+            _action.send(FilePermissionsViewAction.CopyUrlToClipboard(webUrl))
         } catch (exception: OmhStorageException.ApiException) {
-            showErrorDialog(R.string.permission_create_error, exception)
+            showErrorDialog(R.string.permission_url_error, exception)
         }
-        getPermissions()
     }
 
     private suspend fun showErrorDialog(@StringRes title: Int, exception: OmhStorageException) {

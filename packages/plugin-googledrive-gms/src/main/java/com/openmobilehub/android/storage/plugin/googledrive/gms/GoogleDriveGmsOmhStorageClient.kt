@@ -140,7 +140,7 @@ internal class GoogleDriveGmsOmhStorageClient private constructor(
         return fileRepository.getFileMetadata(fileId)
     }
 
-    override suspend fun getShareUrl(fileId: String): String? {
-        return fileRepository.getShareUrl(fileId)
+    override suspend fun getWebUrl(fileId: String): String? {
+        return fileRepository.getWebUrl(fileId)
     }
 }
