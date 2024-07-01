@@ -22,15 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 @Keep
 @JsonIgnoreProperties(ignoreUnknown = true)
-internal data class PermissionResponse(
-    @JsonProperty("id") val id: String?,
-    @JsonProperty("type") val type: String?,
-    @JsonProperty("emailAddress") val emailAddress: String?,
-    @JsonProperty("domain") val domain: String?,
-    @JsonProperty("role") val role: String?,
-    @JsonProperty("displayName") val displayName: String?,
-    @JsonProperty("photoLink") val photoLink: String?,
-    @JsonProperty("deleted") val deleted: Boolean?,
-    @JsonProperty("pendingOwner") val pendingOwner: Boolean?,
-    @JsonProperty("expirationTime") val expirationTime: String?,
+internal data class ShareUrlResponse(
+    @JsonProperty("webViewLink") val webViewLink: String?
 )

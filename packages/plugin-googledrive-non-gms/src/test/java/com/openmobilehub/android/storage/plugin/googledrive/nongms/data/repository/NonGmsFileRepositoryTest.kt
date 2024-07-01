@@ -43,6 +43,7 @@ import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.reposito
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testOmhVersion
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testPermissionResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testPermissionsListResponse
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testShareUrlResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testVersionListRemote
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.GoogleStorageApiService
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit.GoogleStorageApiServiceProvider
@@ -707,5 +708,29 @@ internal class NonGmsFileRepositoryTest {
                 sendNotificationEmail = false,
                 TEST_EMAIL_MESSAGE
             )
+        }
+
+    @Test
+    fun `given a file id, when getShareUrl is success, then an URL to the file is returned`() =
+        runTest {
+            coEvery { googleStorageApiService.getShareUrl(any()) } returns Response.success(
+                testShareUrlResponse
+            )
+
+            val result = fileRepositoryImpl.getShareUrl(TEST_VERSION_FILE_ID)
+
+            assertEquals(testShareUrlResponse.webViewLink, result)
+            coVerify { googleStorageApiService.getShareUrl(TEST_FILE_ID) }
+        }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given a file id, when getShareUrl fails, then an ApiException is thrown`() =
+        runTest {
+            coEvery { googleStorageApiService.getShareUrl(any()) } returns Response.error(
+                500,
+                responseBody
+            )
+
+            fileRepositoryImpl.getShareUrl(TEST_VERSION_FILE_ID)
         }
 }

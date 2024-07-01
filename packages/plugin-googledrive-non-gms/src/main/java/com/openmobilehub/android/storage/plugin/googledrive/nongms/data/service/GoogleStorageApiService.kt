@@ -24,6 +24,7 @@ import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.PermissionResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.PermissionsListResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.RevisionListRemoteResponse
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.ShareUrlResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
@@ -181,5 +182,5 @@ internal interface GoogleStorageApiService {
     suspend fun getShareUrl(
         @Path(FILE_ID) fileId: String,
         @Query(QUERY_FIELDS) fields: String = QUERY_SHARE_URL_LINK,
-    ): Response<PermissionResponse>
+    ): Response<ShareUrlResponse>
 }

@@ -32,7 +32,6 @@ internal val testPermissionResponse = PermissionResponse(
     deleted = false,
     pendingOwner = null,
     expirationTime = TEST_FIRST_MAY_2024_RFC_3339,
-    webViewLink = ""
 )
 
 internal val testPermissionsListResponse = PermissionsListResponse(listOf(testPermissionResponse))
