@@ -44,6 +44,7 @@ class OneDriveApiClient(private val authProvider: OneDriveAuthProvider) {
     }
 
     internal val graphServiceClient = GraphServiceClient(authProvider)
+
     internal fun uploadFile(
         uploadSession: UploadSession,
         fileInputStream: FileInputStream,

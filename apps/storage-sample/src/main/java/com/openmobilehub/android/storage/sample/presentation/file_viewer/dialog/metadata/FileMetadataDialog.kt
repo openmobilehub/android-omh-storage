@@ -33,7 +33,6 @@ import com.openmobilehub.android.storage.plugin.onedrive.data.util.serializeToSt
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.DialogFileMetadataBinding
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.FileViewerViewModel
-import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.metadata.model.FileMetadataViewModel
 import com.openmobilehub.android.storage.sample.util.isFolder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -48,14 +47,10 @@ class FileMetadataDialog : BottomSheetDialogFragment() {
     private val viewModel: FileMetadataViewModel by viewModels()
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         return DialogFileMetadataBinding.inflate(
-            inflater,
-            container,
-            false
+            inflater, container, false
         ).also {
             binding = it
             setupBinding()
@@ -119,6 +114,12 @@ class FileMetadataDialog : BottomSheetDialogFragment() {
             fileExtension.label.text = getString(R.string.file_extension, extension)
             fileSize.label.text = getString(R.string.file_size, size.toString())
 
+            if (file.isFolder()) {
+                fileMimeType.label.visibility = View.GONE
+                fileExtension.label.visibility = View.GONE
+                fileSize.label.visibility = View.GONE
+            }
+
             when (originalMetadata) {
                 is GoogleDriveFile -> { // Google Drive GMS
                     extraMetadata.label.text = originalMetadata.toString()
@@ -132,19 +133,12 @@ class FileMetadataDialog : BottomSheetDialogFragment() {
                     extraMetadata.label.text = originalMetadata.serializeToString()
                 }
             }
-
-            if (file.isFolder()) {
-                fileMimeType.label.visibility = View.GONE
-                fileExtension.label.visibility = View.GONE
-                fileSize.label.visibility = View.GONE
-            }
         }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val file = requireNotNull(parentViewModel.lastFileClicked)
-
 
         viewModel.getFileMetadata(file.id)
 
