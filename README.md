@@ -43,18 +43,18 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 - ❌ - not supported at the moment
 
 | Features                | Google Drive GMS | Google Drive non-GMS | OneDrive | Dropbox |
-|-------------------------|------------------|----------------------|----------|---------|
-| File listing            | ✅                | ✅                    | ✅        | ✅       |
-| File creation           | ✅                | ✅                    | ❌        | ❌       |
-| File update             | ✅                | ✅                    | ❌        | ❌       |
-| File deletion           | ✅                | ✅                    | ✅        | ✅       |
-| File permanent deletion | ✅                | ✅                    | ❌        | ❌       |
-| File upload             | ✅                | ✅                    | ✅        | ✅       |
-| File download           | ✅                | ✅                    | ✅        | ✅       |
-| File searching          | ✅                | ✅                    | ❌        | ❌       |
-| File metadata           | ✅                | ✅                    | ❌        | ❌       |
-| File versioning         | ✅                | ✅                    | ✅        | ✅       |
-| File permissions        | ✅                | ✅                    | ❌        | ❌       |
+| ----------------------- | ---------------- | -------------------- | -------- | ------- |
+| File listing            | ✅               | ✅                   | ✅       | ✅      |
+| File creation           | ✅               | ✅                   | ❌       | ❌      |
+| File update             | ✅               | ✅                   | ❌       | ❌      |
+| File deletion           | ✅               | ✅                   | ✅       | ✅      |
+| File permanent deletion | ✅               | ✅                   | ❌       | ❌      |
+| File upload             | ✅               | ✅                   | ✅       | ✅      |
+| File download           | ✅               | ✅                   | ✅       | ✅      |
+| File searching          | ✅               | ✅                   | ❌       | ✅      |
+| File metadata           | ✅               | ✅                   | ❌       | ❌      |
+| File versioning         | ✅               | ✅                   | ✅       | ✅      |
+| File permissions        | ✅               | ✅                   | ❌        | ❌       |
 
 ## Documentation
 
