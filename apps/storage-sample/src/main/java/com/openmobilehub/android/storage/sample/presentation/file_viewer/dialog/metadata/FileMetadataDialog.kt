@@ -38,7 +38,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import com.google.api.services.drive.model.File as GoogleDriveFile
 
-
 @AndroidEntryPoint
 class FileMetadataDialog : BottomSheetDialogFragment() {
 
