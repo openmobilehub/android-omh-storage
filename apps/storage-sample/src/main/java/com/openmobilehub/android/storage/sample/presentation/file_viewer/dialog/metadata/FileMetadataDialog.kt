@@ -29,7 +29,7 @@ import com.microsoft.graph.models.DriveItem
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.core.utils.toRFC3339String
-import com.openmobilehub.android.storage.plugin.onedrive.data.util.serializeToString
+import com.openmobilehub.android.storage.sample.util.serializeToString
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.DialogFileMetadataBinding
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.FileViewerViewModel

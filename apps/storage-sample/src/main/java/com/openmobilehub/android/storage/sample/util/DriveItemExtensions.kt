@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.onedrive.data.util
+package com.openmobilehub.android.storage.sample.util
 
 import com.microsoft.graph.models.DriveItem
 import java.io.StringWriter
