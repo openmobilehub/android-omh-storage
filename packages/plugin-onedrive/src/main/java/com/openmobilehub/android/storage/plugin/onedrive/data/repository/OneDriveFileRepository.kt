@@ -19,6 +19,7 @@ package com.openmobilehub.android.storage.plugin.onedrive.data.repository
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.toOmhVersion
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiService
@@ -67,5 +68,11 @@ class OneDriveFileRepository(
 
         // It returns true if the file was deleted successfully, otherwise the method will throw an exception
         return true
+    }
+
+    fun getFileMetadata(fileId: String): OmhStorageMetadata {
+        val driveItem = apiService.getFile(fileId)
+
+        return OmhStorageMetadata(driveItemToOmhStorageEntity(driveItem), driveItem)
     }
 }

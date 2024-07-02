@@ -23,6 +23,7 @@ import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.plugin.onedrive.data.repository.OneDriveFileRepository
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_PARENT_ID
@@ -108,6 +109,9 @@ internal class OneDriveOmhStorageClientTest {
 
     @MockK
     private lateinit var uploadedFile: OmhStorageEntity
+
+    @MockK
+    private lateinit var omhStorageMetadata: OmhStorageMetadata
 
     @MockK
     private lateinit var byteArrayOutputStream: ByteArrayOutputStream
@@ -225,5 +229,17 @@ internal class OneDriveOmhStorageClientTest {
                 client.permanentlyDeleteFile(TEST_FILE_ID)
             }
         }
+    }
+
+    @Test
+    fun `given a repository, when getting file metadata, then return OmhStorageMetadata`() = runTest {
+        // Arrange
+        every { repository.getFileMetadata(any()) } returns omhStorageMetadata
+
+        // Act
+        val result = client.getFileMetadata(TEST_FILE_ID)
+
+        // Assert
+        assertEquals(omhStorageMetadata, result)
     }
 }

@@ -19,7 +19,7 @@ dependencies {
     }
 
     // MsGraph
-    implementation(Libs.msGraph)
+    api(Libs.msGraph)
 
     // Annotation
     implementation(Libs.androidxAnnotation)

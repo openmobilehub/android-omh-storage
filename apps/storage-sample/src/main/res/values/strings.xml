@@ -36,6 +36,7 @@
     <string name="text_search_hint">Search by file name…</string>
     <string name="text_delete_dialog_title">Are you sure?</string>
     <string name="text_delete_dialog_message">This action cannot be undone. If you want to move file to trash, use regular delete.</string>
+    <string name="text_show_original_metadata">Show original metadata</string>
 
     <string name="error_dialog_title">Something went wrong</string>
     <string name="error_dialog_message">Error detail:\n\n%s</string>
