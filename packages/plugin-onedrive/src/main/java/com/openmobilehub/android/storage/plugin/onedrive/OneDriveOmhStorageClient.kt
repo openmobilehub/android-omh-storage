@@ -85,7 +85,7 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
     }
 
     override suspend fun permanentlyDeleteFile(id: String): Boolean {
-        throw OmhStorageException.NotSupportedException()
+        throw UnsupportedOperationException()
     }
 
     override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity? {
@@ -125,8 +125,7 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
     }
 
     override suspend fun deletePermission(fileId: String, permissionId: String): Boolean {
-        // To be implemented
-        return true
+        return repository.deletePermission(fileId, permissionId)
     }
 
     override suspend fun updatePermission(
@@ -144,8 +143,7 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
         sendNotificationEmail: Boolean,
         emailMessage: String?
     ): OmhPermission {
-        // To be implemented
-        return OmhPermission.IdentityPermission("", OmhPermissionRole.READER, OmhIdentity.Anyone)
+        return repository.createPermission(fileId, permission, sendNotificationEmail, emailMessage)
     }
 
     override suspend fun getWebUrl(fileId: String): String? {

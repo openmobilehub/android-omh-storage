@@ -81,7 +81,7 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
     }
 
     override suspend fun permanentlyDeleteFile(id: String): Boolean {
-        throw OmhStorageException.NotSupportedException()
+        throw UnsupportedOperationException()
     }
 
     override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity? {

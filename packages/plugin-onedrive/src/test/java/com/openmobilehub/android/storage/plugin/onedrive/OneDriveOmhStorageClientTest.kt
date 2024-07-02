@@ -224,7 +224,7 @@ internal class OneDriveOmhStorageClientTest {
     @Test
     fun `given a repository, when permanently deleting a file, then return throw OmhStorageException_NotSupportedException`() {
         // Act & Assert
-        assertThrows(OmhStorageException.NotSupportedException::class.java) {
+        assertThrows(UnsupportedOperationException::class.java) {
             runTest {
                 client.permanentlyDeleteFile(TEST_FILE_ID)
             }

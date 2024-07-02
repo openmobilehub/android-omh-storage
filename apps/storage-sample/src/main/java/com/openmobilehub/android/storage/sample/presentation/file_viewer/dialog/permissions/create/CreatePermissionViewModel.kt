@@ -20,6 +20,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
+import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
+import com.openmobilehub.android.storage.sample.domain.repository.SessionRepository
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.create.model.CreatePermissionsViewAction
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.create.model.PermissionType
 import com.openmobilehub.android.storage.sample.util.isValidEmail
@@ -32,12 +34,24 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @HiltViewModel
-class CreatePermissionViewModel @Inject constructor() : ViewModel() {
+class CreatePermissionViewModel @Inject constructor(
+    sessionRepository: SessionRepository
+) : ViewModel() {
 
     private val _action = Channel<CreatePermissionsViewAction>()
     val action = _action.receiveAsFlow()
 
     val roles = OmhPermissionRole.values()
+    val disabledRoles: Set<OmhPermissionRole> = when (sessionRepository.getStorageAuthProvider()) {
+        StorageAuthProvider.GOOGLE -> emptySet()
+        StorageAuthProvider.DROPBOX -> emptySet()
+        StorageAuthProvider.MICROSOFT -> setOf(
+            OmhPermissionRole.ORGANIZER,
+            OmhPermissionRole.FILE_ORGANIZER,
+            OmhPermissionRole.COMMENTER
+        )
+    }
+
     private val _role: MutableStateFlow<OmhPermissionRole> =
         MutableStateFlow(OmhPermissionRole.READER)
     val role: StateFlow<OmhPermissionRole> = _role
@@ -51,6 +65,14 @@ class CreatePermissionViewModel @Inject constructor() : ViewModel() {
         }
 
     val types = PermissionType.values()
+    val disabledTypes: Set<PermissionType> = when (sessionRepository.getStorageAuthProvider()) {
+        StorageAuthProvider.GOOGLE -> emptySet()
+        StorageAuthProvider.DROPBOX -> emptySet()
+        StorageAuthProvider.MICROSOFT -> setOf(
+            PermissionType.ANYONE,
+            PermissionType.DOMAIN
+        )
+    }
 
     private val _type: MutableStateFlow<PermissionType> = MutableStateFlow(PermissionType.USER)
     val type: MutableStateFlow<PermissionType> = _type

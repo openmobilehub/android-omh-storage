@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
+@file:Suppress("TooManyFunctions")
+
 package com.openmobilehub.android.storage.plugin.onedrive.data.mapper
 
 import com.microsoft.graph.models.DriveItemVersion
+import com.microsoft.graph.models.DriveRecipient
 import com.microsoft.graph.models.EmailIdentity
 import com.microsoft.graph.models.Identity
+import com.microsoft.graph.models.IdentitySet
 import com.microsoft.graph.models.Permission
 import com.microsoft.graph.models.SharePointIdentitySet
+import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhIdentity
 import com.openmobilehub.android.storage.core.model.OmhPermission
@@ -53,23 +58,37 @@ internal fun Permission.toOmhPermission(): OmhPermission? {
 
 @Suppress("ReturnCount")
 private fun Permission.getOmhIdentity(): OmhIdentity? {
-    val grantedToV2 = grantedToV2 ?: return null
-
-    grantedToV2.getOmhUser(this)?.let { return it }
-    grantedToV2.getOmhGroup(this)?.let { return it }
-    grantedToV2.getOmhDevice(this)?.let { return it }
-    grantedToV2.getOmhApplication(this)?.let { return it }
+    grantedToV2?.toOmhOmhIdentity(this)?.let { return it }
+    // Even that grantedTo is deprecated, it is still sometimes used instead of grantedToV2
+    grantedTo?.toOmhOmhIdentity(this)?.let { return it }
 
     return null
 }
 
-private fun SharePointIdentitySet.getOmhUser(permission: Permission): OmhIdentity.User? {
-    val user = this.user ?: return null
+@Suppress("ReturnCount")
+private fun IdentitySet.toOmhOmhIdentity(permission: Permission): OmhIdentity? {
+    user?.toUser(permission)?.let { return it }
+    device?.toDevice(permission)?.let { return it }
+    application?.toApplication(permission)?.let { return it }
 
+    return null
+}
+
+@Suppress("ReturnCount")
+private fun SharePointIdentitySet.toOmhOmhIdentity(permission: Permission): OmhIdentity? {
+    user?.toUser(permission)?.let { return it }
+    group?.toGroup(permission)?.let { return it }
+    device?.toDevice(permission)?.let { return it }
+    application?.toApplication(permission)?.let { return it }
+
+    return null
+}
+
+private fun Identity.toUser(permission: Permission): OmhIdentity.User {
     return OmhIdentity.User(
-        id = user.id,
-        displayName = user.displayName,
-        emailAddress = user.getEmail(),
+        id = id,
+        displayName = displayName,
+        emailAddress = getEmail(),
         expirationTime = permission.getExpirationTime(),
         deleted = null,
         photoLink = null,
@@ -77,34 +96,28 @@ private fun SharePointIdentitySet.getOmhUser(permission: Permission): OmhIdentit
     )
 }
 
-private fun SharePointIdentitySet.getOmhGroup(permission: Permission): OmhIdentity.Group? {
-    val group = this.group ?: return null
-
+private fun Identity.toGroup(permission: Permission): OmhIdentity.Group {
     return OmhIdentity.Group(
-        id = group.id,
-        displayName = group.displayName,
-        emailAddress = group.getEmail(),
+        id = id,
+        displayName = displayName,
+        emailAddress = getEmail(),
         expirationTime = permission.getExpirationTime(),
         deleted = null
     )
 }
 
-private fun SharePointIdentitySet.getOmhDevice(permission: Permission): OmhIdentity.Device? {
-    val device = this.device ?: return null
-
+private fun Identity.toDevice(permission: Permission): OmhIdentity.Device {
     return OmhIdentity.Device(
-        id = device.id,
-        displayName = device.displayName,
+        id = id,
+        displayName = displayName,
         expirationTime = permission.getExpirationTime(),
     )
 }
 
-private fun SharePointIdentitySet.getOmhApplication(permission: Permission): OmhIdentity.Application? {
-    val application = this.application ?: return null
-
+private fun Identity.toApplication(permission: Permission): OmhIdentity.Application {
     return OmhIdentity.Application(
-        id = application.id,
-        displayName = application.displayName,
+        id = id,
+        displayName = displayName,
         expirationTime = permission.getExpirationTime(),
     )
 }
@@ -132,6 +145,33 @@ private fun Permission.getOmhRole(): OmhPermissionRole? =
             null
         }
     }
+
+internal fun OmhPermissionRole.toOneDriveString(): String =
+    when (this) {
+        OmhPermissionRole.OWNER -> OWNER_ROLE
+        OmhPermissionRole.ORGANIZER ->
+            throw UnsupportedOperationException("OmhPermissionRole.ORGANIZER is unsupported")
+
+        OmhPermissionRole.FILE_ORGANIZER ->
+            throw UnsupportedOperationException("OmhPermissionRole.FILE_ORGANIZER is unsupported")
+
+        OmhPermissionRole.WRITER -> WRITE_ROLE
+        OmhPermissionRole.COMMENTER ->
+            throw UnsupportedOperationException("OmhPermissionRole.COMMENTER is unsupported")
+
+        OmhPermissionRole.READER -> READ_ROLE
+    }
+
+internal fun OmhCreatePermission.toDriveRecipient(): DriveRecipient = when (this) {
+    is OmhCreatePermission.AnyonePermission ->
+        throw UnsupportedOperationException("OmhCreatePermission.AnyonePermission is unsupported")
+
+    is OmhCreatePermission.DomainPermission ->
+        throw UnsupportedOperationException("OmhCreatePermission.DomainPermission is unsupported")
+
+    is OmhCreatePermission.GroupPermission -> DriveRecipient().apply { email = emailAddress }
+    is OmhCreatePermission.UserPermission -> DriveRecipient().apply { email = emailAddress }
+}
 
 private fun Identity.getEmail(): String? {
     return (this as? EmailIdentity)?.email
