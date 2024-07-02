@@ -217,7 +217,7 @@ class OneDriveFileRepositoryTest {
         val result = repository.getFileMetadata(TEST_FILE_ID)
 
         // Assert
-        assertEquals(omhStorageEntity, result.entity)
-        assertEquals(driveItem, result.originalMetadata)
+        assertEquals(omhStorageEntity, result?.entity)
+        assertEquals(driveItem, result?.originalMetadata)
     }
 }

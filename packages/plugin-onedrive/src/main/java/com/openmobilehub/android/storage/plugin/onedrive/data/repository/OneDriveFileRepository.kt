@@ -17,10 +17,12 @@
 package com.openmobilehub.android.storage.plugin.onedrive.data.repository
 
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhStorageEntity
+import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.toOmhPermission
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.toOmhVersion
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiService
 import com.openmobilehub.android.storage.plugin.onedrive.data.util.toByteArrayOutputStream
@@ -70,9 +72,17 @@ class OneDriveFileRepository(
         return true
     }
 
-    fun getFileMetadata(fileId: String): OmhStorageMetadata {
-        val driveItem = apiService.getFile(fileId)
+    fun getFileMetadata(fileId: String): OmhStorageMetadata? {
+        val driveItem = apiService.getFile(fileId) ?: return null
 
         return OmhStorageMetadata(driveItemToOmhStorageEntity(driveItem), driveItem)
+    }
+
+    fun getFilePermissions(fileId: String): List<OmhPermission> {
+        return apiService.getFilePermissions(fileId).mapNotNull { it.toOmhPermission() }
+    }
+
+    fun getWebUrl(fileId: String): String? {
+        return apiService.getFile(fileId)?.webUrl
     }
 }

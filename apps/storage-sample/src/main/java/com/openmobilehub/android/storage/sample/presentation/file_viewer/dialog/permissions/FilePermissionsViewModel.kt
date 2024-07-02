@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
+import com.openmobilehub.android.storage.core.model.OmhIdentity
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageException
@@ -146,10 +147,17 @@ class FilePermissionsViewModel @Inject constructor(
 
 @Suppress("MagicNumber")
 private fun OmhPermission.orderByType(): Int = when (this) {
-    is OmhPermission.AnyonePermission -> 0
-    is OmhPermission.DomainPermission -> 1
-    is OmhPermission.GroupPermission -> 2
-    is OmhPermission.UserPermission -> 3
+    is OmhPermission.IdentityPermission -> this.orderByIdentity()
+}
+
+@Suppress("MagicNumber")
+private fun OmhPermission.IdentityPermission.orderByIdentity(): Int = when (this.identity) {
+    is OmhIdentity.Application -> 0
+    is OmhIdentity.Device -> 1
+    is OmhIdentity.Anyone -> 2
+    is OmhIdentity.Domain -> 3
+    is OmhIdentity.Group -> 4
+    is OmhIdentity.User -> 5
 }
 
 @Suppress("MagicNumber")

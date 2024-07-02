@@ -23,6 +23,7 @@ import com.google.api.services.drive.model.Revision
 import com.google.api.services.drive.model.RevisionList
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhIdentity
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
@@ -92,6 +93,7 @@ internal fun RevisionList.toOmhFileVersions(fileId: String): List<OmhFileVersion
     return this.revisions.toList().map { revision -> revision.toOmhFileVersion(fileId) }
 }
 
+@Suppress("ReturnCount")
 internal fun Permission.toOmhPermission(): OmhPermission? {
     val omhRole = role.stringToRole()
 
@@ -99,13 +101,20 @@ internal fun Permission.toOmhPermission(): OmhPermission? {
         return null
     }
 
+    return OmhPermission.IdentityPermission(
+        id,
+        omhRole,
+        getOmhIdentity() ?: return null
+    )
+}
+
+internal fun Permission.getOmhIdentity(): OmhIdentity? {
     val expirationTime = expirationTime?.value?.let { Date(it) }
 
     return when (type) {
         USER_TYPE -> {
-            OmhPermission.UserPermission(
-                id,
-                omhRole,
+            OmhIdentity.User(
+                id = null,
                 displayName,
                 emailAddress,
                 expirationTime,
@@ -117,30 +126,24 @@ internal fun Permission.toOmhPermission(): OmhPermission? {
         }
 
         GROUP_TYPE -> {
-            OmhPermission.GroupPermission(
-                id,
-                omhRole,
+            OmhIdentity.Group(
+                id = null,
                 displayName,
                 emailAddress,
                 expirationTime,
-                deleted
+                deleted,
             )
         }
 
         DOMAIN_TYPE -> {
-            OmhPermission.DomainPermission(
-                id,
-                omhRole,
-                displayName,
-                domain
+            OmhIdentity.Domain(
+                displayName.orEmpty(),
+                domain.orEmpty()
             )
         }
 
         ANYONE_TYPE -> {
-            OmhPermission.AnyonePermission(
-                id,
-                omhRole,
-            )
+            OmhIdentity.Anyone
         }
 
         else -> null
