@@ -24,6 +24,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.dropbox.core.v2.files.Metadata
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.microsoft.graph.models.DriveItem
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
@@ -130,6 +131,10 @@ class FileMetadataDialog : BottomSheetDialogFragment() {
 
                 is DriveItem -> { // OneDrive
                     extraMetadata.label.text = originalMetadata.serializeToString()
+                }
+
+                is Metadata -> { // Dropbox
+                    extraMetadata.label.text = originalMetadata.toString()
                 }
             }
         }

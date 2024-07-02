@@ -22,9 +22,11 @@ import com.dropbox.core.v2.files.DeleteResult
 import com.dropbox.core.v2.files.FileMetadata
 import com.dropbox.core.v2.files.ListFolderResult
 import com.dropbox.core.v2.files.ListRevisionsResult
+import com.dropbox.core.v2.files.Metadata
 import com.dropbox.core.v2.files.SearchMatchV2
 import com.dropbox.core.v2.files.SearchV2Result
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
+import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.utils.toInputStream
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.MetadataToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.toOmhVersion
@@ -43,6 +45,7 @@ import io.mockk.mockkStatic
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -76,6 +79,9 @@ class DropboxFileRepositoryTest {
 
     @MockK
     private lateinit var fileMetadata: FileMetadata
+
+    @MockK
+    private lateinit var metadata: Metadata
 
     @MockK
     private lateinit var searchMatch: SearchMatchV2
@@ -221,5 +227,31 @@ class DropboxFileRepositoryTest {
 
         // Assert
         assertEquals(listOf(omhStorageEntity), result)
+    }
+
+    @Test
+    fun `given an apiService returns Metadata that can be mapped to OmhStorageEntity, when getting the file, then return OmhStorageMetadata`() {
+        // Arrange
+        every { apiService.getFile(any()) } returns metadata
+        every { metadataToOmhStorageEntity(any()) } returns omhStorageEntity
+
+        // Act
+        val result = repository.getFileMetadata(TEST_FILE_ID)
+
+        // Assert
+        assertEquals(omhStorageEntity, result.entity)
+        assertEquals(metadata, result.originalMetadata)
+    }
+
+    @Test
+    fun `given an apiService returns Metadata that cannot be mapped to OmhStorageEntity, when getting the file, then error is thrown`() {
+        // Arrange
+        every { apiService.getFile(any()) } returns metadata
+        every { metadataToOmhStorageEntity(any()) } returns null
+
+        // Act & Assert
+        assertThrows(OmhStorageException.ApiException::class.java) {
+            repository.getFileMetadata(TEST_FILE_ID)
+        }
     }
 }
