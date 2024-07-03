@@ -21,11 +21,14 @@ Module plugin-googledrive-gms
 
 ## Prerequisites
 
-Ensure you have the [`com.openmobilehub.android.storage:core:2.0.0`](https://miniature-adventure-4gle9ye.pages.github.io/docs/core) package installed before proceeding with the integration.
+Ensure you have the following packages installed before proceeding with the integration:
+
+- [`com.openmobilehub.android.storage:core:2.0.0`](https://miniature-adventure-4gle9ye.pages.github.io/docs/core)
+- [`com.openmobilehub.android.auth:core:2.0.2`](https://github.com/openmobilehub/android-omh-auth)
 
 ## Installation
 
-To integrate the Google Drive OMH Storage provider into your Android project, follow these steps:
+To integrate the Google Drive storage provider into your Android project, follow these steps:
 
 ### 1. Configure Maven Central repository
 
@@ -39,9 +42,9 @@ allprojects {
 }
 ```
 
-### 2. Add Dependency for the Google Drive provider
+### 2. Add Dependency for the Google Drive storage provider
 
-Add the dependency for the Google Drive provider to your project's **build.gradle** file:
+Add the dependency for the Google Drive storage provider to your project's **build.gradle** file:
 
 ```gradle
 dependencies {
@@ -62,7 +65,7 @@ To access Google Drive APIs, follow these steps to obtain the **Client ID**:
 
 ### Secrets
 
-To securely configure the Google Drive provider, add the following entry to your project's **local.properties** file:
+To securely configure the Google Drive storage provider, add the following entry to your project's **local.properties** file:
 
 ```bash
 GOOGLE_CLIENT_ID=<YOUR_GOOGLE_CLIENT_ID>
@@ -72,9 +75,7 @@ GOOGLE_CLIENT_ID=<YOUR_GOOGLE_CLIENT_ID>
 
 ### Initializing
 
-<!-- TODO: Document the initialization -->
-
-Before interacting with Google Drive, initialize the OMH Auth Client and OMH Storage Client with the necessary platform-specific configuration:
+To interact with the Google Drive storage provider, you must first initialize both the OMH Auth Client and OMH Storage Client with the necessary configurations. This setup ensures compatibility with both GMS and non-GMS Android devices.
 
 ```kotlin
 
@@ -82,7 +83,7 @@ Before interacting with Google Drive, initialize the OMH Auth Client and OMH Sto
 
 ### Other methods
 
-Interacting with the Google Drive provider follows the same pattern as other providers since they all implement the [`OmhStorageClient`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client) interface. For a comprehensive list of available methods, refer to the [Quick Start](https://miniature-adventure-4gle9ye.pages.github.io/docs/react-native-omh-auth/docs/getting-started#sign-in) guide.
+Interacting with the Google Drive storage provider follows the same pattern as other storage providers since they all implement the [`OmhStorageClient`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client) interface. This uniformity ensures consistent functionality across different storage providers, so you won’t need to learn new methods regardless of the storage provider you choose! For a comprehensive list of available methods, refer to the [Getting Started](https://miniature-adventure-4gle9ye.pages.github.io/docs/getting-started) guide.
 
 ## License
 

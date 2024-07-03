@@ -22,8 +22,8 @@
 ## Features
 
 - 📱 GMS and non-GMS support for all storage providers
-- 🖇️ Identical API across all providers
-- 📦 Official provider SDK integration
+- 🖇️ Identical API across all storage providers
+- 📦 Official storage provider SDK integration
 - 🚀 Easy configuration and setup
 - 💨 Lightweight modules
 
@@ -59,7 +59,7 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 
 ## Documentation
 
-- [Quick Start](https://miniature-adventure-4gle9ye.pages.github.io/docs/getting-started)
+- [Getting Started](https://miniature-adventure-4gle9ye.pages.github.io/docs/getting-started)
 - [Reference API](https://miniature-adventure-4gle9ye.pages.github.io/api)
 
 ## Contributing

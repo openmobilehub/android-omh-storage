@@ -1,8 +1,7 @@
 ---
 title: Core
 layout: default
-nav_order: 6
-has_children: true
+nav_order: 3
 ---
 
 {% include_relative _README_ORIGINAL.md %}
