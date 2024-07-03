@@ -73,8 +73,10 @@ Before interacting with any storage provider, you must first initialize both the
 
 ```
 
+---
+
 For a more in depth view on the available methods, access the [Reference API](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client).
 
 ## Sample app
 
-Explore the [sample app](https://miniature-adventure-4gle9ye.pages.github.io/docs/contributing#sample-app) included in the repository to see the implementation of storage with Google Drive and other storage providers. The sample app demonstrates the integration and usage of the various storage providers, providing a practical example to help you get started quickly.
+Explore the [sample app](https://github.com/openmobilehub/android-omh-storage/tree/main/apps/storage-sample) included in the repository to see the implementation of storage with Google Drive and other storage providers. The sample app demonstrates the integration and usage of the various storage providers, providing a practical example to help you get started quickly.

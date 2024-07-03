@@ -78,10 +78,34 @@ GOOGLE_CLIENT_ID=<YOUR_GOOGLE_CLIENT_ID>
 To interact with the Google Drive storage provider, you must first initialize both the OMH Auth Client and OMH Storage Client with the necessary configurations. This setup ensures compatibility with both GMS and non-GMS Android devices.
 
 ```kotlin
+val omhAuthClient = OmhAuthProvider.Builder()
+    .addNonGmsPath("com.openmobilehub.android.auth.plugin.google.nongms.presentation.OmhAuthFactoryImpl")
+    .addGmsPath("com.openmobilehub.android.auth.plugin.google.gms.OmhAuthFactoryImpl")
+    .build()
+    .provideAuthClient(
+        context = context,
+        scopes = listOf(
+            "openid",
+            "email",
+            "profile",
+            "https://www.googleapis.com/auth/drive",
+            "https://www.googleapis.com/auth/drive.file"
+        ),
+        clientId = "<YOUR_GOOGLE_CLIENT_ID>"
+    )
 
+val omhStorageClient = OmhStorageProvider.Builder()
+    .addGmsPath(GoogleDriveGmsConstants.IMPLEMENTATION_PATH)
+    .addNonGmsPath(GoogleDriveNonGmsConstants.IMPLEMENTATION_PATH)
+    .build()
+    .provideStorageClient(omhAuthClient, context)
 ```
 
 ### Other methods
+
+#### ⚠️ KNOWN LIMITATIONS
+
+> The methods `downloadFile` and `downloadFileVersion` do not support [Google Workspace documents](https://developers.google.com/drive/api/guides/about-files#types:~:text=Google%20Workspace%20document,MIME%20types.) (Google Docs, Google Sheets, and Google Slides). To download Google Workspace documents, please use the `exportFile` method to export the file to a supported format.
 
 Interacting with the Google Drive storage provider follows the same pattern as other storage providers since they all implement the [`OmhStorageClient`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client) interface. This uniformity ensures consistent functionality across different storage providers, so you won’t need to learn new methods regardless of the storage provider you choose! For a comprehensive list of available methods, refer to the [Getting Started](https://miniature-adventure-4gle9ye.pages.github.io/docs/getting-started) guide.
 
