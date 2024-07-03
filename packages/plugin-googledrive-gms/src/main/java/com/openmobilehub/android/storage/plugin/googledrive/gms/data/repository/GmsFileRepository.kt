@@ -115,28 +115,29 @@ internal class GmsFileRepository(
         .getMimeTypeFromExtension(file.extension)
         ?: ANY_MIME_TYPE
 
-    @SuppressWarnings("SwallowedException")
-    fun downloadFile(fileId: String, mimeType: String?): ByteArrayOutputStream {
+    @Suppress("SwallowedException")
+    fun downloadFile(fileId: String): ByteArrayOutputStream {
         val outputStream = ByteArrayOutputStream()
 
         try {
             apiService.getFile(fileId).executeMediaAndDownloadTo(outputStream)
+            return outputStream
         } catch (exception: HttpResponseException) {
-            with(outputStream) {
-                flush()
-                reset()
-            }
-
-            if (mimeType.isNullOrBlank()) {
-                throw exception.toApiException()
-            }
-
-            apiService
-                .downloadGoogleDoc(fileId, mimeType)
-                .executeMediaAndDownloadTo(outputStream)
+            throw exception.toApiException()
         }
+    }
 
-        return outputStream
+    @Suppress("SwallowedException")
+    fun exportFile(fileId: String, exportedMimeType: String): ByteArrayOutputStream {
+        val outputStream = ByteArrayOutputStream()
+
+        try {
+            apiService.exportFile(fileId, exportedMimeType)
+                .executeMediaAndDownloadTo(outputStream)
+            return outputStream
+        } catch (e: HttpResponseException) {
+            throw e.toApiException()
+        }
     }
 
     fun updateFile(localFileToUpload: File, fileId: String): OmhStorageEntity.OmhFile? {

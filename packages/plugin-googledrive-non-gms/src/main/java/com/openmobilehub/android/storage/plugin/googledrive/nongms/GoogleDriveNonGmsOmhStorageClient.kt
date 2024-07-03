@@ -82,8 +82,15 @@ internal class GoogleDriveNonGmsOmhStorageClient private constructor(
         return fileRepository.uploadFile(localFileToUpload, parentId)
     }
 
-    override suspend fun downloadFile(fileId: String, mimeType: String?): ByteArrayOutputStream {
-        return fileRepository.downloadFile(fileId, mimeType)
+    override suspend fun downloadFile(fileId: String): ByteArrayOutputStream {
+        return fileRepository.downloadFile(fileId)
+    }
+
+    override suspend fun exportFile(
+        fileId: String,
+        exportedMimeType: String
+    ): ByteArrayOutputStream {
+        return fileRepository.exportFile(fileId, exportedMimeType)
     }
 
     override suspend fun updateFile(
