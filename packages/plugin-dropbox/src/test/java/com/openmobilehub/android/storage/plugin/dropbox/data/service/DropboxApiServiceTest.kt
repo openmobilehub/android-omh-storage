@@ -178,4 +178,18 @@ class DropboxApiServiceTest {
         // Assert
         assertEquals(searchResult, result)
     }
+
+    @Test
+    fun `given apiClient returns Metadata, when getting the file, then return Metadata`() {
+        // Arrange
+        every {
+            apiClient.dropboxApiService.files().getMetadata(any())
+        } returns metadata
+
+        // Act
+        val result = apiService.getFile(TEST_FILE_ID)
+
+        // Assert
+        assertEquals(metadata, result)
+    }
 }
