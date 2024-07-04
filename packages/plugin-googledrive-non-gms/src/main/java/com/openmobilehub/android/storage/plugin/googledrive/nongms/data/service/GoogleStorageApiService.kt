@@ -25,7 +25,6 @@ import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.PermissionsListResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.RevisionListRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.WebUrlResponse
-import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -33,11 +32,9 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
-import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
-import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 import retrofit2.http.Url
@@ -76,7 +73,6 @@ internal interface GoogleStorageApiService {
 
         private const val FILE_ID = "fileId"
         private const val REVISION_ID = "revisionId"
-        private const val META_DATA = "metadata"
         private const val PERMISSION_ID = "permissionId"
     }
 
@@ -96,14 +92,6 @@ internal interface GoogleStorageApiService {
     suspend fun deleteFile(
         @Path(FILE_ID) fileId: String
     ): Response<ResponseBody>
-
-    @Multipart
-    @POST(UPLOAD_FILES_PARTICLE)
-    suspend fun uploadFile(
-        @Part(META_DATA) metadata: RequestBody,
-        @Part filePart: MultipartBody.Part,
-        @Query(QUERY_FIELDS) fields: String = QUERY_REQUESTED_FIELDS,
-    ): Response<FileRemoteResponse>
 
     @GET("$FILES_PARTICLE/{$FILE_ID}")
     suspend fun downloadMediaFile(
