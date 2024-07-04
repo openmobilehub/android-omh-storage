@@ -37,9 +37,10 @@ import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsCo
 import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.USER_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.WRITER_ROLE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.extension.isFolder
+import java.lang.Exception
 import java.util.Date
 
-@SuppressWarnings("ComplexCondition")
+@SuppressWarnings("ComplexCondition", "SwallowedException", "TooGenericExceptionCaught")
 internal fun File.toOmhStorageEntity(): OmhStorageEntity? {
     if (mimeType == null || id == null || name == null) {
         return null
@@ -53,6 +54,13 @@ internal fun File.toOmhStorageEntity(): OmhStorageEntity? {
 
     val createdTime = createdTime?.let { Date(it.value) }
     val modifiedTime = modifiedTime?.let { Date(it.value) }
+    val size = try {
+        // This might throw an exception for some specific Google Workspace Documents,
+        // like application/vnd.google-apps.map
+        getSize().toInt()
+    } catch (e: Exception) {
+        null
+    }
 
     return if (isFolder()) {
         OmhStorageEntity.OmhFolder(
@@ -71,8 +79,7 @@ internal fun File.toOmhStorageEntity(): OmhStorageEntity? {
             parentId,
             mimeType,
             fileExtension,
-            // Not using size property as it refers to java.util.AbstractMap instead of File.
-            getSize().toInt(),
+            size,
         )
     }
 }
