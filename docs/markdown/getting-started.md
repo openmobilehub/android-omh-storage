@@ -27,8 +27,8 @@ To integrate a storage provider into your Android project, follow the steps belo
 | Storage provider           | Package                                                                                                                                     |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | Google Drive (GMS/non-GMS) | `com.openmobilehub.android.storage:plugin-googledrive-gms:2.0.0` <br/> `com.openmobilehub.android.storage:plugin-googledrive-non-gms:2.0.0` |
-| OneDrive                   | `com.openmobilehub.android.storage:plugin-onedrive:2.0.0`                                                                                   |
 | OneDrive                   | `com.openmobilehub.android.storage:plugin-dropbox:2.0.0`                                                                                    |
+| Dropbox                    | `com.openmobilehub.android.storage:plugin-dropbox:2.0.0`                                                                                    |
 
 ### 1. Configure Maven Central repository
 
@@ -44,11 +44,11 @@ allprojects {
 
 ### 2. Add Dependency for the desired storage provider
 
-Add the appropriate dependency for the desired storage provider to your project's **build.gradle** file. Replace <storage-provider-name> with the specific storage provider package name as shown in the table above:
+Add the appropriate dependency for the desired storage provider to your project's **build.gradle** file. Replace `<storage-provider-name>` with the specific storage provider package name and `<version>` with the latest version available as shown in the table above:
 
 ```gradle
 dependencies {
-  implementation("com.openmobilehub.android.storage:plugin-<storage-provider-name>:2.0.0")
+  implementation("com.openmobilehub.android.storage:plugin-<storage-provider-name>:<version>")
 }
 ```
 
@@ -56,7 +56,6 @@ dependencies {
 
 Each storage provider requires specific secrets for configuration. Please follow the individual storage provider configuration guides:
 
-- [Core](https://miniature-adventure-4gle9ye.pages.github.io/docs/core/#configuration)
 - [Google Drive](https://miniature-adventure-4gle9ye.pages.github.io/docs/plugin-googledrive-gms/#configuration)
 - [OneDrive](https://miniature-adventure-4gle9ye.pages.github.io/docs/plugin-onedrive/#configuration)
 - [Dropbox](https://miniature-adventure-4gle9ye.pages.github.io/docs/plugin-dropbox/#configuration)
@@ -65,12 +64,208 @@ Each storage provider requires specific secrets for configuration. Please follow
 
 In this guide, we'll use the Google Drive storage provider as an example. You can choose any other storage provider since the exposed methods are identical across all storage storage providers. Each storage provider implements the [`OmhStorageClient`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client) interface, ensuring consistent functionality. This uniformity means you won't need to learn new methods regardless of the storage provider you choose!
 
+### 💡 GOOD TO KNOW
+
+> Any operation you can perform on files can also be applied to folders.
+
 ### Initializing
 
 Before interacting with any storage provider, you must first initialize both the OMH Auth Client and OMH Storage Client with the necessary configurations specific to that storage provider.
 
 ```kotlin
+val omhAuthClient = OmhAuthProvider.Builder()
+    .addNonGmsPath("com.openmobilehub.android.auth.plugin.google.nongms.presentation.OmhAuthFactoryImpl")
+    .addGmsPath("com.openmobilehub.android.auth.plugin.google.gms.OmhAuthFactoryImpl")
+    .build()
+    .provideAuthClient(
+        context = context,
+        scopes = listOf(
+            "openid",
+            "email",
+            "profile",
+            "https://www.googleapis.com/auth/drive",
+            "https://www.googleapis.com/auth/drive.file"
+        ),
+        clientId = "<YOUR_GOOGLE_CLIENT_ID>"
+    )
 
+val omhStorageClient = OmhStorageProvider.Builder()
+    .addGmsPath(GoogleDriveGmsConstants.IMPLEMENTATION_PATH)
+    .addNonGmsPath(GoogleDriveNonGmsConstants.IMPLEMENTATION_PATH)
+    .build()
+    .provideStorageClient(omhAuthClient, context)
+```
+
+### Get root folder path
+
+Retrieves the root folder path of the storage service. Useful when you want to list files in the root folder.
+
+```kotlin
+val rootPath = omhStorageClient.rootFolder
+```
+
+### List files
+
+Lists files from a specific folder.
+
+```kotlin
+val files = omhStorageClient.listFiles(parentId = "folderId")
+```
+
+### Search files
+
+Lists files with names containing the specified query value.
+
+```kotlin
+val searchResults = omhStorageClient.search(query = "fileName")
+```
+
+### Create file
+
+Creates a file in a specific folder.
+
+```kotlin
+val newFile = omhStorageClient.createFile(
+    name = "fileName",
+    mimeType = "fileMimeType",
+    parentId = "folderId"
+)
+```
+
+### Update file
+
+Updates a remote file with the content of a local file.
+
+```kotlin
+val updatedFile = omhStorageClient.updateFile(
+    localFileToUpload = File("localFilePath"),
+    fileId = "fileId"
+)
+```
+
+### Delete file
+
+Moves a file with the given file ID in the trash.
+
+```kotlin
+val isDeleted = omhStorageClient.deleteFile(id = "fileId")
+```
+
+### Permanently delete file
+
+Permanently deletes a file with the given file ID.
+
+```kotlin
+val isPermanentlyDeleted = omhStorageClient.permanentlyDeleteFile(id = "fileId")
+```
+
+### Upload file
+
+Uploads a local file to a specific folder.
+
+```kotlin
+val uploadedFile = omhStorageClient.uploadFile(
+    localFileToUpload = File("localFilePath"),
+    parentId = "folderId"
+)
+```
+
+### Download file
+
+Downloads a file with the given file ID.
+
+```kotlin
+val fileContent = omhStorageClient.downloadFile(fileId = "fileId")
+```
+
+### Export file
+
+Exports a provider application file with the given file ID to a specified MIME type.
+
+```kotlin
+val exportedFileContent = omhStorageClient.exportFile(
+    fileId = "fileId",
+    exportedMimeType = "desiredMimeType"
+)
+```
+
+### Get file metadata
+
+Retrieves the metadata of a file with the given file ID.
+
+```kotlin
+val fileMetadata = omhStorageClient.getFileMetadata(fileId = "fileId")
+```
+
+### Get file versions
+
+Retrieves the versions of a file with the given file ID.
+
+```kotlin
+val fileVersions = omhStorageClient.getFileVersions(fileId = "fileId")
+```
+
+### Download file version
+
+Downloads a specific version of a file.
+
+```kotlin
+val versionContent = omhStorageClient.downloadFileVersion(
+    fileId = "fileId",
+    versionId = "versionId"
+)
+```
+
+### Get file permissions
+
+Lists the permissions of a file with the given file ID.
+
+```kotlin
+val permissions = omhStorageClient.getFilePermissions(fileId = "fileId")
+```
+
+### Create file permission
+
+Creates a permission for a file.
+
+```kotlin
+val newPermission = omhStorageClient.createPermission(
+    fileId = "fileId",
+    permission = OmhCreatePermission(/* parameters */),
+    sendNotificationEmail = true,
+    emailMessage = "Optional message"
+)
+```
+
+### Update file permission
+
+Updates the role of a permission in a file.
+
+```kotlin
+val updatedPermission = omhStorageClient.updatePermission(
+    fileId = "fileId",
+    permissionId = "permissionId",
+    role = OmhPermissionRole.ROLE
+)
+```
+
+### Delete file permission
+
+Deletes a permission with the given permission ID from a file.
+
+```kotlin
+val isPermissionDeleted = omhStorageClient.deletePermission(
+    fileId = "fileId",
+    permissionId = "permissionId"
+)
+```
+
+### Get file URL
+
+Retrieves the file URL.
+
+```kotlin
+val webUrl = omhStorageClient.getWebUrl(fileId = "fileId")
 ```
 
 ---
