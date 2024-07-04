@@ -40,19 +40,18 @@ fun OmhStorageEntity.OmhFile.getFileType() = mimeType?.let {
     FileTypeMapper.getFileTypeWithMime(it)
 } ?: FileType.OTHER
 
-fun OmhStorageEntity.OmhFile.normalizedMimeType(): String = when (getFileType()) {
-    FileType.GOOGLE_DOCUMENT -> FileType.MICROSOFT_WORD.mimeType
-    FileType.GOOGLE_DRAWING -> FileType.PNG.mimeType
-    FileType.GOOGLE_FORM -> FileType.PDF.mimeType
-    FileType.GOOGLE_PHOTO -> FileType.JPEG.mimeType
-    FileType.GOOGLE_PRESENTATION -> FileType.MICROSOFT_POWERPOINT.mimeType
-    FileType.GOOGLE_SCRIPT -> FileType.JSON.mimeType
-    FileType.GOOGLE_SHORTCUT -> FileType.GOOGLE_SHORTCUT.mimeType
-    FileType.GOOGLE_SPREADSHEET -> FileType.MICROSOFT_EXCEL.mimeType
+fun OmhStorageEntity.OmhFile.normalizedFileType(): FileType = when (getFileType()) {
+    FileType.GOOGLE_DOCUMENT -> FileType.OPEN_DOCUMENT_TEXT
+    FileType.GOOGLE_DRAWING -> FileType.PNG
+    FileType.GOOGLE_FORM -> FileType.PDF
+    FileType.GOOGLE_PHOTO -> FileType.JPEG
+    FileType.GOOGLE_PRESENTATION -> FileType.MICROSOFT_POWERPOINT
+    FileType.GOOGLE_SCRIPT -> FileType.JSON
+    FileType.GOOGLE_SHORTCUT -> FileType.GOOGLE_SHORTCUT
+    FileType.GOOGLE_SPREADSHEET -> FileType.MICROSOFT_EXCEL
     FileType.GOOGLE_VIDEO,
-    FileType.GOOGLE_AUDIO -> FileType.MP4.mimeType
-
-    else -> mimeType.orEmpty()
+    FileType.GOOGLE_AUDIO -> FileType.MP4
+    else -> FileType.OTHER
 }
 
 fun OmhStorageEntity.isFolder() = this is OmhStorageEntity.OmhFolder

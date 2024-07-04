@@ -32,7 +32,7 @@ import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.F
 import com.openmobilehub.android.storage.sample.util.coSignOut
 import com.openmobilehub.android.storage.sample.util.isDownloadable
 import com.openmobilehub.android.storage.sample.util.isFolder
-import com.openmobilehub.android.storage.sample.util.normalizedMimeType
+import com.openmobilehub.android.storage.sample.util.normalizedFileType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.File
 import javax.inject.Inject
@@ -51,6 +51,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
 
 @OptIn(FlowPreview::class)
 @HiltViewModel
@@ -105,7 +106,7 @@ class FileViewerViewModel @Inject constructor(
                 }
 
                 return@combine files.sortedWith(
-                    compareBy<OmhStorageEntity> { it is OmhStorageEntity.OmhFile  }
+                    compareBy<OmhStorageEntity> { it is OmhStorageEntity.OmhFile }
                         .thenBy { (it as? OmhStorageEntity.OmhFile)?.mimeType }
                         .thenBy { it.name }
                 )
@@ -139,7 +140,9 @@ class FileViewerViewModel @Inject constructor(
             is FileViewerViewEvent.BackPressed -> backPressedEvent()
             is FileViewerViewEvent.CreateFile -> createFileEvent(event)
             is FileViewerViewEvent.DeleteFile -> deleteFileEvent(event)
-            is FileViewerViewEvent.PermanentlyDeleteFileClicked -> permanentlyDeleteFileEventClicked(event)
+            is FileViewerViewEvent.PermanentlyDeleteFileClicked -> permanentlyDeleteFileEventClicked(
+                event
+            )
             is FileViewerViewEvent.PermanentlyDeleteFile -> permanentlyDeleteFileEvent(event)
             is FileViewerViewEvent.UploadFile -> uploadFile(event)
             is FileViewerViewEvent.UpdateFile -> updateFileEvent(event)
@@ -206,18 +209,34 @@ class FileViewerViewModel @Inject constructor(
                 return
             }
 
-            val mimeTypeToSave = file.normalizedMimeType()
-
             viewModelScope.launch(Dispatchers.IO) {
                 try {
-                    val data = lastFileVersionClicked?.let {
-                        omhStorageClient.downloadFileVersion(
-                            it.fileId,
-                            it.versionId
-                        )
-                    } ?: omhStorageClient.downloadFile(file.id, mimeTypeToSave)
+                    val data: ByteArrayOutputStream?
+                    var fileToSave = file
 
-                    setState(FileViewerViewState.SaveFile(file, data))
+                    if (lastFileVersionClicked !== null) {
+                        data = omhStorageClient.downloadFileVersion(
+                            file.id,
+                            lastFileVersionClicked!!.versionId
+                        )
+                    } else {
+                        val isGoogleWorkspaceFile =
+                            file.mimeType?.startsWith("application/vnd.google-apps")
+
+                        if (isGoogleWorkspaceFile == true) {
+                            val normalizedFileType = file.normalizedFileType()
+                            data = omhStorageClient.exportFile(file.id, normalizedFileType.mimeType)
+                            fileToSave = file.copy(
+                                name = "${file.name}.${normalizedFileType.extension}",
+                                mimeType = normalizedFileType.mimeType,
+                                extension = normalizedFileType.extension
+                            )
+                        } else {
+                            data = omhStorageClient.downloadFile(file.id)
+                        }
+                    }
+
+                    setState(FileViewerViewState.SaveFile(fileToSave, data))
                 } catch (exception: Exception) {
                     errorDialogMessage.postValue(exception.message)
                     toastMessage.postValue("ERROR: ${file.name} was NOT downloaded")

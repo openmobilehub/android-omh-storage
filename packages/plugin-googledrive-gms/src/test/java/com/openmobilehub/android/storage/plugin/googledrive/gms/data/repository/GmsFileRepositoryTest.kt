@@ -99,6 +99,9 @@ internal class GmsFileRepositoryTest {
     private lateinit var driveFilesGetRequest: Drive.Files.Get
 
     @MockK(relaxed = true)
+    private lateinit var driveFilesExportRequest: Drive.Files.Export
+
+    @MockK(relaxed = true)
     lateinit var driveRevisionsGetRequest: Drive.Revisions.Get
 
     @MockK(relaxed = true)
@@ -211,13 +214,23 @@ internal class GmsFileRepositoryTest {
         }
 
     @Test
-    fun `given a file id and a mime type, when downloadFile is success, then a ByteArrayOutputStream is returned`() =
+    fun `given a file id, when downloadFile is success, then getFile is called`() =
         runTest {
             every { apiService.getFile(TEST_FILE_ID) } returns driveFilesGetRequest
 
-            fileRepositoryImpl.downloadFile(TEST_FILE_ID, TEST_FILE_MIME_TYPE)
+            fileRepositoryImpl.downloadFile(TEST_FILE_ID)
 
             verify { apiService.getFile(TEST_FILE_ID) }
+        }
+
+    @Test
+    fun `given a file id and a mime type, when exporting is success, then exportFile is called`() =
+        runTest {
+            every { apiService.exportFile(TEST_FILE_ID, TEST_FILE_MIME_TYPE) } returns driveFilesExportRequest
+
+            fileRepositoryImpl.exportFile(TEST_FILE_ID, TEST_FILE_MIME_TYPE)
+
+            verify { apiService.exportFile(TEST_FILE_ID, TEST_FILE_MIME_TYPE) }
         }
 
     @Test

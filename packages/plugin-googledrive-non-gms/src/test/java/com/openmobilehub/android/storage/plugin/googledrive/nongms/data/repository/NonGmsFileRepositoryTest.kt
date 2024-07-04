@@ -179,7 +179,7 @@ internal class NonGmsFileRepositoryTest {
         }
 
     @Test
-    fun `given a file id and a mime type, when downloadFile is success, then a ByteArrayOutputStream is returned`() =
+    fun `given a file id, when downloadFile is success, then a ByteArrayOutputStream is returned`() =
         runTest {
             val expectedResult = ByteArrayOutputStream()
             mockkStatic(ResponseBody?::toByteArrayOutputStream)
@@ -193,10 +193,31 @@ internal class NonGmsFileRepositoryTest {
                 responseBody
             )
 
-            val result = fileRepositoryImpl.downloadFile(TEST_FILE_ID, TEST_FILE_MIME_TYPE)
+            val result = fileRepositoryImpl.downloadFile(TEST_FILE_ID)
 
             assertEquals(expectedResult, result)
             coVerify { googleStorageApiService.downloadMediaFile(any(), any()) }
+        }
+
+    @Test
+    fun `given a file id and mime type, when exportFile is success, then a ByteArrayOutputStream is returned`() =
+        runTest {
+            val expectedResult = ByteArrayOutputStream()
+            mockkStatic(ResponseBody?::toByteArrayOutputStream)
+            every { responseBody.toByteArrayOutputStream() } returns expectedResult
+            coEvery {
+                googleStorageApiService.exportFile(
+                    any(),
+                    any()
+                )
+            } returns Response.success(
+                responseBody
+            )
+
+            val result = fileRepositoryImpl.exportFile(TEST_FILE_ID, TEST_FILE_MIME_TYPE)
+
+            assertEquals(expectedResult, result)
+            coVerify { googleStorageApiService.exportFile(any(), any()) }
         }
 
     @Test
@@ -288,7 +309,7 @@ internal class NonGmsFileRepositoryTest {
     }
 
     @Test(expected = OmhStorageException.ApiException::class)
-    fun `given a null mimeType, when downloadFile fails, then a DownloadException is thrown`() =
+    fun `given a fileId, when downloadFile fails, then a ApiException is thrown`() =
         runTest {
             coEvery {
                 googleStorageApiService.downloadMediaFile(
@@ -300,14 +321,14 @@ internal class NonGmsFileRepositoryTest {
                 responseBody
             )
 
-            fileRepositoryImpl.downloadFile(TEST_FILE_ID, null)
+            fileRepositoryImpl.downloadFile(TEST_FILE_ID)
         }
 
     @Test(expected = OmhStorageException.ApiException::class)
-    fun `given a fileId and mimeType, when downloadFile fails, then a DownloadException is thrown`() =
+    fun `given a fileId, when exportFile fails, then a ApiException is thrown`() =
         runTest {
             coEvery {
-                googleStorageApiService.downloadMediaFile(
+                googleStorageApiService.exportFile(
                     any(),
                     any()
                 )
@@ -316,7 +337,7 @@ internal class NonGmsFileRepositoryTest {
                 responseBody
             )
 
-            fileRepositoryImpl.downloadFile(TEST_FILE_ID, null)
+            fileRepositoryImpl.exportFile(TEST_FILE_ID, TEST_FILE_MIME_TYPE)
         }
 
     @Test(expected = OmhStorageException.ApiException::class)

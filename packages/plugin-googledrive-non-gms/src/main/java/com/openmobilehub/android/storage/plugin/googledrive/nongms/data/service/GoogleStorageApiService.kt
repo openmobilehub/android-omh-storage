@@ -114,7 +114,7 @@ internal interface GoogleStorageApiService {
     ): Response<PermissionsListResponse>
 
     @GET("$FILES_PARTICLE/{$FILE_ID}/export")
-    suspend fun exportDocEditor(
+    suspend fun exportFile(
         @Path(FILE_ID) fileId: String,
         @Query(QUERY_MIME_TYPE) mimeType: String
     ): Response<ResponseBody>

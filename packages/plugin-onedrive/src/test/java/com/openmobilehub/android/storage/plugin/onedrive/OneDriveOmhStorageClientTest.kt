@@ -26,6 +26,7 @@ import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.plugin.onedrive.data.repository.OneDriveFileRepository
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_ID
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_MIME_TYPE
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_PARENT_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_VERSION_FILE_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_VERSION_ID
@@ -178,10 +179,20 @@ internal class OneDriveOmhStorageClientTest {
         every { repository.downloadFile(any()) } returns byteArrayOutputStream
 
         // Act
-        val result = client.downloadFile(TEST_FILE_ID, null)
+        val result = client.downloadFile(TEST_FILE_ID)
 
         // Assert
         assertEquals(byteArrayOutputStream, result)
+    }
+
+    @Test
+    fun `given a repository, when exporting a file, throw OmhStorageException_NotSupportedException `() {
+        // Act & Assert
+        assertThrows(OmhStorageException.NotSupportedException::class.java) {
+            runTest {
+                client.exportFile(TEST_FILE_ID, TEST_FILE_MIME_TYPE)
+            }
+        }
     }
 
     @Test
@@ -222,7 +233,7 @@ internal class OneDriveOmhStorageClientTest {
     }
 
     @Test
-    fun `given a repository, when permanently deleting a file, then return throw OmhStorageException_NotSupportedException`() {
+    fun `given a repository, when permanently deleting a file, then throw OmhStorageException_NotSupportedException`() {
         // Act & Assert
         assertThrows(OmhStorageException.NotSupportedException::class.java) {
             runTest {

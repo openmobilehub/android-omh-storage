@@ -161,7 +161,7 @@ internal class NonGmsFileRepository(
         }
     }
 
-    suspend fun downloadFile(fileId: String, mimeType: String?): ByteArrayOutputStream {
+    suspend fun downloadFile(fileId: String): ByteArrayOutputStream {
         val response = retrofitImpl
             .getGoogleStorageApiService()
             .downloadMediaFile(fileId = fileId, alt = MEDIA)
@@ -169,18 +169,14 @@ internal class NonGmsFileRepository(
         return if (response.isSuccessful) {
             response.body().toByteArrayOutputStream()
         } else {
-            if (mimeType == null) {
-                throw response.toApiException()
-            }
-
-            return exportDocEditor(fileId, mimeType)
+            throw response.toApiException()
         }
     }
 
-    private suspend fun exportDocEditor(fileId: String, mimeType: String): ByteArrayOutputStream {
+    suspend fun exportFile(fileId: String, mimeType: String): ByteArrayOutputStream {
         val response = retrofitImpl
             .getGoogleStorageApiService()
-            .exportDocEditor(fileId, mimeType)
+            .exportFile(fileId, mimeType)
 
         return if (response.isSuccessful) {
             response.body().toByteArrayOutputStream()

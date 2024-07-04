@@ -88,8 +88,15 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         return repository.uploadFile(localFileToUpload, safeParentId)
     }
 
-    override suspend fun downloadFile(fileId: String, mimeType: String?): ByteArrayOutputStream {
+    override suspend fun downloadFile(fileId: String): ByteArrayOutputStream {
         return repository.downloadFile(fileId)
+    }
+
+    override suspend fun exportFile(
+        fileId: String,
+        exportedMimeType: String
+    ): ByteArrayOutputStream {
+        throw OmhStorageException.NotSupportedException("Exporting files is not supported in Dropbox")
     }
 
     override suspend fun getWebUrl(fileId: String): String? {
