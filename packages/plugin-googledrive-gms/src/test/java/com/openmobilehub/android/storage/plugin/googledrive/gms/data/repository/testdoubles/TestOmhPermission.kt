@@ -24,6 +24,7 @@ import com.openmobilehub.android.storage.core.utils.fromRFC3339StringToDate
 const val TEST_PERMISSION_ID = "123"
 const val TEST_PERMISSION_DISPLAY_NAME = "Tester"
 const val TEST_PERMISSION_EMAIL_ADDRESS = "test@test.com"
+const val TEST_PERMISSION_DOMAIN = "test.com"
 val TEST_PERMISSION_EXPIRATION_TIME = TEST_FIRST_MAY_2024_RFC_3339.fromRFC3339StringToDate()
 const val TEST_PERMISSION_PHOTO_LINK = "https://test.com/image"
 
