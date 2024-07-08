@@ -20,6 +20,7 @@ import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhIdentity
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
+import com.openmobilehub.android.storage.core.model.PermissionRecipient
 import com.openmobilehub.android.storage.core.utils.fromRFC3339StringToDate
 
 const val TEST_PERMISSION_ID = "123"
@@ -44,7 +45,7 @@ val testOmhPermission = OmhPermission.IdentityPermission(
     )
 )
 
-val testOmhCreatePermission = OmhCreatePermission.UserPermission(
+val testOmhCreatePermission = OmhCreatePermission.CreateIdentityPermission(
     OmhPermissionRole.OWNER,
-    TEST_PERMISSION_EMAIL_ADDRESS
+    PermissionRecipient.User(TEST_PERMISSION_EMAIL_ADDRESS)
 )

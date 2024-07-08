@@ -30,6 +30,7 @@ import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhIdentity
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
+import com.openmobilehub.android.storage.core.model.PermissionRecipient
 import com.openmobilehub.android.storage.plugin.onedrive.OneDriveConstants.OWNER_ROLE
 import com.openmobilehub.android.storage.plugin.onedrive.OneDriveConstants.READ_ROLE
 import com.openmobilehub.android.storage.plugin.onedrive.OneDriveConstants.WRITE_ROLE
@@ -149,28 +150,24 @@ private fun Permission.getOmhRole(): OmhPermissionRole? =
 internal fun OmhPermissionRole.toOneDriveString(): String =
     when (this) {
         OmhPermissionRole.OWNER -> OWNER_ROLE
-        OmhPermissionRole.ORGANIZER ->
-            throw UnsupportedOperationException("OmhPermissionRole.ORGANIZER is unsupported")
-
-        OmhPermissionRole.FILE_ORGANIZER ->
-            throw UnsupportedOperationException("OmhPermissionRole.FILE_ORGANIZER is unsupported")
-
+        OmhPermissionRole.ORGANIZER -> throw UnsupportedOperationException("Unsupported role")
+        OmhPermissionRole.FILE_ORGANIZER -> throw UnsupportedOperationException("Unsupported role")
         OmhPermissionRole.WRITER -> WRITE_ROLE
-        OmhPermissionRole.COMMENTER ->
-            throw UnsupportedOperationException("OmhPermissionRole.COMMENTER is unsupported")
-
+        OmhPermissionRole.COMMENTER -> throw UnsupportedOperationException("Unsupported role")
         OmhPermissionRole.READER -> READ_ROLE
     }
 
 internal fun OmhCreatePermission.toDriveRecipient(): DriveRecipient = when (this) {
-    is OmhCreatePermission.AnyonePermission ->
-        throw UnsupportedOperationException("OmhCreatePermission.AnyonePermission is unsupported")
+    is OmhCreatePermission.CreateIdentityPermission -> recipient.toDriveRecipient()
+}
 
-    is OmhCreatePermission.DomainPermission ->
-        throw UnsupportedOperationException("OmhCreatePermission.DomainPermission is unsupported")
-
-    is OmhCreatePermission.GroupPermission -> DriveRecipient().apply { email = emailAddress }
-    is OmhCreatePermission.UserPermission -> DriveRecipient().apply { email = emailAddress }
+internal fun PermissionRecipient.toDriveRecipient(): DriveRecipient = when (this) {
+    PermissionRecipient.Anyone -> throw UnsupportedOperationException("Unsupported recipient")
+    is PermissionRecipient.Domain -> throw UnsupportedOperationException("Unsupported recipient")
+    is PermissionRecipient.Group -> DriveRecipient().apply { email = emailAddress }
+    is PermissionRecipient.User -> DriveRecipient().apply { email = emailAddress }
+    is PermissionRecipient.WithAlias -> DriveRecipient().apply { alias = alias }
+    is PermissionRecipient.WithObjectId -> DriveRecipient().apply { objectId = objectId }
 }
 
 private fun Identity.getEmail(): String? {

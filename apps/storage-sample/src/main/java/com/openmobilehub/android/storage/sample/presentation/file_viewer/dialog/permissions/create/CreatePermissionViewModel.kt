@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
+import com.openmobilehub.android.storage.core.model.PermissionRecipient
 import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
 import com.openmobilehub.android.storage.sample.domain.repository.SessionRepository
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.create.model.CreatePermissionsViewAction
@@ -103,29 +104,29 @@ class CreatePermissionViewModel @Inject constructor(
 
     @Suppress("ReturnCount")
     private suspend fun validatePermission(): OmhCreatePermission? {
-        when (_type.value) {
+        val recipient = when (_type.value) {
             PermissionType.USER ->
-                return OmhCreatePermission.UserPermission(
-                    role = _role.value,
+                PermissionRecipient.User(
                     emailAddress = validateEmail() ?: return null
                 )
 
             PermissionType.GROUP ->
-                return OmhCreatePermission.GroupPermission(
-                    role = _role.value,
+                PermissionRecipient.Group(
                     emailAddress = validateEmail() ?: return null
                 )
 
             PermissionType.DOMAIN ->
-                return OmhCreatePermission.DomainPermission(
-                    role = _role.value,
+                PermissionRecipient.Domain(
                     domain = validateDomain() ?: return null
                 )
 
-            PermissionType.ANYONE -> return OmhCreatePermission.AnyonePermission(
-                role = _role.value,
-            )
+            PermissionType.ANYONE -> PermissionRecipient.Anyone
         }
+
+        return OmhCreatePermission.CreateIdentityPermission(
+            role = _role.value,
+            recipient = recipient
+        )
     }
 
     private suspend fun validateEmail(): String? {

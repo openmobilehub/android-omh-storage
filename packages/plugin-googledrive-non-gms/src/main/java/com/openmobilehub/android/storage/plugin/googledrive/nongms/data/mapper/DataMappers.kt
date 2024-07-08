@@ -24,6 +24,7 @@ import com.openmobilehub.android.storage.core.model.OmhIdentity
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
+import com.openmobilehub.android.storage.core.model.PermissionRecipient
 import com.openmobilehub.android.storage.core.utils.fromRFC3339StringToDate
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.ANYONE_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.COMMENTER_ROLE
@@ -188,31 +189,39 @@ internal fun OmhPermissionRole.toUpdateRequestBody(): UpdatePermissionRequestBod
 }
 
 internal fun OmhCreatePermission.toCreateRequestBody(): CreatePermissionRequestBody = when (this) {
-    is OmhCreatePermission.AnyonePermission -> CreatePermissionRequestBody(
-        type = ANYONE_TYPE,
-        role = role.toStringRole(),
-        emailAddress = null,
-        domain = null
-    )
-
-    is OmhCreatePermission.DomainPermission -> CreatePermissionRequestBody(
-        type = DOMAIN_TYPE,
-        role = role.toStringRole(),
-        emailAddress = null,
-        domain = domain
-    )
-
-    is OmhCreatePermission.GroupPermission -> CreatePermissionRequestBody(
-        type = GROUP_TYPE,
-        role = role.toStringRole(),
-        emailAddress = emailAddress,
-        domain = null
-    )
-
-    is OmhCreatePermission.UserPermission -> CreatePermissionRequestBody(
-        type = USER_TYPE,
-        role = role.toStringRole(),
-        emailAddress = emailAddress,
-        domain = null
-    )
+    is OmhCreatePermission.CreateIdentityPermission -> recipient.toCreateRequestBody(role.toStringRole())
 }
+
+internal fun PermissionRecipient.toCreateRequestBody(role: String): CreatePermissionRequestBody =
+    when (this) {
+        is PermissionRecipient.Anyone -> CreatePermissionRequestBody(
+            type = ANYONE_TYPE,
+            role = role,
+            emailAddress = null,
+            domain = null
+        )
+
+        is PermissionRecipient.Domain -> CreatePermissionRequestBody(
+            type = DOMAIN_TYPE,
+            role = role,
+            emailAddress = null,
+            domain = domain
+        )
+
+        is PermissionRecipient.Group -> CreatePermissionRequestBody(
+            type = GROUP_TYPE,
+            role = role,
+            emailAddress = emailAddress,
+            domain = null
+        )
+
+        is PermissionRecipient.User -> CreatePermissionRequestBody(
+            type = USER_TYPE,
+            role = role,
+            emailAddress = emailAddress,
+            domain = null
+        )
+
+        is PermissionRecipient.WithAlias -> throw UnsupportedOperationException("Unsupported recipient")
+        is PermissionRecipient.WithObjectId -> throw UnsupportedOperationException("Unsupported recipient")
+    }
