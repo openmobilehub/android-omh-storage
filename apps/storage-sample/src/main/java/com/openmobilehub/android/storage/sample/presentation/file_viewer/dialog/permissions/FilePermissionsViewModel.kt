@@ -112,7 +112,7 @@ class FilePermissionsViewModel @Inject constructor(
                 fileId,
                 permission,
                 sendNotificationEmail,
-                emailMessage
+                emailMessage?.ifBlank { null }
             )
             _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_created))
         } catch (exception: OmhStorageException.ApiException) {
