@@ -33,17 +33,16 @@ import com.openmobilehub.android.storage.core.model.PermissionRecipient
 import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.ANYONE_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.COMMENTER_ROLE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.DOMAIN_TYPE
-import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.FILE_ORGANIZER_ROLE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.GROUP_TYPE
-import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.ORGANIZER_ROLE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.OWNER_ROLE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.READER_ROLE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.USER_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.WRITER_ROLE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.extension.isFolder
+import java.lang.Exception
 import java.util.Date
 
-@SuppressWarnings("ComplexCondition")
+@SuppressWarnings("ComplexCondition", "SwallowedException", "TooGenericExceptionCaught")
 internal fun File.toOmhStorageEntity(): OmhStorageEntity? {
     if (mimeType == null || id == null || name == null) {
         return null
@@ -57,6 +56,13 @@ internal fun File.toOmhStorageEntity(): OmhStorageEntity? {
 
     val createdTime = createdTime?.let { Date(it.value) }
     val modifiedTime = modifiedTime?.let { Date(it.value) }
+    val size = try {
+        // This might throw an exception for some specific Google Workspace Documents,
+        // like application/vnd.google-apps.map
+        getSize().toInt()
+    } catch (e: Exception) {
+        null
+    }
 
     return if (isFolder()) {
         OmhStorageEntity.OmhFolder(
@@ -155,8 +161,6 @@ internal fun Permission.getOmhIdentity(): OmhIdentity? {
 
 internal fun String.stringToRole(): OmhPermissionRole? = when (this) {
     OWNER_ROLE -> OmhPermissionRole.OWNER
-    ORGANIZER_ROLE -> OmhPermissionRole.ORGANIZER
-    FILE_ORGANIZER_ROLE -> OmhPermissionRole.FILE_ORGANIZER
     WRITER_ROLE -> OmhPermissionRole.WRITER
     COMMENTER_ROLE -> OmhPermissionRole.COMMENTER
     READER_ROLE -> OmhPermissionRole.READER
@@ -165,8 +169,6 @@ internal fun String.stringToRole(): OmhPermissionRole? = when (this) {
 
 internal fun OmhPermissionRole.toStringRole(): String = when (this) {
     OmhPermissionRole.OWNER -> OWNER_ROLE
-    OmhPermissionRole.ORGANIZER -> ORGANIZER_ROLE
-    OmhPermissionRole.FILE_ORGANIZER -> FILE_ORGANIZER_ROLE
     OmhPermissionRole.WRITER -> WRITER_ROLE
     OmhPermissionRole.COMMENTER -> COMMENTER_ROLE
     OmhPermissionRole.READER -> READER_ROLE

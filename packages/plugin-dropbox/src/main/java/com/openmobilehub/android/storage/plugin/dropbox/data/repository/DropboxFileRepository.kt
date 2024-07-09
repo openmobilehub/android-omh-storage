@@ -18,6 +18,8 @@ package com.openmobilehub.android.storage.plugin.dropbox.data.repository
 
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
+import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.core.utils.toInputStream
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.MetadataToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.toOmhVersion
@@ -81,5 +83,13 @@ internal class DropboxFileRepository(
         return searchResults.matches.mapNotNull {
             metadataToOmhStorageEntity(it.metadata.metadataValue)
         }
+    }
+
+    fun getFileMetadata(fileId: String): OmhStorageMetadata {
+        val metadata = apiService.getFile(fileId)
+        val omhStorageEntity = metadataToOmhStorageEntity(metadata)
+            ?: throw OmhStorageException.ApiException(message = "Failed to get metadata for file with ID: $fileId")
+
+        return OmhStorageMetadata(omhStorageEntity, metadata)
     }
 }

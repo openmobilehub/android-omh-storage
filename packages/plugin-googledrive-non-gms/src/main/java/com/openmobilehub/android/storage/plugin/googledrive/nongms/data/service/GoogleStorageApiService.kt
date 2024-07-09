@@ -25,19 +25,19 @@ import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.PermissionsListResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.RevisionListRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.WebUrlResponse
-import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
-import retrofit2.http.Multipart
+import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.POST
-import retrofit2.http.Part
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.Url
 
 @Suppress("TooManyFunctions")
 internal interface GoogleStorageApiService {
@@ -53,6 +53,7 @@ internal interface GoogleStorageApiService {
         private const val QUERY_TRANSFER_OWNERSHIP = "transferOwnership"
         private const val QUERY_SEND_NOTIFICATION_EMAIL = "sendNotificationEmail"
         private const val QUERY_EMAIL_MESSAGE = "emailMessage"
+        private const val QUERY_UPLOAD_TYPE = "uploadType"
 
         private const val PARENT_ID_Q_VALUE = "'%s' in parents and trashed = false"
         private const val SEARCH_BY_NAME_Q_VALUE = "name contains '%s' and trashed = false"
@@ -72,7 +73,6 @@ internal interface GoogleStorageApiService {
 
         private const val FILE_ID = "fileId"
         private const val REVISION_ID = "revisionId"
-        private const val META_DATA = "metadata"
         private const val PERMISSION_ID = "permissionId"
     }
 
@@ -93,14 +93,6 @@ internal interface GoogleStorageApiService {
         @Path(FILE_ID) fileId: String
     ): Response<ResponseBody>
 
-    @Multipart
-    @POST(UPLOAD_FILES_PARTICLE)
-    suspend fun uploadFile(
-        @Part(META_DATA) metadata: RequestBody,
-        @Part filePart: MultipartBody.Part,
-        @Query(QUERY_FIELDS) fields: String = QUERY_REQUESTED_FIELDS,
-    ): Response<FileRemoteResponse>
-
     @GET("$FILES_PARTICLE/{$FILE_ID}")
     suspend fun downloadMediaFile(
         @Path(FILE_ID) fileId: String,
@@ -114,7 +106,7 @@ internal interface GoogleStorageApiService {
     ): Response<PermissionsListResponse>
 
     @GET("$FILES_PARTICLE/{$FILE_ID}/export")
-    suspend fun exportDocEditor(
+    suspend fun exportFile(
         @Path(FILE_ID) fileId: String,
         @Query(QUERY_MIME_TYPE) mimeType: String
     ): Response<ResponseBody>
@@ -183,4 +175,19 @@ internal interface GoogleStorageApiService {
         @Path(FILE_ID) fileId: String,
         @Query(QUERY_FIELDS) fields: String = QUERY_WEB_URL,
     ): Response<WebUrlResponse>
+
+    @POST(UPLOAD_FILES_PARTICLE)
+    suspend fun postResumableUpload(
+        @Body body: RequestBody,
+        @Query(QUERY_UPLOAD_TYPE) uploadType: String = "resumable",
+        @Query(QUERY_FIELDS) fields: String = QUERY_REQUESTED_FIELDS,
+    ): Response<ResponseBody>
+
+    @PUT
+    suspend fun uploadFileChunk(
+        @Url url: String,
+        @Header("Content-Length") contentLength: Long,
+        @Header("Content-Range") contentRange: String,
+        @Body fileChunk: RequestBody,
+    ): Response<FileRemoteResponse>
 }

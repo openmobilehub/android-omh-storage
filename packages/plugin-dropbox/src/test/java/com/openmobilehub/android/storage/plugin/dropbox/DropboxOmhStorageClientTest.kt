@@ -23,8 +23,10 @@ import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.plugin.dropbox.data.repository.DropboxFileRepository
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_ID
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_MIME_TYPE
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_PARENT_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_VERSION_FILE_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_VERSION_ID
@@ -110,6 +112,9 @@ internal class DropboxOmhStorageClientTest {
     private lateinit var omhStorageEntity: OmhStorageEntity
 
     @MockK
+    private lateinit var omhStorageMetadata: OmhStorageMetadata
+
+    @MockK
     private lateinit var byteArrayOutputStream: ByteArrayOutputStream
 
     private lateinit var client: DropboxOmhStorageClient
@@ -177,10 +182,20 @@ internal class DropboxOmhStorageClientTest {
         every { repository.downloadFile(any()) } returns byteArrayOutputStream
 
         // Act
-        val result = client.downloadFile(TEST_FILE_ID, null)
+        val result = client.downloadFile(TEST_FILE_ID)
 
         // Assert
         assertEquals(byteArrayOutputStream, result)
+    }
+
+    @Test
+    fun `given a repository, when exporting a file, throw OmhStorageException_NotSupportedException `() {
+        // Act & Assert
+        assertThrows(UnsupportedOperationException::class.java) {
+            runTest {
+                client.exportFile(TEST_FILE_ID, TEST_FILE_MIME_TYPE)
+            }
+        }
     }
 
     @Test
@@ -240,5 +255,17 @@ internal class DropboxOmhStorageClientTest {
 
         // Assert
         assertEquals(omhStorageEntityList, result)
+    }
+
+    @Test
+    fun `given a repository, when getting file metadata, then return OmhStorageMetadata`() = runTest {
+        // Arrange
+        every { repository.getFileMetadata(any()) } returns omhStorageMetadata
+
+        // Act
+        val result = client.getFileMetadata(TEST_FILE_ID)
+
+        // Assert
+        assertEquals(omhStorageMetadata, result)
     }
 }

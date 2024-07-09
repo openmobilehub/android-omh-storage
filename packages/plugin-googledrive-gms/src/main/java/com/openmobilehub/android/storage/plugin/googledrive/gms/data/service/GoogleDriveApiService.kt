@@ -88,7 +88,7 @@ internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProv
             fields = ALL_FIELDS
         }
 
-    fun downloadGoogleDoc(fileId: String, mimeType: String): Drive.Files.Export = apiProvider
+    fun exportFile(fileId: String, mimeType: String): Drive.Files.Export = apiProvider
         .googleDriveApiService
         .files()
         .export(fileId, mimeType)

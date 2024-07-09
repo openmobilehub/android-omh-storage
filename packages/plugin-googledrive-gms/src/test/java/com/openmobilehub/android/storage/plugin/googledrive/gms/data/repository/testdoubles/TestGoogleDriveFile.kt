@@ -28,5 +28,5 @@ fun File.setUpMock() {
     every { parents } returns listOf(TEST_FILE_PARENT_ID)
     every { mimeType } returns TEST_FILE_MIME_TYPE
     every { fileExtension } returns TEST_FILE_EXTENSION
-    every { size } returns TEST_FILE_SIZE
+    every { getSize() } returns TEST_FILE_SIZE.toLong()
 }

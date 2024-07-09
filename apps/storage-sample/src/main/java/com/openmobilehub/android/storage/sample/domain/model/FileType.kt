@@ -16,7 +16,7 @@
 
 package com.openmobilehub.android.storage.sample.domain.model
 
-enum class FileType(val mimeType: String) {
+enum class FileType(val mimeType: String, val extension: String? = null) {
     /**
      * Can find documentation about supported MIME types here:
      *
@@ -47,67 +47,85 @@ enum class FileType(val mimeType: String) {
     // Documents
     MICROSOFT_WORD(
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "docx",
     ), // .docx
     OPEN_DOCUMENT_TEXT(
         "application/vnd.oasis.opendocument.text",
+        "odt",
     ), // .odt
     RICH_TEXT(
         "application/rtf",
+        "rtf",
     ), // RTF
     PDF(
         "application/pdf",
+        "pdf",
     ), // .pdf
     TEXT(
         "text/plain",
+        "txt",
     ), // .txt
     ZIP(
         "application/zip",
+        "zip",
     ), // ZIP
     EPUB(
         "application/epub+zip",
+        "epub",
     ), // .epub
 
     // Spreadsheets
     MICROSOFT_EXCEL(
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "xlsx",
     ), // .xlsx
     OPEN_DOCUMENT_SPREADSHEET(
         "application/x-vnd.oasis.opendocument.spreadsheet",
+        "ods",
     ), // .ods
     CSV(
         "text/csv",
+        "csv",
     ), // .csv
     TSV(
         "text/tab-separated-values",
+        "tsv",
     ), // .tsv
 
     // Presentations
     MICROSOFT_POWERPOINT(
         "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        "pptx",
     ), // .pptx
     OPEN_DOCUMENT_PRESENTATION(
         "application/vnd.oasis.opendocument.presentation",
+        "odp",
     ), // .odp
 
     // Drawings
     JPEG(
         "image/jpeg",
+        "jpg",
     ), // .jpg
     PNG(
         "image/png",
+        "png",
     ), // .png
     SVG(
         "image/svg+xml",
+        "svg",
     ), // .svg
 
     // Apps Scripts
     JSON(
         "application/vnd.google-apps.script+json",
+        "json",
     ), // .json
 
     // Video
     MP4(
         "video/mp4",
+        "mp4",
     ),
 
     // Other MYME type

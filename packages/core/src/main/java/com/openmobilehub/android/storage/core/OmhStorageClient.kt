@@ -121,14 +121,23 @@ abstract class OmhStorageClient protected constructor(
     ): OmhStorageEntity?
 
     /**
-     * This method download a file with a given mime type and a given id
+     * This method download a file with given id
      *
      * @param fileId The id fo the file to be downloaded
-     * @param mimeType The mimeType of the file to be downloaded
      *
      * @return A ByteArrayOutputStream with the content of the downloaded file
      */
-    abstract suspend fun downloadFile(fileId: String, mimeType: String?): ByteArrayOutputStream
+    abstract suspend fun downloadFile(fileId: String): ByteArrayOutputStream
+
+    /**
+     * This method export a provider application file with a given id to a given mimeType
+     *
+     * @param fileId The id for the file to be downloaded
+     * @param exportedMimeType The mime type of exported file
+     *
+     * @return A ByteArrayOutputStream with the content of the exported file
+     */
+    abstract suspend fun exportFile(fileId: String, exportedMimeType: String): ByteArrayOutputStream
 
     /**
      * This method update a remote file with the content of a local file

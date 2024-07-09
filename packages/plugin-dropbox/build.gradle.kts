@@ -16,7 +16,7 @@ dependencies {
     }
 
     // Dropbox
-    implementation(Libs.dropboxCore)
+    api(Libs.dropboxCore)
 
     // Annotation
     implementation(Libs.androidxAnnotation)

@@ -150,8 +150,6 @@ private fun Permission.getOmhRole(): OmhPermissionRole? =
 internal fun OmhPermissionRole.toOneDriveString(): String =
     when (this) {
         OmhPermissionRole.OWNER -> OWNER_ROLE
-        OmhPermissionRole.ORGANIZER -> throw UnsupportedOperationException("Unsupported role")
-        OmhPermissionRole.FILE_ORGANIZER -> throw UnsupportedOperationException("Unsupported role")
         OmhPermissionRole.WRITER -> WRITE_ROLE
         OmhPermissionRole.COMMENTER -> throw UnsupportedOperationException("Unsupported role")
         OmhPermissionRole.READER -> READ_ROLE

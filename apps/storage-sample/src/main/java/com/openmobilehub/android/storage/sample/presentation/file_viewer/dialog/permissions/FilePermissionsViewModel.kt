@@ -113,7 +113,7 @@ class FilePermissionsViewModel @Inject constructor(
                 fileId,
                 permission,
                 sendNotificationEmail,
-                emailMessage
+                emailMessage?.ifBlank { null }
             )
             _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_created))
         } catch (exception: OmhStorageException.ApiException) {
@@ -163,9 +163,7 @@ private fun OmhPermission.IdentityPermission.orderByIdentity(): Int = when (this
 @Suppress("MagicNumber")
 private fun OmhPermission.orderRole(): Int = when (this.role) {
     OmhPermissionRole.OWNER -> 0
-    OmhPermissionRole.ORGANIZER -> 1
-    OmhPermissionRole.FILE_ORGANIZER -> 2
-    OmhPermissionRole.WRITER -> 3
-    OmhPermissionRole.COMMENTER -> 4
-    OmhPermissionRole.READER -> 5
+    OmhPermissionRole.WRITER -> 1
+    OmhPermissionRole.COMMENTER -> 2
+    OmhPermissionRole.READER -> 3
 }
