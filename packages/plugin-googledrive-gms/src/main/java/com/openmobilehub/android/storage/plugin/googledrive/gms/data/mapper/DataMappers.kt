@@ -29,9 +29,7 @@ import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.ANYONE_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.COMMENTER_ROLE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.DOMAIN_TYPE
-import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.FILE_ORGANIZER_ROLE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.GROUP_TYPE
-import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.ORGANIZER_ROLE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.OWNER_ROLE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.READER_ROLE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.USER_TYPE
@@ -157,8 +155,6 @@ internal fun Permission.toOmhPermission(): OmhPermission? {
 
 internal fun String.stringToRole(): OmhPermissionRole? = when (this) {
     OWNER_ROLE -> OmhPermissionRole.OWNER
-    ORGANIZER_ROLE -> OmhPermissionRole.ORGANIZER
-    FILE_ORGANIZER_ROLE -> OmhPermissionRole.FILE_ORGANIZER
     WRITER_ROLE -> OmhPermissionRole.WRITER
     COMMENTER_ROLE -> OmhPermissionRole.COMMENTER
     READER_ROLE -> OmhPermissionRole.READER
@@ -167,8 +163,6 @@ internal fun String.stringToRole(): OmhPermissionRole? = when (this) {
 
 internal fun OmhPermissionRole.toStringRole(): String = when (this) {
     OmhPermissionRole.OWNER -> OWNER_ROLE
-    OmhPermissionRole.ORGANIZER -> ORGANIZER_ROLE
-    OmhPermissionRole.FILE_ORGANIZER -> FILE_ORGANIZER_ROLE
     OmhPermissionRole.WRITER -> WRITER_ROLE
     OmhPermissionRole.COMMENTER -> COMMENTER_ROLE
     OmhPermissionRole.READER -> READER_ROLE

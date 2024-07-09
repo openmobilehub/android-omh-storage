@@ -24,6 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class EditPermissionViewModel @Inject constructor() : ViewModel() {
     val roles = OmhPermissionRole.values()
+        .filter { it != OmhPermissionRole.OWNER } // Changing the owner of a file requires a separate flow
     var role: OmhPermissionRole? = null
 
     var roleIndex: Int
