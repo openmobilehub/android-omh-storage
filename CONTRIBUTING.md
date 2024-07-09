@@ -54,7 +54,13 @@ This project maintains documentation across several important areas:
 
 ### Building documentation locally
 
-To build the documentation locally, run the `buildDocs` Gradle task, which performs the following tasks:
+You can build the documentation locally with the following command:
+
+```bash
+./gradlew buildDocs
+```
+
+This command performs the following Gradle tasks:
 
 - `dokkaHtmlMultiModule` - Generates HTML API documentation for all modules. Outputs are written to **/docs/generated/**.
 
@@ -67,3 +73,30 @@ To locally serve the entire project documentation, ensure [**Ruby 3.1.6**](https
 #### API documentation
 
 To view the generated API documentation locally, serve the directory **/docs/generated/** using a local server of your choice (e.g., `python3 -m http.server`).
+
+## Creating a plugin
+
+To create a new plugin for a storage provider, follow these steps:
+
+### 1. Add dependency for the Core package
+
+Add the dependency for the Core package to your plugin's **build.gradle** file:
+
+```gradle
+dependencies {
+  implementation("com.openmobilehub.android.storage:core:2.0.0")
+}
+```
+
+### 2. Implement the `OmhStorageClient` class
+
+To implement the [`OmhStorageClient`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client) class, you will need to provide implementations for various functionalities specific to your storage provider. Use the existing plugins as references to guide you in developing your own plugin.
+
+Here are some examples to help structure your implementation and integrate with different storage providers:
+
+- [Google Drive (GMS)](https://github.com/openmobilehub/android-omh-storage/tree/main/packages/plugin-googledrive-gms)
+- [Google Drive (non-GMS)](https://github.com/openmobilehub/android-omh-storage/tree/main/packages/plugin-googledrive-non-gms)
+- [OneDrive](https://github.com/openmobilehub/android-omh-storage/tree/main/packages/plugin-onedrive)
+- [Dropbox](https://github.com/openmobilehub/android-omh-storage/tree/main/packages/plugin-dropbox)
+
+By examining these examples, you can better understand the best practices and necessary components for creating a robust plugin tailored to your storage provider.

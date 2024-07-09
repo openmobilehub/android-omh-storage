@@ -66,7 +66,7 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 
 ## Contributing
 
-- [Overview](https://miniature-adventure-4gle9ye.pages.github.io/docs/contributing)
+- [Overview](https://github.com/openmobilehub/android-omh-storage/blob/main/CONTRIBUTING.md)
 - [Issues](https://github.com/openmobilehub/android-omh-storage/issues)
 - [PRs](https://github.com/openmobilehub/android-omh-storage/pulls)
 

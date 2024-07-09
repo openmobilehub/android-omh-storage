@@ -53,7 +53,7 @@ Additionally you can add it as a flag to your `gradlew` command:
 
 When you make changes to any module within the **packages/** directory, you need to publish the specific module to Maven Local to reflect those changes.
 
-##### Step 1: Publish the `Core` module to Maven Local
+##### 1: Publish the `Core` module to Maven Local
 
 Before publishing other modules, you must publish the `core` module first by running the following command:
 
@@ -63,7 +63,7 @@ Before publishing other modules, you must publish the `core` module first by run
 
 This ensures that any dependencies on the `core` module are resolved correctly.
 
-##### Step 2: Publish other modules to Maven Local
+##### 2: Publish other modules to Maven Local
 
 After publishing the `core` module, you can publish the remaining modules. You have two options:
 

@@ -42,7 +42,7 @@ allprojects {
 }
 ```
 
-### 2. Add Dependency for the Google Drive storage provider
+### 2. Add dependency for the Google Drive storage provider
 
 Add the dependency for the Google Drive storage provider to your project's **build.gradle** file:
 

@@ -43,7 +43,7 @@ allprojects {
 }
 ```
 
-### 2. Add Dependency for the desired storage provider
+### 2. Add dependency for the desired storage provider
 
 Add the appropriate dependency for the desired storage provider to your project's **build.gradle** file. Replace `<storage-provider-name>` with the specific storage provider package name and `<version>` with the latest version available as shown in the table above:
 
