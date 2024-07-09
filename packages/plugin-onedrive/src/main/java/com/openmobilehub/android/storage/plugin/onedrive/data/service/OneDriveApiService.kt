@@ -145,4 +145,18 @@ class OneDriveApiService(private val apiClient: OneDriveApiClient) {
             .byPermissionId(permissionId)
             .delete()
     }
+
+    fun updatePermission(fileId: String, permissionId: String, role: String): Permission {
+        return apiClient.graphServiceClient.drives()
+            .byDriveId(driveId)
+            .items()
+            .byDriveItemId(fileId)
+            .permissions()
+            .byPermissionId(permissionId)
+            .patch(
+                Permission().apply {
+                    this.roles = listOf(role)
+                }
+            )
+    }
 }

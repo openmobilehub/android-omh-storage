@@ -24,12 +24,14 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
+import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.sample.databinding.DialogEditPermissionBinding
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.FilePermissionsViewModel
+import com.openmobilehub.android.storage.sample.presentation.util.DefaultArrayAdapter
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class EditPermissionDialog: DialogFragment(), AdapterView.OnItemSelectedListener {
+class EditPermissionDialog : DialogFragment(), AdapterView.OnItemSelectedListener {
 
     private val viewModel: EditPermissionViewModel by viewModels()
     private val parentViewModel: FilePermissionsViewModel by viewModels({ requireParentFragment() })
@@ -54,11 +56,14 @@ class EditPermissionDialog: DialogFragment(), AdapterView.OnItemSelectedListener
     private fun setupBinding() {
         viewModel.role = requireNotNull(parentViewModel.state.value.editedPermission?.role)
 
-        binding.roleSpinner.adapter = ArrayAdapter(
+        binding.roleSpinner.adapter = object : DefaultArrayAdapter<OmhPermissionRole>(
             requireContext(),
-            android.R.layout.simple_spinner_dropdown_item,
-            viewModel.roles
-        )
+            viewModel.roles,
+        ) {
+            override fun isEnabled(position: Int): Boolean {
+                return !viewModel.disabledRoles.contains(viewModel.roles[position])
+            }
+        }
 
         binding.roleSpinner.onItemSelectedListener = this
         binding.roleSpinner.setSelection(viewModel.roleIndex)

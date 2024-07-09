@@ -18,13 +18,30 @@ package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog
 
 import androidx.lifecycle.ViewModel
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
+import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
+import com.openmobilehub.android.storage.sample.domain.repository.SessionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class EditPermissionViewModel @Inject constructor() : ViewModel() {
+class EditPermissionViewModel @Inject constructor(
+    sessionRepository: SessionRepository
+) : ViewModel() {
     val roles = OmhPermissionRole.values()
     var role: OmhPermissionRole? = null
+    val disabledRoles: Set<OmhPermissionRole> = when (sessionRepository.getStorageAuthProvider()) {
+        StorageAuthProvider.GOOGLE -> setOf(
+            OmhPermissionRole.OWNER
+        )
+
+        StorageAuthProvider.DROPBOX -> emptySet()
+        StorageAuthProvider.MICROSOFT -> setOf(
+            OmhPermissionRole.OWNER,
+            OmhPermissionRole.ORGANIZER,
+            OmhPermissionRole.FILE_ORGANIZER,
+            OmhPermissionRole.COMMENTER
+        )
+    }
 
     var roleIndex: Int
         get() {

@@ -22,7 +22,6 @@ import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
-import com.openmobilehub.android.storage.core.model.OmhIdentity
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
@@ -133,8 +132,7 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
         permissionId: String,
         role: OmhPermissionRole
     ): OmhPermission {
-        // To be implemented
-        return OmhPermission.IdentityPermission("", OmhPermissionRole.READER, OmhIdentity.Anyone)
+        return repository.updatePermission(fileId, permissionId, role)
     }
 
     override suspend fun createPermission(

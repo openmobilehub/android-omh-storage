@@ -20,6 +20,7 @@ import com.microsoft.graph.drives.item.items.item.invite.InvitePostRequestBody
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhPermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
@@ -115,5 +116,23 @@ class OneDriveFileRepository(
 
         // It returns true if the permission was deleted successfully, otherwise the method will throw an exception
         return true
+    }
+
+    fun updatePermission(
+        fileId: String,
+        permissionId: String,
+        role: OmhPermissionRole
+    ): OmhPermission {
+        if (role == OmhPermissionRole.OWNER) {
+            // According to documentation the owner role should be allowed but an exception is thrown:
+            // ODataError: Unexpected value passed in for role: owner
+            // https://learn.microsoft.com/en-us/graph/api/permission-update?view=graph-rest-1.0&tabs=http#request-body
+            throw UnsupportedOperationException("Unsupported role to updated to")
+        }
+
+        return apiService.updatePermission(fileId, permissionId, role.toOneDriveString())
+            .toOmhPermission() ?: throw OmhStorageException.ApiException(
+            message = "Update succeeded but API failed to return expected permission"
+        )
     }
 }

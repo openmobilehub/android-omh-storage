@@ -44,9 +44,12 @@ class CreatePermissionViewModel @Inject constructor(
 
     val roles = OmhPermissionRole.values()
     val disabledRoles: Set<OmhPermissionRole> = when (sessionRepository.getStorageAuthProvider()) {
-        StorageAuthProvider.GOOGLE -> emptySet()
+        StorageAuthProvider.GOOGLE -> setOf(
+            OmhPermissionRole.OWNER
+        )
         StorageAuthProvider.DROPBOX -> emptySet()
         StorageAuthProvider.MICROSOFT -> setOf(
+            OmhPermissionRole.OWNER,
             OmhPermissionRole.ORGANIZER,
             OmhPermissionRole.FILE_ORGANIZER,
             OmhPermissionRole.COMMENTER
