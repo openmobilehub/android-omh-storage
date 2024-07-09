@@ -123,13 +123,6 @@ class OneDriveFileRepository(
         permissionId: String,
         role: OmhPermissionRole
     ): OmhPermission {
-        if (role == OmhPermissionRole.OWNER) {
-            // According to documentation the owner role should be allowed but an exception is thrown:
-            // ODataError: Unexpected value passed in for role: owner
-            // https://learn.microsoft.com/en-us/graph/api/permission-update?view=graph-rest-1.0&tabs=http#request-body
-            throw UnsupportedOperationException("Unsupported role to updated to")
-        }
-
         return apiService.updatePermission(fileId, permissionId, role.toOneDriveString())
             .toOmhPermission() ?: throw OmhStorageException.ApiException(
             message = "Update succeeded but API failed to return expected permission"
