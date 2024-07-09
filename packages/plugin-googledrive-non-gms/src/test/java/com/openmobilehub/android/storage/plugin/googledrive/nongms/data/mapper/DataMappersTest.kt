@@ -26,8 +26,8 @@ import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNo
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.GROUP_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.USER_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.WRITER_ROLE
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_PERMISSION_DOMAIN
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_PERMISSION_EMAIL_ADDRESS
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.TEST_PERMISSION_DOMAIN
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.TEST_PERMISSION_EMAIL_ADDRESS
 import org.junit.Test
 import kotlin.test.assertEquals
 

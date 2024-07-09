@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles
+package com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles
 
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhIdentity

@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles
+package com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles
 
-import com.openmobilehub.android.storage.core.model.OmhFileVersion
-import com.openmobilehub.android.storage.core.utils.fromRFC3339StringToDate
+import com.openmobilehub.android.storage.core.utils.toRFC3339String
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.RevisionListRemoteResponse
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.RevisionRemoteResponse
 
-const val TEST_VERSION_FILE_ID = "123"
-const val TEST_VERSION_ID = "456"
-val TEST_VERSION_FILE_MODIFIED_TIME = TEST_FIRST_MAY_2024_RFC_3339.fromRFC3339StringToDate()!!
-
-val testOmhVersion = OmhFileVersion(
-    TEST_VERSION_FILE_ID,
+internal val testRevisionRemote = RevisionRemoteResponse(
     TEST_VERSION_ID,
-    TEST_VERSION_FILE_MODIFIED_TIME
+    TEST_VERSION_FILE_MODIFIED_TIME.toRFC3339String(),
 )
+
+internal val testVersionListRemote = RevisionListRemoteResponse(listOf(testRevisionRemote))
