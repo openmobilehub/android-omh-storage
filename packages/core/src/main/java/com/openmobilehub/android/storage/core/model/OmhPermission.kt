@@ -58,8 +58,6 @@ sealed class OmhPermission(
 
 enum class OmhPermissionRole {
     OWNER,
-    ORGANIZER,
-    FILE_ORGANIZER,
     WRITER,
     COMMENTER,
     READER,

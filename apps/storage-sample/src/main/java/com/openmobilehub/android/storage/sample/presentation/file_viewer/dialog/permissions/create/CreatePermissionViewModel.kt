@@ -38,6 +38,7 @@ class CreatePermissionViewModel @Inject constructor() : ViewModel() {
     val action = _action.receiveAsFlow()
 
     val roles = OmhPermissionRole.values()
+        .filter { it != OmhPermissionRole.OWNER } // Changing the owner of a file requires a separate flow
     private val _role: MutableStateFlow<OmhPermissionRole> =
         MutableStateFlow(OmhPermissionRole.READER)
     val role: StateFlow<OmhPermissionRole> = _role

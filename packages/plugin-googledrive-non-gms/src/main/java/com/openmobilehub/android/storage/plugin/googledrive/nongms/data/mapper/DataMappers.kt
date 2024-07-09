@@ -27,10 +27,8 @@ import com.openmobilehub.android.storage.core.utils.fromRFC3339StringToDate
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.ANYONE_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.COMMENTER_ROLE
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.DOMAIN_TYPE
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.FILE_ORGANIZER_ROLE
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.FOLDER_MIME_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.GROUP_TYPE
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.ORGANIZER_ROLE
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.OWNER_ROLE
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.READER_ROLE
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.USER_TYPE
@@ -162,8 +160,6 @@ internal fun PermissionResponse.toPermission(): OmhPermission? {
 
 internal fun String.stringToRole(): OmhPermissionRole? = when (this) {
     OWNER_ROLE -> OmhPermissionRole.OWNER
-    ORGANIZER_ROLE -> OmhPermissionRole.ORGANIZER
-    FILE_ORGANIZER_ROLE -> OmhPermissionRole.FILE_ORGANIZER
     WRITER_ROLE -> OmhPermissionRole.WRITER
     COMMENTER_ROLE -> OmhPermissionRole.COMMENTER
     READER_ROLE -> OmhPermissionRole.READER
@@ -172,8 +168,6 @@ internal fun String.stringToRole(): OmhPermissionRole? = when (this) {
 
 internal fun OmhPermissionRole.toStringRole(): String = when (this) {
     OmhPermissionRole.OWNER -> OWNER_ROLE
-    OmhPermissionRole.ORGANIZER -> ORGANIZER_ROLE
-    OmhPermissionRole.FILE_ORGANIZER -> FILE_ORGANIZER_ROLE
     OmhPermissionRole.WRITER -> WRITER_ROLE
     OmhPermissionRole.COMMENTER -> COMMENTER_ROLE
     OmhPermissionRole.READER -> READER_ROLE
