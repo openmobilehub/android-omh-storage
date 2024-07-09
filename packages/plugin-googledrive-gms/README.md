@@ -4,7 +4,7 @@ Module plugin-googledrive-gms
   <a href="https://miniature-adventure-4gle9ye.pages.github.io/docs/">
     <img width="500px" src="https://openmobilehub.org/wp-content/uploads/sites/13/2024/06/OpenMobileHub-horizontal-color.svg"/><br/>
   </a>
-  <h2 align="center">Android OMH Storage - Google Drive (GMS/non-GMS)</h2>
+  <h2 align="center">Android OMH Storage - Google Drive (GMS)</h2>
 </p>
 
 <p align="center">

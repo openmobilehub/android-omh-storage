@@ -5,7 +5,7 @@ We recommend that anyone interested in contributing to this library use this sam
 ## Prerequisites
 
 - **Gradle version**: 7.0 or higher
-- **Android API level**: 23 or higher
+- **Android API level**: 26 or higher
 
 ## Storage provider configuration
 

@@ -13,7 +13,7 @@ Android OMH Storage is a project that integrates various cloud storage providers
 Before integrating any storage provider into your Android project, ensure you meet the following requirements:
 
 - **Gradle version**: 7.0 or higher
-- **Android API level**: 23 or higher
+- **Android API level**: 23(GoogleDrive, Dropbox), 26(OneDrive) or higher
 
 Additionally, ensure you have the following packages installed before proceeding with the integration:
 
@@ -24,11 +24,12 @@ Additionally, ensure you have the following packages installed before proceeding
 
 To integrate a storage provider into your Android project, follow the steps below to install one of the available Maven Central packages:
 
-| Storage provider           | Package                                                                                                                                     |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| Google Drive (GMS/non-GMS) | `com.openmobilehub.android.storage:plugin-googledrive-gms:2.0.0` <br/> `com.openmobilehub.android.storage:plugin-googledrive-non-gms:2.0.0` |
-| OneDrive                   | `com.openmobilehub.android.storage:plugin-dropbox:2.0.0`                                                                                    |
-| Dropbox                    | `com.openmobilehub.android.storage:plugin-dropbox:2.0.0`                                                                                    |
+| Storage provider       | Package                                                              | Min Android API level |
+| ---------------------- | -------------------------------------------------------------------- | --------------------- |
+| Google Drive (GMS)     | `com.openmobilehub.android.storage:plugin-googledrive-gms:2.0.0`     | 23                    |
+| Google Drive (non-GMS) | `com.openmobilehub.android.storage:plugin-googledrive-non-gms:2.0.0` | 23                    |
+| OneDrive               | `com.openmobilehub.android.storage:plugin-dropbox:2.0.0`             | 26                    |
+| Dropbox                | `com.openmobilehub.android.storage:plugin-dropbox:2.0.0`             | 23                    |
 
 ### 1. Configure Maven Central repository
 
