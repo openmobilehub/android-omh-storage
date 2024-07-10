@@ -1,14 +1,14 @@
-Module core
+Module plugin-googledrive-non-gms
 
 <p align="center">
   <a href="https://miniature-adventure-4gle9ye.pages.github.io/docs/">
     <img width="500px" src="https://openmobilehub.org/wp-content/uploads/sites/13/2024/06/OpenMobileHub-horizontal-color.svg"/><br/>
   </a>
-  <h2 align="center">Android OMH Storage - Core</h2>
+  <h2 align="center">Android OMH Storage - Google Drive (non-GMS)</h2>
 </p>
 
 <p align="center">
-  <a href="https://central.sonatype.com/artifact/com.openmobilehub.android.storage/core"><img src="https://img.shields.io/maven-central/v/com.openmobilehub.android.storage/core" alt="NPM version"/></a>
+  <a href="https://central.sonatype.com/artifact/com.openmobilehub.android.storage/plugin-googledrive-non-gms"><img src="https://img.shields.io/maven-central/v/com.openmobilehub.android.storage/plugin-googledrive-non-gms" alt="NPM version"/></a>
   <a href="https://github.com/openmobilehub/android-omh-storage/blob/main/LICENSE"><img src="https://img.shields.io/github/license/openmobilehub/android-omh-storage" alt="License"/></a>
 </p>
 
@@ -19,31 +19,7 @@ Module core
 
 ---
 
-## Installation
-
-To integrate the Core package into your Android project, follow these steps:
-
-### 1. Configure Maven Central repository
-
-Ensure Maven Central is included as a repository in your root **build.gradle** file:
-
-```gradle
-allprojects {
-  repositories {
-    mavenCentral()
-  }
-}
-```
-
-### 2. Add dependency for the Core package
-
-Add the dependency for the Core package to your project's **build.gradle** file:
-
-```gradle
-dependencies {
-  implementation("com.openmobilehub.android.storage:core:2.0.0")
-}
-```
+For further instructions, please refer to the [Google Drive (GMS) documentation](https://miniature-adventure-4gle9ye.pages.github.io/docs/plugin-googledrive-gms), as it shares a similar setup and behavior.
 
 ## License
 
