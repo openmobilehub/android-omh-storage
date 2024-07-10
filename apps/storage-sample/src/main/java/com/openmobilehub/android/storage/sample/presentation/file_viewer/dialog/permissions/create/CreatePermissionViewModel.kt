@@ -120,6 +120,6 @@ class CreatePermissionViewModel @Inject constructor() : ViewModel() {
             _action.send(CreatePermissionsViewAction.ShowError(domain = true))
             return null
         }
-        return emailAddress
+        return domain
     }
 }
