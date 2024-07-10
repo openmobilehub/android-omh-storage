@@ -22,8 +22,8 @@
 ## Features
 
 - 📱 GMS and non-GMS support for all storage providers
-- 🖇️ Identical API across all providers
-- 📦 Official provider SDK integration
+- 🖇️ Identical API across all storage providers
+- 📦 Official storage provider SDK integration
 - 🚀 Easy configuration and setup
 - 💨 Lightweight modules
 
@@ -32,7 +32,8 @@
 This is the main directory of the mono-repo for Android OMH Storage. If you're searching for a particular package, please click on the corresponding package link below.
 
 - [Core](https://miniature-adventure-4gle9ye.pages.github.io/docs/core)
-- [Google Drive](https://miniature-adventure-4gle9ye.pages.github.io/docs/plugin-googledrive-gms)
+- [Google Drive (GMS)](https://miniature-adventure-4gle9ye.pages.github.io/docs/plugin-googledrive-gms)
+- [Google Drive (non-GMS)](https://miniature-adventure-4gle9ye.pages.github.io/docs/plugin-googledrive-non-gms)
 - [OneDrive](https://miniature-adventure-4gle9ye.pages.github.io/docs/plugin-onedrive)
 - [Dropbox](https://miniature-adventure-4gle9ye.pages.github.io/docs/plugin-dropbox)
 
@@ -45,26 +46,27 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 | Features                | Google Drive GMS | Google Drive non-GMS | OneDrive | Dropbox |
 | ----------------------- | ---------------- | -------------------- | -------- | ------- |
 | File listing            | ✅               | ✅                   | ✅       | ✅      |
-| File creation           | ✅               | ✅                   | ❌       | ❌      |
-| File update             | ✅               | ✅                   | ❌       | ❌      |
+| File searching          | ✅               | ✅                   |          | ✅      |
+| File creation           | ✅               | ✅                   |          |         |
+| File update             | ✅               | ✅                   |          |         |
 | File deletion           | ✅               | ✅                   | ✅       | ✅      |
 | File permanent deletion | ✅               | ✅                   | ❌       | ❌      |
 | File upload             | ✅               | ✅                   | ✅       | ✅      |
 | File download           | ✅               | ✅                   | ✅       | ✅      |
 | File export             | ✅               | ✅                   | ❌       | ❌      |
-| File searching          | ✅               | ✅                   | ❌       | ✅      |
 | File metadata           | ✅               | ✅                   | ✅       | ✅      |
 | File versioning         | ✅               | ✅                   | ✅       | ✅      |
-| File permissions        | ✅               | ✅                   | ❌       | ❌      |
+| File permissions        | ✅               | ✅                   |          |         |
+| File URL                | ✅               | ✅                   |          |         |
 
 ## Documentation
 
-- [Quick Start](https://miniature-adventure-4gle9ye.pages.github.io/docs/getting-started)
+- [Getting Started](https://miniature-adventure-4gle9ye.pages.github.io/docs/getting-started)
 - [Reference API](https://miniature-adventure-4gle9ye.pages.github.io/api)
 
 ## Contributing
 
-- [Overview](https://miniature-adventure-4gle9ye.pages.github.io/docs/contributing)
+- [Overview](https://github.com/openmobilehub/android-omh-storage/blob/main/CONTRIBUTING.md)
 - [Issues](https://github.com/openmobilehub/android-omh-storage/issues)
 - [PRs](https://github.com/openmobilehub/android-omh-storage/pulls)
 
