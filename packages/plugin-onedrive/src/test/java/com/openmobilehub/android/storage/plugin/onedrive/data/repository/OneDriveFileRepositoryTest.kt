@@ -21,16 +21,22 @@ package com.openmobilehub.android.storage.plugin.onedrive.data.repository
 import com.microsoft.graph.models.DriveItem
 import com.microsoft.graph.models.DriveItemVersion
 import com.microsoft.graph.models.DriveItemVersionCollectionResponse
+import com.microsoft.graph.models.Permission
+import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhStorageEntity
+import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.toOmhPermission
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.toOmhVersion
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiService
 import com.openmobilehub.android.storage.plugin.onedrive.data.util.toByteArrayOutputStream
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_PARENT_ID
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_WEB_URL
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_PERMISSION_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_VERSION_FILE_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_VERSION_ID
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.testOmhPermission
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.testOmhVersion
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
@@ -76,6 +82,9 @@ class OneDriveFileRepositoryTest {
     @MockK
     private lateinit var driveItemVersion: DriveItemVersion
 
+    @MockK
+    private lateinit var permission: Permission
+
     private lateinit var repository: OneDriveFileRepository
 
     @Before
@@ -83,6 +92,7 @@ class OneDriveFileRepositoryTest {
         MockKAnnotations.init(this)
         mockkStatic("com.openmobilehub.android.storage.plugin.onedrive.data.util.InputStreamExtensionsKt")
         mockkStatic("com.openmobilehub.android.storage.plugin.onedrive.data.mapper.VersionMappersKt")
+        mockkStatic("com.openmobilehub.android.storage.plugin.onedrive.data.mapper.PermissionMapperKt")
 
         repository = OneDriveFileRepository(apiService, driveItemToOmhStorageEntity)
     }
@@ -95,7 +105,10 @@ class OneDriveFileRepositoryTest {
     @Test
     fun `given an apiService returns a non-empty list, when getting the files list, then return a non-empty list`() {
         // Arrange
-        every { apiService.getFilesList(TEST_FILE_PARENT_ID) } returns mutableListOf(driveItem, driveItem)
+        every { apiService.getFilesList(TEST_FILE_PARENT_ID) } returns mutableListOf(
+            driveItem,
+            driveItem
+        )
         every { driveItemToOmhStorageEntity(any()) } returns omhStorageEntity
 
         // Act
@@ -144,7 +157,7 @@ class OneDriveFileRepositoryTest {
     }
 
     @Test
-    fun `given an api service returns null, when downloading the file, then throw an OmhStorageException_DownloadException`() {
+    fun `given an api service returns null, when downloading the file, then throw an OmhStorageException_ApiException`() {
         // Arrange
         every { apiService.downloadFile(any()) } returns null
 
@@ -219,5 +232,55 @@ class OneDriveFileRepositoryTest {
         // Assert
         assertEquals(omhStorageEntity, result?.entity)
         assertEquals(driveItem, result?.originalMetadata)
+    }
+
+    @Test
+    fun `given an api service, when deleting a permission, then return true`() {
+        // Arrange
+        every { apiService.deletePermission(any(), any()) } returns Unit
+
+        // Act
+        val result = repository.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
+
+        // Assert
+        assertEquals(true, result)
+    }
+
+    @Test
+    fun `given an apiService returns a non-empty list, when getting the permissions list, then return a non-empty list`() {
+        // Arrange
+        every { apiService.getFilePermissions(any()) } returns listOf(permission)
+        every { permission.toOmhPermission() } returns testOmhPermission
+
+        // Act
+        val result = repository.getFilePermissions(TEST_FILE_ID)
+
+        // Assert
+        assertEquals(listOf(testOmhPermission), result)
+    }
+
+    @Test
+    fun `given an apiService returns an empty list, when getting the permissions list, then return an empty list`() {
+        // Arrange
+        every { apiService.getFilePermissions(any()) } returns emptyList()
+
+        // Act
+        val result = repository.getFilePermissions(TEST_FILE_ID)
+
+        // Assert
+        assertEquals(emptyList<OmhPermission>(), result)
+    }
+
+    @Test
+    fun `given an apiService returns a file, when getting file web URL, then return a URL`() {
+        // Arrange
+        every { apiService.getFile(any()) } returns driveItem
+        every { driveItem.webUrl } returns TEST_FILE_WEB_URL
+
+        // Act
+        val result = repository.getWebUrl(TEST_FILE_ID)
+
+        // Assert
+        assertEquals(driveItem.webUrl, result)
     }
 }

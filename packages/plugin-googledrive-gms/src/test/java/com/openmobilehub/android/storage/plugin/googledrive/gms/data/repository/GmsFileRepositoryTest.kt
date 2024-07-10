@@ -35,10 +35,10 @@ import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.TEST
 import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.TEST_FILE_MIME_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.TEST_FILE_NAME
 import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.TEST_FILE_PARENT_ID
+import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.TEST_FILE_WEB_URL
 import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.TEST_PERMISSION_ID
 import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.TEST_VERSION_FILE_ID
 import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.TEST_VERSION_ID
-import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.TEST_WEB_URL
 import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.setUpMock
 import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.testOmhCreatePermission
 import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.testOmhFile
@@ -561,13 +561,13 @@ internal class GmsFileRepositoryTest {
 
     @Test
     fun `given a file id, when getWebUrl is success, then an URL to the file is returned`() {
-        every { googleDriveFile.webViewLink } returns TEST_WEB_URL
+        every { googleDriveFile.webViewLink } returns TEST_FILE_WEB_URL
         every { driveFilesGetRequest.execute() } returns googleDriveFile
         every { apiService.getWebUrl(any()) } returns driveFilesGetRequest
 
         val result = fileRepositoryImpl.getWebUrl(TEST_VERSION_FILE_ID)
 
-        assertEquals(TEST_WEB_URL, result)
+        assertEquals(TEST_FILE_WEB_URL, result)
         verify { apiService.getWebUrl(TEST_FILE_ID) }
     }
 
