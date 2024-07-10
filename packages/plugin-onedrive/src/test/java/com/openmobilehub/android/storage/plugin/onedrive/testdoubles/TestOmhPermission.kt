@@ -16,14 +16,17 @@
 
 package com.openmobilehub.android.storage.plugin.onedrive.testdoubles
 
+import com.microsoft.graph.drives.item.items.item.invite.InvitePostRequestBody
+import com.microsoft.graph.models.DriveRecipient
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhIdentity
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.PermissionRecipient
 import com.openmobilehub.android.storage.core.utils.fromRFC3339StringToDate
+import com.openmobilehub.android.storage.plugin.onedrive.OneDriveConstants.WRITE_ROLE
 
-const val TEST_PERMISSION_ID = "123"
+const val TEST_PERMISSION_ID = "456"
 const val TEST_PERMISSION_DISPLAY_NAME = "Tester"
 const val TEST_PERMISSION_EMAIL_ADDRESS = "test@test.com"
 const val TEST_PERMISSION_DOMAIN = "test.com"
@@ -31,7 +34,7 @@ val TEST_PERMISSION_EXPIRATION_TIME = TEST_FIRST_MAY_2024_RFC_3339.fromRFC3339St
 
 const val TEST_EMAIL_MESSAGE = "Test message"
 
-const val TEST_IDENTITY_ID = "456"
+const val TEST_IDENTITY_ID = "789"
 
 val testOmhUserIdentity = OmhIdentity.User(
     TEST_IDENTITY_ID,
@@ -68,6 +71,13 @@ val testOmhPermission = OmhPermission.IdentityPermission(
     OmhPermissionRole.WRITER,
     testOmhUserIdentity
 )
+
+val invitePostRequestBody = InvitePostRequestBody().apply {
+    roles = listOf(WRITE_ROLE)
+    recipients = listOf(DriveRecipient())
+    message = TEST_EMAIL_MESSAGE
+    sendInvitation = true
+}
 
 val createWriterPermission = OmhCreatePermission.CreateIdentityPermission(
     OmhPermissionRole.WRITER,
