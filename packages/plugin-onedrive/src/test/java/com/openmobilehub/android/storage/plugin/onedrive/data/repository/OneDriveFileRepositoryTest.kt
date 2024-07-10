@@ -82,7 +82,7 @@ class OneDriveFileRepositoryTest {
     fun setUp() {
         MockKAnnotations.init(this)
         mockkStatic("com.openmobilehub.android.storage.plugin.onedrive.data.util.InputStreamExtensionsKt")
-        mockkStatic("com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DataMappersKt")
+        mockkStatic("com.openmobilehub.android.storage.plugin.onedrive.data.mapper.VersionMappersKt")
 
         repository = OneDriveFileRepository(apiService, driveItemToOmhStorageEntity)
     }

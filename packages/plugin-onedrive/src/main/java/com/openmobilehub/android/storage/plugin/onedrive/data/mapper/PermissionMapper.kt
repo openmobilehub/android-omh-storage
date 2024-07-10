@@ -18,7 +18,6 @@
 
 package com.openmobilehub.android.storage.plugin.onedrive.data.mapper
 
-import com.microsoft.graph.models.DriveItemVersion
 import com.microsoft.graph.models.DriveRecipient
 import com.microsoft.graph.models.EmailIdentity
 import com.microsoft.graph.models.Identity
@@ -26,7 +25,6 @@ import com.microsoft.graph.models.IdentitySet
 import com.microsoft.graph.models.Permission
 import com.microsoft.graph.models.SharePointIdentitySet
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
-import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhIdentity
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
@@ -35,14 +33,6 @@ import com.openmobilehub.android.storage.plugin.onedrive.OneDriveConstants.OWNER
 import com.openmobilehub.android.storage.plugin.onedrive.OneDriveConstants.READ_ROLE
 import com.openmobilehub.android.storage.plugin.onedrive.OneDriveConstants.WRITE_ROLE
 import java.util.Date
-
-internal fun DriveItemVersion.toOmhVersion(fileId: String): OmhFileVersion {
-    return OmhFileVersion(
-        fileId,
-        id,
-        Date.from(lastModifiedDateTime.toInstant())
-    )
-}
 
 @Suppress("ReturnCount")
 internal fun Permission.toOmhPermission(): OmhPermission? {
@@ -58,16 +48,16 @@ internal fun Permission.toOmhPermission(): OmhPermission? {
 }
 
 @Suppress("ReturnCount")
-private fun Permission.getOmhIdentity(): OmhIdentity? {
-    grantedToV2?.toOmhOmhIdentity(this)?.let { return it }
+internal fun Permission.getOmhIdentity(): OmhIdentity? {
+    grantedToV2?.toOmhIdentity(this)?.let { return it }
     // Even that grantedTo is deprecated, it is still sometimes used instead of grantedToV2
-    grantedTo?.toOmhOmhIdentity(this)?.let { return it }
+    grantedTo?.toOmhIdentity(this)?.let { return it }
 
     return null
 }
 
 @Suppress("ReturnCount")
-private fun IdentitySet.toOmhOmhIdentity(permission: Permission): OmhIdentity? {
+internal fun IdentitySet.toOmhIdentity(permission: Permission): OmhIdentity? {
     user?.toUser(permission)?.let { return it }
     device?.toDevice(permission)?.let { return it }
     application?.toApplication(permission)?.let { return it }
@@ -76,7 +66,7 @@ private fun IdentitySet.toOmhOmhIdentity(permission: Permission): OmhIdentity? {
 }
 
 @Suppress("ReturnCount")
-private fun SharePointIdentitySet.toOmhOmhIdentity(permission: Permission): OmhIdentity? {
+internal fun SharePointIdentitySet.toOmhIdentity(permission: Permission): OmhIdentity? {
     user?.toUser(permission)?.let { return it }
     group?.toGroup(permission)?.let { return it }
     device?.toDevice(permission)?.let { return it }
@@ -128,7 +118,7 @@ private fun Permission.getExpirationTime(): Date? {
     return Date(expirationDateTime.toInstant().toEpochMilli())
 }
 
-private fun Permission.getOmhRole(): OmhPermissionRole? =
+internal fun Permission.getOmhRole(): OmhPermissionRole? =
     when {
         roles.contains(OWNER_ROLE) -> {
             OmhPermissionRole.OWNER
