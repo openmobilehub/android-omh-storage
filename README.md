@@ -37,32 +37,32 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 - [OneDrive](https://miniature-adventure-4gle9ye.pages.github.io/docs/plugin-onedrive)
 - [Dropbox](https://miniature-adventure-4gle9ye.pages.github.io/docs/plugin-dropbox)
 
-## Supported functionality
-
-- ✅ - supported
-- ⚠️ - partially supported
-- ❌ - not supported at the moment
-
-| Features                | Google Drive GMS | Google Drive non-GMS | OneDrive | Dropbox |
-| ----------------------- | ---------------- | -------------------- | -------- | ------- |
-| File listing            | ✅               | ✅                   | ✅       | ✅      |
-| File searching          | ✅               | ✅                   |          | ✅      |
-| File creation           | ✅               | ✅                   |          |         |
-| File update             | ✅               | ✅                   |          |         |
-| File deletion           | ✅               | ✅                   | ✅       | ✅      |
-| File permanent deletion | ✅               | ✅                   | ❌       | ❌      |
-| File upload             | ✅               | ✅                   | ✅       | ✅      |
-| File download           | ✅               | ✅                   | ✅       | ✅      |
-| File export             | ✅               | ✅                   | ❌       | ❌      |
-| File metadata           | ✅               | ✅                   | ✅       | ✅      |
-| File versioning         | ✅               | ✅                   | ✅       | ✅      |
-| File permissions        | ✅               | ✅                   |          |         |
-| File URL                | ✅               | ✅                   |          |         |
-
 ## Documentation
 
 - [Getting Started](https://miniature-adventure-4gle9ye.pages.github.io/docs/getting-started)
 - [Reference API](https://miniature-adventure-4gle9ye.pages.github.io/api)
+
+## Supported functionality
+
+- ✅ - supported
+- 🟨 - partially supported
+- ❌ - not supported
+
+| Features                | Google Drive GMS | Google Drive non-GMS | OneDrive | Dropbox |
+| ----------------------- | :--------------: | :------------------: | :------: | :-----: |
+| File listing            |        ✅        |          ✅          |    ✅    |   ✅    |
+| File searching          |        ✅        |          ✅          |          |   ✅    |
+| File creation           |        ✅        |          ✅          |          |         |
+| File update             |        ✅        |          ✅          |          |         |
+| File deletion           |        ✅        |          ✅          |    ✅    |   ✅    |
+| File permanent deletion |        ✅        |          ✅          |    ❌    |   ❌    |
+| File upload             |        ✅        |          ✅          |    ✅    |   ✅    |
+| File download           |        ✅        |          ✅          |    ✅    |   ✅    |
+| File export             |        ✅        |          ✅          |    ❌    |   ❌    |
+| File metadata           |        ✅        |          ✅          |    ✅    |   ✅    |
+| File versioning         |        ✅        |          ✅          |    ✅    |   ✅    |
+| File permissions        |        ✅        |          ✅          |    ✅    |         |
+| File URL                |        ✅        |          ✅          |          |         |
 
 ## Contributing
 

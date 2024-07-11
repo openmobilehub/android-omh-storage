@@ -91,10 +91,9 @@ val omhStorageClient = OneDriveOmhStorageFactory().getStorageClient(omhAuthClien
 
 Interacting with the OneDrive storage provider follows the same pattern as other storage providers since they all implement the [`OmhStorageClient`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client) interface. This uniformity ensures consistent functionality across different storage providers, so you won’t need to learn new methods regardless of the storage provider you choose! For a comprehensive list of available methods, refer to the [Getting Started](https://miniature-adventure-4gle9ye.pages.github.io/docs/getting-started) guide.
 
-#### ⚠️ KNOWN LIMITATIONS
+#### Caveats
 
-> The [Sharing links](https://learn.microsoft.com/en-us/graph/api/resources/permission?view=graph-rest-1.0#sharing-links)
-> permissions are not supported.
+> The [Sharing Links](https://learn.microsoft.com/en-us/graph/api/resources/permission?view=graph-rest-1.0#sharing-links) permissions are not supported.
 
 ## License
 

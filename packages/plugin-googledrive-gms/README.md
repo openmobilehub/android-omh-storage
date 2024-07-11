@@ -145,16 +145,13 @@ val omhStorageClient = OmhStorageProvider.Builder()
 | WithObjectId |     ❌     |
 | WithAlias    |     ❌     |
 
-#### ⚠️ KNOWN LIMITATIONS
+Interacting with the Google Drive storage provider follows the same pattern as other storage providers since they all implement the [`OmhStorageClient`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client) interface. This uniformity ensures consistent functionality across different storage providers, so you won’t need to learn new methods regardless of the storage provider you choose! For a comprehensive list of available methods, refer to the [Getting Started](https://miniature-adventure-4gle9ye.pages.github.io/docs/getting-started) guide.
+
+#### Caveats
 
 > The methods `downloadFile` and `downloadFileVersion` do not support [Google Workspace documents](https://developers.google.com/drive/api/guides/about-files#types:~:text=Google%20Workspace%20document,MIME%20types.) (Google Docs, Google Sheets, and Google Slides). To download Google Workspace documents, please use the `exportFile` method to export the file to a supported format.
 
-#### CAVEATS
-
-> The method `createPermission` will override `sendNotificationEmail` parameter to `true` when
-> creating permission with `OWNER` role.
-
-Interacting with the Google Drive storage provider follows the same pattern as other storage providers since they all implement the [`OmhStorageClient`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client) interface. This uniformity ensures consistent functionality across different storage providers, so you won’t need to learn new methods regardless of the storage provider you choose! For a comprehensive list of available methods, refer to the [Getting Started](https://miniature-adventure-4gle9ye.pages.github.io/docs/getting-started) guide.
+> The method `createPermission` will override `sendNotificationEmail` parameter to `true` when creating permission with `OWNER` role.
 
 ## License
 
