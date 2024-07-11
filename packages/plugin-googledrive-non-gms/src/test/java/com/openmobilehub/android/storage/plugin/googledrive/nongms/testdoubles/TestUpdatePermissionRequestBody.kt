@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles
+package com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles
 
-import com.openmobilehub.android.storage.core.model.OmhFileVersion
-import com.openmobilehub.android.storage.core.utils.fromRFC3339StringToDate
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.COMMENTER_ROLE
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.OWNER_ROLE
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body.UpdatePermissionRequestBody
 
-const val TEST_VERSION_FILE_ID = "123"
-const val TEST_VERSION_ID = "456"
-val TEST_VERSION_FILE_MODIFIED_TIME = "2023-07-04T03:03:55.397Z".fromRFC3339StringToDate()!!
+internal val commenterUpdatePermission = UpdatePermissionRequestBody(
+    COMMENTER_ROLE
+)
 
-val testOmhVersion = OmhFileVersion(
-    TEST_VERSION_FILE_ID,
-    TEST_VERSION_ID,
-    TEST_VERSION_FILE_MODIFIED_TIME
+internal val ownerUpdatePermission = UpdatePermissionRequestBody(
+    OWNER_ROLE
 )

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles
+package com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles
 
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileListRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileRemoteResponse

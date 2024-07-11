@@ -19,22 +19,26 @@
 package com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper
 
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRecipient
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.ANYONE_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.DOMAIN_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.GROUP_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.USER_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.WRITER_ROLE
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_PERMISSION_DOMAIN
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_PERMISSION_EMAIL_ADDRESS
+import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.TEST_PERMISSION_DOMAIN
+import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.TEST_PERMISSION_EMAIL_ADDRESS
 import org.junit.Test
 import kotlin.test.assertEquals
 
 internal class DataMappersTest {
 
     @Test
-    fun `given a AnyonePermission, when toPermission is called, then a Permission with corresponding fields is returned`() {
-        val anyonePermission = OmhCreatePermission.AnyonePermission(OmhPermissionRole.WRITER)
+    fun `given Anyone permission, when toPermission is called, then a Permission with corresponding fields is returned`() {
+        val anyonePermission = OmhCreatePermission.CreateIdentityPermission(
+            OmhPermissionRole.WRITER,
+            OmhPermissionRecipient.Anyone
+        )
 
         val result = anyonePermission.toPermission()
 
@@ -43,9 +47,11 @@ internal class DataMappersTest {
     }
 
     @Test
-    fun `given a DomainPermission, when toPermission is called, then a Permission with corresponding fields is returned`() {
-        val domainPermission =
-            OmhCreatePermission.DomainPermission(OmhPermissionRole.WRITER, TEST_PERMISSION_DOMAIN)
+    fun `given Domain permission, when toPermission is called, then a Permission with corresponding fields is returned`() {
+        val domainPermission = OmhCreatePermission.CreateIdentityPermission(
+            OmhPermissionRole.WRITER,
+            OmhPermissionRecipient.Domain(TEST_PERMISSION_DOMAIN)
+        )
 
         val result = domainPermission.toPermission()
 
@@ -55,10 +61,10 @@ internal class DataMappersTest {
     }
 
     @Test
-    fun `given a GroupPermission, when toPermission is called, then a Permission with corresponding fields is returned`() {
-        val groupPermission = OmhCreatePermission.GroupPermission(
+    fun `given Group permission, when toPermission is called, then a Permission with corresponding fields is returned`() {
+        val groupPermission = OmhCreatePermission.CreateIdentityPermission(
             OmhPermissionRole.WRITER,
-            TEST_PERMISSION_EMAIL_ADDRESS
+            OmhPermissionRecipient.Group(TEST_PERMISSION_EMAIL_ADDRESS)
         )
 
         val result = groupPermission.toPermission()
@@ -69,13 +75,13 @@ internal class DataMappersTest {
     }
 
     @Test
-    fun `given a UserPermission, when toPermission is called, then a Permission with corresponding fields is returned`() {
-        val groupPermission = OmhCreatePermission.UserPermission(
+    fun `given User permission, when toPermission is called, then a Permission with corresponding fields is returned`() {
+        val userPermission = OmhCreatePermission.CreateIdentityPermission(
             OmhPermissionRole.WRITER,
-            TEST_PERMISSION_EMAIL_ADDRESS
+            OmhPermissionRecipient.User(TEST_PERMISSION_EMAIL_ADDRESS)
         )
 
-        val result = groupPermission.toPermission()
+        val result = userPermission.toPermission()
 
         assertEquals(USER_TYPE, result.type)
         assertEquals(WRITER_ROLE, result.role)

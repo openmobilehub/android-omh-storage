@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("TooManyFunctions")
+
 package com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper
 
 import com.google.api.services.drive.model.File
@@ -23,7 +25,9 @@ import com.google.api.services.drive.model.Revision
 import com.google.api.services.drive.model.RevisionList
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhIdentity
 import com.openmobilehub.android.storage.core.model.OmhPermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRecipient
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants.ANYONE_TYPE
@@ -98,6 +102,7 @@ internal fun RevisionList.toOmhFileVersions(fileId: String): List<OmhFileVersion
     return this.revisions.toList().map { revision -> revision.toOmhFileVersion(fileId) }
 }
 
+@Suppress("ReturnCount")
 internal fun Permission.toOmhPermission(): OmhPermission? {
     val omhRole = role.stringToRole()
 
@@ -105,13 +110,20 @@ internal fun Permission.toOmhPermission(): OmhPermission? {
         return null
     }
 
+    return OmhPermission.IdentityPermission(
+        id,
+        omhRole,
+        getOmhIdentity() ?: return null
+    )
+}
+
+internal fun Permission.getOmhIdentity(): OmhIdentity? {
     val expirationTime = expirationTime?.value?.let { Date(it) }
 
     return when (type) {
         USER_TYPE -> {
-            OmhPermission.UserPermission(
-                id,
-                omhRole,
+            OmhIdentity.User(
+                id = null,
                 displayName,
                 emailAddress,
                 expirationTime,
@@ -123,30 +135,24 @@ internal fun Permission.toOmhPermission(): OmhPermission? {
         }
 
         GROUP_TYPE -> {
-            OmhPermission.GroupPermission(
-                id,
-                omhRole,
+            OmhIdentity.Group(
+                id = null,
                 displayName,
                 emailAddress,
                 expirationTime,
-                deleted
+                deleted,
             )
         }
 
         DOMAIN_TYPE -> {
-            OmhPermission.DomainPermission(
-                id,
-                omhRole,
-                displayName,
-                domain
+            OmhIdentity.Domain(
+                displayName.orEmpty(),
+                domain.orEmpty()
             )
         }
 
         ANYONE_TYPE -> {
-            OmhPermission.AnyonePermission(
-                id,
-                omhRole,
-            )
+            OmhIdentity.Anyone
         }
 
         else -> null
@@ -174,36 +180,40 @@ internal fun OmhPermissionRole.toPermission(): Permission {
     }
 }
 
-internal fun OmhCreatePermission.toPermission(): Permission {
-    val omhCreatePermission = this
-    val role = omhCreatePermission.role.toStringRole()
-    return when (omhCreatePermission) {
-        is OmhCreatePermission.AnyonePermission -> {
+internal fun OmhCreatePermission.toPermission(): Permission = when (this) {
+    is OmhCreatePermission.CreateIdentityPermission -> recipient.toPermission(role.toStringRole())
+}
+
+internal fun OmhPermissionRecipient.toPermission(role: String): Permission =
+    when (val permissionRecipient = this) {
+        is OmhPermissionRecipient.Anyone -> {
             Permission().apply {
                 this.role = role
                 type = ANYONE_TYPE
             }
         }
 
-        is OmhCreatePermission.DomainPermission ->
+        is OmhPermissionRecipient.Domain ->
             Permission().apply {
                 this.role = role
                 type = DOMAIN_TYPE
-                domain = omhCreatePermission.domain
+                domain = permissionRecipient.domain
             }
 
-        is OmhCreatePermission.GroupPermission ->
+        is OmhPermissionRecipient.Group ->
             Permission().apply {
                 this.role = role
                 type = GROUP_TYPE
-                emailAddress = omhCreatePermission.emailAddress
+                emailAddress = permissionRecipient.emailAddress
             }
 
-        is OmhCreatePermission.UserPermission ->
+        is OmhPermissionRecipient.User ->
             Permission().apply {
                 this.role = role
                 type = USER_TYPE
-                emailAddress = omhCreatePermission.emailAddress
+                emailAddress = permissionRecipient.emailAddress
             }
+
+        is OmhPermissionRecipient.WithAlias -> throw UnsupportedOperationException("Unsupported recipient")
+        is OmhPermissionRecipient.WithObjectId -> throw UnsupportedOperationException("Unsupported recipient")
     }
-}

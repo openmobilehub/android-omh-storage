@@ -18,42 +18,63 @@ package com.openmobilehub.android.storage.core.model
 
 import java.util.Date
 
+/**
+ * This sealed class currently has only one inheritance, but in future, it could be extended with a sharing link:
+ *
+ *    data class SharingLinkPermission(
+ *        override val id: String,
+ *        override val role: OmhPermissionRole,
+ *        val sharingLink: OmhSharingLink
+ *    ) : OmhPermission(id, role)
+ */
 sealed class OmhPermission(
     open val id: String,
     open val role: OmhPermissionRole
 ) {
-
-    data class UserPermission(
+    data class IdentityPermission(
         override val id: String,
         override val role: OmhPermissionRole,
-        val displayName: String,
-        val emailAddress: String,
+        val identity: OmhIdentity
+    ) : OmhPermission(id, role)
+}
+
+sealed class OmhIdentity {
+    data class User(
+        val id: String?,
+        val displayName: String?,
+        val emailAddress: String?,
         val expirationTime: Date?,
         val deleted: Boolean?,
         val photoLink: String?,
         val pendingOwner: Boolean?,
-    ) : OmhPermission(id, role)
+    ) : OmhIdentity()
 
-    data class GroupPermission(
-        override val id: String,
-        override val role: OmhPermissionRole,
-        val displayName: String,
-        val emailAddress: String,
+    data class Group(
+        val id: String?,
+        val displayName: String?,
+        val emailAddress: String?,
         val expirationTime: Date?,
         val deleted: Boolean?,
-    ) : OmhPermission(id, role)
+    ) : OmhIdentity()
 
-    data class DomainPermission(
-        override val id: String,
-        override val role: OmhPermissionRole,
+    data class Domain(
         val displayName: String,
         val domain: String
-    ) : OmhPermission(id, role)
+    ) : OmhIdentity()
 
-    data class AnyonePermission(
-        override val id: String,
-        override val role: OmhPermissionRole,
-    ) : OmhPermission(id, role)
+    object Anyone : OmhIdentity()
+
+    data class Device(
+        val id: String?,
+        val displayName: String?,
+        val expirationTime: Date?,
+    ) : OmhIdentity()
+
+    data class Application(
+        val id: String?,
+        val displayName: String?,
+        val expirationTime: Date?,
+    ) : OmhIdentity()
 }
 
 enum class OmhPermissionRole {

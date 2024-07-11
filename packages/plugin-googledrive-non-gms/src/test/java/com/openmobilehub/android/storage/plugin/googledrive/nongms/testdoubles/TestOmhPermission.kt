@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles
+package com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles
 
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
+import com.openmobilehub.android.storage.core.model.OmhIdentity
 import com.openmobilehub.android.storage.core.model.OmhPermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRecipient
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.utils.fromRFC3339StringToDate
 
@@ -30,18 +32,26 @@ const val TEST_PERMISSION_PHOTO_LINK = "https://test.com/image"
 
 const val TEST_EMAIL_MESSAGE = "Test message"
 
-val testOmhPermission = OmhPermission.UserPermission(
+val testOmhPermission = OmhPermission.IdentityPermission(
     TEST_PERMISSION_ID,
     OmhPermissionRole.OWNER,
-    TEST_PERMISSION_DISPLAY_NAME,
-    TEST_PERMISSION_EMAIL_ADDRESS,
-    TEST_PERMISSION_EXPIRATION_TIME,
-    false,
-    TEST_PERMISSION_PHOTO_LINK,
-    null
+    OmhIdentity.User(
+        null,
+        TEST_PERMISSION_DISPLAY_NAME,
+        TEST_PERMISSION_EMAIL_ADDRESS,
+        TEST_PERMISSION_EXPIRATION_TIME,
+        false,
+        TEST_PERMISSION_PHOTO_LINK,
+        null
+    )
 )
 
-val testOmhCreatePermission = OmhCreatePermission.UserPermission(
+val createOwnerPermission = OmhCreatePermission.CreateIdentityPermission(
     OmhPermissionRole.OWNER,
-    TEST_PERMISSION_EMAIL_ADDRESS
+    OmhPermissionRecipient.User(TEST_PERMISSION_EMAIL_ADDRESS)
+)
+
+val createCommenterPermission = OmhCreatePermission.CreateIdentityPermission(
+    OmhPermissionRole.COMMENTER,
+    OmhPermissionRecipient.User(TEST_PERMISSION_EMAIL_ADDRESS)
 )

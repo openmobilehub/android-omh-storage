@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles
+package com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles
 
 import com.google.api.client.util.DateTime
 import com.google.api.services.drive.model.Permission

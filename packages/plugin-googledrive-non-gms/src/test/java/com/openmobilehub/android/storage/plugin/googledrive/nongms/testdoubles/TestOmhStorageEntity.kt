@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles
+package com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles
 
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.utils.fromRFC3339StringToDate

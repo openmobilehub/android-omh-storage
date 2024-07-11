@@ -28,7 +28,7 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 
-class DataMappersTest {
+class VersionMapperTest {
 
     @MockK
     private lateinit var driveItemVersion: DriveItemVersion

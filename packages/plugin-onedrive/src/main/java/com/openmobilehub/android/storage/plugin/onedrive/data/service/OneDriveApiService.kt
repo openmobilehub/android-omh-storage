@@ -18,14 +18,17 @@ package com.openmobilehub.android.storage.plugin.onedrive.data.service
 
 import androidx.annotation.VisibleForTesting
 import com.microsoft.graph.drives.item.items.item.createuploadsession.CreateUploadSessionPostRequestBody
+import com.microsoft.graph.drives.item.items.item.invite.InvitePostRequestBody
 import com.microsoft.graph.models.DriveItem
 import com.microsoft.graph.models.DriveItemUploadableProperties
 import com.microsoft.graph.models.DriveItemVersionCollectionResponse
+import com.microsoft.graph.models.Permission
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.utils.toInputStream
 import java.io.File
 import java.io.InputStream
 
+@Suppress("TooManyFunctions")
 class OneDriveApiService(private val apiClient: OneDriveApiClient) {
     private val driveId by lazy { retrieveDriveId() }
 
@@ -42,7 +45,7 @@ class OneDriveApiService(private val apiClient: OneDriveApiClient) {
         }
     }
 
-    fun getFilesList(parentId: String): MutableList<DriveItem> {
+    fun getFilesList(parentId: String): List<DriveItem> {
         return apiClient.graphServiceClient.drives().byDriveId(driveId).items()
             .byDriveItemId(parentId).children().get().value
     }
@@ -106,10 +109,54 @@ class OneDriveApiService(private val apiClient: OneDriveApiClient) {
             .byDriveItemId(fileId).delete()
     }
 
-    fun getFile(fileId: String): DriveItem {
+    fun getFile(fileId: String): DriveItem? {
         return apiClient.graphServiceClient.drives()
             .byDriveId(driveId)
             .items()
             .byDriveItemId(fileId).get()
+    }
+
+    fun getFilePermissions(fileId: String): List<Permission> {
+        return apiClient.graphServiceClient.drives()
+            .byDriveId(driveId)
+            .items()
+            .byDriveItemId(fileId)
+            .permissions()
+            .get()
+            .value
+    }
+
+    fun createPermission(fileId: String, body: InvitePostRequestBody): List<Permission> {
+        return apiClient.graphServiceClient.drives()
+            .byDriveId(driveId)
+            .items()
+            .byDriveItemId(fileId)
+            .invite()
+            .post(body)
+            .value
+    }
+
+    fun deletePermission(fileId: String, permissionId: String) {
+        apiClient.graphServiceClient.drives()
+            .byDriveId(driveId)
+            .items()
+            .byDriveItemId(fileId)
+            .permissions()
+            .byPermissionId(permissionId)
+            .delete()
+    }
+
+    fun updatePermission(fileId: String, permissionId: String, role: String): Permission {
+        return apiClient.graphServiceClient.drives()
+            .byDriveId(driveId)
+            .items()
+            .byDriveItemId(fileId)
+            .permissions()
+            .byPermissionId(permissionId)
+            .patch(
+                Permission().apply {
+                    this.roles = listOf(role)
+                }
+            )
     }
 }

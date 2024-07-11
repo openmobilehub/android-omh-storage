@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
+@file:Suppress("TooManyFunctions")
+
 package com.openmobilehub.android.storage.plugin.onedrive.data.mapper
 
 import com.microsoft.graph.models.DriveItemVersion
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import java.util.Date
 
-fun DriveItemVersion.toOmhVersion(fileId: String): OmhFileVersion {
+internal fun DriveItemVersion.toOmhVersion(fileId: String): OmhFileVersion {
     return OmhFileVersion(
         fileId,
         id,

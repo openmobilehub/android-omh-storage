@@ -20,6 +20,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
+import com.openmobilehub.android.storage.core.model.OmhPermissionRecipient
+import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
+import com.openmobilehub.android.storage.sample.domain.repository.SessionRepository
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.create.model.CreatePermissionsViewAction
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.create.model.PermissionType
 import com.openmobilehub.android.storage.sample.util.isValidEmail
@@ -32,13 +35,28 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @HiltViewModel
-class CreatePermissionViewModel @Inject constructor() : ViewModel() {
+class CreatePermissionViewModel @Inject constructor(
+    sessionRepository: SessionRepository
+) : ViewModel() {
 
     private val _action = Channel<CreatePermissionsViewAction>()
     val action = _action.receiveAsFlow()
 
     val roles = OmhPermissionRole.values()
-        .filter { it != OmhPermissionRole.OWNER } // Changing the owner of a file requires a separate flow
+    val disabledRoles: Set<OmhPermissionRole> = when (sessionRepository.getStorageAuthProvider()) {
+        StorageAuthProvider.GOOGLE -> setOf(
+            // Changing the owner of a file requires a separate flow that is not covered by the sample app
+            OmhPermissionRole.OWNER
+        )
+
+        StorageAuthProvider.DROPBOX -> emptySet()
+        StorageAuthProvider.MICROSOFT -> setOf(
+            // Changing the owner of a file requires a separate flow that is not covered by the sample app
+            OmhPermissionRole.OWNER,
+            OmhPermissionRole.COMMENTER
+        )
+    }
+
     private val _role: MutableStateFlow<OmhPermissionRole> =
         MutableStateFlow(OmhPermissionRole.READER)
     val role: StateFlow<OmhPermissionRole> = _role
@@ -52,6 +70,14 @@ class CreatePermissionViewModel @Inject constructor() : ViewModel() {
         }
 
     val types = PermissionType.values()
+    val disabledTypes: Set<PermissionType> = when (sessionRepository.getStorageAuthProvider()) {
+        StorageAuthProvider.GOOGLE -> emptySet()
+        StorageAuthProvider.DROPBOX -> emptySet()
+        StorageAuthProvider.MICROSOFT -> setOf(
+            PermissionType.ANYONE,
+            PermissionType.DOMAIN
+        )
+    }
 
     private val _type: MutableStateFlow<PermissionType> = MutableStateFlow(PermissionType.USER)
     val type: MutableStateFlow<PermissionType> = _type
@@ -82,29 +108,29 @@ class CreatePermissionViewModel @Inject constructor() : ViewModel() {
 
     @Suppress("ReturnCount")
     private suspend fun validatePermission(): OmhCreatePermission? {
-        when (_type.value) {
+        val recipient = when (_type.value) {
             PermissionType.USER ->
-                return OmhCreatePermission.UserPermission(
-                    role = _role.value,
+                OmhPermissionRecipient.User(
                     emailAddress = validateEmail() ?: return null
                 )
 
             PermissionType.GROUP ->
-                return OmhCreatePermission.GroupPermission(
-                    role = _role.value,
+                OmhPermissionRecipient.Group(
                     emailAddress = validateEmail() ?: return null
                 )
 
             PermissionType.DOMAIN ->
-                return OmhCreatePermission.DomainPermission(
-                    role = _role.value,
+                OmhPermissionRecipient.Domain(
                     domain = validateDomain() ?: return null
                 )
 
-            PermissionType.ANYONE -> return OmhCreatePermission.AnyonePermission(
-                role = _role.value,
-            )
+            PermissionType.ANYONE -> OmhPermissionRecipient.Anyone
         }
+
+        return OmhCreatePermission.CreateIdentityPermission(
+            role = _role.value,
+            recipient = recipient
+        )
     }
 
     private suspend fun validateEmail(): String? {

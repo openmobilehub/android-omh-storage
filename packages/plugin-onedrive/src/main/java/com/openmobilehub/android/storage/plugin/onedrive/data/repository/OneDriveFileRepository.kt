@@ -16,17 +16,25 @@
 
 package com.openmobilehub.android.storage.plugin.onedrive.data.repository
 
+import com.microsoft.graph.drives.item.items.item.invite.InvitePostRequestBody
+import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhPermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhStorageEntity
+import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.toDriveRecipient
+import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.toOmhPermission
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.toOmhVersion
+import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.toOneDriveString
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiService
 import com.openmobilehub.android.storage.plugin.onedrive.data.util.toByteArrayOutputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 
+@Suppress("TooManyFunctions")
 class OneDriveFileRepository(
     private val apiService: OneDriveApiService,
     private val driveItemToOmhStorageEntity: DriveItemToOmhStorageEntity
@@ -70,9 +78,54 @@ class OneDriveFileRepository(
         return true
     }
 
-    fun getFileMetadata(fileId: String): OmhStorageMetadata {
-        val driveItem = apiService.getFile(fileId)
+    fun getFileMetadata(fileId: String): OmhStorageMetadata? {
+        val driveItem = apiService.getFile(fileId) ?: return null
 
         return OmhStorageMetadata(driveItemToOmhStorageEntity(driveItem), driveItem)
+    }
+
+    fun getFilePermissions(fileId: String): List<OmhPermission> {
+        return apiService.getFilePermissions(fileId).mapNotNull { it.toOmhPermission() }
+    }
+
+    fun getWebUrl(fileId: String): String? {
+        return apiService.getFile(fileId)?.webUrl
+    }
+
+    fun createPermission(
+        fileId: String,
+        permission: OmhCreatePermission,
+        sendNotificationEmail: Boolean,
+        emailMessage: String?
+    ): OmhPermission {
+        val requestBody = InvitePostRequestBody().apply {
+            roles = listOf(permission.role.toOneDriveString())
+            recipients = listOf(permission.toDriveRecipient())
+            message = emailMessage
+            sendInvitation = sendNotificationEmail
+        }
+
+        return apiService.createPermission(fileId, requestBody).firstOrNull()?.toOmhPermission()
+            ?: throw OmhStorageException.ApiException(
+                message = "Create succeeded but API failed to return expected permission"
+            )
+    }
+
+    fun deletePermission(fileId: String, permissionId: String): Boolean {
+        apiService.deletePermission(fileId, permissionId)
+
+        // It returns true if the permission was deleted successfully, otherwise the method will throw an exception
+        return true
+    }
+
+    fun updatePermission(
+        fileId: String,
+        permissionId: String,
+        role: OmhPermissionRole
+    ): OmhPermission {
+        return apiService.updatePermission(fileId, permissionId, role.toOneDriveString())
+            .toOmhPermission() ?: throw OmhStorageException.ApiException(
+            message = "Update succeeded but API failed to return expected permission"
+        )
     }
 }

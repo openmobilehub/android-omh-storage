@@ -21,7 +21,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.DialogFragment
@@ -35,6 +34,7 @@ import com.openmobilehub.android.storage.sample.databinding.DialogCreatePermissi
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.FilePermissionsViewModel
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.create.model.CreatePermissionsViewAction
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.create.model.PermissionType
+import com.openmobilehub.android.storage.sample.presentation.util.DefaultArrayAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -62,12 +62,14 @@ class CreatePermissionDialog : DialogFragment() {
     }
 
     private fun setupBinding() = with(binding) {
-        roleSpinner.adapter = ArrayAdapter(
+        roleSpinner.adapter = object : DefaultArrayAdapter<OmhPermissionRole>(
             requireContext(),
-            android.R.layout.simple_spinner_dropdown_item,
-            viewModel.roles
-        )
-
+            viewModel.roles,
+        ) {
+            override fun isEnabled(position: Int): Boolean {
+                return !viewModel.disabledRoles.contains(viewModel.roles[position])
+            }
+        }
         roleSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
@@ -83,12 +85,14 @@ class CreatePermissionDialog : DialogFragment() {
             }
         }
 
-
-        typeSpinner.adapter = ArrayAdapter(
+        typeSpinner.adapter = object : DefaultArrayAdapter<PermissionType>(
             requireContext(),
-            android.R.layout.simple_spinner_dropdown_item,
-            viewModel.types
-        )
+            viewModel.types,
+        ) {
+            override fun isEnabled(position: Int): Boolean {
+                return !viewModel.disabledTypes.contains(viewModel.types[position])
+            }
+        }
 
         typeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(

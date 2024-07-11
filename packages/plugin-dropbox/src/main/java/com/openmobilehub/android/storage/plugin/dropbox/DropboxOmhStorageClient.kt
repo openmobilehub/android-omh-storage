@@ -22,6 +22,7 @@ import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhIdentity
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
@@ -80,7 +81,7 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
     }
 
     override suspend fun permanentlyDeleteFile(id: String): Boolean {
-        throw OmhStorageException.NotSupportedException()
+        throw UnsupportedOperationException()
     }
 
     override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity? {
@@ -96,7 +97,7 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         fileId: String,
         exportedMimeType: String
     ): ByteArrayOutputStream {
-        throw OmhStorageException.NotSupportedException("Exporting files is not supported in Dropbox")
+        throw UnsupportedOperationException("Exporting files is not supported in Dropbox")
     }
 
     override suspend fun getWebUrl(fileId: String): String? {
@@ -144,7 +145,7 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         emailMessage: String?
     ): OmhPermission {
         // To be implemented
-        return OmhPermission.AnyonePermission("", OmhPermissionRole.READER)
+        return OmhPermission.IdentityPermission("", OmhPermissionRole.READER, OmhIdentity.Anyone)
     }
 
     override suspend fun updatePermission(
@@ -153,6 +154,6 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         role: OmhPermissionRole
     ): OmhPermission {
         // To be implemented
-        return OmhPermission.AnyonePermission("", OmhPermissionRole.READER)
+        return OmhPermission.IdentityPermission("", OmhPermissionRole.READER, OmhIdentity.Anyone)
     }
 }

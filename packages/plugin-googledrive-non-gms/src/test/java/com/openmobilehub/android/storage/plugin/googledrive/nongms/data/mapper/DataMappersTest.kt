@@ -19,22 +19,26 @@
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper
 
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRecipient
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.ANYONE_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.DOMAIN_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.GROUP_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.USER_TYPE
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.WRITER_ROLE
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_PERMISSION_DOMAIN
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_PERMISSION_EMAIL_ADDRESS
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.TEST_PERMISSION_DOMAIN
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.TEST_PERMISSION_EMAIL_ADDRESS
 import org.junit.Test
 import kotlin.test.assertEquals
 
 internal class DataMappersTest {
 
     @Test
-    fun `given a AnyonePermission, when toCreateRequestBody is called, then a Permission with corresponding fields is returned`() {
-        val anyonePermission = OmhCreatePermission.AnyonePermission(OmhPermissionRole.WRITER)
+    fun `given Anyone permission, when toCreateRequestBody is called, then a Permission with corresponding fields is returned`() {
+        val anyonePermission = OmhCreatePermission.CreateIdentityPermission(
+            OmhPermissionRole.WRITER,
+            OmhPermissionRecipient.Anyone
+        )
 
         val result = anyonePermission.toCreateRequestBody()
 
@@ -43,9 +47,11 @@ internal class DataMappersTest {
     }
 
     @Test
-    fun `given a DomainPermission, when toCreateRequestBody is called, then a Permission with corresponding fields is returned`() {
-        val domainPermission =
-            OmhCreatePermission.DomainPermission(OmhPermissionRole.WRITER, TEST_PERMISSION_DOMAIN)
+    fun `given Domain permission, when toCreateRequestBody is called, then a Permission with corresponding fields is returned`() {
+        val domainPermission = OmhCreatePermission.CreateIdentityPermission(
+            OmhPermissionRole.WRITER,
+            OmhPermissionRecipient.Domain(TEST_PERMISSION_DOMAIN)
+        )
 
         val result = domainPermission.toCreateRequestBody()
 
@@ -55,10 +61,10 @@ internal class DataMappersTest {
     }
 
     @Test
-    fun `given a GroupPermission, when toCreateRequestBody is called, then a Permission with corresponding fields is returned`() {
-        val groupPermission = OmhCreatePermission.GroupPermission(
+    fun `given Group permission, when toCreateRequestBody is called, then a Permission with corresponding fields is returned`() {
+        val groupPermission = OmhCreatePermission.CreateIdentityPermission(
             OmhPermissionRole.WRITER,
-            TEST_PERMISSION_EMAIL_ADDRESS
+            OmhPermissionRecipient.Group(TEST_PERMISSION_EMAIL_ADDRESS)
         )
 
         val result = groupPermission.toCreateRequestBody()
@@ -69,13 +75,13 @@ internal class DataMappersTest {
     }
 
     @Test
-    fun `given a UserPermission, when toCreateRequestBody is called, then a Permission with corresponding fields is returned`() {
-        val groupPermission = OmhCreatePermission.UserPermission(
+    fun `given User permission, when toCreateRequestBody is called, then a Permission with corresponding fields is returned`() {
+        val userPermission = OmhCreatePermission.CreateIdentityPermission(
             OmhPermissionRole.WRITER,
-            TEST_PERMISSION_EMAIL_ADDRESS
+            OmhPermissionRecipient.User(TEST_PERMISSION_EMAIL_ADDRESS)
         )
 
-        val result = groupPermission.toCreateRequestBody()
+        val result = userPermission.toCreateRequestBody()
 
         assertEquals(USER_TYPE, result.type)
         assertEquals(WRITER_ROLE, result.role)

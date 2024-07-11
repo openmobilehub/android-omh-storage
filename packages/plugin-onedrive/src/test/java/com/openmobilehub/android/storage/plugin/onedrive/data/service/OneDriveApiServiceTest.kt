@@ -21,19 +21,24 @@ package com.openmobilehub.android.storage.plugin.onedrive.data.service
 import com.microsoft.graph.core.models.UploadResult
 import com.microsoft.graph.models.DriveItem
 import com.microsoft.graph.models.DriveItemVersionCollectionResponse
+import com.microsoft.graph.models.Permission
 import com.microsoft.graph.models.UploadSession
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.utils.toInputStream
+import com.openmobilehub.android.storage.plugin.onedrive.OneDriveConstants.WRITE_ROLE
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_PARENT_ID
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_PERMISSION_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_VERSION_FILE_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_VERSION_ID
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.invitePostRequestBody
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.mockkStatic
+import io.mockk.slot
 import io.mockk.verify
 import org.junit.After
 import org.junit.Assert
@@ -63,6 +68,9 @@ class OneDriveApiServiceTest {
 
     @MockK
     private lateinit var driveItemVersionCollectionResponse: DriveItemVersionCollectionResponse
+
+    @MockK
+    private lateinit var permission: Permission
 
     private lateinit var apiService: OneDriveApiService
 
@@ -109,7 +117,7 @@ class OneDriveApiServiceTest {
         every {
             apiClient.graphServiceClient.drives().byDriveId(any()).items().byDriveItemId(any())
                 .children().get().value
-        } returns mutableListOf(
+        } returns listOf(
             driveItem
         )
 
@@ -117,7 +125,7 @@ class OneDriveApiServiceTest {
         val result = apiService.getFilesList(TEST_FILE_PARENT_ID)
 
         // Assert
-        Assert.assertEquals(mutableListOf(driveItem), result)
+        Assert.assertEquals(listOf(driveItem), result)
     }
 
     @Test
@@ -242,5 +250,119 @@ class OneDriveApiServiceTest {
 
         // Assert
         Assert.assertEquals(driveItem, result)
+    }
+
+    @Test
+    fun `given api client, when deleting a permission, then client is called with correct file and permission ID`() {
+        // Arrange
+        every {
+            apiClient.graphServiceClient.drives()
+                .byDriveId(any())
+                .items()
+                .byDriveItemId(TEST_FILE_ID)
+                .permissions()
+                .byPermissionId(TEST_PERMISSION_ID)
+                .delete()
+        } returns Unit
+
+        // Act
+        apiService.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
+
+        // Assert
+        verify {
+            apiClient.graphServiceClient.drives()
+                .byDriveId(any())
+                .items()
+                .byDriveItemId(TEST_FILE_ID)
+                .permissions()
+                .byPermissionId(TEST_PERMISSION_ID)
+                .delete()
+        }
+    }
+
+    @Test
+    fun `given apiClient returns list of permission, when getting a file permission list, then return list of permissions`() {
+        // Arrange
+        every {
+            apiClient.graphServiceClient.drives()
+                .byDriveId(any())
+                .items()
+                .byDriveItemId(TEST_FILE_ID)
+                .permissions()
+                .get()
+                .value
+        } returns listOf(permission)
+
+        // Act
+        val result = apiService.getFilePermissions(TEST_FILE_ID)
+
+        // Assert
+        Assert.assertEquals(listOf(permission), result)
+    }
+
+    @Test
+    fun `given apiClient successfully creates the permission, when creating permission, then return Permission`() {
+        // Arrange
+        every {
+            apiClient.graphServiceClient.drives()
+                .byDriveId(any())
+                .items()
+                .byDriveItemId(TEST_FILE_ID)
+                .invite()
+                .post(invitePostRequestBody)
+                .value
+        } returns listOf(permission)
+
+        // Act
+        val result = apiService.createPermission(TEST_FILE_ID, invitePostRequestBody)
+
+        // Assert
+        Assert.assertEquals(listOf(permission), result)
+    }
+
+    @Test
+    fun `given apiClient successfully updates the permission, when updating permission, then return Permission`() {
+        // Arrange
+        every {
+            apiClient.graphServiceClient.drives()
+                .byDriveId(any())
+                .items()
+                .byDriveItemId(TEST_FILE_ID)
+                .permissions()
+                .byPermissionId(TEST_PERMISSION_ID)
+                .patch(
+                    any()
+                )
+        } returns permission
+
+        // Act
+        val result = apiService.updatePermission(TEST_FILE_ID, TEST_PERMISSION_ID, WRITE_ROLE)
+
+        // Assert
+        Assert.assertEquals(permission, result)
+    }
+
+    @Test
+    fun `given api client, when updating a permission, then client is called with Permission with correct role`() {
+        // Arrange
+        val permissionSlot = slot<Permission>()
+        val permission = Permission().apply {
+            roles = listOf(WRITE_ROLE)
+        }
+        every {
+            apiClient.graphServiceClient.drives()
+                .byDriveId(any())
+                .items()
+                .byDriveItemId(TEST_FILE_ID)
+                .permissions()
+                .byPermissionId(TEST_PERMISSION_ID)
+                .patch(capture(permissionSlot))
+        } returns permission
+
+        // Act
+        apiService.updatePermission(TEST_FILE_ID, TEST_PERMISSION_ID, WRITE_ROLE)
+
+        // Assert
+        Assert.assertEquals(permission.roles, permissionSlot.captured.roles)
     }
 }

@@ -20,7 +20,9 @@ package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper
 
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhIdentity
 import com.openmobilehub.android.storage.core.model.OmhPermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRecipient
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.utils.fromRFC3339StringToDate
@@ -102,6 +104,7 @@ internal fun RevisionListRemoteResponse.toOmhFileVersions(fileId: String): List<
 
 internal fun isFolder(mimeType: String) = mimeType == FOLDER_MIME_TYPE
 
+@Suppress("ReturnCount")
 internal fun PermissionResponse.toPermission(): OmhPermission? {
     val omhRole = role?.stringToRole()
 
@@ -109,15 +112,20 @@ internal fun PermissionResponse.toPermission(): OmhPermission? {
         return null
     }
 
-    val displayName = displayName.orEmpty()
-    val emailAddress = emailAddress.orEmpty()
+    return OmhPermission.IdentityPermission(
+        id,
+        omhRole,
+        getOmhIdentity() ?: return null
+    )
+}
+
+internal fun PermissionResponse.getOmhIdentity(): OmhIdentity? {
     val expirationTime = expirationTime?.fromRFC3339StringToDate()
 
     return when (type) {
         USER_TYPE -> {
-            OmhPermission.UserPermission(
-                id,
-                omhRole,
+            OmhIdentity.User(
+                id = null,
                 displayName,
                 emailAddress,
                 expirationTime,
@@ -128,9 +136,8 @@ internal fun PermissionResponse.toPermission(): OmhPermission? {
         }
 
         GROUP_TYPE -> {
-            OmhPermission.GroupPermission(
-                id,
-                omhRole,
+            OmhIdentity.Group(
+                id = null,
                 displayName,
                 emailAddress,
                 expirationTime,
@@ -139,19 +146,14 @@ internal fun PermissionResponse.toPermission(): OmhPermission? {
         }
 
         DOMAIN_TYPE -> {
-            OmhPermission.DomainPermission(
-                id,
-                omhRole,
-                displayName,
+            OmhIdentity.Domain(
+                displayName.orEmpty(),
                 domain.orEmpty()
             )
         }
 
         ANYONE_TYPE -> {
-            OmhPermission.AnyonePermission(
-                id,
-                omhRole,
-            )
+            OmhIdentity.Anyone
         }
 
         else -> null
@@ -181,28 +183,39 @@ internal fun OmhPermissionRole.toUpdateRequestBody(): UpdatePermissionRequestBod
 }
 
 internal fun OmhCreatePermission.toCreateRequestBody(): CreatePermissionRequestBody = when (this) {
-    is OmhCreatePermission.AnyonePermission -> CreatePermissionRequestBody(
-        type = ANYONE_TYPE,
-        role = role.toStringRole(),
-        emailAddress = null,
-        domain = null
-    )
-    is OmhCreatePermission.DomainPermission -> CreatePermissionRequestBody(
-        type = DOMAIN_TYPE,
-        role = role.toStringRole(),
-        emailAddress = null,
-        domain = domain
-    )
-    is OmhCreatePermission.GroupPermission -> CreatePermissionRequestBody(
-        type = GROUP_TYPE,
-        role = role.toStringRole(),
-        emailAddress = emailAddress,
-        domain = null
-    )
-    is OmhCreatePermission.UserPermission -> CreatePermissionRequestBody(
-        type = USER_TYPE,
-        role = role.toStringRole(),
-        emailAddress = emailAddress,
-        domain = null
-    )
+    is OmhCreatePermission.CreateIdentityPermission -> recipient.toCreateRequestBody(role.toStringRole())
 }
+
+internal fun OmhPermissionRecipient.toCreateRequestBody(role: String): CreatePermissionRequestBody =
+    when (this) {
+        is OmhPermissionRecipient.Anyone -> CreatePermissionRequestBody(
+            type = ANYONE_TYPE,
+            role = role,
+            emailAddress = null,
+            domain = null
+        )
+
+        is OmhPermissionRecipient.Domain -> CreatePermissionRequestBody(
+            type = DOMAIN_TYPE,
+            role = role,
+            emailAddress = null,
+            domain = domain
+        )
+
+        is OmhPermissionRecipient.Group -> CreatePermissionRequestBody(
+            type = GROUP_TYPE,
+            role = role,
+            emailAddress = emailAddress,
+            domain = null
+        )
+
+        is OmhPermissionRecipient.User -> CreatePermissionRequestBody(
+            type = USER_TYPE,
+            role = role,
+            emailAddress = emailAddress,
+            domain = null
+        )
+
+        is OmhPermissionRecipient.WithAlias -> throw UnsupportedOperationException("Unsupported recipient")
+        is OmhPermissionRecipient.WithObjectId -> throw UnsupportedOperationException("Unsupported recipient")
+    }

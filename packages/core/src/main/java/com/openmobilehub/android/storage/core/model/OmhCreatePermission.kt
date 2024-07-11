@@ -19,22 +19,20 @@ package com.openmobilehub.android.storage.core.model
 sealed class OmhCreatePermission(
     open val role: OmhPermissionRole
 ) {
-    data class UserPermission(
+    data class CreateIdentityPermission(
         override val role: OmhPermissionRole,
-        val emailAddress: String,
+        val recipient: OmhPermissionRecipient
     ) : OmhCreatePermission(role)
+}
 
-    data class GroupPermission(
-        override val role: OmhPermissionRole,
-        val emailAddress: String,
-    ) : OmhCreatePermission(role)
-
-    data class DomainPermission(
-        override val role: OmhPermissionRole,
+sealed class OmhPermissionRecipient {
+    data class User(val emailAddress: String) : OmhPermissionRecipient()
+    data class Group(val emailAddress: String) : OmhPermissionRecipient()
+    data class Domain(
         val domain: String
-    ) : OmhCreatePermission(role)
+    ) : OmhPermissionRecipient()
 
-    data class AnyonePermission(
-        override val role: OmhPermissionRole,
-    ) : OmhCreatePermission(role)
+    object Anyone : OmhPermissionRecipient()
+    data class WithObjectId(val id: String) : OmhPermissionRecipient()
+    data class WithAlias(val alias: String) : OmhPermissionRecipient()
 }
