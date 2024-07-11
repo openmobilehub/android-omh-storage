@@ -19,67 +19,83 @@ Module plugin-onedrive
 
 ---
 
+## Prerequisites
+
+Ensure you have the following packages installed before proceeding with the integration:
+
+- [`com.openmobilehub.android.storage:core:2.0.0`](https://miniature-adventure-4gle9ye.pages.github.io/docs/core)
+- [`com.openmobilehub.android.auth:core:2.0.2`](https://github.com/openmobilehub/android-omh-auth)
+
+## Installation
+
+To integrate the OneDrive storage provider into your Android project, follow these steps:
+
+### 1. Configure Maven Central repository
+
+Ensure Maven Central is included as a repository in your root **build.gradle** file:
+
+```gradle
+allprojects {
+  repositories {
+    mavenCentral()
+  }
+}
+```
+
+### 2. Add dependency for the OneDrive storage provider
+
+Add the dependency for the OneDrive storage provider to your project's **build.gradle** file:
+
+```gradle
+dependencies {
+  implementation("com.openmobilehub.android.storage:plugin-onedrive-gms:2.0.0")
+}
+```
+
+## Configuration
+
+### Console App
+
+To access Microsoft APIs, follow these steps to obtain the **ms_auth_config.json** file:
+
+1. [Create a new app](https://learn.microsoft.com/en-us/entra/identity-platform/tutorial-v2-android#register-your-application-with-microsoft-entra-id) in [Microsoft Azure](https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/CreateApplicationBlade).
+2. Add the **Android** platform and specify your [**Package Name**](https://developer.android.com/build/configure-app-module#set-application-id) and [**Signature Hash**](https://learn.microsoft.com/en-us/entra/identity-platform/tutorial-v2-android#register-your-application-with-microsoft-entra-id:~:text=In%20the%20Signature%20hash%20section%20of%20the%20Configure%20your%20Android%20app%20pane%2C%20select%20Generating%20a%20development%20Signature%20Hash.%20and%20copy%20the%20KeyTool%20command%20to%20your%20command%20line.) for your app.
+3. Download the **ms_auth_config.json** file and add it in the **src/main/res/raw** directory.
+
+### Secrets
+
+To securely configure the OneDrive storage provider, add the following entry to your project's **local.properties** file:
+
+```bash
+MICROSOFT_HOST_PATH=<YOUR_ANDROID_PACKAGE_NAME>.MainApplication
+MICROSOFT_SIGNATURE_HASH=<YOUR_MICROSOFT_SIGNATURE_HASH>
+```
+
+## Usage
+
+### Initializing
+
+To interact with the OneDrive storage provider, you must first initialize both the OMH Auth Client and OMH Storage Client with the necessary configurations.
+
+```kotlin
+val omhAuthClient = MicrosoftAuthClient(
+    configFileResourceId = R.raw.ms_auth_config,
+    context = context,
+    scopes = arrayListOf("User.Read", "Files.ReadWrite.All"),
+)
+
+val omhStorageClient = OneDriveOmhStorageFactory().getStorageClient(omhAuthClient)
+```
+
 ### Other methods
 
-#### Compatibility exemptions ✅❌🟨
-
-##### OmhIdentity
-
-| Classes     | Supported |
-|-------------|:---------:|
-| User        |     ✅     |
-| Group       |     ✅     |
-| Domain      |     ❌     |
-| Anyone      |     ❌     |
-| Device      |     ✅     |
-| Application |     ✅     |
-
-| User           | Supported |
-|----------------|:---------:|
-| id             |     ✅     |
-| displayName    |     ✅     |
-| emailAddress   |     🟨     |
-| expirationTime |     ✅     |
-| deleted        |     ❌     |
-| photoLink      |     ❌     |
-| pendingOwner   |     ❌     |
-
-| Group          | Supported |
-|----------------|:---------:|
-| id             |     ✅     |
-| displayName    |     ✅     |
-| emailAddress   |     🟨     |
-| expirationTime |     ✅     |
-| deleted        |     ❌     |
-
-Comments for partially supported 🟨 properties:
-
-| Property     | Comments                    |
-|--------------|-----------------------------|
-| emailAddress | It may not always provided. |
-
-##### OmhPermissionRole
-
-| Classes   | Supported |
-|-----------|:---------:|
-| OWNER     |     ✅     |
-| WRITER    |     ✅     |
-| COMMENTER |     ❌     |
-| READER    |     ✅     |
-
-##### OmhPermissionRecipient
-
-| Classes      | Supported |
-|--------------|:---------:|
-| User         |     ✅     |
-| Group        |     ✅     |
-| Domain       |     ❌     |
-| Anyone       |     ❌     |
-| WithObjectId |     ✅     |
-| WithAlias    |     ✅     |
+Interacting with the OneDrive storage provider follows the same pattern as other storage providers since they all implement the [`OmhStorageClient`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client) interface. This uniformity ensures consistent functionality across different storage providers, so you won’t need to learn new methods regardless of the storage provider you choose! For a comprehensive list of available methods, refer to the [Getting Started](https://miniature-adventure-4gle9ye.pages.github.io/docs/getting-started) guide.
 
 #### ⚠️ KNOWN LIMITATIONS
 
->
-The [Sharing links](https://learn.microsoft.com/en-us/graph/api/resources/permission?view=graph-rest-1.0#sharing-links)
-permissions are not supported.
+> The [Sharing links](https://learn.microsoft.com/en-us/graph/api/resources/permission?view=graph-rest-1.0#sharing-links)
+> permissions are not supported.
+
+## License
+
+- See [LICENSE](https://github.com/openmobilehub/android-omh-storage/blob/main/LICENSE)
