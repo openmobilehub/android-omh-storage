@@ -43,7 +43,7 @@ jobs:
         uses: actions/configure-pages@v4
 
       - name: Setup secrets
-        run: bash ./.github/scripts/setup_secrets.sh "${{ secrets.GOOGLE_CLIENT_ID}}" "${{ secrets.DROPBOX_APP_KEY }}" "${{ secrets.MICROSOFT_CLIENT_ID }}" "${{ secrets.MICROSOFT_SIGNATURE_HASH }}" "${{ secrets.MICROSOFT_CLIENT_ID }}" "${{ secrets.MICROSOFT_SIGNATURE_HASH }}"
+        run: bash ./.github/scripts/setup_secrets.sh "${{ secrets.GOOGLE_CLIENT_ID}}" "${{ secrets.DROPBOX_CLIENT_ID }}" "${{ secrets.MICROSOFT_CLIENT_ID }}" "${{ secrets.MICROSOFT_SIGNATURE_HASH }}" "${{ secrets.MICROSOFT_CLIENT_ID }}" "${{ secrets.MICROSOFT_SIGNATURE_HASH }}"
 
       - name: Set useMavenLocal flag
         run: echo useMavenLocal=true >> local.properties
