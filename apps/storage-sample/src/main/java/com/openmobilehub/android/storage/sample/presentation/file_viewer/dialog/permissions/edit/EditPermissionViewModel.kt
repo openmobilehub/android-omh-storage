@@ -31,10 +31,12 @@ class EditPermissionViewModel @Inject constructor(
     var role: OmhPermissionRole? = null
     val disabledRoles: Set<OmhPermissionRole> = when (sessionRepository.getStorageAuthProvider()) {
         StorageAuthProvider.GOOGLE -> setOf(
+            // Changing the owner of a file requires a separate flow that is not covered by the sample app
             OmhPermissionRole.OWNER
         )
         StorageAuthProvider.DROPBOX -> emptySet()
         StorageAuthProvider.MICROSOFT -> setOf(
+            // Changing the owner of a file requires a separate flow that is not covered by the sample app
             OmhPermissionRole.OWNER,
             OmhPermissionRole.COMMENTER
         )

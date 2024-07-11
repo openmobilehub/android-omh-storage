@@ -18,3 +18,68 @@ Module plugin-onedrive
 </p>
 
 ---
+
+### Other methods
+
+#### Compatibility exemptions ✅❌🟨
+
+##### OmhIdentity
+
+| Classes     | Supported |
+|-------------|:---------:|
+| User        |     ✅     |
+| Group       |     ✅     |
+| Domain      |     ❌     |
+| Anyone      |     ❌     |
+| Device      |     ✅     |
+| Application |     ✅     |
+
+| User           | Supported |
+|----------------|:---------:|
+| id             |     ✅     |
+| displayName    |     ✅     |
+| emailAddress   |     🟨     |
+| expirationTime |     ✅     |
+| deleted        |     ❌     |
+| photoLink      |     ❌     |
+| pendingOwner   |     ❌     |
+
+| Group          | Supported |
+|----------------|:---------:|
+| id             |     ✅     |
+| displayName    |     ✅     |
+| emailAddress   |     🟨     |
+| expirationTime |     ✅     |
+| deleted        |     ❌     |
+
+Comments for partially supported 🟨 properties:
+
+| Property     | Comments                    |
+|--------------|-----------------------------|
+| emailAddress | It may not always provided. |
+
+##### OmhPermissionRole
+
+| Classes   | Supported |
+|-----------|:---------:|
+| OWNER     |     ✅     |
+| WRITER    |     ✅     |
+| COMMENTER |     ❌     |
+| READER    |     ✅     |
+
+##### OmhPermissionRecipient
+
+| Classes      | Supported |
+|--------------|:---------:|
+| User         |     ✅     |
+| Group        |     ✅     |
+| Domain       |     ❌     |
+| Anyone       |     ❌     |
+| WithObjectId |     ✅     |
+| WithAlias    |     ✅     |
+
+#### ⚠️ KNOWN LIMITATIONS
+
+>
+The [Sharing links](https://learn.microsoft.com/en-us/graph/api/resources/permission?view=graph-rest-1.0#sharing-links)
+permissions are not supported.

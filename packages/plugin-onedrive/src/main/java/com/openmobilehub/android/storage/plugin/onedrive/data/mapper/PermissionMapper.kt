@@ -27,8 +27,8 @@ import com.microsoft.graph.models.SharePointIdentitySet
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhIdentity
 import com.openmobilehub.android.storage.core.model.OmhPermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRecipient
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
-import com.openmobilehub.android.storage.core.model.PermissionRecipient
 import com.openmobilehub.android.storage.plugin.onedrive.OneDriveConstants.OWNER_ROLE
 import com.openmobilehub.android.storage.plugin.onedrive.OneDriveConstants.READ_ROLE
 import com.openmobilehub.android.storage.plugin.onedrive.OneDriveConstants.WRITE_ROLE
@@ -149,13 +149,13 @@ internal fun OmhCreatePermission.toDriveRecipient(): DriveRecipient = when (this
     is OmhCreatePermission.CreateIdentityPermission -> recipient.toDriveRecipient()
 }
 
-internal fun PermissionRecipient.toDriveRecipient(): DriveRecipient = when (this) {
-    PermissionRecipient.Anyone -> throw UnsupportedOperationException("Unsupported recipient")
-    is PermissionRecipient.Domain -> throw UnsupportedOperationException("Unsupported recipient")
-    is PermissionRecipient.Group -> DriveRecipient().apply { email = emailAddress }
-    is PermissionRecipient.User -> DriveRecipient().apply { email = emailAddress }
-    is PermissionRecipient.WithAlias -> DriveRecipient().apply { alias = alias }
-    is PermissionRecipient.WithObjectId -> DriveRecipient().apply { objectId = objectId }
+internal fun OmhPermissionRecipient.toDriveRecipient(): DriveRecipient = when (this) {
+    OmhPermissionRecipient.Anyone -> throw UnsupportedOperationException("Unsupported recipient")
+    is OmhPermissionRecipient.Domain -> throw UnsupportedOperationException("Unsupported recipient")
+    is OmhPermissionRecipient.Group -> DriveRecipient().apply { email = emailAddress }
+    is OmhPermissionRecipient.User -> DriveRecipient().apply { email = emailAddress }
+    is OmhPermissionRecipient.WithAlias -> DriveRecipient().apply { alias = alias }
+    is OmhPermissionRecipient.WithObjectId -> DriveRecipient().apply { objectId = objectId }
 }
 
 private fun Identity.getEmail(): String? {

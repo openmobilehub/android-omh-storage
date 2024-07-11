@@ -21,18 +21,18 @@ sealed class OmhCreatePermission(
 ) {
     data class CreateIdentityPermission(
         override val role: OmhPermissionRole,
-        val recipient: PermissionRecipient
+        val recipient: OmhPermissionRecipient
     ) : OmhCreatePermission(role)
 }
 
-sealed class PermissionRecipient {
-    data class User(val emailAddress: String) : PermissionRecipient()
-    data class Group(val emailAddress: String) : PermissionRecipient()
+sealed class OmhPermissionRecipient {
+    data class User(val emailAddress: String) : OmhPermissionRecipient()
+    data class Group(val emailAddress: String) : OmhPermissionRecipient()
     data class Domain(
         val domain: String
-    ) : PermissionRecipient()
+    ) : OmhPermissionRecipient()
 
-    object Anyone : PermissionRecipient()
-    data class WithObjectId(val id: String) : PermissionRecipient()
-    data class WithAlias(val alias: String) : PermissionRecipient()
+    object Anyone : OmhPermissionRecipient()
+    data class WithObjectId(val id: String) : OmhPermissionRecipient()
+    data class WithAlias(val alias: String) : OmhPermissionRecipient()
 }

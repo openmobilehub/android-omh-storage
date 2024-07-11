@@ -20,7 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
-import com.openmobilehub.android.storage.core.model.PermissionRecipient
+import com.openmobilehub.android.storage.core.model.OmhPermissionRecipient
 import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
 import com.openmobilehub.android.storage.sample.domain.repository.SessionRepository
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.create.model.CreatePermissionsViewAction
@@ -45,10 +45,13 @@ class CreatePermissionViewModel @Inject constructor(
     val roles = OmhPermissionRole.values()
     val disabledRoles: Set<OmhPermissionRole> = when (sessionRepository.getStorageAuthProvider()) {
         StorageAuthProvider.GOOGLE -> setOf(
+            // Changing the owner of a file requires a separate flow that is not covered by the sample app
             OmhPermissionRole.OWNER
         )
+
         StorageAuthProvider.DROPBOX -> emptySet()
         StorageAuthProvider.MICROSOFT -> setOf(
+            // Changing the owner of a file requires a separate flow that is not covered by the sample app
             OmhPermissionRole.OWNER,
             OmhPermissionRole.COMMENTER
         )
@@ -107,21 +110,21 @@ class CreatePermissionViewModel @Inject constructor(
     private suspend fun validatePermission(): OmhCreatePermission? {
         val recipient = when (_type.value) {
             PermissionType.USER ->
-                PermissionRecipient.User(
+                OmhPermissionRecipient.User(
                     emailAddress = validateEmail() ?: return null
                 )
 
             PermissionType.GROUP ->
-                PermissionRecipient.Group(
+                OmhPermissionRecipient.Group(
                     emailAddress = validateEmail() ?: return null
                 )
 
             PermissionType.DOMAIN ->
-                PermissionRecipient.Domain(
+                OmhPermissionRecipient.Domain(
                     domain = validateDomain() ?: return null
                 )
 
-            PermissionType.ANYONE -> PermissionRecipient.Anyone
+            PermissionType.ANYONE -> OmhPermissionRecipient.Anyone
         }
 
         return OmhCreatePermission.CreateIdentityPermission(

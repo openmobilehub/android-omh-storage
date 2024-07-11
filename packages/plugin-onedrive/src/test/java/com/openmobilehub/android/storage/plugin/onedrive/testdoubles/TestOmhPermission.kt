@@ -21,8 +21,8 @@ import com.microsoft.graph.models.DriveRecipient
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhIdentity
 import com.openmobilehub.android.storage.core.model.OmhPermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRecipient
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
-import com.openmobilehub.android.storage.core.model.PermissionRecipient
 import com.openmobilehub.android.storage.core.utils.fromRFC3339StringToDate
 import com.openmobilehub.android.storage.plugin.onedrive.OneDriveConstants.WRITE_ROLE
 
@@ -81,10 +81,10 @@ val invitePostRequestBody = InvitePostRequestBody().apply {
 
 val createWriterPermission = OmhCreatePermission.CreateIdentityPermission(
     OmhPermissionRole.WRITER,
-    PermissionRecipient.User(TEST_PERMISSION_EMAIL_ADDRESS)
+    OmhPermissionRecipient.User(TEST_PERMISSION_EMAIL_ADDRESS)
 )
 
 val createReaderPermission = OmhCreatePermission.CreateIdentityPermission(
     OmhPermissionRole.READER,
-    PermissionRecipient.User(TEST_PERMISSION_EMAIL_ADDRESS)
+    OmhPermissionRecipient.User(TEST_PERMISSION_EMAIL_ADDRESS)
 )
