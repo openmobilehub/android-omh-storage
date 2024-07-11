@@ -64,6 +64,65 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 | File permissions        |        ✅        |          ✅          |    ✅    |         |
 | File URL                |        ✅        |          ✅          |          |         |
 
+### File permissions
+
+`OmhIdentity`
+
+| Type        | Google Drive GMS | Google Drive non-GMS | OneDrive | Dropbox |
+| ----------- | :--------------: | :------------------: | :------: | :-----: |
+| User        |        ✅        |          ✅          |    ✅    |         |
+| Group       |        ✅        |          ✅          |    ✅    |         |
+| Domain      |        ✅        |          ✅          |    ❌    |         |
+| Anyone      |        ✅        |          ✅          |    ❌    |         |
+| Device      |        ❌        |          ❌          |    ✅    |         |
+| Application |        ❌        |          ❌          |    ✅    |         |
+
+`OmhIdentity.User`
+
+| Property       | Google Drive GMS | Google Drive non-GMS | OneDrive | Dropbox |
+| -------------- | :--------------: | :------------------: | :------: | :-----: |
+| id             |        ❌        |          ❌          |    ✅    |         |
+| displayName    |        ✅        |          ✅          |    ✅    |         |
+| emailAddress   |        ✅        |          ✅          |    🟨    |         |
+| expirationTime |        ✅        |          ✅          |    ✅    |         |
+| deleted        |        ✅        |          ✅          |    ❌    |         |
+| photoLink      |        ✅        |          ✅          |    ❌    |         |
+| pendingOwner   |        ❌        |          ✅          |    ❌    |         |
+
+`OmhIdentity.Group`
+
+| Property       | Google Drive GMS | Google Drive non-GMS | OneDrive | Dropbox |
+| -------------- | :--------------: | :------------------: | :------: | :-----: |
+| id             |        ❌        |          ❌          |    ✅    |         |
+| displayName    |        ✅        |          ✅          |    ✅    |         |
+| emailAddress   |        ✅        |          ✅          |    🟨    |         |
+| expirationTime |        ✅        |          ✅          |    ✅    |         |
+| deleted        |        ✅        |          ✅          |    ❌    |         |
+
+`OmhPermissionRole`
+
+| Role      | Google Drive GMS | Google Drive non-GMS | OneDrive | Dropbox |
+| --------- | :--------------: | :------------------: | :------: | :-----: |
+| OWNER     |        ✅        |          ✅          |    ✅    |         |
+| WRITER    |        ✅        |          ✅          |    ✅    |         |
+| COMMENTER |        ✅        |          ✅          |    ❌    |         |
+| READER    |        ✅        |          ✅          |    ✅    |         |
+
+`OmhPermissionRecipient`
+
+| Type         | Google Drive GMS | Google Drive non-GMS | OneDrive | Dropbox |
+| ------------ | :--------------: | :------------------: | :------: | :-----: |
+| User         |        ✅        |          ✅          |    ✅    |         |
+| Group        |        ✅        |          ✅          |    ✅    |         |
+| Domain       |        ✅        |          ✅          |    ❌    |         |
+| Anyone       |        ✅        |          ✅          |    ❌    |         |
+| WithObjectId |        ❌        |          ❌          |    ✅    |         |
+| WithAlias    |        ❌        |          ❌          |    ✅    |         |
+
+#### 🟨 Caveats
+
+> The `emailAddress` property may not always be provided by the OneDrive storage provider.
+
 ## Contributing
 
 - [Overview](https://github.com/openmobilehub/android-omh-storage/blob/main/CONTRIBUTING.md)

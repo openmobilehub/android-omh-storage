@@ -103,48 +103,6 @@ val omhStorageClient = OmhStorageProvider.Builder()
 
 ### Other methods
 
-#### Compatibility exemptions ✅❌🟨
-
-##### OmhIdentity
-
-| Classes     | Supported |
-|-------------|:---------:|
-| User        |     ✅     |
-| Group       |     ✅     |
-| Domain      |     ✅     |
-| Anyone      |     ✅     |
-| Device      |     ❌     |
-| Application |     ❌     |
-
-| User           | Supported |
-|----------------|:---------:|
-| id             |     ❌     |
-| displayName    |     ✅     |
-| emailAddress   |     ✅     |
-| expirationTime |     ✅     |
-| deleted        |     ✅     |
-| photoLink      |     ✅     |
-| pendingOwner   |     ❌     |
-
-| Group          | Supported |
-|----------------|:---------:|
-| id             |     ❌     |
-| displayName    |     ✅     |
-| emailAddress   |     ✅     |
-| expirationTime |     ✅     |
-| deleted        |     ✅     |
-
-##### OmhPermissionRecipient
-
-| Classes      | Supported |
-|--------------|:---------:|
-| User         |     ✅     |
-| Group        |     ✅     |
-| Domain       |     ✅     |
-| Anyone       |     ✅     |
-| WithObjectId |     ❌     |
-| WithAlias    |     ❌     |
-
 Interacting with the Google Drive storage provider follows the same pattern as other storage providers since they all implement the [`OmhStorageClient`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client) interface. This uniformity ensures consistent functionality across different storage providers, so you won’t need to learn new methods regardless of the storage provider you choose! For a comprehensive list of available methods, refer to the [Getting Started](https://miniature-adventure-4gle9ye.pages.github.io/docs/getting-started) guide.
 
 #### Caveats
