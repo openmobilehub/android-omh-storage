@@ -54,9 +54,9 @@ Module plugin-onedrive
 
 Comments for partially supported 🟨 properties:
 
-| Property     | Comments                    |
-|--------------|-----------------------------|
-| emailAddress | It may not always provided. |
+| Property     | Comments                                                                                                                                                                                                                                   |
+|--------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| emailAddress | Provided only when underlying [Identity](https://learn.microsoft.com/en-us/graph/api/resources/identity?view=graph-rest-1.0) was [EmailIdentity](https://learn.microsoft.com/en-us/graph/api/resources/emailidentity?view=graph-rest-1.0). |
 
 ##### OmhPermissionRole
 

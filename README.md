@@ -40,7 +40,7 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 ## Supported functionality
 
 - ✅ - supported
-- ⚠️ - partially supported
+- 🟨 - partially supported
 - ❌ - not supported at the moment
 
 | Features                | Google Drive GMS | Google Drive non-GMS | OneDrive | Dropbox |
@@ -56,8 +56,10 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 | File export             | ✅               | ✅                   | ❌       | ❌      |
 | File metadata           | ✅               | ✅                   | ✅       | ✅      |
 | File versioning         | ✅               | ✅                   | ✅       | ✅      |
-| File permissions        | ✅               | ✅                   |          |         |
-| File URL                | ✅               | ✅                   |          |         |
+| File permissions        | 🟨               | 🟨                   | 🟨       |         |
+| File URL                | ✅               | ✅                   | ✅       |         |
+
+For more details regarding partially supported 🟨 properties, see each plugin's README file.
 
 ## Documentation
 
