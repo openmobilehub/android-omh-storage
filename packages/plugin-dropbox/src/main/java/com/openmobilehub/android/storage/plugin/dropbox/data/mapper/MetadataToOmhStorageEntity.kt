@@ -28,16 +28,15 @@ import com.openmobilehub.android.storage.core.utils.removeWhitespaces
 class MetadataToOmhStorageEntity(private val mimeTypeMap: MimeTypeMap) {
     operator fun invoke(metadata: Metadata): OmhStorageEntity? {
         metadata.run {
+            val createdDate = null // Dropbox does not provide a created date
             val parentId = parentSharedFolderId
 
             return when (this) {
                 is FileMetadata -> {
                     val sanitizedName = name.removeWhitespaces()
+                    val modifiedDate = DateUtils.getNewerDate(clientModified, serverModified)
                     val mimeType = mimeTypeMap.getMimeTypeFromUrl(sanitizedName)
                     val extension = MimeTypeMap.getFileExtensionFromUrl(sanitizedName)?.ifEmpty { null }
-
-                    val createdDate = null // Dropbox does not provide a created date for files
-                    val modifiedDate = DateUtils.getNewerDate(clientModified, serverModified)
 
                     OmhStorageEntity.OmhFile(
                         id,
@@ -52,7 +51,6 @@ class MetadataToOmhStorageEntity(private val mimeTypeMap: MimeTypeMap) {
                 }
 
                 is FolderMetadata -> {
-                    val createdDate = null // Dropbox does not provide a created date for folders
                     val modifiedDate = null // Dropbox does not provide a modified date for folders
 
                     OmhStorageEntity.OmhFolder(
