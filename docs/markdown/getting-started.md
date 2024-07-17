@@ -149,7 +149,7 @@ val updatedFile = omhStorageClient.updateFile(
 Moves a file with the given file ID in the trash.
 
 ```kotlin
-val isDeleted = omhStorageClient.deleteFile(id = "fileId")
+omhStorageClient.deleteFile(id = "fileId")
 ```
 
 ### Permanently delete file
@@ -157,7 +157,7 @@ val isDeleted = omhStorageClient.deleteFile(id = "fileId")
 Permanently deletes a file with the given file ID.
 
 ```kotlin
-val isPermanentlyDeleted = omhStorageClient.permanentlyDeleteFile(id = "fileId")
+omhStorageClient.permanentlyDeleteFile(id = "fileId")
 ```
 
 ### Upload file
@@ -198,6 +198,8 @@ Retrieves the metadata of a file with the given file ID.
 val fileMetadata = omhStorageClient.getFileMetadata(fileId = "fileId")
 ```
 
+> For more details on file metadata support for each provider, please refer to the [File metadata documentation](https://miniature-adventure-4gle9ye.pages.github.io/docs/#file-metadata).
+
 ### Get file versions
 
 Retrieves the versions of a file with the given file ID.
@@ -205,6 +207,8 @@ Retrieves the versions of a file with the given file ID.
 ```kotlin
 val fileVersions = omhStorageClient.getFileVersions(fileId = "fileId")
 ```
+
+> For more details on file versioning support for each provider, please refer to the [File versioning documentation](https://miniature-adventure-4gle9ye.pages.github.io/docs/#file-versioning).
 
 ### Download file version
 
@@ -230,13 +234,20 @@ val permissions = omhStorageClient.getFilePermissions(fileId = "fileId")
 Creates a permission for a file.
 
 ```kotlin
+val userPermission = OmhCreatePermission.CreateIdentityPermission(
+    OmhPermissionRole.WRITER,
+    OmhPermissionRecipient.User("test@email.com")
+)
+
 val newPermission = omhStorageClient.createPermission(
     fileId = "fileId",
-    permission = OmhCreatePermission(/* parameters */),
+    permission = userPermission,
     sendNotificationEmail = true,
     emailMessage = "Optional message"
 )
 ```
+
+> For more details on file permissions support for each provider, please refer to the [File permissions documentation](https://miniature-adventure-4gle9ye.pages.github.io/docs/#file-permissions).
 
 ### Update file permission
 
@@ -255,7 +266,7 @@ val updatedPermission = omhStorageClient.updatePermission(
 Deletes a permission with the given permission ID from a file.
 
 ```kotlin
-val isPermissionDeleted = omhStorageClient.deletePermission(
+omhStorageClient.deletePermission(
     fileId = "fileId",
     permissionId = "permissionId"
 )

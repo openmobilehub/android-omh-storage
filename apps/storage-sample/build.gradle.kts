@@ -18,7 +18,7 @@ android {
         versionName = "1.0"
         minSdk = 26
 
-        val dropboxAppKey = getValueFromEnvOrProperties("DROPBOX_APP_KEY")
+        val dropboxAppKey = getValueFromEnvOrProperties("DROPBOX_CLIENT_ID")
         val microsoftClientId = getValueFromEnvOrProperties("MICROSOFT_CLIENT_ID")
         val microsoftSignatureHash = getValueFromEnvOrProperties("MICROSOFT_SIGNATURE_HASH")
 

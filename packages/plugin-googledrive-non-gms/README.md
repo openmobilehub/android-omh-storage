@@ -21,48 +21,6 @@ Module plugin-googledrive-non-gms
 
 For further instructions, please refer to the [Google Drive (GMS) documentation](https://miniature-adventure-4gle9ye.pages.github.io/docs/plugin-googledrive-gms), as it shares a similar setup and behavior.
 
-#### Compatibility exemptions
-
-##### OmhIdentity
-
-| Classes     | Supported |
-|-------------|:---------:|
-| User        |     ✅     |
-| Group       |     ✅     |
-| Domain      |     ✅     |
-| Anyone      |     ✅     |
-| Device      |     ❌     |
-| Application |     ❌     |
-
-| User           | Supported |
-|----------------|:---------:|
-| id             |     ❌     |
-| displayName    |     ✅     |
-| emailAddress   |     ✅     |
-| expirationTime |     ✅     |
-| deleted        |     ✅     |
-| photoLink      |     ✅     |
-| pendingOwner   |     ✅     |
-
-| Group          | Supported |
-|----------------|:---------:|
-| id             |     ❌     |
-| displayName    |     ✅     |
-| emailAddress   |     ✅     |
-| expirationTime |     ✅     |
-| deleted        |     ✅     |
-
-##### OmhPermissionRecipient
-
-| Classes      | Supported |
-|--------------|:---------:|
-| User         |     ✅     |
-| Group        |     ✅     |
-| Domain       |     ✅     |
-| Anyone       |     ✅     |
-| WithObjectId |     ❌     |
-| WithAlias    |     ❌     |
-
 ## License
 
 - See [LICENSE](https://github.com/openmobilehub/android-omh-storage/blob/main/LICENSE)
