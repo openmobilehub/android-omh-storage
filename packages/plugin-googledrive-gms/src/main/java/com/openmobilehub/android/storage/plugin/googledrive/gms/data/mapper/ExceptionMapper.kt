@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.gms.data.extension
+package com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper
 
 import com.google.api.client.http.HttpResponseException
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 
-fun HttpResponseException.toApiException(): OmhStorageException.ApiException {
-    return OmhStorageException.ApiException(statusCode, content, this)
+object ExceptionMapper {
+    fun toOmhApiException(exception: HttpResponseException): OmhStorageException.ApiException =
+        OmhStorageException.ApiException(exception.statusCode, exception.content, exception)
 }

@@ -57,7 +57,6 @@ import org.junit.Before
 import org.junit.Test
 import java.io.File
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import com.google.api.services.drive.model.File as GoogleDriveFile
 
@@ -313,8 +312,8 @@ internal class GmsFileRepositoryTest {
             verify { apiService.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID) }
         }
 
-    @Test
-    fun `given a fileId and permissionId, when deletePermission fails, then false is returned`() =
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given a fileId and permissionId, when deletePermission fails, then ApiException is thrown`() =
         runTest {
             every {
                 apiService.deletePermission(
@@ -323,10 +322,7 @@ internal class GmsFileRepositoryTest {
                 )
             }.throws(responseException)
 
-            val result = fileRepositoryImpl.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
-
-            assertFalse(result)
-            verify { apiService.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID) }
+            fileRepositoryImpl.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
         }
 
     @Test

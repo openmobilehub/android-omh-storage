@@ -89,6 +89,7 @@ abstract class OmhStorageClient protected constructor(
         parentId: String
     ): OmhStorageEntity?
 
+    // TODO dn: should return void or throw OmhApiException
     /**
      * This method delete files with a given file id
      *
@@ -98,6 +99,7 @@ abstract class OmhStorageClient protected constructor(
      */
     abstract suspend fun deleteFile(id: String): Boolean
 
+    // TODO dn: should return void or throw OmhApiException
     /**
      * This method permanently delete files with a given file id
      *
@@ -192,6 +194,7 @@ abstract class OmhStorageClient protected constructor(
      */
     abstract suspend fun getFilePermissions(fileId: String): List<OmhPermission>
 
+    // TODO dn: should return void or throw OmhApiException
     /**
      * This method delete permission with a given permission id in a given file
      *
