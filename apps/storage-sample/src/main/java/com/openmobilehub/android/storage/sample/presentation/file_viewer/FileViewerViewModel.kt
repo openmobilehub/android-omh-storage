@@ -25,6 +25,8 @@ import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.sample.domain.model.FileType
+import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
+import com.openmobilehub.android.storage.sample.domain.repository.SessionRepository
 import com.openmobilehub.android.storage.sample.presentation.BaseViewModel
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.DisplayFileType
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewAction
@@ -58,7 +60,8 @@ import java.io.ByteArrayOutputStream
 @HiltViewModel
 class FileViewerViewModel @Inject constructor(
     private val authClient: OmhAuthClient,
-    private val omhStorageClient: OmhStorageClient
+    private val omhStorageClient: OmhStorageClient,
+    sessionRepository: SessionRepository
 ) : BaseViewModel<FileViewerViewState, FileViewerViewEvent>() {
 
     companion object {
@@ -89,6 +92,13 @@ class FileViewerViewModel @Inject constructor(
     private val parentId = StackWithFlow(omhStorageClient.rootFolder)
     private var searchQuery: MutableStateFlow<String?> = MutableStateFlow(null)
     private var forceRefresh: MutableStateFlow<Int> = MutableStateFlow(0)
+
+    private val isPermanentlyDeleteSupported: Boolean =
+        when (sessionRepository.getStorageAuthProvider()) {
+            StorageAuthProvider.GOOGLE -> true
+            StorageAuthProvider.DROPBOX -> false
+            StorageAuthProvider.MICROSOFT -> false
+        }
 
     init {
         viewModelScope.launch {
@@ -367,7 +377,11 @@ class FileViewerViewModel @Inject constructor(
     }
 
     private fun permanentlyDeleteFileEventClicked(event: FileViewerViewEvent.PermanentlyDeleteFileClicked) {
-        setState(FileViewerViewState.ShowPermanentlyDeleteDialog(event.file))
+        if (isPermanentlyDeleteSupported) {
+            setState(FileViewerViewState.ShowPermanentlyDeleteDialog(event.file))
+        } else {
+            toastMessage.postValue("Unsupported operation")
+        }
     }
 
     private fun permanentlyDeleteFileEvent(event: FileViewerViewEvent.PermanentlyDeleteFile) {
