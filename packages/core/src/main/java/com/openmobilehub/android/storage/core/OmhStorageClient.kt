@@ -37,6 +37,7 @@ import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
+import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -89,25 +90,23 @@ abstract class OmhStorageClient protected constructor(
         parentId: String
     ): OmhStorageEntity?
 
-    // TODO dn: should return void or throw OmhApiException
     /**
      * This method delete files with a given file id
      *
      * @param id The id of the desired file to delete
      *
-     * @return true if the file was deleted, false otherwise
+     * @throws OmhStorageException.ApiException if file was not deleted
      */
-    abstract suspend fun deleteFile(id: String): Boolean
+    abstract suspend fun deleteFile(id: String)
 
-    // TODO dn: should return void or throw OmhApiException
     /**
      * This method permanently delete files with a given file id
      *
      * @param id The id of the desired file to delete
      *
-     * @return true if the file was deleted, false otherwise
+     * @throws OmhStorageException.ApiException if file was not deleted
      */
-    abstract suspend fun permanentlyDeleteFile(id: String): Boolean
+    abstract suspend fun permanentlyDeleteFile(id: String)
 
     /**
      * This method upload a file in an specific folder
@@ -194,16 +193,15 @@ abstract class OmhStorageClient protected constructor(
      */
     abstract suspend fun getFilePermissions(fileId: String): List<OmhPermission>
 
-    // TODO dn: should return void or throw OmhApiException
     /**
      * This method delete permission with a given permission id in a given file
      *
      * @param fileId The file id with the permission
      * @param permissionId The permission id of the desired permission to delete
      *
-     * @return true if the permission was deleted, false otherwise
+     * @throws OmhStorageException.ApiException if permission was not deleted
      */
-    abstract suspend fun deletePermission(fileId: String, permissionId: String): Boolean
+    abstract suspend fun deletePermission(fileId: String, permissionId: String)
 
     /**
      * This method update permission role in a given file
@@ -213,6 +211,7 @@ abstract class OmhStorageClient protected constructor(
      * @param role The desired role value
      *
      * @return Updated permission
+     * @throws OmhStorageException.ApiException if permission was not updated
      */
     abstract suspend fun updatePermission(
         fileId: String,
@@ -229,6 +228,7 @@ abstract class OmhStorageClient protected constructor(
      * @param emailMessage A plain text custom message to include in the notification email
      *
      * @return Created permission
+     * @throws OmhStorageException.ApiException if permission was not created
      */
     abstract suspend fun createPermission(
         fileId: String,

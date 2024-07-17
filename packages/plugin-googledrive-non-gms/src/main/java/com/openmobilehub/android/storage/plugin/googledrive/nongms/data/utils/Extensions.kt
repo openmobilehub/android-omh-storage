@@ -87,3 +87,6 @@ fun ResponseBody?.toOmhStorageEntityMetadata(): OmhStorageMetadata {
 
 fun <T> Response<T>.toApiException(): OmhStorageException.ApiException =
     OmhStorageException.ApiException(code(), errorBody()?.string(), HttpException(this))
+
+val <T> Response<T>.isNotSuccessful: Boolean
+    get() = !isSuccessful

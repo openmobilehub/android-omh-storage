@@ -73,19 +73,19 @@ internal class GmsFileRepository(
         throw ExceptionMapper.toOmhApiException(exception)
     }
 
-    fun deleteFile(fileId: String): Boolean = try {
+    fun deleteFile(fileId: String): Unit = try {
         val file = GoogleDriveFile().apply {
             trashed = true
         }
         apiService.updateFile(fileId, file).execute()
-        true
+        Unit
     } catch (exception: HttpResponseException) {
         throw ExceptionMapper.toOmhApiException(exception)
     }
 
-    fun permanentlyDeleteFile(fileId: String) = try {
+    fun permanentlyDeleteFile(fileId: String): Unit = try {
         apiService.deleteFile(fileId).execute()
-        true
+        Unit
     } catch (exception: HttpResponseException) {
         throw ExceptionMapper.toOmhApiException(exception)
     }
@@ -191,9 +191,9 @@ internal class GmsFileRepository(
         throw ExceptionMapper.toOmhApiException(exception)
     }
 
-    fun deletePermission(fileId: String, permissionId: String): Boolean = try {
+    fun deletePermission(fileId: String, permissionId: String): Unit = try {
         apiService.deletePermission(fileId, permissionId).execute()
-        true
+        Unit
     } catch (exception: HttpResponseException) {
         throw ExceptionMapper.toOmhApiException(exception)
     }

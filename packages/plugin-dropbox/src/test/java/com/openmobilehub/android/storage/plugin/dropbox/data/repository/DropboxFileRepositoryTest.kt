@@ -202,15 +202,12 @@ class DropboxFileRepositoryTest {
     }
 
     @Test
-    fun `given an api service return DeleteResult, when deleting the file, then return true`() {
+    fun `given an api service return DeleteResult, when deleting the file, then exceptions is not thrown`() {
         // Arrange
         every { apiService.deleteFile(any()) } returns deleteResult
 
-        // Act
-        val result = repository.deleteFile(TEST_FILE_ID)
-
-        // Assert
-        assertEquals(true, result)
+        // Act & Assert
+        repository.deleteFile(TEST_FILE_ID)
     }
 
     @Test

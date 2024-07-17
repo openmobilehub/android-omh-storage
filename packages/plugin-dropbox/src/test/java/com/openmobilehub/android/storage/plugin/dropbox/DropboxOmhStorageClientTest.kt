@@ -224,15 +224,12 @@ internal class DropboxOmhStorageClientTest {
     }
 
     @Test
-    fun `given a repository, when deleting a file, then return delete file result`() = runTest {
+    fun `given a repository, when deleting a file succeeds, then it succeeds`() = runTest {
         // Arrange
-        every { repository.deleteFile(any()) } returns true
+        every { repository.deleteFile(any()) } returns Unit
 
-        // Act
-        val result = client.deleteFile(TEST_FILE_ID)
-
-        // Assert
-        assertEquals(true, result)
+        // Act & Assert
+        client.deleteFile(TEST_FILE_ID)
     }
 
     @Test

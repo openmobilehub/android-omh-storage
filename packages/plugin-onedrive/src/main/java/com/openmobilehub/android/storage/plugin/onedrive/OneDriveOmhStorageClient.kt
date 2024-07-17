@@ -79,11 +79,11 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
         return null
     }
 
-    override suspend fun deleteFile(id: String): Boolean {
+    override suspend fun deleteFile(id: String) {
         return repository.deleteFile(id)
     }
 
-    override suspend fun permanentlyDeleteFile(id: String): Boolean {
+    override suspend fun permanentlyDeleteFile(id: String) {
         throw UnsupportedOperationException()
     }
 
@@ -130,7 +130,7 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
         return repository.getFileMetadata(fileId)
     }
 
-    override suspend fun deletePermission(fileId: String, permissionId: String): Boolean {
+    override suspend fun deletePermission(fileId: String, permissionId: String) {
         return repository.deletePermission(fileId, permissionId)
     }
 

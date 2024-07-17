@@ -83,11 +83,8 @@ class OneDriveFileRepository(
         throw ExceptionMapper.toOmhApiException(exception)
     }
 
-    fun deleteFile(fileId: String): Boolean = try {
+    fun deleteFile(fileId: String) = try {
         apiService.deleteFile(fileId)
-
-        // It returns true if the file was deleted successfully, otherwise the method will throw an exception
-        true
     } catch (exception: ApiException) {
         throw ExceptionMapper.toOmhApiException(exception)
     }
@@ -135,11 +132,8 @@ class OneDriveFileRepository(
         throw ExceptionMapper.toOmhApiException(exception)
     }
 
-    fun deletePermission(fileId: String, permissionId: String): Boolean = try {
+    fun deletePermission(fileId: String, permissionId: String) = try {
         apiService.deletePermission(fileId, permissionId)
-
-        // It returns true if the permission was deleted successfully, otherwise the method will throw an exception
-        true
     } catch (exception: ApiException) {
         throw ExceptionMapper.toOmhApiException(exception)
     }

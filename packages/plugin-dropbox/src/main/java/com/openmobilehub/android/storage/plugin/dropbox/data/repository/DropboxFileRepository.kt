@@ -71,11 +71,8 @@ internal class DropboxFileRepository(
         return outputStream
     }
 
-    fun deleteFile(fileId: String): Boolean {
+    fun deleteFile(fileId: String) {
         apiService.deleteFile(fileId)
-
-        // It returns true if the file was deleted successfully, otherwise the method will throw an exception
-        return true
     }
 
     fun search(query: String): List<OmhStorageEntity> {
