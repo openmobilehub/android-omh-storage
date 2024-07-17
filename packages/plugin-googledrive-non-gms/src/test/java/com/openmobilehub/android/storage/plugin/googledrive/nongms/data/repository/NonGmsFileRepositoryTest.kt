@@ -73,7 +73,6 @@ import java.io.File
 import java.io.FileInputStream
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 @Suppress("LargeClass")
@@ -359,24 +358,21 @@ internal class NonGmsFileRepositoryTest {
             fileRepositoryImpl.getFilesList(TEST_FILE_PARENT_ID)
         }
 
-    @Test
-    fun `given a name, mimeType and a parentId, when createFile fails, then returns null`() =
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given a name, mimeType and a parentId, when createFile fails, then ApiException exceptions is thrown`() =
         runTest {
             coEvery { googleStorageApiService.createFile(any(), any()) } returns Response.error(
                 500,
                 responseBody
             )
-            val result = fileRepositoryImpl.createFile(
+            fileRepositoryImpl.createFile(
                 TEST_FILE_NAME,
                 TEST_FILE_MIME_TYPE,
                 TEST_FILE_PARENT_ID
             )
-
-            assertNull(result)
-            coVerify { googleStorageApiService.createFile(any(), any()) }
         }
 
-    @Test
+    @Test(expected = OmhStorageException.ApiException::class)
     fun `given a fileId, when permanentlyDeleteFile fails, then false is returned`() = runTest {
         coEvery { googleStorageApiService.deleteFile(any()) } returns Response.error(
             500,
@@ -389,17 +385,14 @@ internal class NonGmsFileRepositoryTest {
         coVerify { googleStorageApiService.deleteFile(TEST_FILE_ID) }
     }
 
-    @Test
-    fun `given a fileId, when deleteFile fails, then false is returned`() = runTest {
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given a fileId, when deleteFile fails, then ApiException is thrown`() = runTest {
         coEvery { googleStorageApiService.updateMetaData(any(), any()) } returns Response.error(
             500,
             responseBody
         )
 
-        val result = fileRepositoryImpl.deleteFile(TEST_FILE_ID)
-
-        assertFalse(result)
-        coVerify { googleStorageApiService.updateMetaData(any(), TEST_FILE_ID) }
+        fileRepositoryImpl.deleteFile(TEST_FILE_ID)
     }
 
     @Test(expected = OmhStorageException.ApiException::class)
@@ -664,8 +657,8 @@ internal class NonGmsFileRepositoryTest {
             coVerify { googleStorageApiService.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID) }
         }
 
-    @Test
-    fun `given a fileId and permissionId, when deletePermission fails, then false is returned`() =
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given a fileId and permissionId, when deletePermission fails, then ApiException is thrown`() =
         runTest {
             coEvery {
                 googleStorageApiService.deletePermission(
@@ -674,10 +667,7 @@ internal class NonGmsFileRepositoryTest {
                 )
             } returns Response.error(500, responseBody)
 
-            val result = fileRepositoryImpl.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
-
-            assertFalse(result)
-            coVerify { googleStorageApiService.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID) }
+            fileRepositoryImpl.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
         }
 
     @Test

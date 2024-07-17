@@ -104,7 +104,7 @@ internal class NonGmsFileRepository(
         return if (response.isSuccessful) {
             response.body()?.toOmhStorageEntity()
         } else {
-            null
+            throw response.toApiException()
         }
     }
 
@@ -115,7 +115,11 @@ internal class NonGmsFileRepository(
                 fileId = fileId
             )
 
-        return response.isSuccessful
+        return if (response.isSuccessful) {
+            true
+        } else {
+            throw response.toApiException()
+        }
     }
 
     suspend fun deleteFile(fileId: String): Boolean {
@@ -127,7 +131,11 @@ internal class NonGmsFileRepository(
         val response = retrofitImpl
             .getGoogleStorageApiService().updateMetaData(jsonRequestBody, fileId)
 
-        return response.isSuccessful
+        return if (response.isSuccessful) {
+            true
+        } else {
+            throw response.toApiException()
+        }
     }
 
     suspend fun uploadFile(
@@ -342,7 +350,11 @@ internal class NonGmsFileRepository(
                 permissionId = permissionId
             )
 
-        return response.isSuccessful
+        return if (response.isSuccessful) {
+            true
+        } else {
+            throw response.toApiException()
+        }
     }
 
     suspend fun updatePermission(
@@ -410,7 +422,6 @@ internal class NonGmsFileRepository(
         }
     }
 
-    @Suppress("SwallowedException")
     suspend fun getWebUrl(fileId: String): String? {
         val response = retrofitImpl
             .getGoogleStorageApiService()
