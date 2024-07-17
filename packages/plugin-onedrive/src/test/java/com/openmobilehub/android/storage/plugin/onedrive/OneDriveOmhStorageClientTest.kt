@@ -233,15 +233,12 @@ internal class OneDriveOmhStorageClientTest {
         }
 
     @Test
-    fun `given a repository, when deleting a file, then return true`() = runTest {
+    fun `given a repository, when deleting a file, then exceptions is not thrown`() = runTest {
         // Arrange
-        every { repository.deleteFile(any()) } returns true
+        every { repository.deleteFile(any()) } returns Unit
 
-        // Act
-        val result = client.deleteFile(TEST_FILE_ID)
-
-        // Assert
-        assertEquals(true, result)
+        // Act & Assert
+        client.deleteFile(TEST_FILE_ID)
     }
 
     @Test
@@ -281,16 +278,14 @@ internal class OneDriveOmhStorageClientTest {
         }
 
     @Test
-    fun `given a repository, when deleting a permission, then return true`() = runTest {
-        // Arrange
-        every { repository.deletePermission(any(), any()) } returns true
+    fun `given a repository, when deleting a permission, then exceptions is not thrown`() =
+        runTest {
+            // Arrange
+            every { repository.deletePermission(any(), any()) } returns Unit
 
-        // Act
-        val result = client.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
-
-        // Assert
-        assertEquals(true, result)
-    }
+            // Act & Assert
+            client.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
+        }
 
     @Test
     fun `given a repository, when getting file web URL, then return URL`() = runTest {

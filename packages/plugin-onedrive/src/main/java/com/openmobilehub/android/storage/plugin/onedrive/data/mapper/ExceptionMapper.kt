@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.gms.data.extension
+package com.openmobilehub.android.storage.plugin.onedrive.data.mapper
 
-import com.google.api.client.http.HttpResponseException
+import com.microsoft.kiota.ApiException
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 
-fun HttpResponseException.toApiException(): OmhStorageException.ApiException {
-    return OmhStorageException.ApiException(statusCode, content, this)
+object ExceptionMapper {
+    // Note that extensions function couldn't be used here due to SwallowedException warning:
+    // https://github.com/detekt/detekt/issues/4520
+    fun toOmhApiException(exception: ApiException) =
+        OmhStorageException.ApiException(exception.responseStatusCode, exception.message, exception)
 }

@@ -76,11 +76,11 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         return null
     }
 
-    override suspend fun deleteFile(id: String): Boolean {
-        return repository.deleteFile(id)
+    override suspend fun deleteFile(id: String) {
+        repository.deleteFile(id)
     }
 
-    override suspend fun permanentlyDeleteFile(id: String): Boolean {
+    override suspend fun permanentlyDeleteFile(id: String) {
         throw UnsupportedOperationException()
     }
 
@@ -133,9 +133,8 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         return repository.getFileMetadata(fileId)
     }
 
-    override suspend fun deletePermission(fileId: String, permissionId: String): Boolean {
+    override suspend fun deletePermission(fileId: String, permissionId: String) {
         // To be implemented
-        return true
     }
 
     override suspend fun createPermission(

@@ -57,8 +57,6 @@ import org.junit.Before
 import org.junit.Test
 import java.io.File
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 import com.google.api.services.drive.model.File as GoogleDriveFile
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -181,22 +179,20 @@ internal class GmsFileRepositoryTest {
         }
 
     @Test
-    fun `given a fileId, when permanentlyDeleteFile is success, then true is returned`() = runTest {
+    fun `given a fileId, when permanentlyDeleteFile is success, then exceptions is not thrown`() = runTest {
         every { apiService.deleteFile(any()) } returns driveFilesDeleteRequest
 
-        val result = fileRepositoryImpl.permanentlyDeleteFile(TEST_FILE_ID)
+        fileRepositoryImpl.permanentlyDeleteFile(TEST_FILE_ID)
 
-        assertTrue(result)
         verify { apiService.deleteFile(TEST_FILE_ID) }
     }
 
     @Test
-    fun `given a fileId, when deleteFile is success, then true is returned`() = runTest {
+    fun `given a fileId, when deleteFile is success, then exceptions is not thrown`() = runTest {
         every { apiService.updateFile(any(), any()) } returns driveFilesUpdateRequest
 
-        val result = fileRepositoryImpl.deleteFile(TEST_FILE_ID)
+        fileRepositoryImpl.deleteFile(TEST_FILE_ID)
 
-        assertTrue(result)
         verify { apiService.updateFile(TEST_FILE_ID, any()) }
     }
 
@@ -298,7 +294,7 @@ internal class GmsFileRepositoryTest {
         }
 
     @Test
-    fun `given a fileId and permissionId, when deletePermission is success, then true is returned`() =
+    fun `given a fileId and permissionId, when deletePermission is success, then exceptions is not thrown`() =
         runTest {
             every {
                 apiService.deletePermission(
@@ -307,14 +303,13 @@ internal class GmsFileRepositoryTest {
                 )
             } returns drivePermissionsDeleteRequest
 
-            val result = fileRepositoryImpl.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
+            fileRepositoryImpl.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
 
-            assertTrue(result)
             verify { apiService.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID) }
         }
 
-    @Test
-    fun `given a fileId and permissionId, when deletePermission fails, then false is returned`() =
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given a fileId and permissionId, when deletePermission fails, then ApiException is thrown`() =
         runTest {
             every {
                 apiService.deletePermission(
@@ -323,10 +318,7 @@ internal class GmsFileRepositoryTest {
                 )
             }.throws(responseException)
 
-            val result = fileRepositoryImpl.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
-
-            assertFalse(result)
-            verify { apiService.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID) }
+            fileRepositoryImpl.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
         }
 
     @Test

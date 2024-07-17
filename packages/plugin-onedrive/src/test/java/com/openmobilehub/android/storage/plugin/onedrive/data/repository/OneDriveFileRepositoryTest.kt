@@ -221,15 +221,12 @@ class OneDriveFileRepositoryTest {
     }
 
     @Test
-    fun `given an api service, when deleting the file, then return true`() {
+    fun `given an api service, when deleting the file, then exceptions is not thrown`() {
         // Arrange
         every { apiService.deleteFile(any()) } returns Unit
 
-        // Act
-        val result = repository.deleteFile(TEST_FILE_ID)
-
-        // Assert
-        assertEquals(true, result)
+        // Act & Assert
+        repository.deleteFile(TEST_FILE_ID)
     }
 
     @Test
@@ -247,15 +244,12 @@ class OneDriveFileRepositoryTest {
     }
 
     @Test
-    fun `given an api service, when deleting a permission, then return true`() {
+    fun `given an api service, when deleting a permission, then exceptions is not thrown`() {
         // Arrange
         every { apiService.deletePermission(any(), any()) } returns Unit
 
-        // Act
-        val result = repository.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
-
-        // Assert
-        assertEquals(true, result)
+        // Act & Assert
+        repository.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
     }
 
     @Test

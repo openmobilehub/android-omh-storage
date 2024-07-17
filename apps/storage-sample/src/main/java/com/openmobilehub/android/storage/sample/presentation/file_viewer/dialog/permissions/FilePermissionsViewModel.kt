@@ -93,13 +93,13 @@ class FilePermissionsViewModel @Inject constructor(
     }
 
     fun remove(permission: OmhPermission) = viewModelScope.launch(Dispatchers.IO) {
-        val message = if (omhStorageClient.deletePermission(fileId, permission.id)) {
-            R.string.permission_removed
-        } else {
-            R.string.permission_remove_error
+        try {
+            omhStorageClient.deletePermission(fileId, permission.id)
+            _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_removed))
+            getPermissions()
+        } catch (exception: OmhStorageException.ApiException) {
+            showErrorDialog(R.string.permission_remove_error, exception)
         }
-        _action.send(FilePermissionsViewAction.ShowToast(message))
-        getPermissions()
     }
 
     fun create(
