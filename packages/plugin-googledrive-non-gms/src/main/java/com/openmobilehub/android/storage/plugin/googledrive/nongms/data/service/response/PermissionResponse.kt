@@ -33,4 +33,14 @@ internal data class PermissionResponse(
     @JsonProperty("deleted") val deleted: Boolean?,
     @JsonProperty("pendingOwner") val pendingOwner: Boolean?,
     @JsonProperty("expirationTime") val expirationTime: String?,
+    @JsonProperty("permissionDetails") val permissionDetails: List<PermissionDetails>?,
+)
+
+@Keep
+@JsonIgnoreProperties(ignoreUnknown = true)
+internal data class PermissionDetails(
+    @JsonProperty("permissionType") val permissionType: String?,
+    @JsonProperty("inheritedFrom") val inheritedFrom: String?,
+    @JsonProperty("role") val role: String?,
+    @JsonProperty("inherited") val inherited: Boolean?,
 )

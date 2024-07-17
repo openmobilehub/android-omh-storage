@@ -26,6 +26,8 @@ import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.sample.R
+import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
+import com.openmobilehub.android.storage.sample.domain.repository.SessionRepository
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model.FilePermissionsViewAction
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model.FilePermissionsViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,7 +41,8 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class FilePermissionsViewModel @Inject constructor(
-    private val omhStorageClient: OmhStorageClient
+    private val omhStorageClient: OmhStorageClient,
+    sessionRepository: SessionRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(
         FilePermissionsViewState(
@@ -54,6 +57,13 @@ class FilePermissionsViewModel @Inject constructor(
     val action = _action.receiveAsFlow()
 
     private lateinit var fileId: String
+
+    private val isDeletingInheritedPermissionsSupported: Boolean =
+        when (sessionRepository.getStorageAuthProvider()) {
+            StorageAuthProvider.GOOGLE -> true
+            StorageAuthProvider.DROPBOX -> true
+            StorageAuthProvider.MICROSOFT -> false
+        }
 
     fun getPermissions(fileId: String) {
         this.fileId = fileId
@@ -93,6 +103,14 @@ class FilePermissionsViewModel @Inject constructor(
     }
 
     fun remove(permission: OmhPermission) = viewModelScope.launch(Dispatchers.IO) {
+        if (permission.inheritedFromEntity != null && !isDeletingInheritedPermissionsSupported) {
+            showErrorDialog(
+                R.string.permission_remove_error,
+                UnsupportedOperationException("Removing inherited permissions is not supported by provider")
+            )
+            return@launch
+        }
+
         try {
             omhStorageClient.deletePermission(fileId, permission.id)
             _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_removed))
@@ -135,7 +153,7 @@ class FilePermissionsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun showErrorDialog(@StringRes title: Int, exception: OmhStorageException) {
+    private suspend fun showErrorDialog(@StringRes title: Int, exception: Exception) {
         _action.send(
             FilePermissionsViewAction.ShowErrorDialog(
                 title,

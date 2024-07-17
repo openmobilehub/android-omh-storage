@@ -380,7 +380,7 @@ class FileViewerViewModel @Inject constructor(
         if (isPermanentlyDeleteSupported) {
             setState(FileViewerViewState.ShowPermanentlyDeleteDialog(event.file))
         } else {
-            toastMessage.postValue("Unsupported operation")
+            toastMessage.postValue("Permanent deleting is not supported by provider")
         }
     }
 

@@ -49,20 +49,20 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 - ❌ - not supported
 
 | Features                | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
-| ----------------------- | :----------------: | :--------------------: | :------: | :-----: |
-| File listing            |         ✅         |           ✅           |    ✅    |   ✅    |
-| File searching          |         ✅         |           ✅           |          |   ✅    |
-| File creation           |         ✅         |           ✅           |          |         |
-| File update             |         ✅         |           ✅           |          |         |
-| File deletion           |         ✅         |           ✅           |    ✅    |   ✅    |
-| File permanent deletion |         ✅         |           ✅           |    ❌    |   ❌    |
-| File upload             |         ✅         |           ✅           |    ✅    |   ✅    |
-| File download           |         ✅         |           ✅           |    ✅    |   ✅    |
-| File export             |         ✅         |           ✅           |    ❌    |   ❌    |
-| File metadata           |         ✅         |           ✅           |    🟨    |   🟨    |
-| File versioning         |         ✅         |           ✅           |    ✅    |   ✅    |
-| File permissions        |         🟨         |           🟨           |    🟨    |         |
-| File URL                |         ✅         |           ✅           |    ✅    |         |
+|-------------------------|:------------------:|:----------------------:|:--------:|:-------:|
+| File listing            |         ✅          |           ✅            |    ✅     |    ✅    |
+| File searching          |         ✅          |           ✅            |          |    ✅    |
+| File creation           |         ✅          |           ✅            |         |         |
+| File update             |         ✅          |           ✅            |         |         |
+| File deletion           |         ✅          |           ✅            |    ✅     |    ✅    |
+| File permanent deletion |         ✅          |           ✅            |    ❌     |    ❌    |
+| File upload             |         ✅          |           ✅            |    ✅     |    ✅    |
+| File download           |         ✅          |           ✅            |    ✅     |    ✅    |
+| File export             |         ✅          |           ✅            |    ❌     |    ❌    |
+| File metadata           |         ✅          |           ✅            |    🟨     |    🟨    |
+| File versioning         |         ✅          |           ✅            |    ✅     |    ✅    |
+| File permissions        |         🟨          |           🟨            |    🟨     |         |
+| File URL                |         ✅          |           ✅            |    ✅     |         |
 
 ### File metadata
 
@@ -126,6 +126,17 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 
 <summary>Show details</summary>
 
+[`OmhPermission.IdentityPermission`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-permission)
+
+| Property            | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
+|---------------------|:------------------:|:----------------------:|:--------:|:-------:|
+| id                  |         ✅         |           ✅           |    ✅    |         |
+| role                |         ✅         |           ✅           |    ✅    |         |
+| identity            |         ✅         |           ✅           |    ✅    |         |
+| inheritedFromEntity |         🟨         |           🟨           |    ✅    |         |
+
+> Google Drive: `inheritedFromEntity` is present only for shared drive items.
+
 [`OmhIdentity`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-identity)
 
 | Type        | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
@@ -143,13 +154,11 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 | -------------- | :----------------: | :--------------------: | :------: | :-----: |
 | id             |         ❌         |           ❌           |    ✅    |         |
 | displayName    |         ✅         |           ✅           |    ✅    |         |
-| emailAddress   |         ✅         |           ✅           |    🟨    |         |
+| emailAddress   |         ✅         |           ✅           |    ❌    |         |
 | expirationTime |         ✅         |           ✅           |    ✅    |         |
 | deleted        |         ✅         |           ✅           |    ❌    |         |
 | photoLink      |         ✅         |           ✅           |    ❌    |         |
 | pendingOwner   |         ❌         |           ✅           |    ❌    |         |
-
-> The `emailAddress` property is only provided by the OneDrive storage provider when the associated [`Identity`](https://learn.microsoft.com/en-us/graph/api/resources/identity) is of type [`EmailIdentity`](https://learn.microsoft.com/en-us/graph/api/resources/emailidentity).
 
 [`OmhIdentity.Group`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-identity/-group)
 
@@ -157,11 +166,9 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 | -------------- | :----------------: | :--------------------: | :------: | :-----: |
 | id             |         ❌         |           ❌           |    ✅    |         |
 | displayName    |         ✅         |           ✅           |    ✅    |         |
-| emailAddress   |         ✅         |           ✅           |    🟨    |         |
+| emailAddress   |         ✅         |           ✅           |    ❌    |         |
 | expirationTime |         ✅         |           ✅           |    ✅    |         |
 | deleted        |         ✅         |           ✅           |    ❌    |         |
-
-> The `emailAddress` property is only provided by the OneDrive storage provider when the associated [`Identity`](https://learn.microsoft.com/en-us/graph/api/resources/identity) is of type [`EmailIdentity`](https://learn.microsoft.com/en-us/graph/api/resources/emailidentity).
 
 [`OmhPermissionRole`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-permission-role)
 

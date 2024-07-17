@@ -144,7 +144,7 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         emailMessage: String?
     ): OmhPermission {
         // To be implemented
-        return OmhPermission.IdentityPermission("", OmhPermissionRole.READER, OmhIdentity.Anyone)
+        return OmhPermission.IdentityPermission("", OmhPermissionRole.READER, OmhIdentity.Anyone, null)
     }
 
     override suspend fun updatePermission(
@@ -153,6 +153,6 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         role: OmhPermissionRole
     ): OmhPermission {
         // To be implemented
-        return OmhPermission.IdentityPermission("", OmhPermissionRole.READER, OmhIdentity.Anyone)
+        return OmhPermission.IdentityPermission("", OmhPermissionRole.READER, OmhIdentity.Anyone, null)
     }
 }

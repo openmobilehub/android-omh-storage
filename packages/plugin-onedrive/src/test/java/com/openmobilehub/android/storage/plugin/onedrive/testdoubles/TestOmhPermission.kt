@@ -69,7 +69,15 @@ val testOmhGroupIdentity = OmhIdentity.Group(
 val testOmhPermission = OmhPermission.IdentityPermission(
     TEST_PERMISSION_ID,
     OmhPermissionRole.WRITER,
-    testOmhUserIdentity
+    testOmhUserIdentity,
+    null
+)
+
+val testInheritedPermission = OmhPermission.IdentityPermission(
+    TEST_PERMISSION_ID,
+    OmhPermissionRole.WRITER,
+    testOmhUserIdentity,
+    TEST_FILE_ID
 )
 
 val invitePostRequestBody = InvitePostRequestBody().apply {

@@ -42,8 +42,9 @@ val testOmhPermission = OmhPermission.IdentityPermission(
         TEST_PERMISSION_EXPIRATION_TIME,
         false,
         TEST_PERMISSION_PHOTO_LINK,
-        null
-    )
+        null,
+    ),
+    null,
 )
 
 val testOmhCreatePermission = OmhCreatePermission.CreateIdentityPermission(
