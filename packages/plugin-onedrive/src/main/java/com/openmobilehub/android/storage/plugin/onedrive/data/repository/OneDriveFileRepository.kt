@@ -20,16 +20,21 @@ import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
+import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemResponseToOmhEntity
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.toOmhVersion
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiService
+import com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit.MsGraphApiServiceProvider
+import com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit.body.CreateFolderRequestBody
 import com.openmobilehub.android.storage.plugin.onedrive.data.util.toByteArrayOutputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 
 class OneDriveFileRepository(
     private val apiService: OneDriveApiService,
-    private val driveItemToOmhStorageEntity: DriveItemToOmhStorageEntity
+    private val retrofitClient: MsGraphApiServiceProvider,
+    private val driveItemToOmhStorageEntity: DriveItemToOmhStorageEntity,
+    private val driveItemResponseToOmhEntity: DriveItemResponseToOmhEntity
 ) {
     fun getFilesList(parentId: String): List<OmhStorageEntity> {
         return apiService.getFilesList(parentId).map {
@@ -74,5 +79,24 @@ class OneDriveFileRepository(
         val driveItem = apiService.getFile(fileId)
 
         return OmhStorageMetadata(driveItemToOmhStorageEntity(driveItem), driveItem)
+    }
+
+    suspend fun createFolder(name: String, parentId: String): OmhStorageEntity? {
+        val driveId = apiService.driveId
+
+        val response = retrofitClient.getGoogleStorageApiService().createFolder(
+            driveId = driveId,
+            parentId = parentId,
+            body = CreateFolderRequestBody(name, emptyMap()),
+        )
+
+        return if (response.isSuccessful) {
+            response.body()?.let { driveItemResponseToOmhEntity(it) }
+        } else {
+            //to do: error handling
+            throw OmhStorageException.ApiException(
+                message = "Failed to create folder. Response code: ${response.code()}"
+            )
+        }
     }
 }

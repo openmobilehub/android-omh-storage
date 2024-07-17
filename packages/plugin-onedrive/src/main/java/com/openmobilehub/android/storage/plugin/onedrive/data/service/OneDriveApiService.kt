@@ -16,7 +16,6 @@
 
 package com.openmobilehub.android.storage.plugin.onedrive.data.service
 
-import androidx.annotation.VisibleForTesting
 import com.microsoft.graph.drives.item.items.item.createuploadsession.CreateUploadSessionPostRequestBody
 import com.microsoft.graph.models.DriveItem
 import com.microsoft.graph.models.DriveItemUploadableProperties
@@ -27,11 +26,10 @@ import java.io.File
 import java.io.InputStream
 
 class OneDriveApiService(private val apiClient: OneDriveApiClient) {
-    private val driveId by lazy { retrieveDriveId() }
+    val driveId by lazy { retrieveDriveId() }
 
     @Suppress("TooGenericExceptionCaught")
-    @VisibleForTesting
-    internal fun retrieveDriveId(): String {
+    fun retrieveDriveId(): String {
         try {
             return apiClient.graphServiceClient.me().drive().get().id
         } catch (exception: Exception) {

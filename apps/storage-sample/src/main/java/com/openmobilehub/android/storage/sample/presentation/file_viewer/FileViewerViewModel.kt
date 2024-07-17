@@ -62,7 +62,7 @@ class FileViewerViewModel @Inject constructor(
 
     companion object {
         val listOfFileTypes = listOf(
-            DisplayFileType("Folder", FileType.GOOGLE_FOLDER),
+            DisplayFileType("Folder", null),
             DisplayFileType("Document", FileType.GOOGLE_DOCUMENT),
             DisplayFileType("Sheet", FileType.GOOGLE_SPREADSHEET),
             DisplayFileType("Presentation", FileType.GOOGLE_PRESENTATION),
@@ -139,6 +139,7 @@ class FileViewerViewModel @Inject constructor(
             is FileViewerViewEvent.FileVersionClicked -> fileVersionClicked(event)
             is FileViewerViewEvent.BackPressed -> backPressedEvent()
             is FileViewerViewEvent.CreateFile -> createFileEvent(event)
+            is FileViewerViewEvent.CreateFolder -> createFolderEvent(event)
             is FileViewerViewEvent.DeleteFile -> deleteFileEvent(event)
             is FileViewerViewEvent.PermanentlyDeleteFileClicked -> permanentlyDeleteFileEventClicked(
                 event
@@ -293,6 +294,24 @@ class FileViewerViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 omhStorageClient.createFile(event.name, event.mimeType, parentId)
+                refreshFileListEvent()
+            } catch (exception: Exception) {
+                errorDialogMessage.postValue(exception.message)
+                toastMessage.postValue(exception.message)
+                exception.printStackTrace()
+
+                refreshFileListEvent()
+            }
+        }
+    }
+
+    private fun createFolderEvent(event: FileViewerViewEvent.CreateFolder) {
+        setState(FileViewerViewState.Loading)
+        val parentId = parentId.peek()
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                omhStorageClient.createFolder(event.name, parentId)
                 refreshFileListEvent()
             } catch (exception: Exception) {
                 errorDialogMessage.postValue(exception.message)

@@ -27,11 +27,13 @@ import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
+import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemResponseToOmhEntity
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.onedrive.data.repository.OneDriveFileRepository
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiClient
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiService
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveAuthProvider
+import com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit.MsGraphApiServiceProvider
 import java.io.ByteArrayOutputStream
 import java.io.File
 
@@ -52,7 +54,11 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
             val apiService = OneDriveApiService(apiClient)
             val driveItemToOmhStorageEntity =
                 DriveItemToOmhStorageEntity(MimeTypeMap.getSingleton())
-            val repository = OneDriveFileRepository(apiService, driveItemToOmhStorageEntity)
+            val driveItemResponseToOmhEntity = DriveItemResponseToOmhEntity(MimeTypeMap.getSingleton())
+
+            val retrofitClient = MsGraphApiServiceProvider.getInstance(accessToken)
+
+            val repository = OneDriveFileRepository(apiService, retrofitClient, driveItemToOmhStorageEntity, driveItemResponseToOmhEntity)
 
             return OneDriveOmhStorageClient(authClient, repository)
         }
@@ -75,8 +81,11 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
         mimeType: String,
         parentId: String
     ): OmhStorageEntity? {
-        // To be implemented
-        return null
+        return repository.createFolder(name, parentId)
+    }
+
+    override suspend fun createFolder(name: String, parentId: String): OmhStorageEntity? {
+        return repository.createFolder(name, parentId)
     }
 
     override suspend fun deleteFile(id: String): Boolean {

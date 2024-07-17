@@ -72,6 +72,13 @@ internal class GoogleDriveGmsOmhStorageClient private constructor(
         return fileRepository.createFile(name, mimeType, parentId)
     }
 
+    override suspend fun createFolder(
+        name: String,
+        parentId: String
+    ): OmhStorageEntity? {
+        return fileRepository.createFolder(name, parentId)
+    }
+
     override suspend fun deleteFile(id: String): Boolean {
         return fileRepository.deleteFile(id)
     }

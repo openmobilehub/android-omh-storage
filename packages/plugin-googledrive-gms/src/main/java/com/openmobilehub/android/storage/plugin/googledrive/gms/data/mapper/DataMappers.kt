@@ -72,7 +72,7 @@ internal fun File.toOmhStorageEntity(): OmhStorageEntity? {
             mimeType,
             fileExtension,
             // Not using size property as it refers to java.util.AbstractMap instead of File.
-            getSize().toInt(),
+            null
         )
     }
 }

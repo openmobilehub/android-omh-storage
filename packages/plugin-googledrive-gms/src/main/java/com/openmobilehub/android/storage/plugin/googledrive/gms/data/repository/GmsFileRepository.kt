@@ -26,6 +26,7 @@ import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
+import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.extension.toApiException
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhFileVersions
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhPermission
@@ -65,6 +66,10 @@ internal class GmsFileRepository(
         val responseFile: GoogleDriveFile = apiService.createFile(fileToBeCreated).execute()
 
         return responseFile.toOmhStorageEntity()
+    }
+
+    fun createFolder(name: String, parentId: String?): OmhStorageEntity? {
+        return createFile(name, GoogleDriveGmsConstants.FOLDER_MIME_TYPE,  parentId)
     }
 
     @SuppressWarnings("SwallowedException")

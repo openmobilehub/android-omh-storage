@@ -90,6 +90,19 @@ abstract class OmhStorageClient protected constructor(
     ): OmhStorageEntity?
 
     /**
+     * This method create folders in an specific folder
+     *
+     * @param name The name of the folder to be created
+     * @param parentId The id of the folder where the folder will be created
+     *
+     * @return An OmhStorageEntity with the information of the created folder. Null in case the folder was not created
+     */
+    abstract suspend fun createFolder(
+        name: String,
+        parentId: String
+    ): OmhStorageEntity?
+
+    /**
      * This method delete files with a given file id
      *
      * @param id The id of the desired file to delete

@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.sample.presentation.file_viewer.model
+package com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit.body
 
-import com.openmobilehub.android.storage.sample.domain.model.FileType
+import androidx.annotation.Keep
 
-data class DisplayFileType(val name: String, val fileType: FileType?)
+@Keep
+data class CreateFolderRequestBody(
+    val name: String,
+    val folder: Map<String, Any>,
+)

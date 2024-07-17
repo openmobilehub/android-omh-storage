@@ -14,8 +14,17 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.sample.presentation.file_viewer.model
+package com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit.body
 
-import com.openmobilehub.android.storage.sample.domain.model.FileType
+import androidx.annotation.Keep
+import kotlinx.serialization.SerialName
+import okhttp3.RequestBody
+import java.io.FileInputStream
 
-data class DisplayFileType(val name: String, val fileType: FileType?)
+@Keep
+data class CreateFileRequestBody(
+    val name: String,
+    val file: Map<String, Any>,
+//    val content: String,
+    @SerialName("@odata.type") val odataType: String = "#microsoft.graph.driveItem"
+)

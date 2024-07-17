@@ -23,7 +23,9 @@ import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
+
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toCreateRequestBody
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toFileList
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toOmhFileVersions
@@ -99,6 +101,10 @@ internal class NonGmsFileRepository(
         } else {
             null
         }
+    }
+
+    suspend fun createFolder(name: String, parentId: String): OmhStorageEntity? {
+        return createFile(name, GoogleDriveNonGmsConstants.FOLDER_MIME_TYPE, parentId)
     }
 
     suspend fun permanentlyDeleteFile(fileId: String): Boolean {

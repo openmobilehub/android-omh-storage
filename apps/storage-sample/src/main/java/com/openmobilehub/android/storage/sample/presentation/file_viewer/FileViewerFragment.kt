@@ -182,7 +182,8 @@ class FileViewerFragment :
     private fun uploadFile() = filePickerUpload.launch(FileViewerViewModel.ANY_MIME_TYPE)
     private fun signOut() = dispatchEvent(FileViewerViewEvent.SignOut)
 
-    private fun showFileMetadata() = FileMetadataDialog().show(childFragmentManager, FILE_METADATA_DIALOG_TAG)
+    private fun showFileMetadata() =
+        FileMetadataDialog().show(childFragmentManager, FILE_METADATA_DIALOG_TAG)
 
     private fun showFilePermissions() = FilePermissionsDialog().show(
         childFragmentManager,
@@ -420,7 +421,14 @@ class FileViewerFragment :
         val fileName = view.fileName.text.toString()
         val fileType = viewModel.createFileSelectedType?.mimeType
 
-        if (fileName.isNotBlank() && !fileType.isNullOrEmpty()) {
+        if (fileName.isBlank()) {
+            dialog.dismiss()
+            return
+        }
+
+        if (fileType.isNullOrBlank()) {
+            dispatchEvent(FileViewerViewEvent.CreateFolder(fileName))
+        } else {
             dispatchEvent(FileViewerViewEvent.CreateFile(fileName, fileType))
         }
 

@@ -32,6 +32,7 @@ import com.openmobilehub.android.storage.sample.databinding.ActivityBaseBinding
 import com.openmobilehub.android.storage.sample.domain.repository.SessionRepository
 import com.openmobilehub.android.storage.sample.presentation.BaseFragment
 import com.openmobilehub.android.storage.sample.util.coInitialize
+import com.openmobilehub.android.storage.sample.util.coSignOut
 import com.openmobilehub.android.storage.sample.util.isUserLoggedIn
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -90,6 +91,7 @@ open class MainActivity : AppCompatActivity(), BaseFragment.BaseFragmentListener
                 val startDestId = if (isUserLoggedIn) {
                     R.id.file_viewer_fragment
                 } else {
+//                    omhAuthClient.get().coSignOut()
                     R.id.login_fragment
                 }
                 navGraph.setStartDestination(startDestId)

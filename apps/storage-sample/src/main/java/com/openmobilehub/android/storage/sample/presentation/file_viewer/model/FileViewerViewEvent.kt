@@ -69,6 +69,11 @@ sealed class FileViewerViewEvent : ViewEvent {
         override fun getEventName() = "FileViewerViewEvent.CreateFile"
     }
 
+    class CreateFolder(val name: String) : FileViewerViewEvent() {
+
+        override fun getEventName() = "FileViewerViewEvent.CreateFolder"
+    }
+
     class DeleteFile(val file: OmhStorageEntity) : FileViewerViewEvent() {
 
         override fun getEventName() = "FileViewerViewEvent.DeleteFile"

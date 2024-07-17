@@ -84,7 +84,12 @@ class OneDriveFileRepositoryTest {
         mockkStatic("com.openmobilehub.android.storage.plugin.onedrive.data.util.InputStreamExtensionsKt")
         mockkStatic("com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DataMappersKt")
 
-        repository = OneDriveFileRepository(apiService, driveItemToOmhStorageEntity)
+        repository = OneDriveFileRepository(
+            apiService,
+            retrofitClient,
+            driveItemToOmhStorageEntity,
+            driveItemResponseToOmhEntity
+        )
     }
 
     @After
