@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper
+package com.openmobilehub.android.storage.plugin.dropbox.data.mapper
 
-import com.google.api.client.http.HttpResponseException
+import com.dropbox.core.DbxApiException
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 
 object ExceptionMapper {
     // Note that extensions function couldn't be used here due to SwallowedException warning:
     // https://github.com/detekt/detekt/issues/4520
-    fun toOmhApiException(exception: HttpResponseException): OmhStorageException.ApiException =
-        OmhStorageException.ApiException(exception.statusCode, exception.content, exception)
+    fun toOmhApiException(exception: DbxApiException): OmhStorageException.ApiException =
+        OmhStorageException.ApiException(null, exception.userMessage.toString(), exception)
 }

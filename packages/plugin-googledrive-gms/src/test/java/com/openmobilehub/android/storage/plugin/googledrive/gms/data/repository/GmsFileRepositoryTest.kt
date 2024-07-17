@@ -303,7 +303,7 @@ internal class GmsFileRepositoryTest {
                 )
             } returns drivePermissionsDeleteRequest
 
-            val result = fileRepositoryImpl.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
+            fileRepositoryImpl.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
 
             verify { apiService.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID) }
         }
