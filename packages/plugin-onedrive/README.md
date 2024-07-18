@@ -56,11 +56,12 @@ dependencies {
 
 ### Console App
 
-To access Microsoft APIs, follow these steps to obtain the **ms_auth_config.json** file:
+To access Microsoft APIs, follow these steps to obtain the **MSAL Configuration**:
 
 1. [Create a new app](https://learn.microsoft.com/en-us/entra/identity-platform/tutorial-v2-android#register-your-application-with-microsoft-entra-id) in [Microsoft Azure](https://portal.azure.com/#view/Microsoft_AAD_RegisteredApps/CreateApplicationBlade).
 2. Add the **Android** platform and specify your [**Package Name**](https://developer.android.com/build/configure-app-module#set-application-id) and [**Signature Hash**](https://learn.microsoft.com/en-us/entra/identity-platform/tutorial-v2-android#register-your-application-with-microsoft-entra-id:~:text=In%20the%20Signature%20hash%20section%20of%20the%20Configure%20your%20Android%20app%20pane%2C%20select%20Generating%20a%20development%20Signature%20Hash.%20and%20copy%20the%20KeyTool%20command%20to%20your%20command%20line.) for your app.
-3. Download the **ms_auth_config.json** file and add it in the **src/main/res/raw** directory.
+3. Copy the **MSAL Configuration** into a newly created JSON file named **ms_auth_config.json** and place it in the **src/main/res/raw** directory.
+4. In the **ms_auth_config.json** file, add a new key `"account_mode"` with the value `"SINGLE"`.
 
 ### Secrets
 
