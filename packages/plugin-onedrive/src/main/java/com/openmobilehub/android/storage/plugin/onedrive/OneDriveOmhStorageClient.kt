@@ -25,7 +25,6 @@ import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
-import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.onedrive.data.repository.OneDriveFileRepository
@@ -44,11 +43,8 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
     internal class Builder : OmhStorageClient.Builder {
 
         override fun build(authClient: OmhAuthClient): OmhStorageClient {
-            val accessToken = authClient.getCredentials().accessToken
-                ?: throw OmhStorageException.InvalidCredentialsException()
-
-            val authProvider = OneDriveAuthProvider(accessToken)
-            val apiClient = OneDriveApiClient.getInstance(authProvider)
+            val authProvider = OneDriveAuthProvider(authClient)
+            val apiClient = OneDriveApiClient(authProvider)
             val apiService = OneDriveApiService(apiClient)
             val driveItemToOmhStorageEntity =
                 DriveItemToOmhStorageEntity(MimeTypeMap.getSingleton())

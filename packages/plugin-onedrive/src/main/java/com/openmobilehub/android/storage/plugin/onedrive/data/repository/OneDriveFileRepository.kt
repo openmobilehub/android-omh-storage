@@ -37,7 +37,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 
 @Suppress("TooManyFunctions")
-class OneDriveFileRepository(
+internal class OneDriveFileRepository(
     private val apiService: OneDriveApiService,
     private val driveItemToOmhStorageEntity: DriveItemToOmhStorageEntity
 ) {

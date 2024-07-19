@@ -35,23 +35,32 @@ import java.io.File
 @Suppress("TooManyFunctions")
 internal class GoogleDriveGmsOmhStorageClient private constructor(
     authClient: OmhAuthClient,
-    private val fileRepository: GmsFileRepository,
+    private val repositoryBuilder: RepositoryBuilder,
 ) : OmhStorageClient(authClient) {
 
     internal class Builder : OmhStorageClient.Builder {
 
         override fun build(authClient: OmhAuthClient): OmhStorageClient {
+            return GoogleDriveGmsOmhStorageClient(authClient, RepositoryBuilder())
+        }
+    }
+
+    private class RepositoryBuilder : GmsFileRepository.Builder {
+        override fun build(authClient: OmhAuthClient): GmsFileRepository {
             val credentials =
                 (authClient.getCredentials() as? GmsCredentials)?.googleAccountCredential
-                    ?: throw OmhStorageException.InvalidCredentialsException()
+                    ?: throw OmhStorageException.InvalidCredentialsException(
+                        "Couldn't get access token from auth client"
+                    )
 
             val apiProvider = GoogleDriveApiProvider.getInstance(credentials)
             val apiService = GoogleDriveApiService(apiProvider)
-            val repository = GmsFileRepository(apiService)
-
-            return GoogleDriveGmsOmhStorageClient(authClient, repository)
+            return GmsFileRepository(apiService)
         }
     }
+
+    private val fileRepository: GmsFileRepository
+        get() = repositoryBuilder.build(authClient)
 
     override val rootFolder: String
         get() = GoogleDriveGmsConstants.ROOT_FOLDER
