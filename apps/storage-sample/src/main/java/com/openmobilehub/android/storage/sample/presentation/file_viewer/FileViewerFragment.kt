@@ -54,7 +54,6 @@ import com.openmobilehub.android.storage.sample.databinding.DialogCreateFileBind
 import com.openmobilehub.android.storage.sample.databinding.DialogUploadFileBinding
 import com.openmobilehub.android.storage.sample.databinding.FragmentFileViewerBinding
 import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
-import com.openmobilehub.android.storage.sample.domain.repository.SessionRepository
 import com.openmobilehub.android.storage.sample.presentation.BaseFragment
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.menu.FileMenuDialog
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.FilePermissionsDialog
@@ -423,26 +422,33 @@ class FileViewerFragment :
             viewModel.storageAuthProvider === StorageAuthProvider.GOOGLE
 
         val fileName = view.fileName.text.toString()
-        val fileType = viewModel.createFileSelectedType?.fileType
+        val fileType = viewModel.createFileSelectedType
 
+        // Empty file name is not allowed
         if (fileName.isBlank()) {
             dialog.dismiss()
-            return
         }
 
+        // Folder creation
         if (fileType == null) {
             dispatchEvent(FileViewerViewEvent.CreateFolder(fileName))
-        } else {
-            if (isGoogleDrive) {
-                dispatchEvent(FileViewerViewEvent.CreateFile(fileName, fileType.mimeType))
-            } else {
-                val extension = fileType.extension
-                if (extension != null) {
-                    dispatchEvent(FileViewerViewEvent.CreateFileWithExtension(fileName, fileType.extension))
-                }
-            }
+            return dialog.dismiss()
         }
 
+        // Google Drive file creation
+        if (isGoogleDrive) {
+            dispatchEvent(FileViewerViewEvent.CreateFileWithMimeType(fileName, fileType.mimeType))
+            return dialog.dismiss()
+        }
+
+        // Extension for other providers cannot be null
+        if (fileType.extension == null) {
+            dialog.dismiss()
+            throw IllegalStateException("File type extension cannot be null")
+        }
+
+        // Other providers file creation
+        dispatchEvent(FileViewerViewEvent.CreateFileWithExtension(fileName, fileType.extension))
         dialog.dismiss()
     }
 
@@ -450,7 +456,7 @@ class FileViewerFragment :
         val isGoogleDrive =
             viewModel.storageAuthProvider === StorageAuthProvider.GOOGLE
         val fileTypes =
-            if (isGoogleDrive) FileViewerViewModel.googleListOfileTypes else FileViewerViewModel.commonListOfFileTypes
+            if (isGoogleDrive) FileViewerViewModel.googleListOfFileTypes else FileViewerViewModel.commonListOfFileTypes
 
         context?.let { context ->
 
@@ -468,12 +474,12 @@ class FileViewerFragment :
                         parent: AdapterView<*>?, view: View?, position: Int, id: Long
                     ) {
                         val fileType = fileTypes[position]
-                        viewModel.createFileSelectedType = fileType
+                        viewModel.createFileSelectedType = fileType.fileType
                     }
 
                     override fun onNothingSelected(parent: AdapterView<*>?) {
                         val fileType = fileTypes[0]
-                        viewModel.createFileSelectedType = fileType
+                        viewModel.createFileSelectedType = fileType.fileType
                     }
                 }
             }

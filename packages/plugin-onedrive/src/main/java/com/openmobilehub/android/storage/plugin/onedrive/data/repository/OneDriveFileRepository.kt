@@ -46,14 +46,12 @@ class OneDriveFileRepository(
     private val apiService: OneDriveApiService,
     private val oneDriveRestApiService: OneDriveRestApiService,
     private val driveItemToOmhStorageEntity: DriveItemToOmhStorageEntity,
-    private val driveItemResponseToOmhEntity: DriveItemResponseToOmhStorageEntity
+    private val driveItemResponseToOmhStorageEntity: DriveItemResponseToOmhStorageEntity
 ) {
     fun getFilesList(parentId: String): List<OmhStorageEntity> = try {
-        val result = apiService.getFilesList(parentId).map {
+        apiService.getFilesList(parentId).map {
             driveItemToOmhStorageEntity(it)
         }
-
-        result
     } catch (exception: ApiException) {
         throw ExceptionMapper.toOmhApiException(exception)
     }
@@ -171,7 +169,7 @@ class OneDriveFileRepository(
         )
 
         return if (response.isSuccessful) {
-            response.body()?.let { driveItemResponseToOmhEntity(it) }
+            response.body()?.let { driveItemResponseToOmhStorageEntity(it) }
                 ?: throw OmhStorageException.ApiException(
                     message = "Create succeeded but API failed to return expected folder"
                 )
@@ -190,12 +188,14 @@ class OneDriveFileRepository(
             val driveItem = apiService.createNewFile(fullFileName, parentId, inputStream)
 
             tempFile.delete()
+
             return driveItem?.let { driveItemToOmhStorageEntity(it) }
                 ?: throw OmhStorageException.ApiException(
                     message = "Create succeeded but API failed to return expected file"
                 )
         } catch (exception: ApiException) {
             tempFile.delete()
+
             throw ExceptionMapper.toOmhApiException(exception)
         }
     }

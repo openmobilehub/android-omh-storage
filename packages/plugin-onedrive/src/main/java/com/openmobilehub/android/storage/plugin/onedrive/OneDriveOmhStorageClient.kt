@@ -54,7 +54,7 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
             val apiService = OneDriveApiService(apiClient)
             val driveItemToOmhStorageEntity =
                 DriveItemToOmhStorageEntity(MimeTypeMap.getSingleton())
-            val driveItemResponseToOmhEntity = DriveItemResponseToOmhStorageEntity(MimeTypeMap.getSingleton())
+            val driveItemResponseToOmhStorageEntity = DriveItemResponseToOmhStorageEntity(MimeTypeMap.getSingleton())
 
             val oneDriveRestApiServiceProvider = OneDriveRestApiServiceProvider.getInstance(accessToken)
             val oneDriveRestApiService = oneDriveRestApiServiceProvider.getOneDriveApiService()
@@ -63,7 +63,7 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
                 apiService,
                 oneDriveRestApiService,
                 driveItemToOmhStorageEntity,
-                driveItemResponseToOmhEntity
+                driveItemResponseToOmhStorageEntity
             )
 
             return OneDriveOmhStorageClient(authClient, repository)

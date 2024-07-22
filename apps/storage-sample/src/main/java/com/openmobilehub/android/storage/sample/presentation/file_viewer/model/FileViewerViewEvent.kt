@@ -64,9 +64,9 @@ sealed class FileViewerViewEvent : ViewEvent {
         override fun getEventName() = "FileViewerViewEvent.BackPressed"
     }
 
-    class CreateFile(val name: String, val mimeType: String) : FileViewerViewEvent() {
+    class CreateFileWithMimeType(val name: String, val mimeType: String) : FileViewerViewEvent() {
 
-        override fun getEventName() = "FileViewerViewEvent.CreateFile"
+        override fun getEventName() = "FileViewerViewEvent.CreateFileWithMimeType"
     }
 
     class CreateFileWithExtension(val name: String, val extension: String) : FileViewerViewEvent() {

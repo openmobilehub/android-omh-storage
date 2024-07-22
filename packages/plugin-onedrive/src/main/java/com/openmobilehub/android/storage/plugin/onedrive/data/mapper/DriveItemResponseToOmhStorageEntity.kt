@@ -26,8 +26,8 @@ import com.openmobilehub.android.storage.core.utils.removeWhitespaces
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit.response.DriveItemResponse
 
 class DriveItemResponseToOmhStorageEntity(private val mimeTypeMap: MimeTypeMap) {
-    operator fun invoke(driveItem: DriveItemResponse): OmhStorageEntity? {
-        driveItem.run {
+    operator fun invoke(driveItemResponse: DriveItemResponse): OmhStorageEntity? {
+        driveItemResponse.run {
             @Suppress("ComplexCondition")
             if (id == null || name == null || createdTime == null || modifiedTime == null || parentReference == null || size == null) {
                 return null

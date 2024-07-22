@@ -17,9 +17,6 @@
 package com.openmobilehub.android.storage.sample.presentation.main_activity
 
 import android.os.Bundle
-import android.util.Log
-import android.webkit.MimeTypeMap
-import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
@@ -32,13 +29,12 @@ import com.openmobilehub.android.storage.sample.databinding.ActivityBaseBinding
 import com.openmobilehub.android.storage.sample.domain.repository.SessionRepository
 import com.openmobilehub.android.storage.sample.presentation.BaseFragment
 import com.openmobilehub.android.storage.sample.util.coInitialize
-import com.openmobilehub.android.storage.sample.util.coSignOut
 import com.openmobilehub.android.storage.sample.util.isUserLoggedIn
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
-import javax.inject.Provider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import javax.inject.Provider
 
 @AndroidEntryPoint
 open class MainActivity : AppCompatActivity(), BaseFragment.BaseFragmentListener {
@@ -91,7 +87,6 @@ open class MainActivity : AppCompatActivity(), BaseFragment.BaseFragmentListener
                 val startDestId = if (isUserLoggedIn) {
                     R.id.file_viewer_fragment
                 } else {
-//                    omhAuthClient.get().coSignOut()
                     R.id.login_fragment
                 }
                 navGraph.setStartDestination(startDestId)

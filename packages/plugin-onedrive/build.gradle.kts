@@ -31,8 +31,6 @@ dependencies {
     implementation(Libs.retrofitJacksonConverter)
     implementation(Libs.okHttp)
     implementation(Libs.okHttpLoggingInterceptor)
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
-
 
     // Annotation
     implementation(Libs.androidxAnnotation)

@@ -454,7 +454,7 @@ class OneDriveFileRepositoryTest {
     }
 
     @Test
-    fun `given an apiService returns a driveItem response, when creating a folder, then return an OmhStorageEntity`() = runTest {
+    fun `given an apiService returns a drive item response, when creating a folder, then return an OmhStorageEntity`() = runTest {
         // Arrange
         every { apiService.driveId } returns "driveId"
         coEvery { oneDriveRestApiService.createFolder(any(), any(), any()) } returns Response.success(driveItemResponse)

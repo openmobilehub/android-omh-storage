@@ -82,7 +82,7 @@ abstract class OmhStorageClient protected constructor(
      * @param mimeType The mimeType of the file to be created
      * @param parentId The id of the folder where the file will be created
      *
-     * @return An OmhStorageEntity with the information of the created file. Null in case the file was not created
+     * @return An OmhStorageEntity with the information of the created file.
      */
     abstract suspend fun createFileWithMimeType(
         name: String,
@@ -97,7 +97,7 @@ abstract class OmhStorageClient protected constructor(
      * @param extension The extension of the file to be created
      * @param parentId The id of the folder where the file will be created
      *
-     * @return An OmhStorageEntity with the information of the created file. Null in case the file was not created
+     * @return An OmhStorageEntity with the information of the created file.
      */
     abstract suspend fun createFileWithExtension(
         name: String,
@@ -106,12 +106,12 @@ abstract class OmhStorageClient protected constructor(
     ): OmhStorageEntity?
 
     /**
-     * This method create folders in an specific folder
+     * This method create folder in an specific folder
      *
      * @param name The name of the folder to be created
      * @param parentId The id of the folder where the folder will be created
      *
-     * @return An OmhStorageEntity with the information of the created folder. Null in case the folder was not created
+     * @return An OmhStorageEntity with the information of the created folder.
      */
     abstract suspend fun createFolder(
         name: String,

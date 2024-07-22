@@ -65,7 +65,7 @@ class FileViewerViewModel @Inject constructor(
 ) : BaseViewModel<FileViewerViewState, FileViewerViewEvent>() {
 
     companion object {
-        val googleListOfileTypes = listOf(
+        val googleListOfFileTypes = listOf(
             DisplayFileType("Folder"),
             DisplayFileType("Document", FileType.GOOGLE_DOCUMENT),
             DisplayFileType("Sheet", FileType.GOOGLE_SPREADSHEET),
@@ -87,7 +87,7 @@ class FileViewerViewModel @Inject constructor(
     private val _action = Channel<FileViewerViewAction>()
     val action = _action.receiveAsFlow()
 
-    var createFileSelectedType: DisplayFileType? = null
+    var createFileSelectedType: FileType? = null
 
     var isGridLayoutManager = true
         private set
@@ -158,7 +158,7 @@ class FileViewerViewModel @Inject constructor(
             is FileViewerViewEvent.FileClicked -> fileClickedEvent(event)
             is FileViewerViewEvent.FileVersionClicked -> fileVersionClicked(event)
             is FileViewerViewEvent.BackPressed -> backPressedEvent()
-            is FileViewerViewEvent.CreateFile -> createFileEvent(event)
+            is FileViewerViewEvent.CreateFileWithMimeType -> createFileWithMimeTypeEvent(event)
             is FileViewerViewEvent.CreateFileWithExtension -> createFileWithExtensionEvent(event)
             is FileViewerViewEvent.CreateFolder -> createFolderEvent(event)
             is FileViewerViewEvent.DeleteFile -> deleteFileEvent(event)
@@ -309,48 +309,23 @@ class FileViewerViewModel @Inject constructor(
     }
 
     private fun createFileWithExtensionEvent(event: FileViewerViewEvent.CreateFileWithExtension) {
-        setState(FileViewerViewState.Loading)
-        val parentId = parentId.peek()
-
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                omhStorageClient.createFileWithExtension(event.name, event.extension, parentId)
-                refreshFileListEvent()
-            } catch (exception: Exception) {
-                errorDialogMessage.postValue(exception.message)
-                toastMessage.postValue(exception.message)
-                exception.printStackTrace()
-
-                refreshFileListEvent()
-            }
-        }
+        handleFileCreationEvent { omhStorageClient.createFileWithExtension(event.name, event.extension, parentId.peek()) }
     }
 
-    private fun createFileEvent(event: FileViewerViewEvent.CreateFile) {
-        setState(FileViewerViewState.Loading)
-        val parentId = parentId.peek()
-
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                omhStorageClient.createFileWithMimeType(event.name, event.mimeType, parentId)
-                refreshFileListEvent()
-            } catch (exception: Exception) {
-                errorDialogMessage.postValue(exception.message)
-                toastMessage.postValue(exception.message)
-                exception.printStackTrace()
-
-                refreshFileListEvent()
-            }
-        }
+    private fun createFileWithMimeTypeEvent(event: FileViewerViewEvent.CreateFileWithMimeType) {
+        handleFileCreationEvent { omhStorageClient.createFileWithMimeType(event.name, event.mimeType, parentId.peek()) }
     }
 
     private fun createFolderEvent(event: FileViewerViewEvent.CreateFolder) {
+        handleFileCreationEvent { omhStorageClient.createFolder(event.name, parentId.peek()) }
+    }
+
+    private fun handleFileCreationEvent(fileCreation: suspend () -> Unit) {
         setState(FileViewerViewState.Loading)
-        val parentId = parentId.peek()
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                omhStorageClient.createFolder(event.name, parentId)
+                fileCreation()
                 refreshFileListEvent()
             } catch (exception: Exception) {
                 errorDialogMessage.postValue(exception.message)
