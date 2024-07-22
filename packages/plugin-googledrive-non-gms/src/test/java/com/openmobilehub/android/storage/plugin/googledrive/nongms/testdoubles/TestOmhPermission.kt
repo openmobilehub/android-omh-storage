@@ -43,7 +43,8 @@ val testOmhPermission = OmhPermission.IdentityPermission(
         false,
         TEST_PERMISSION_PHOTO_LINK,
         null
-    )
+    ),
+    null,
 )
 
 val createOwnerPermission = OmhCreatePermission.CreateIdentityPermission(

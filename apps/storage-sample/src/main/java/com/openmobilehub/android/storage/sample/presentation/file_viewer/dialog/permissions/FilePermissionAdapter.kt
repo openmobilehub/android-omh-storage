@@ -61,6 +61,7 @@ class FilePermissionAdapter(
                 id.value.text = permission.id
                 type.value.text = permission.getType(context)
                 role.value.text = permission.role.toString()
+                inheritedFrom.value.text = permission.inheritedFromEntity.toString()
 
                 when (permission) {
                     is OmhPermission.IdentityPermission -> {
@@ -135,6 +136,7 @@ class FilePermissionAdapter(
             displayName.label.text = context.getString(R.string.permission_label_display_name)
             type.label.text = context.getString(R.string.permission_label_type)
             role.label.text = context.getString(R.string.permission_label_role)
+            inheritedFrom.label.text = context.getString(R.string.permission_label_inherited_from)
             photoText.label.text = context.getString(R.string.permission_label_user_photo)
             email.label.text = context.getString(R.string.permission_label_email)
             expirationTime.label.text = context.getString(R.string.permission_label_expiration_time)

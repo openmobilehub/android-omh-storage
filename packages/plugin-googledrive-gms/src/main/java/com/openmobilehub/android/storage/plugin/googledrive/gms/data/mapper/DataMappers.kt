@@ -113,7 +113,8 @@ internal fun Permission.toOmhPermission(): OmhPermission? {
     return OmhPermission.IdentityPermission(
         id,
         omhRole,
-        getOmhIdentity() ?: return null
+        getOmhIdentity() ?: return null,
+        permissionDetails?.firstOrNull { it.inheritedFrom != null }?.inheritedFrom
     )
 }
 

@@ -18,13 +18,16 @@ package com.openmobilehub.android.storage.plugin.onedrive.data.mapper
 
 import com.microsoft.graph.models.EmailIdentity
 import com.microsoft.graph.models.IdentitySet
+import com.microsoft.graph.models.ItemReference
 import com.microsoft.graph.models.Permission
 import com.microsoft.graph.models.SharePointIdentitySet
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.plugin.onedrive.OneDriveConstants
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.setUpEmailMock
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.setUpMock
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.setUpUserMock
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.testInheritedPermission
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.testOmhApplicationIdentity
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.testOmhDeviceIdentity
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.testOmhGroupIdentity
@@ -54,6 +57,9 @@ class PermissionMapperTest {
     @MockK
     private lateinit var identity: EmailIdentity
 
+    @MockK
+    private lateinit var inheritedFrom: ItemReference
+
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
@@ -80,6 +86,22 @@ class PermissionMapperTest {
 
         // Assert
         Assert.assertEquals(testOmhPermission, result)
+    }
+
+    @Test
+    fun `given a inherited Permission, when mapped, then return the expected OmhPermission`() {
+        // Arrange
+        identity.setUpEmailMock()
+        identitySet.setUpUserMock(identity)
+        every { permission.grantedTo } returns identitySet
+        every { inheritedFrom.id } returns TEST_FILE_ID
+        every { permission.inheritedFrom } returns inheritedFrom
+
+        // Act
+        val result = permission.toOmhPermission()
+
+        // Assert
+        Assert.assertEquals(testInheritedPermission, result)
     }
 
     @Test

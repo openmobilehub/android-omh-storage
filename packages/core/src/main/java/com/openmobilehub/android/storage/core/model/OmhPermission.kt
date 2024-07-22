@@ -29,13 +29,15 @@ import java.util.Date
  */
 sealed class OmhPermission(
     open val id: String,
-    open val role: OmhPermissionRole
+    open val role: OmhPermissionRole,
+    open val inheritedFromEntity: String?
 ) {
     data class IdentityPermission(
         override val id: String,
         override val role: OmhPermissionRole,
-        val identity: OmhIdentity
-    ) : OmhPermission(id, role)
+        val identity: OmhIdentity,
+        override val inheritedFromEntity: String?
+    ) : OmhPermission(id, role, inheritedFromEntity)
 }
 
 sealed class OmhIdentity {

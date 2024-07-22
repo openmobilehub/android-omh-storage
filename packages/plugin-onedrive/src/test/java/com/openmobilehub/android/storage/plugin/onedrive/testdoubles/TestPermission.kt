@@ -32,6 +32,7 @@ internal fun Permission.setUpMock() {
     every { grantedToV2 } returns null
     every { expirationDateTime } returns TEST_PERMISSION_EXPIRATION_TIME.toInstant()
         .atOffset(ZoneOffset.UTC)
+    every { inheritedFrom } returns null
 }
 
 internal fun IdentitySet.setUpUserMock(identity: Identity) {
