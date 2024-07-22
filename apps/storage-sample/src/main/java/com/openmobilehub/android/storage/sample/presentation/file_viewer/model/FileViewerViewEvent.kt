@@ -69,6 +69,11 @@ sealed class FileViewerViewEvent : ViewEvent {
         override fun getEventName() = "FileViewerViewEvent.CreateFile"
     }
 
+    class CreateFileWithExtension(val name: String, val extension: String) : FileViewerViewEvent() {
+
+        override fun getEventName() = "FileViewerViewEvent.CreateFileWithExtension"
+    }
+
     class CreateFolder(val name: String) : FileViewerViewEvent() {
 
         override fun getEventName() = "FileViewerViewEvent.CreateFolder"

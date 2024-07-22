@@ -25,6 +25,7 @@ import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
+import com.openmobilehub.android.storage.core.utils.toInputStream
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemResponseToOmhEntity
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.ExceptionMapper
@@ -47,9 +48,11 @@ class OneDriveFileRepository(
     private val driveItemResponseToOmhEntity: DriveItemResponseToOmhEntity
 ) {
     fun getFilesList(parentId: String): List<OmhStorageEntity> = try {
-        apiService.getFilesList(parentId).map {
+        val result = apiService.getFilesList(parentId).map {
             driveItemToOmhStorageEntity(it)
         }
+
+        result
     } catch (exception: ApiException) {
         throw ExceptionMapper.toOmhApiException(exception)
     }
@@ -174,5 +177,19 @@ class OneDriveFileRepository(
                 message = "Failed to create folder. Response code: ${response.code()}"
             )
         }
+    }
+
+    fun createFile(name: String, extension: String, parentId: String): OmhStorageEntity? = try {
+        // Create a temporary empty file to upload
+        val tempFile = File.createTempFile("tempFile", ".$extension")
+        val inputStream = tempFile.toInputStream()
+        val fileNameWithExtension = "$name.$extension"
+
+        val driveItem = apiService.uploadSmallFile(fileNameWithExtension, parentId, inputStream)
+        tempFile.delete()
+
+        driveItem?.let { driveItemToOmhStorageEntity(it) }
+    } catch (exception: ApiException) {
+        throw ExceptionMapper.toOmhApiException(exception)
     }
 }

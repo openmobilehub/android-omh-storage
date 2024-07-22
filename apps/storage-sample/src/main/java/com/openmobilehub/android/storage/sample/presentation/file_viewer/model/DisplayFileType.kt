@@ -18,4 +18,4 @@ package com.openmobilehub.android.storage.sample.presentation.file_viewer.model
 
 import com.openmobilehub.android.storage.sample.domain.model.FileType
 
-data class DisplayFileType(val name: String, val fileType: FileType?)
+data class DisplayFileType(val name: String, val fileType: FileType? = null)

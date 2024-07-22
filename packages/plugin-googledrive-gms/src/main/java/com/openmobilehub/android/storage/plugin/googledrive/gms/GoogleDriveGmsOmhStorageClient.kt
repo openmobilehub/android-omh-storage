@@ -72,6 +72,15 @@ internal class GoogleDriveGmsOmhStorageClient private constructor(
         return fileRepository.createFile(name, mimeType, parentId)
     }
 
+    override suspend fun createFileWithExtension(
+        name: String,
+        extension: String,
+        parentId: String
+    ): OmhStorageEntity? {
+        // To be implemented
+        return null
+    }
+
     override suspend fun createFolder(
         name: String,
         parentId: String

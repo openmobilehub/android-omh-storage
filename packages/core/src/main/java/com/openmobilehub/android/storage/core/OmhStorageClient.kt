@@ -91,6 +91,21 @@ abstract class OmhStorageClient protected constructor(
     ): OmhStorageEntity?
 
     /**
+     * This method create files in an specific folder
+     *
+     * @param name The name of the file to be created
+     * @param extension The extension of the file to be created
+     * @param parentId The id of the folder where the file will be created
+     *
+     * @return An OmhStorageEntity with the information of the created file. Null in case the file was not created
+     */
+    abstract suspend fun createFileWithExtension(
+        name: String,
+        extension: String,
+        parentId: String
+    ): OmhStorageEntity?
+
+    /**
      * This method create folders in an specific folder
      *
      * @param name The name of the folder to be created

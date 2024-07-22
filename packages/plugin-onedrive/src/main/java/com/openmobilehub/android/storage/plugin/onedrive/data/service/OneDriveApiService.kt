@@ -25,6 +25,7 @@ import com.microsoft.graph.models.Permission
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.utils.toInputStream
 import java.io.File
+import java.io.FileInputStream
 import java.io.InputStream
 
 @Suppress("TooManyFunctions")
@@ -156,5 +157,20 @@ class OneDriveApiService(private val apiClient: OneDriveApiClient) {
                     this.roles = listOf(role)
                 }
             )
+    }
+
+    fun uploadSmallFile(
+        fileName: String,
+        parentId: String,
+        inputStream: FileInputStream
+    ): DriveItem? {
+        return apiClient.graphServiceClient.drives()
+            .byDriveId(driveId)
+            .items()
+            .byDriveItemId(parentId)
+            .children()
+            .byDriveItemId1(fileName)
+            .content()
+            .put(inputStream)
     }
 }

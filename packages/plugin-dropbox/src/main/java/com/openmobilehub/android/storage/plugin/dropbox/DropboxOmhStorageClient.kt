@@ -76,6 +76,15 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         return null
     }
 
+    override suspend fun createFileWithExtension(
+        name: String,
+        extension: String,
+        parentId: String
+    ): OmhStorageEntity? {
+        // To be implemented
+        return null
+    }
+
     override suspend fun createFolder(name: String, parentId: String): OmhStorageEntity? {
         // To be implemented
         return null

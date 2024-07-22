@@ -53,6 +53,8 @@ import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.DialogCreateFileBinding
 import com.openmobilehub.android.storage.sample.databinding.DialogUploadFileBinding
 import com.openmobilehub.android.storage.sample.databinding.FragmentFileViewerBinding
+import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
+import com.openmobilehub.android.storage.sample.domain.repository.SessionRepository
 import com.openmobilehub.android.storage.sample.presentation.BaseFragment
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.menu.FileMenuDialog
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.FilePermissionsDialog
@@ -61,7 +63,6 @@ import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewAction
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewEvent
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewState
-import com.openmobilehub.android.storage.sample.presentation.util.displayToast
 import com.openmobilehub.android.storage.sample.presentation.util.navigateTo
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.ByteArrayOutputStream
@@ -418,25 +419,38 @@ class FileViewerFragment :
     private fun configureCreateFilePositiveButtonEvent(
         view: DialogCreateFileBinding, dialog: DialogInterface
     ) {
+        val isGoogleDrive =
+            viewModel.storageAuthProvider === StorageAuthProvider.GOOGLE
+
         val fileName = view.fileName.text.toString()
-        val fileType = viewModel.createFileSelectedType?.mimeType
+        val fileType = viewModel.createFileSelectedType?.fileType
 
         if (fileName.isBlank()) {
             dialog.dismiss()
             return
         }
 
-        if (fileType.isNullOrBlank()) {
+        if (fileType == null) {
             dispatchEvent(FileViewerViewEvent.CreateFolder(fileName))
         } else {
-            dispatchEvent(FileViewerViewEvent.CreateFile(fileName, fileType))
+            if (isGoogleDrive) {
+                dispatchEvent(FileViewerViewEvent.CreateFile(fileName, fileType.mimeType))
+            } else {
+                val extension = fileType.extension
+                if (extension != null) {
+                    dispatchEvent(FileViewerViewEvent.CreateFileWithExtension(fileName, fileType.extension))
+                }
+            }
         }
 
         dialog.dismiss()
     }
 
     private fun configureCreateFileDialogSpinner(view: DialogCreateFileBinding) {
-        val fileTypes = FileViewerViewModel.listOfFileTypes
+        val isGoogleDrive =
+            viewModel.storageAuthProvider === StorageAuthProvider.GOOGLE
+        val fileTypes =
+            if (isGoogleDrive) FileViewerViewModel.googleListOfileTypes else FileViewerViewModel.commonListOfFileTypes
 
         context?.let { context ->
 
@@ -454,12 +468,12 @@ class FileViewerFragment :
                         parent: AdapterView<*>?, view: View?, position: Int, id: Long
                     ) {
                         val fileType = fileTypes[position]
-                        viewModel.createFileSelectedType = fileType.fileType
+                        viewModel.createFileSelectedType = fileType
                     }
 
                     override fun onNothingSelected(parent: AdapterView<*>?) {
                         val fileType = fileTypes[0]
-                        viewModel.createFileSelectedType = fileType.fileType
+                        viewModel.createFileSelectedType = fileType
                     }
                 }
             }

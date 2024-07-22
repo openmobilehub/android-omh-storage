@@ -86,7 +86,15 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
         mimeType: String,
         parentId: String
     ): OmhStorageEntity? {
-        return repository.createFolder(name, parentId)
+        throw UnsupportedOperationException("Create file with mimeType is not supported in OneDrive.")
+    }
+
+    override suspend fun createFileWithExtension(
+        name: String,
+        extension: String,
+        parentId: String
+    ): OmhStorageEntity? {
+        return repository.createFile(name, extension, parentId)
     }
 
     override suspend fun createFolder(name: String, parentId: String): OmhStorageEntity? {
