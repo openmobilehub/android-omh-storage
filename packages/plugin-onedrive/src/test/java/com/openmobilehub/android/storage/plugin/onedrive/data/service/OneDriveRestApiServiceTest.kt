@@ -27,6 +27,7 @@ import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.utils.toInputStream
 import com.openmobilehub.android.storage.plugin.onedrive.OneDriveConstants.WRITE_ROLE
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_ID
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_NAME
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_PARENT_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_PERMISSION_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_VERSION_FILE_ID
@@ -59,6 +60,9 @@ class OneDriveRestApiServiceTest {
 
     @MockK(relaxed = true)
     private lateinit var file: File
+
+    @MockK
+    private lateinit var fileInputStream: FileInputStream
 
     @MockK
     private lateinit var uploadSession: UploadSession
@@ -364,5 +368,26 @@ class OneDriveRestApiServiceTest {
 
         // Assert
         Assert.assertEquals(permission.roles, permissionSlot.captured.roles)
+    }
+
+    @Test
+    fun `given apiClient, when creating a new file, then return drive item`() {
+        // Arrange
+        every {
+            apiClient.graphServiceClient.drives()
+                .byDriveId(any())
+                .items()
+                .byDriveItemId(any())
+                .children()
+                .byDriveItemId1(any())
+                .content()
+                .put(any())
+        } returns driveItem
+
+        // Act
+        val result = apiService.createNewFile(TEST_FILE_NAME, TEST_FILE_PARENT_ID, fileInputStream)
+
+        // Assert
+        Assert.assertEquals(driveItem, result)
     }
 }

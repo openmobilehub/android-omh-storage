@@ -187,7 +187,7 @@ class OneDriveFileRepository(
             val inputStream = tempFile.toInputStream()
             val fullFileName = "$name.$extension"
 
-            val driveItem = apiService.uploadSmallFile(fullFileName, parentId, inputStream)
+            val driveItem = apiService.createNewFile(fullFileName, parentId, inputStream)
 
             tempFile.delete()
             return driveItem?.let { driveItemToOmhStorageEntity(it) }

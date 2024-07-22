@@ -159,7 +159,7 @@ class OneDriveApiService(private val apiClient: OneDriveApiClient) {
             )
     }
 
-    fun uploadSmallFile(
+    fun createNewFile(
         fileName: String,
         parentId: String,
         inputStream: FileInputStream

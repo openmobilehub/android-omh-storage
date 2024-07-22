@@ -37,6 +37,7 @@ class DriveItemResponseToOmhStorageEntity(private val mimeTypeMap: MimeTypeMap) 
 
             val createdTime = createdTime.fromRFC3339StringToDate()
             val modifiedTime = modifiedTime.fromRFC3339StringToDate()
+
             val parentId = parentReference.id
 
             return if (isFolder) {

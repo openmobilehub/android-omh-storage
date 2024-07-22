@@ -35,12 +35,17 @@ import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.toDriveReci
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.toOmhPermission
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.toOmhVersion
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiService
-import com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit.OneDriveRestApiServiceProvider
+import com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit.OneDriveRestApiService
+import com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit.response.DriveItemResponse
 import com.openmobilehub.android.storage.plugin.onedrive.data.util.toByteArrayOutputStream
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_EMAIL_MESSAGE
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_EXTENSION
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_ID
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_NAME
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_PARENT_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_WEB_URL
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FOLDER_NAME
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FOLDER_PARENT_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_PERMISSION_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_VERSION_FILE_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_VERSION_ID
@@ -49,21 +54,27 @@ import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.testOmhPerm
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.testOmhVersion
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.slot
 import io.mockk.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
+import okhttp3.ResponseBody
 import org.junit.After
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import retrofit2.Response
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.InputStream
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class OneDriveFileRepositoryTest {
 
     @MockK
@@ -73,15 +84,21 @@ class OneDriveFileRepositoryTest {
     private lateinit var driveItem: DriveItem
 
     @MockK
+    private lateinit var driveItemResponse: DriveItemResponse
+
+    @MockK(relaxed = true)
+    private lateinit var responseBody: ResponseBody
+
+    @MockK
     private lateinit var apiService: OneDriveApiService
 
-    @MockK lateinit var retrofitClient: OneDriveRestApiServiceProvider
+    @MockK lateinit var oneDriveRestApiService: OneDriveRestApiService
 
     @MockK
     private lateinit var driveItemToOmhStorageEntity: DriveItemToOmhStorageEntity
 
     @MockK
-    private lateinit var driveItemResponseToOmhEntity: DriveItemResponseToOmhStorageEntity
+    private lateinit var driveItemResponseToOmhStorageEntity: DriveItemResponseToOmhStorageEntity
 
     @MockK(relaxed = true)
     private lateinit var file: File
@@ -115,9 +132,9 @@ class OneDriveFileRepositoryTest {
 
         repository = OneDriveFileRepository(
             apiService,
-            retrofitClient,
+            oneDriveRestApiService,
             driveItemToOmhStorageEntity,
-            driveItemResponseToOmhEntity
+            driveItemResponseToOmhStorageEntity
         )
     }
 
@@ -403,5 +420,70 @@ class OneDriveFileRepositoryTest {
             sendNotificationEmail = true,
             TEST_EMAIL_MESSAGE
         )
+    }
+
+    @Test
+    fun `given an apiService returns a drive item, when creating a file, then return an OmhStorageEntity`() {
+        // Arrange
+        every { apiService.createNewFile(any(), any(), any()) } returns driveItem
+        every { driveItemToOmhStorageEntity(any()) } returns omhStorageEntity
+
+        // Act
+        val result = repository.createFile(TEST_FILE_NAME, TEST_FILE_EXTENSION, TEST_FILE_PARENT_ID)
+
+        // Assert
+        assertEquals(omhStorageEntity, result)
+    }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given an apiService returns null, when creating a file, then an ApiException is thrown`() {
+        // Arrange
+        every { apiService.createNewFile(any(), any(), any()) } returns null
+
+        // Act & Assert
+        repository.createFile(TEST_FILE_NAME, TEST_FILE_EXTENSION, TEST_FILE_PARENT_ID)
+    }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given an apiService throws an exception, when creating a file, then an ApiException is thrown`() {
+        // Arrange
+        every { apiService.createNewFile(any(), any(), any()) } throws OmhStorageException.ApiException()
+
+        // Act & Assert
+        repository.createFile(TEST_FILE_NAME, TEST_FILE_EXTENSION, TEST_FILE_PARENT_ID)
+    }
+
+    @Test
+    fun `given an apiService returns a driveItem response, when creating a folder, then return an OmhStorageEntity`() = runTest {
+        // Arrange
+        every { apiService.driveId } returns "driveId"
+        coEvery { oneDriveRestApiService.createFolder(any(), any(), any()) } returns Response.success(driveItemResponse)
+        every { driveItemResponseToOmhStorageEntity(any()) } returns omhStorageEntity
+
+        // Act
+        val result = repository.createFolder(TEST_FOLDER_NAME, TEST_FOLDER_PARENT_ID)
+
+        // Assert
+        assertEquals(omhStorageEntity, result)
+    }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given an apiService returns null, when creating a folder, then an ApiException is thrown`() = runTest {
+        // Arrange
+        every { apiService.driveId } returns "driveId"
+        coEvery { oneDriveRestApiService.createFolder(any(), any(), any()) } returns Response.success(null)
+
+        // Act & Assert
+        repository.createFolder(TEST_FOLDER_NAME, TEST_FOLDER_PARENT_ID)
+    }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given an apiService return error response, when creating a folder, then an ApiException is thrown`() = runTest {
+        // Arrange
+        every { apiService.driveId } returns "driveId"
+        coEvery { oneDriveRestApiService.createFolder(any(), any(), any()) } returns Response.error(500, responseBody)
+
+        // Act & Assert
+        repository.createFolder(TEST_FOLDER_NAME, TEST_FOLDER_PARENT_ID)
     }
 }
