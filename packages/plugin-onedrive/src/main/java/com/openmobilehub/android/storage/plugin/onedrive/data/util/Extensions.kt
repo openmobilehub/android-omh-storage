@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit.body
+package com.openmobilehub.android.storage.plugin.onedrive.data.util
 
-import androidx.annotation.Keep
-import kotlinx.serialization.SerialName
+import com.openmobilehub.android.storage.core.model.OmhStorageException
+import retrofit2.HttpException
+import retrofit2.Response
 
-@Keep
-data class CreateFileRequestBody(
-    val name: String,
-    val file: Map<String, Any>,
-//    val content: String,
-    @SerialName("@odata.type") val odataType: String = "#microsoft.graph.driveItem"
-)
+fun <T> Response<T>.toApiException(): OmhStorageException.ApiException =
+    OmhStorageException.ApiException(code(), errorBody()?.string(), HttpException(this))

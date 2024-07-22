@@ -49,7 +49,7 @@ import java.io.FileInputStream
 import java.io.InputStream
 import java.net.URI
 
-class OneDriveApiServiceTest {
+class OneDriveRestApiServiceTest {
 
     @MockK
     private lateinit var driveItem: DriveItem

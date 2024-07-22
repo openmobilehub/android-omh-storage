@@ -6,6 +6,11 @@ android {
     namespace = "com.openmobilehub.android.storage.plugin.onedrive"
     defaultConfig {
         minSdk = 26
+        buildConfigField(
+            type = "String",
+            name = "ONEDRIVE_API_URL",
+            value = getRequiredValueFromEnvOrProperties("oneDriveStorageUrl")
+        )
     }
 }
 

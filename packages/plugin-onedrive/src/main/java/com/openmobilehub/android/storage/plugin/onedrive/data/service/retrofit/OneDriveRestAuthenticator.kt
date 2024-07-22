@@ -21,14 +21,14 @@ import okhttp3.Request
 import okhttp3.Response
 import okhttp3.Route
 
-internal class MsGraphAuthenticator(private val accessToken: String) : Authenticator {
+internal class OneDriveRestAuthenticator(private val accessToken: String) : Authenticator {
 
     override fun authenticate(route: Route?, response: Response): Request {
         return response.request
             .newBuilder()
             .header(
-                name = MsGraphApiServiceProvider.HEADER_AUTHORIZATION_NAME,
-                value = MsGraphApiServiceProvider.BEARER.format(accessToken)
+                name = OneDriveRestApiServiceProvider.HEADER_AUTHORIZATION_NAME,
+                value = OneDriveRestApiServiceProvider.BEARER.format(accessToken)
             )
             .build()
     }

@@ -16,31 +16,32 @@
 
 package com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit
 
+import com.openmobilehub.android.storage.plugin.onedrive.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
 
-class MsGraphApiServiceProvider(private val accessToken: String) {
+class OneDriveRestApiServiceProvider(private val accessToken: String) {
 
     companion object {
         internal const val HEADER_AUTHORIZATION_NAME = "Authorization"
         internal const val BEARER = "Bearer %s"
 
-        private var instance: MsGraphApiServiceProvider? = null
+        private var instance: OneDriveRestApiServiceProvider? = null
 
-        internal fun getInstance(accessToken: String): MsGraphApiServiceProvider {
+        internal fun getInstance(accessToken: String): OneDriveRestApiServiceProvider {
             if (instance == null) {
-                instance = MsGraphApiServiceProvider(accessToken)
+                instance = OneDriveRestApiServiceProvider(accessToken)
             }
 
             return instance!!
         }
     }
 
-    private var apiService: MsGraphApiService? = null
+    private var apiService: OneDriveRestApiService? = null
 
-    fun getGoogleStorageApiService(): MsGraphApiService {
+    fun getOneDriveApiService(): OneDriveRestApiService {
         if (apiService != null) {
             return apiService!!
         }
@@ -48,16 +49,16 @@ class MsGraphApiServiceProvider(private val accessToken: String) {
         val retrofit = Retrofit.Builder()
             .client(createOkHttpClient())
             .addConverterFactory(createConverterFactory())
-//            .baseUrl(BuildConfig.G_STORAGE_URL)
-            .baseUrl("https://graph.microsoft.com/v1.0/")
+            .baseUrl(BuildConfig.ONEDRIVE_API_URL)
             .build()
 
-        apiService = retrofit.create(MsGraphApiService::class.java)
+        apiService = retrofit.create(OneDriveRestApiService::class.java)
         return apiService!!
     }
 
     private fun createOkHttpClient(): OkHttpClient {
-        val authenticator = MsGraphAuthenticator(accessToken)
+        val authenticator = OneDriveRestAuthenticator(accessToken)
+
         return OkHttpClient.Builder()
             .addInterceptor { chain ->
                 val request = setupRequestInterceptor(chain)

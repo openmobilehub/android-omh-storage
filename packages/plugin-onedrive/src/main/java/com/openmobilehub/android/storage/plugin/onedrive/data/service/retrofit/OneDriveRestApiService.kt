@@ -24,7 +24,7 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 @Suppress("TooManyFunctions")
-interface MsGraphApiService {
+interface OneDriveRestApiService {
 
     companion object {
         private const val DRIVES_PARTICLE = "drives"

@@ -27,13 +27,13 @@ import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
-import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemResponseToOmhEntity
+import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemResponseToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.onedrive.data.repository.OneDriveFileRepository
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiClient
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiService
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveAuthProvider
-import com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit.MsGraphApiServiceProvider
+import com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit.OneDriveRestApiServiceProvider
 import java.io.ByteArrayOutputStream
 import java.io.File
 
@@ -54,13 +54,14 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
             val apiService = OneDriveApiService(apiClient)
             val driveItemToOmhStorageEntity =
                 DriveItemToOmhStorageEntity(MimeTypeMap.getSingleton())
-            val driveItemResponseToOmhEntity = DriveItemResponseToOmhEntity(MimeTypeMap.getSingleton())
+            val driveItemResponseToOmhEntity = DriveItemResponseToOmhStorageEntity(MimeTypeMap.getSingleton())
 
-            val retrofitClient = MsGraphApiServiceProvider.getInstance(accessToken)
+            val oneDriveRestApiServiceProvider = OneDriveRestApiServiceProvider.getInstance(accessToken)
+            val oneDriveRestApiService = oneDriveRestApiServiceProvider.getOneDriveApiService()
 
             val repository = OneDriveFileRepository(
                 apiService,
-                retrofitClient,
+                oneDriveRestApiService,
                 driveItemToOmhStorageEntity,
                 driveItemResponseToOmhEntity
             )
@@ -81,12 +82,14 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
         return emptyList()
     }
 
-    override suspend fun createFile(
+    override suspend fun createFileWithMimeType(
         name: String,
         mimeType: String,
         parentId: String
     ): OmhStorageEntity? {
-        throw UnsupportedOperationException("Create file with mimeType is not supported in OneDrive.")
+        throw UnsupportedOperationException(
+            "OneDrive does not support creating files with mime type. Use createFileWithExtension instead."
+        )
     }
 
     override suspend fun createFileWithExtension(

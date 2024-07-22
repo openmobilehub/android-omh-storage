@@ -67,13 +67,14 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         return repository.search(query)
     }
 
-    override suspend fun createFile(
+    override suspend fun createFileWithMimeType(
         name: String,
         mimeType: String,
         parentId: String
     ): OmhStorageEntity? {
-        // To be implemented
-        return null
+        throw UnsupportedOperationException(
+            "Dropbox does not support creating files with mime types. Use createFileWithExtension instead."
+        )
     }
 
     override suspend fun createFileWithExtension(

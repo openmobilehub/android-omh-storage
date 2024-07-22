@@ -29,13 +29,13 @@ import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.plugin.onedrive.OneDriveConstants.WRITE_ROLE
-import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemResponseToOmhEntity
+import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemResponseToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.toDriveRecipient
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.toOmhPermission
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.toOmhVersion
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiService
-import com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit.MsGraphApiServiceProvider
+import com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit.OneDriveRestApiServiceProvider
 import com.openmobilehub.android.storage.plugin.onedrive.data.util.toByteArrayOutputStream
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_EMAIL_MESSAGE
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_ID
@@ -75,13 +75,13 @@ class OneDriveFileRepositoryTest {
     @MockK
     private lateinit var apiService: OneDriveApiService
 
-    @MockK lateinit var retrofitClient: MsGraphApiServiceProvider
+    @MockK lateinit var retrofitClient: OneDriveRestApiServiceProvider
 
     @MockK
     private lateinit var driveItemToOmhStorageEntity: DriveItemToOmhStorageEntity
 
     @MockK
-    private lateinit var driveItemResponseToOmhEntity: DriveItemResponseToOmhEntity
+    private lateinit var driveItemResponseToOmhEntity: DriveItemResponseToOmhStorageEntity
 
     @MockK(relaxed = true)
     private lateinit var file: File

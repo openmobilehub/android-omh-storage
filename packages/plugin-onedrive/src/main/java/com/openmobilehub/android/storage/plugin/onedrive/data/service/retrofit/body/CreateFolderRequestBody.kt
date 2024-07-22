@@ -21,5 +21,5 @@ import androidx.annotation.Keep
 @Keep
 data class CreateFolderRequestBody(
     val name: String,
-    val folder: Map<String, Any>,
+    val folder: Map<String, Any>? = emptyMap(),
 )

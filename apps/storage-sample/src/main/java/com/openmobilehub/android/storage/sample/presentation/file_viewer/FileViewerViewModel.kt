@@ -332,7 +332,7 @@ class FileViewerViewModel @Inject constructor(
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                omhStorageClient.createFile(event.name, event.mimeType, parentId)
+                omhStorageClient.createFileWithMimeType(event.name, event.mimeType, parentId)
                 refreshFileListEvent()
             } catch (exception: Exception) {
                 errorDialogMessage.postValue(exception.message)
