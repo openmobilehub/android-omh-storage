@@ -22,6 +22,7 @@ import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhIdentity
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
@@ -80,12 +81,12 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         return null
     }
 
-    override suspend fun deleteFile(id: String): Boolean {
-        return repository.deleteFile(id)
+    override suspend fun deleteFile(id: String) {
+        repository.deleteFile(id)
     }
 
-    override suspend fun permanentlyDeleteFile(id: String): Boolean {
-        throw OmhStorageException.NotSupportedException()
+    override suspend fun permanentlyDeleteFile(id: String) {
+        throw UnsupportedOperationException()
     }
 
     override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity? {
@@ -101,7 +102,7 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         fileId: String,
         exportedMimeType: String
     ): ByteArrayOutputStream {
-        throw OmhStorageException.NotSupportedException("Exporting files is not supported in Dropbox")
+        throw UnsupportedOperationException("Exporting files is not supported in Dropbox")
     }
 
     override suspend fun getWebUrl(fileId: String): String? {
@@ -137,9 +138,8 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         return repository.getFileMetadata(fileId)
     }
 
-    override suspend fun deletePermission(fileId: String, permissionId: String): Boolean {
+    override suspend fun deletePermission(fileId: String, permissionId: String) {
         // To be implemented
-        return true
     }
 
     override suspend fun createPermission(
@@ -149,7 +149,7 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         emailMessage: String?
     ): OmhPermission {
         // To be implemented
-        return OmhPermission.AnyonePermission("", OmhPermissionRole.READER)
+        return OmhPermission.IdentityPermission("", OmhPermissionRole.READER, OmhIdentity.Anyone, null)
     }
 
     override suspend fun updatePermission(
@@ -158,6 +158,6 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         role: OmhPermissionRole
     ): OmhPermission {
         // To be implemented
-        return OmhPermission.AnyonePermission("", OmhPermissionRole.READER)
+        return OmhPermission.IdentityPermission("", OmhPermissionRole.READER, OmhIdentity.Anyone, null)
     }
 }

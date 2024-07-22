@@ -21,10 +21,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
+import com.openmobilehub.android.storage.core.model.OmhIdentity
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.sample.R
+import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
+import com.openmobilehub.android.storage.sample.domain.repository.SessionRepository
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model.FilePermissionsViewAction
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model.FilePermissionsViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,7 +41,8 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class FilePermissionsViewModel @Inject constructor(
-    private val omhStorageClient: OmhStorageClient
+    private val omhStorageClient: OmhStorageClient,
+    sessionRepository: SessionRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(
         FilePermissionsViewState(
@@ -53,6 +57,13 @@ class FilePermissionsViewModel @Inject constructor(
     val action = _action.receiveAsFlow()
 
     private lateinit var fileId: String
+
+    private val isDeletingInheritedPermissionsSupported: Boolean =
+        when (sessionRepository.getStorageAuthProvider()) {
+            StorageAuthProvider.GOOGLE -> true
+            StorageAuthProvider.DROPBOX -> true
+            StorageAuthProvider.MICROSOFT -> false
+        }
 
     fun getPermissions(fileId: String) {
         this.fileId = fileId
@@ -92,13 +103,21 @@ class FilePermissionsViewModel @Inject constructor(
     }
 
     fun remove(permission: OmhPermission) = viewModelScope.launch(Dispatchers.IO) {
-        val message = if (omhStorageClient.deletePermission(fileId, permission.id)) {
-            R.string.permission_removed
-        } else {
-            R.string.permission_remove_error
+        if (permission.inheritedFromEntity != null && !isDeletingInheritedPermissionsSupported) {
+            showErrorDialog(
+                R.string.permission_remove_error,
+                UnsupportedOperationException("Removing inherited permissions is not supported by provider")
+            )
+            return@launch
         }
-        _action.send(FilePermissionsViewAction.ShowToast(message))
-        getPermissions()
+
+        try {
+            omhStorageClient.deletePermission(fileId, permission.id)
+            _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_removed))
+            getPermissions()
+        } catch (exception: OmhStorageException.ApiException) {
+            showErrorDialog(R.string.permission_remove_error, exception)
+        }
     }
 
     fun create(
@@ -112,7 +131,7 @@ class FilePermissionsViewModel @Inject constructor(
                 fileId,
                 permission,
                 sendNotificationEmail,
-                emailMessage
+                emailMessage?.ifBlank { null }
             )
             _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_created))
         } catch (exception: OmhStorageException.ApiException) {
@@ -134,7 +153,7 @@ class FilePermissionsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun showErrorDialog(@StringRes title: Int, exception: OmhStorageException) {
+    private suspend fun showErrorDialog(@StringRes title: Int, exception: Exception) {
         _action.send(
             FilePermissionsViewAction.ShowErrorDialog(
                 title,
@@ -146,18 +165,23 @@ class FilePermissionsViewModel @Inject constructor(
 
 @Suppress("MagicNumber")
 private fun OmhPermission.orderByType(): Int = when (this) {
-    is OmhPermission.AnyonePermission -> 0
-    is OmhPermission.DomainPermission -> 1
-    is OmhPermission.GroupPermission -> 2
-    is OmhPermission.UserPermission -> 3
+    is OmhPermission.IdentityPermission -> this.orderByIdentity()
+}
+
+@Suppress("MagicNumber")
+private fun OmhPermission.IdentityPermission.orderByIdentity(): Int = when (this.identity) {
+    is OmhIdentity.Application -> 0
+    is OmhIdentity.Device -> 1
+    is OmhIdentity.Anyone -> 2
+    is OmhIdentity.Domain -> 3
+    is OmhIdentity.Group -> 4
+    is OmhIdentity.User -> 5
 }
 
 @Suppress("MagicNumber")
 private fun OmhPermission.orderRole(): Int = when (this.role) {
     OmhPermissionRole.OWNER -> 0
-    OmhPermissionRole.ORGANIZER -> 1
-    OmhPermissionRole.FILE_ORGANIZER -> 2
-    OmhPermissionRole.WRITER -> 3
-    OmhPermissionRole.COMMENTER -> 4
-    OmhPermissionRole.READER -> 5
+    OmhPermissionRole.WRITER -> 1
+    OmhPermissionRole.COMMENTER -> 2
+    OmhPermissionRole.READER -> 3
 }

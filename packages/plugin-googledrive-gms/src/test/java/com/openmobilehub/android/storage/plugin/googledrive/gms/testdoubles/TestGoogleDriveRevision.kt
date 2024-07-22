@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.gms.data.extension
+package com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles
 
-import com.google.api.client.http.HttpResponseException
-import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.google.api.client.util.DateTime
+import com.google.api.services.drive.model.Revision
+import io.mockk.every
 
-fun HttpResponseException.toApiException(): OmhStorageException.ApiException {
-    return OmhStorageException.ApiException(statusCode, content, this)
+fun Revision.setUpMock() {
+    every { id } returns TEST_VERSION_ID
+    every { modifiedTime } returns DateTime(TEST_VERSION_FILE_MODIFIED_TIME)
 }

@@ -16,16 +16,17 @@
 
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository
 
-import android.webkit.MimeTypeMap
+import androidx.annotation.VisibleForTesting
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
-
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
+import com.openmobilehub.android.storage.core.utils.toInputStream
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.LocalFileToMimeType
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toCreateRequestBody
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toFileList
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toOmhFileVersions
@@ -36,11 +37,11 @@ import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.t
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.GoogleStorageApiService
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body.CreateFileRequestBody
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit.GoogleStorageApiServiceProvider
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.isNotSuccessful
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.toApiException
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.toByteArrayOutputStream
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.toOmhStorageEntityMetadata
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
@@ -50,17 +51,23 @@ import java.io.File
 
 @Suppress("TooManyFunctions")
 internal class NonGmsFileRepository(
-    private val retrofitImpl: GoogleStorageApiServiceProvider
+    private val retrofitImpl: GoogleStorageApiServiceProvider,
+    private val localFileToMimeType: LocalFileToMimeType
 ) {
 
     companion object {
         private const val FILE_NAME_KEY = "name"
         private const val FILE_PARENTS_KEY = "parents"
         private const val FILE_TRASHED_KEY = "trashed"
-        private const val ANY_MIME_TYPE = "*/*"
         private const val MEDIA = "media"
 
+        private const val LOCATION_HEADER = "Location"
+
         private val JSON_MIME_TYPE = "application/json".toMediaTypeOrNull()
+
+        private const val UPLOAD_CHUNK_SIZE = 1024 * 1024 * 10 // 10MB
+        private const val DEFAULT_UPLOAD_MIME_TYPE = "application/octet-stream"
+        private const val RESUME_INCOMPLETE_STATUS_CODE = 308
     }
 
     suspend fun getFilesList(parentId: String): List<OmhStorageEntity> {
@@ -99,7 +106,7 @@ internal class NonGmsFileRepository(
         return if (response.isSuccessful) {
             response.body()?.toOmhStorageEntity()
         } else {
-            null
+            throw response.toApiException()
         }
     }
 
@@ -107,17 +114,19 @@ internal class NonGmsFileRepository(
         return createFile(name, GoogleDriveNonGmsConstants.FOLDER_MIME_TYPE, parentId)
     }
 
-    suspend fun permanentlyDeleteFile(fileId: String): Boolean {
+    suspend fun permanentlyDeleteFile(fileId: String) {
         val response = retrofitImpl
             .getGoogleStorageApiService()
             .deleteFile(
                 fileId = fileId
             )
 
-        return response.isSuccessful
+        if (response.isNotSuccessful) {
+            throw response.toApiException()
+        }
     }
 
-    suspend fun deleteFile(fileId: String): Boolean {
+    suspend fun deleteFile(fileId: String) {
         val jsonMetaData = JSONObject().apply {
             put(FILE_TRASHED_KEY, true)
         }
@@ -126,20 +135,24 @@ internal class NonGmsFileRepository(
         val response = retrofitImpl
             .getGoogleStorageApiService().updateMetaData(jsonRequestBody, fileId)
 
-        return response.isSuccessful
+        if (response.isNotSuccessful) {
+            throw response.toApiException()
+        }
     }
 
     suspend fun uploadFile(
         localFileToUpload: File,
         parentId: String?
     ): OmhStorageEntity? {
-        val stringMimeType = MimeTypeMap
-            .getSingleton()
-            .getMimeTypeFromExtension(localFileToUpload.extension)
-            ?: ANY_MIME_TYPE
+        val uploadUrl = initializeResumableUpload(localFileToUpload, parentId)
+        return uploadFile(uploadUrl, localFileToUpload)
+    }
 
-        val mimeType = stringMimeType.toMediaTypeOrNull()
-        val requestFile = localFileToUpload.asRequestBody(mimeType)
+    @VisibleForTesting
+    suspend fun initializeResumableUpload(
+        localFileToUpload: File,
+        parentId: String?
+    ): String {
         val parentsList = if (parentId.isNullOrBlank()) {
             emptyList()
         } else {
@@ -153,18 +166,74 @@ internal class NonGmsFileRepository(
         }
 
         val jsonRequestBody = jsonMetaData.toString().toRequestBody(JSON_MIME_TYPE)
-        val filePart =
-            MultipartBody.Part.createFormData(FILE_NAME_KEY, localFileToUpload.name, requestFile)
 
         val response = retrofitImpl
             .getGoogleStorageApiService()
-            .uploadFile(jsonRequestBody, filePart)
+            .postResumableUpload(jsonRequestBody)
 
-        return if (response.isSuccessful) {
-            response.body()?.toOmhStorageEntity()
-        } else {
-            null
+        if (!response.isSuccessful) {
+            throw response.toApiException()
         }
+
+        return response.headers()[LOCATION_HEADER]
+            ?: throw OmhStorageException.ApiException(
+                message = "Location header is missing from the response"
+            )
+    }
+
+    @VisibleForTesting
+    suspend fun uploadFile(
+        uploadUrl: String,
+        file: File,
+    ): OmhStorageEntity? {
+        val fileLength = file.length()
+        val inputStream = file.toInputStream()
+        var uploadedBytes: Long = 0
+
+        inputStream.use { stream ->
+            while (uploadedBytes < fileLength) {
+                val remainingBytes = fileLength - uploadedBytes
+                val bytesToRead =
+                    if (remainingBytes < UPLOAD_CHUNK_SIZE) remainingBytes else UPLOAD_CHUNK_SIZE
+
+                val buffer = ByteArray(bytesToRead.toInt())
+                val bytesRead = stream.read(buffer, 0, bytesToRead.toInt())
+                if (bytesRead == -1) break
+
+                val mimeType = localFileToMimeType(file) ?: DEFAULT_UPLOAD_MIME_TYPE
+
+                val fileChunk = buffer.toRequestBody(
+                    mimeType.toMediaTypeOrNull(),
+                    0,
+                )
+
+                val contentRange =
+                    "bytes $uploadedBytes-${uploadedBytes + bytesRead - 1}/$fileLength"
+                val response = retrofitImpl.getGoogleStorageApiService().uploadFileChunk(
+                    uploadUrl,
+                    bytesRead.toLong(),
+                    contentRange,
+                    fileChunk
+                )
+
+                when {
+                    response.isSuccessful -> return response.body()?.toOmhStorageEntity()
+                        ?: throw OmhStorageException.ApiException(
+                            message = "Failed to map response to OmhStorageEntity"
+                        )
+
+                    response.code() == RESUME_INCOMPLETE_STATUS_CODE -> {
+                        uploadedBytes += bytesRead
+                    }
+
+                    else -> throw OmhStorageException.ApiException(
+                        message = "Failed to upload file chunk",
+                        cause = response.toApiException()
+                    )
+                }
+            }
+        }
+        return null
     }
 
     suspend fun downloadFile(fileId: String): ByteArrayOutputStream {
@@ -275,7 +344,7 @@ internal class NonGmsFileRepository(
         }
     }
 
-    suspend fun deletePermission(fileId: String, permissionId: String): Boolean {
+    suspend fun deletePermission(fileId: String, permissionId: String) {
         val response = retrofitImpl
             .getGoogleStorageApiService()
             .deletePermission(
@@ -283,7 +352,9 @@ internal class NonGmsFileRepository(
                 permissionId = permissionId
             )
 
-        return response.isSuccessful
+        if (response.isNotSuccessful) {
+            throw response.toApiException()
+        }
     }
 
     suspend fun updatePermission(
@@ -351,7 +422,6 @@ internal class NonGmsFileRepository(
         }
     }
 
-    @Suppress("SwallowedException")
     suspend fun getWebUrl(fileId: String): String? {
         val response = retrofitImpl
             .getGoogleStorageApiService()

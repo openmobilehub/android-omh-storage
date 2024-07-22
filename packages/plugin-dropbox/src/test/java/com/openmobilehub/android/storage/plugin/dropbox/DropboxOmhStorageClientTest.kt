@@ -191,7 +191,7 @@ internal class DropboxOmhStorageClientTest {
     @Test
     fun `given a repository, when exporting a file, throw OmhStorageException_NotSupportedException `() {
         // Act & Assert
-        assertThrows(OmhStorageException.NotSupportedException::class.java) {
+        assertThrows(UnsupportedOperationException::class.java) {
             runTest {
                 client.exportFile(TEST_FILE_ID, TEST_FILE_MIME_TYPE)
             }
@@ -224,21 +224,18 @@ internal class DropboxOmhStorageClientTest {
     }
 
     @Test
-    fun `given a repository, when deleting a file, then return delete file result`() = runTest {
+    fun `given a repository, when deleting a file succeeds, then it succeeds`() = runTest {
         // Arrange
-        every { repository.deleteFile(any()) } returns true
+        every { repository.deleteFile(any()) } returns Unit
 
-        // Act
-        val result = client.deleteFile(TEST_FILE_ID)
-
-        // Assert
-        assertEquals(true, result)
+        // Act & Assert
+        client.deleteFile(TEST_FILE_ID)
     }
 
     @Test
     fun `given a repository, when permanently deleting a file, then return throw OmhStorageException_NotSupportedException`() {
         // Act & Assert
-        assertThrows(OmhStorageException.NotSupportedException::class.java) {
+        assertThrows(UnsupportedOperationException::class.java) {
             runTest {
                 client.permanentlyDeleteFile(TEST_FILE_ID)
             }

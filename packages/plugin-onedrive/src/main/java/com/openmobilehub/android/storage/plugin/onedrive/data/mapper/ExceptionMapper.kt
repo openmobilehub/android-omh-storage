@@ -16,14 +16,12 @@
 
 package com.openmobilehub.android.storage.plugin.onedrive.data.mapper
 
-import com.microsoft.graph.models.DriveItemVersion
-import com.openmobilehub.android.storage.core.model.OmhFileVersion
-import java.util.Date
+import com.microsoft.kiota.ApiException
+import com.openmobilehub.android.storage.core.model.OmhStorageException
 
-fun DriveItemVersion.toOmhVersion(fileId: String): OmhFileVersion {
-    return OmhFileVersion(
-        fileId,
-        id,
-        Date.from(lastModifiedDateTime.toInstant())
-    )
+object ExceptionMapper {
+    // Note that extensions function couldn't be used here due to SwallowedException warning:
+    // https://github.com/detekt/detekt/issues/4520
+    fun toOmhApiException(exception: ApiException) =
+        OmhStorageException.ApiException(exception.responseStatusCode, exception.message, exception)
 }

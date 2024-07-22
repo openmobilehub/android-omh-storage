@@ -16,6 +16,7 @@
 
 package com.openmobilehub.android.storage.plugin.googledrive.nongms
 
+import android.webkit.MimeTypeMap
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.auth.core.OmhCredentials
 import com.openmobilehub.android.storage.core.OmhStorageClient
@@ -26,6 +27,7 @@ import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.LocalFileToMimeType
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.NonGmsFileRepository
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit.GoogleStorageApiServiceProvider
 import java.io.ByteArrayOutputStream
@@ -44,8 +46,8 @@ internal class GoogleDriveNonGmsOmhStorageClient private constructor(
                 ?: throw OmhStorageException.InvalidCredentialsException()
 
             val retrofitImpl = GoogleStorageApiServiceProvider.getInstance(omhCredentials)
-
-            val fileRepository = NonGmsFileRepository(retrofitImpl)
+            val localFileToMimeType = LocalFileToMimeType(MimeTypeMap.getSingleton())
+            val fileRepository = NonGmsFileRepository(retrofitImpl, localFileToMimeType)
 
             return GoogleDriveNonGmsOmhStorageClient(authClient, fileRepository)
         }
@@ -71,15 +73,15 @@ internal class GoogleDriveNonGmsOmhStorageClient private constructor(
     }
 
     override suspend fun createFolder(name: String, parentId: String): OmhStorageEntity? {
-        return  fileRepository.createFolder(name, parentId)
+        return fileRepository.createFolder(name, parentId)
     }
 
-    override suspend fun deleteFile(id: String): Boolean {
-        return fileRepository.deleteFile(id)
+    override suspend fun deleteFile(id: String) {
+        fileRepository.deleteFile(id)
     }
 
-    override suspend fun permanentlyDeleteFile(id: String): Boolean {
-        return fileRepository.permanentlyDeleteFile(id)
+    override suspend fun permanentlyDeleteFile(id: String) {
+        fileRepository.permanentlyDeleteFile(id)
     }
 
     override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity? {
@@ -119,8 +121,8 @@ internal class GoogleDriveNonGmsOmhStorageClient private constructor(
         return fileRepository.getFilePermissions(fileId)
     }
 
-    override suspend fun deletePermission(fileId: String, permissionId: String): Boolean {
-        return fileRepository.deletePermission(fileId, permissionId)
+    override suspend fun deletePermission(fileId: String, permissionId: String) {
+        fileRepository.deletePermission(fileId, permissionId)
     }
 
     override suspend fun updatePermission(
@@ -137,7 +139,12 @@ internal class GoogleDriveNonGmsOmhStorageClient private constructor(
         sendNotificationEmail: Boolean,
         emailMessage: String?
     ): OmhPermission {
-        return fileRepository.createPermission(fileId, permission, sendNotificationEmail, emailMessage)
+        return fileRepository.createPermission(
+            fileId,
+            permission,
+            sendNotificationEmail,
+            emailMessage
+        )
     }
 
     override suspend fun getWebUrl(fileId: String): String? {

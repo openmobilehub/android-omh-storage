@@ -16,11 +16,13 @@
 
 package com.openmobilehub.android.storage.plugin.dropbox.data.repository
 
+import com.dropbox.core.DbxApiException
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.core.utils.toInputStream
+import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.ExceptionMapper
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.MetadataToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.toOmhVersion
 import com.openmobilehub.android.storage.plugin.dropbox.data.service.DropboxApiService
@@ -32,64 +34,78 @@ internal class DropboxFileRepository(
     private val metadataToOmhStorageEntity: MetadataToOmhStorageEntity
 ) {
 
-    fun getFilesList(parentId: String): List<OmhStorageEntity> {
+    fun getFilesList(parentId: String): List<OmhStorageEntity> = try {
         val dropboxFiles = apiService.getFilesList(parentId)
-        return dropboxFiles.entries.mapNotNull {
+        dropboxFiles.entries.mapNotNull {
             metadataToOmhStorageEntity(it)
         }
+    } catch (exception: DbxApiException) {
+        throw ExceptionMapper.toOmhApiException(exception)
     }
 
-    fun uploadFile(localFileToUpload: File, parentId: String): OmhStorageEntity? {
+    fun uploadFile(localFileToUpload: File, parentId: String): OmhStorageEntity? = try {
         val inputStream = localFileToUpload.toInputStream()
 
         val path = "$parentId/${localFileToUpload.name}"
 
         val response = apiService.uploadFile(inputStream, path)
 
-        return metadataToOmhStorageEntity(response)
+        metadataToOmhStorageEntity(response)
+    } catch (exception: DbxApiException) {
+        throw ExceptionMapper.toOmhApiException(exception)
     }
 
-    fun downloadFile(fileId: String): ByteArrayOutputStream {
+    fun downloadFile(fileId: String): ByteArrayOutputStream = try {
         val outputStream = ByteArrayOutputStream()
         apiService.downloadFile(fileId, outputStream)
 
-        return outputStream
+        outputStream
+    } catch (exception: DbxApiException) {
+        throw ExceptionMapper.toOmhApiException(exception)
     }
 
-    fun getFileVersions(fileId: String): List<OmhFileVersion> {
+    fun getFileVersions(fileId: String): List<OmhFileVersion> = try {
         val revisions = apiService.getFileRevisions(fileId)
 
-        return revisions.entries.map {
+        revisions.entries.map {
             it.toOmhVersion()
         }
+    } catch (exception: DbxApiException) {
+        throw ExceptionMapper.toOmhApiException(exception)
     }
 
-    fun downloadFileVersion(versionId: String): ByteArrayOutputStream {
+    fun downloadFileVersion(versionId: String): ByteArrayOutputStream = try {
         val outputStream = ByteArrayOutputStream()
         apiService.downloadFileRevision(versionId, outputStream)
 
-        return outputStream
+        outputStream
+    } catch (exception: DbxApiException) {
+        throw ExceptionMapper.toOmhApiException(exception)
     }
 
-    fun deleteFile(fileId: String): Boolean {
+    fun deleteFile(fileId: String): Unit = try {
         apiService.deleteFile(fileId)
-
-        // It returns true if the file was deleted successfully, otherwise the method will throw an exception
-        return true
+        Unit
+    } catch (exception: DbxApiException) {
+        throw ExceptionMapper.toOmhApiException(exception)
     }
 
-    fun search(query: String): List<OmhStorageEntity> {
+    fun search(query: String): List<OmhStorageEntity> = try {
         val searchResults = apiService.search(query)
-        return searchResults.matches.mapNotNull {
+        searchResults.matches.mapNotNull {
             metadataToOmhStorageEntity(it.metadata.metadataValue)
         }
+    } catch (exception: DbxApiException) {
+        throw ExceptionMapper.toOmhApiException(exception)
     }
 
-    fun getFileMetadata(fileId: String): OmhStorageMetadata {
+    fun getFileMetadata(fileId: String): OmhStorageMetadata = try {
         val metadata = apiService.getFile(fileId)
         val omhStorageEntity = metadataToOmhStorageEntity(metadata)
             ?: throw OmhStorageException.ApiException(message = "Failed to get metadata for file with ID: $fileId")
 
-        return OmhStorageMetadata(omhStorageEntity, metadata)
+        OmhStorageMetadata(omhStorageEntity, metadata)
+    } catch (exception: DbxApiException) {
+        throw ExceptionMapper.toOmhApiException(exception)
     }
 }

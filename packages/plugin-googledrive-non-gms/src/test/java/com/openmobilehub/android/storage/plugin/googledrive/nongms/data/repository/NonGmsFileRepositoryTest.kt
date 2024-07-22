@@ -22,32 +22,35 @@ import android.webkit.MimeTypeMap
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_EMAIL_MESSAGE
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_FILE_ID
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_FILE_MIME_TYPE
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_FILE_NAME
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_FILE_PARENT_ID
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_PERMISSION_ID
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_VERSION_FILE_ID
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.TEST_VERSION_ID
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.commenterUpdatePermission
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.createCommenterPermission
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.createCommenterPermissionRequestBody
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.createOwnerPermission
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.createOwnerPermissionRequestBody
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.ownerUpdatePermission
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testFileListRemote
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testFileRemote
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testOmhFile
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testOmhPermission
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testOmhVersion
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testPermissionResponse
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testPermissionsListResponse
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testVersionListRemote
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles.testWebUrlResponse
+import com.openmobilehub.android.storage.core.utils.toInputStream
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.LocalFileToMimeType
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.GoogleStorageApiService
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit.GoogleStorageApiServiceProvider
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.toByteArrayOutputStream
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.TEST_EMAIL_MESSAGE
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.TEST_FILE_ID
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.TEST_FILE_MIME_TYPE
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.TEST_FILE_NAME
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.TEST_FILE_PARENT_ID
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.TEST_PERMISSION_ID
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.TEST_VERSION_FILE_ID
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.TEST_VERSION_ID
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.commenterUpdatePermission
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.createCommenterPermission
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.createCommenterPermissionRequestBody
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.createOwnerPermission
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.createOwnerPermissionRequestBody
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.ownerUpdatePermission
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.testFileListRemote
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.testFileRemote
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.testOmhFile
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.testOmhPermission
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.testOmhVersion
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.testPermissionResponse
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.testPermissionsListResponse
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.testVersionListRemote
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.testWebUrlResponse
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
@@ -58,6 +61,7 @@ import io.mockk.mockk
 import io.mockk.mockkStatic
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import okhttp3.Headers
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody
 import org.junit.After
@@ -66,11 +70,10 @@ import org.junit.Test
 import retrofit2.Response
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileInputStream
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
+@Suppress("LargeClass")
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class NonGmsFileRepositoryTest {
 
@@ -78,6 +81,7 @@ internal class NonGmsFileRepositoryTest {
         private const val FILE_PATH = "anyPath"
         private const val TEST_GET_FILE_RESPONSE_BODY_CONTENT =
             "{\"id\": \"123\", \"name\": \"fileName.txt\", \"createdTime\": \"2024-05-01T00:00:00.000Z\", \"modifiedTime\": \"2024-06-01T00:00:00.000Z\", \"parents\": [\"parentId\"], \"mimeType\": \"test/mime-type\", \"fileExtension\": \"txt\", \"size\": 10}"
+        private const val UPLOAD_URL = "https://upload.url"
     }
 
     @MockK(relaxed = true)
@@ -92,12 +96,25 @@ internal class NonGmsFileRepositoryTest {
     @MockK(relaxed = true)
     private lateinit var responseBody: ResponseBody
 
+    @MockK(relaxed = true)
+    private lateinit var file: File
+
+    @MockK(relaxed = true)
+    private lateinit var fileInputStream: FileInputStream
+
+    @MockK
+    private lateinit var localFileToMimeType: LocalFileToMimeType
+
     private lateinit var fileRepositoryImpl: NonGmsFileRepository
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
-        fileRepositoryImpl = NonGmsFileRepository(retrofitImpl)
+
+        mockkStatic("com.openmobilehub.android.storage.core.utils.FileExtensionsKt")
+        every { localFileToMimeType.invoke(any()) } returns TEST_FILE_MIME_TYPE
+
+        fileRepositoryImpl = NonGmsFileRepository(retrofitImpl, localFileToMimeType)
 
         every { retrofitImpl.getGoogleStorageApiService() } returns googleStorageApiService
         mockkStatic(MimeTypeMap::class)
@@ -141,41 +158,129 @@ internal class NonGmsFileRepositoryTest {
         }
 
     @Test
-    fun `given a fileId, when permanentlyDeleteFile is success, then true is returned`() = runTest {
-        coEvery { googleStorageApiService.deleteFile(any()) } returns Response.success(responseBody)
+    fun `given a fileId, when permanentlyDeleteFile is success, then exceptions is not thrown`() =
+        runTest {
+            coEvery { googleStorageApiService.deleteFile(any()) } returns Response.success(
+                responseBody
+            )
 
-        val result = fileRepositoryImpl.permanentlyDeleteFile(TEST_FILE_ID)
+            fileRepositoryImpl.permanentlyDeleteFile(TEST_FILE_ID)
 
-        assertTrue(result)
-        coVerify { googleStorageApiService.deleteFile(TEST_FILE_ID) }
-    }
+            coVerify { googleStorageApiService.deleteFile(TEST_FILE_ID) }
+        }
 
     @Test
-    fun `given a fileId, when deleteFile is success, then true is returned`() = runTest {
+    fun `given a fileId, when deleteFile is success, then exceptions is not thrown`() = runTest {
         coEvery { googleStorageApiService.updateMetaData(any(), any()) } returns Response.success(
             testFileRemote
         )
 
-        val result = fileRepositoryImpl.deleteFile(TEST_FILE_ID)
+        fileRepositoryImpl.deleteFile(TEST_FILE_ID)
 
-        assertTrue(result)
         coVerify { googleStorageApiService.updateMetaData(any(), TEST_FILE_ID) }
     }
 
     @Test
-    fun `given a File and a parentId, when uploadFile is success, then a OmhStorageEntity is returned`() =
+    fun `given a File and a parentId, when initializeResumableUpload is success and location header is present, then a upload url is returned`() =
         runTest {
             val localFileUpload: File = mockk()
             every { localFileUpload.name } returns TEST_FILE_NAME
             every { localFileUpload.path } returns FILE_PATH
-            coEvery { googleStorageApiService.uploadFile(any(), any()) } returns Response.success(
+            val headers = Headers.Builder().add("Location", UPLOAD_URL).build()
+
+            coEvery {
+                googleStorageApiService.postResumableUpload(
+                    any(),
+                    any()
+                )
+            } returns Response.success(
+                responseBody,
+                headers
+            )
+
+            val result =
+                fileRepositoryImpl.initializeResumableUpload(localFileUpload, TEST_FILE_PARENT_ID)
+
+            assertEquals(UPLOAD_URL, result)
+        }
+
+    @Test
+    fun `given valid uploadUrl and 1mb file, when uploadFile is called, then returns OmhStorageEntity`() =
+        runTest {
+            val fileSize = 1 * 1024 * 1024
+            every { file.length() } returns fileSize.toLong()
+
+            every { file.toInputStream() } returns fileInputStream
+            every { fileInputStream.read(any(), any(), any()) } returns fileSize
+
+            coEvery {
+                googleStorageApiService.uploadFileChunk(
+                    any(),
+                    any(),
+                    any(),
+                    any()
+                )
+            } returns Response.success(
                 testFileRemote
             )
 
-            val result = fileRepositoryImpl.uploadFile(localFileUpload, TEST_FILE_PARENT_ID)
+            val result = fileRepositoryImpl.uploadFile(UPLOAD_URL, file)
 
             assertEquals(testOmhFile, result)
-            coVerify { googleStorageApiService.uploadFile(any(), any()) }
+            coVerify(exactly = 1) {
+                googleStorageApiService.uploadFileChunk(
+                    any(),
+                    any(),
+                    any(),
+                    any()
+                )
+            }
+        }
+
+    @Test
+    fun `given valid uploadUrl and 15mb file, when uploadFile is called, then returns OmhStorageEntity`() =
+        runTest {
+            val fileSize = 15 * 1024 * 1024
+            every { file.length() } returns fileSize.toLong()
+
+            every { file.toInputStream() } returns fileInputStream
+            every { fileInputStream.read(any(), any(), any()) } returnsMany listOf(
+                10 * 1024 * 1024,
+                5 * 1024 * 1024,
+            )
+
+            // We cannot use Response.success or Response.error because the code is 308
+            val resumeIncompleteResponse = mockk<Response<FileRemoteResponse>>()
+            with(resumeIncompleteResponse) {
+                every { isSuccessful } returns false
+                every { code() } returns 308
+            }
+
+            coEvery {
+                googleStorageApiService.uploadFileChunk(
+                    any(),
+                    any(),
+                    any(),
+                    any()
+                )
+            } returnsMany listOf(
+                resumeIncompleteResponse,
+                Response.success(
+                    testFileRemote
+                )
+            )
+
+            val result = fileRepositoryImpl.uploadFile(UPLOAD_URL, file)
+
+            assertEquals(testOmhFile, result)
+            coVerify(exactly = 2) {
+                googleStorageApiService.uploadFileChunk(
+                    any(),
+                    any(),
+                    any(),
+                    any()
+                )
+            }
         }
 
     @Test
@@ -252,61 +357,126 @@ internal class NonGmsFileRepositoryTest {
             fileRepositoryImpl.getFilesList(TEST_FILE_PARENT_ID)
         }
 
-    @Test
-    fun `given a name, mimeType and a parentId, when createFile fails, then returns null`() =
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given a name, mimeType and a parentId, when createFile fails, then ApiException exceptions is thrown`() =
         runTest {
             coEvery { googleStorageApiService.createFile(any(), any()) } returns Response.error(
                 500,
                 responseBody
             )
-            val result = fileRepositoryImpl.createFile(
+            fileRepositoryImpl.createFile(
                 TEST_FILE_NAME,
                 TEST_FILE_MIME_TYPE,
                 TEST_FILE_PARENT_ID
             )
-
-            assertNull(result)
-            coVerify { googleStorageApiService.createFile(any(), any()) }
         }
 
-    @Test
-    fun `given a fileId, when permanentlyDeleteFile fails, then false is returned`() = runTest {
-        coEvery { googleStorageApiService.deleteFile(any()) } returns Response.error(
-            500,
-            responseBody
-        )
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given a fileId, when permanentlyDeleteFile fails, then ApiException exceptions is thrown`() =
+        runTest {
+            coEvery { googleStorageApiService.deleteFile(any()) } returns Response.error(
+                500,
+                responseBody
+            )
 
-        val result = fileRepositoryImpl.permanentlyDeleteFile(TEST_FILE_ID)
+            fileRepositoryImpl.permanentlyDeleteFile(TEST_FILE_ID)
+        }
 
-        assertFalse(result)
-        coVerify { googleStorageApiService.deleteFile(TEST_FILE_ID) }
-    }
-
-    @Test
-    fun `given a fileId, when deleteFile fails, then false is returned`() = runTest {
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given a fileId, when deleteFile fails, then ApiException is thrown`() = runTest {
         coEvery { googleStorageApiService.updateMetaData(any(), any()) } returns Response.error(
             500,
             responseBody
         )
 
-        val result = fileRepositoryImpl.deleteFile(TEST_FILE_ID)
-
-        assertFalse(result)
-        coVerify { googleStorageApiService.updateMetaData(any(), TEST_FILE_ID) }
+        fileRepositoryImpl.deleteFile(TEST_FILE_ID)
     }
 
-    @Test
-    fun `given a File and a parentId, when uploadFile fails, then null is returned`() = runTest {
-        coEvery { googleStorageApiService.uploadFile(any(), any()) } returns Response.error(
-            500,
-            responseBody
-        )
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given a File and a parentId, when initializeResumableUpload is success, but location header is not present, then an OmhApiException is thrown`() =
+        runTest {
+            val localFileUpload: File = mockk()
+            every { localFileUpload.name } returns TEST_FILE_NAME
+            every { localFileUpload.path } returns FILE_PATH
 
-        val result = fileRepositoryImpl.uploadFile(File(FILE_PATH), TEST_FILE_PARENT_ID)
+            val headers = Headers.Builder().build() // No location header
 
-        assertNull(result)
-        coVerify { googleStorageApiService.uploadFile(any(), any()) }
-    }
+            coEvery {
+                googleStorageApiService.postResumableUpload(
+                    any(),
+                    any()
+                )
+            } returns Response.success(
+                responseBody,
+                headers
+            )
+
+            fileRepositoryImpl.initializeResumableUpload(localFileUpload, TEST_FILE_PARENT_ID)
+        }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given a File and a parentId, when initializeResumableUpload fails, then an OmhApiException is thrown`() =
+        runTest {
+            val localFileUpload: File = mockk()
+            every { localFileUpload.name } returns TEST_FILE_NAME
+            every { localFileUpload.path } returns FILE_PATH
+
+            coEvery {
+                googleStorageApiService.postResumableUpload(
+                    any(),
+                    any()
+                )
+            } returns Response.error(500, responseBody)
+
+            fileRepositoryImpl.initializeResumableUpload(localFileUpload, TEST_FILE_PARENT_ID)
+        }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given valid uploadUrl and 1mb file, when uploadFile is success, but response cannot be parsed to OmhStorageEntity, then an OmhApiException is thrown`() =
+        runTest {
+            val fileSize = 1 * 1024 * 1024
+            every { file.length() } returns fileSize.toLong()
+
+            every { file.toInputStream() } returns fileInputStream
+            every { fileInputStream.read(any(), any(), any()) } returns fileSize
+
+            coEvery {
+                googleStorageApiService.uploadFileChunk(
+                    any(),
+                    any(),
+                    any(),
+                    any()
+                )
+            } returns Response.success(
+                null
+            )
+
+            fileRepositoryImpl.uploadFile(UPLOAD_URL, file)
+        }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given valid uploadUrl and 1mb file, when uploadFile fails, then an OmhApiException is thrown`() =
+        runTest {
+            val fileSize = 1 * 1024 * 1024
+            every { file.length() } returns fileSize.toLong()
+
+            every { file.toInputStream() } returns fileInputStream
+            every { fileInputStream.read(any(), any(), any()) } returns fileSize
+
+            coEvery {
+                googleStorageApiService.uploadFileChunk(
+                    any(),
+                    any(),
+                    any(),
+                    any()
+                )
+            } returns Response.error(
+                500,
+                responseBody
+            )
+
+            fileRepositoryImpl.uploadFile(UPLOAD_URL, file)
+        }
 
     @Test(expected = OmhStorageException.ApiException::class)
     fun `given a fileId, when downloadFile fails, then a ApiException is thrown`() =
@@ -469,7 +639,7 @@ internal class NonGmsFileRepositoryTest {
         }
 
     @Test
-    fun `given a fileId and permissionId, when deletePermission is success, then true is returned`() =
+    fun `given a fileId and permissionId, when deletePermission is success, then exception is not thrown`() =
         runTest {
             coEvery {
                 googleStorageApiService.deletePermission(
@@ -478,14 +648,13 @@ internal class NonGmsFileRepositoryTest {
                 )
             } returns Response.success(responseBody)
 
-            val result = fileRepositoryImpl.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
+            fileRepositoryImpl.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
 
-            assertTrue(result)
             coVerify { googleStorageApiService.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID) }
         }
 
-    @Test
-    fun `given a fileId and permissionId, when deletePermission fails, then false is returned`() =
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given a fileId and permissionId, when deletePermission fails, then ApiException is thrown`() =
         runTest {
             coEvery {
                 googleStorageApiService.deletePermission(
@@ -494,10 +663,7 @@ internal class NonGmsFileRepositoryTest {
                 )
             } returns Response.error(500, responseBody)
 
-            val result = fileRepositoryImpl.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
-
-            assertFalse(result)
-            coVerify { googleStorageApiService.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID) }
+            fileRepositoryImpl.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
         }
 
     @Test

@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles
+package com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles
 
-import com.google.api.client.util.DateTime
-import com.google.api.services.drive.model.Revision
-import io.mockk.every
+import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.utils.fromRFC3339StringToDate
 
-fun Revision.setUpMock() {
-    every { id } returns TEST_VERSION_ID
-    every { modifiedTime } returns DateTime(TEST_VERSION_FILE_MODIFIED_TIME)
-}
+const val TEST_VERSION_FILE_ID = "123"
+const val TEST_VERSION_ID = "456"
+val TEST_VERSION_FILE_MODIFIED_TIME = TEST_FIRST_MAY_2024_RFC_3339.fromRFC3339StringToDate()!!
+
+val testOmhVersion = OmhFileVersion(
+    TEST_VERSION_FILE_ID,
+    TEST_VERSION_ID,
+    TEST_VERSION_FILE_MODIFIED_TIME
+)

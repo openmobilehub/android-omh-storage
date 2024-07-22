@@ -23,7 +23,10 @@ import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
+import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.sample.domain.model.FileType
+import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
+import com.openmobilehub.android.storage.sample.domain.repository.SessionRepository
 import com.openmobilehub.android.storage.sample.presentation.BaseViewModel
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.DisplayFileType
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewAction
@@ -57,7 +60,8 @@ import java.io.ByteArrayOutputStream
 @HiltViewModel
 class FileViewerViewModel @Inject constructor(
     private val authClient: OmhAuthClient,
-    private val omhStorageClient: OmhStorageClient
+    private val omhStorageClient: OmhStorageClient,
+    sessionRepository: SessionRepository
 ) : BaseViewModel<FileViewerViewState, FileViewerViewEvent>() {
 
     companion object {
@@ -88,6 +92,13 @@ class FileViewerViewModel @Inject constructor(
     private val parentId = StackWithFlow(omhStorageClient.rootFolder)
     private var searchQuery: MutableStateFlow<String?> = MutableStateFlow(null)
     private var forceRefresh: MutableStateFlow<Int> = MutableStateFlow(0)
+
+    private val isPermanentlyDeleteSupported: Boolean =
+        when (sessionRepository.getStorageAuthProvider()) {
+            StorageAuthProvider.GOOGLE -> true
+            StorageAuthProvider.DROPBOX -> false
+            StorageAuthProvider.MICROSOFT -> false
+        }
 
     init {
         viewModelScope.launch {
@@ -371,10 +382,10 @@ class FileViewerViewModel @Inject constructor(
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val isSuccess = omhStorageClient.deleteFile(file.id)
-                handleDeleteSuccess(isSuccess, file)
+                omhStorageClient.deleteFile(file.id)
+                handleDeleteSuccess(file)
                 refreshFileListEvent()
-            } catch (exception: Exception) {
+            } catch (exception: OmhStorageException.ApiException) {
                 errorDialogMessage.postValue(exception.message)
                 toastMessage.postValue("ERROR: ${file.name} was NOT deleted")
                 exception.printStackTrace()
@@ -385,7 +396,11 @@ class FileViewerViewModel @Inject constructor(
     }
 
     private fun permanentlyDeleteFileEventClicked(event: FileViewerViewEvent.PermanentlyDeleteFileClicked) {
-        setState(FileViewerViewState.ShowPermanentlyDeleteDialog(event.file))
+        if (isPermanentlyDeleteSupported) {
+            setState(FileViewerViewState.ShowPermanentlyDeleteDialog(event.file))
+        } else {
+            toastMessage.postValue("Permanent deleting is not supported by provider")
+        }
     }
 
     private fun permanentlyDeleteFileEvent(event: FileViewerViewEvent.PermanentlyDeleteFile) {
@@ -395,10 +410,10 @@ class FileViewerViewModel @Inject constructor(
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val isSuccess = omhStorageClient.permanentlyDeleteFile(file.id)
-                handleDeleteSuccess(isSuccess, file)
+                omhStorageClient.permanentlyDeleteFile(file.id)
+                handleDeleteSuccess(file)
                 refreshFileListEvent()
-            } catch (exception: Exception) {
+            } catch (exception: OmhStorageException.ApiException) {
                 errorDialogMessage.postValue(exception.message)
                 toastMessage.postValue("ERROR: ${file.name} was NOT permanently deleted")
                 exception.printStackTrace()
@@ -408,14 +423,8 @@ class FileViewerViewModel @Inject constructor(
         }
     }
 
-    private fun handleDeleteSuccess(isSuccessful: Boolean, file: OmhStorageEntity) {
-        val toastText = if (isSuccessful) {
-            "${file.name} was successfully deleted"
-        } else {
-            "${file.name} was NOT deleted"
-        }
-
-        toastMessage.postValue(toastText)
+    private fun handleDeleteSuccess(file: OmhStorageEntity) {
+        toastMessage.postValue("${file.name} was successfully deleted")
     }
 
     private fun signOut() {

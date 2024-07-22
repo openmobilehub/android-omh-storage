@@ -79,12 +79,12 @@ internal class GoogleDriveGmsOmhStorageClient private constructor(
         return fileRepository.createFolder(name, parentId)
     }
 
-    override suspend fun deleteFile(id: String): Boolean {
-        return fileRepository.deleteFile(id)
+    override suspend fun deleteFile(id: String) {
+        fileRepository.deleteFile(id)
     }
 
-    override suspend fun permanentlyDeleteFile(id: String): Boolean {
-        return fileRepository.permanentlyDeleteFile(id)
+    override suspend fun permanentlyDeleteFile(id: String) {
+        fileRepository.permanentlyDeleteFile(id)
     }
 
     override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity? {
@@ -124,7 +124,7 @@ internal class GoogleDriveGmsOmhStorageClient private constructor(
         return fileRepository.getFilePermissions(fileId)
     }
 
-    override suspend fun deletePermission(fileId: String, permissionId: String): Boolean {
+    override suspend fun deletePermission(fileId: String, permissionId: String) {
         return fileRepository.deletePermission(fileId, permissionId)
     }
 

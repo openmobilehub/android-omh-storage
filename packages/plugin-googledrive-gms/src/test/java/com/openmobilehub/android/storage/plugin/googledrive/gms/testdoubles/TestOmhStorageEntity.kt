@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles
+package com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles
 
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.utils.fromRFC3339StringToDate
@@ -27,7 +27,7 @@ const val TEST_FILE_PARENT_ID = "parentId"
 const val TEST_FILE_MIME_TYPE = "test/mime-type"
 const val TEST_FILE_EXTENSION = "txt"
 const val TEST_FILE_SIZE = 10
-const val TEST_WEB_URL = "https://test.com/file_123"
+const val TEST_FILE_WEB_URL = "https://test.com/file_123"
 
 val testOmhFile: OmhStorageEntity.OmhFile = OmhStorageEntity.OmhFile(
     TEST_FILE_ID,

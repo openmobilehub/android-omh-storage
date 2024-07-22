@@ -18,8 +18,6 @@ package com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit.
 
 import androidx.annotation.Keep
 import kotlinx.serialization.SerialName
-import okhttp3.RequestBody
-import java.io.FileInputStream
 
 @Keep
 data class CreateFileRequestBody(

@@ -58,7 +58,12 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
 
             val retrofitClient = MsGraphApiServiceProvider.getInstance(accessToken)
 
-            val repository = OneDriveFileRepository(apiService, retrofitClient, driveItemToOmhStorageEntity, driveItemResponseToOmhEntity)
+            val repository = OneDriveFileRepository(
+                apiService,
+                retrofitClient,
+                driveItemToOmhStorageEntity,
+                driveItemResponseToOmhEntity
+            )
 
             return OneDriveOmhStorageClient(authClient, repository)
         }
@@ -88,12 +93,12 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
         return repository.createFolder(name, parentId)
     }
 
-    override suspend fun deleteFile(id: String): Boolean {
+    override suspend fun deleteFile(id: String) {
         return repository.deleteFile(id)
     }
 
-    override suspend fun permanentlyDeleteFile(id: String): Boolean {
-        throw OmhStorageException.NotSupportedException()
+    override suspend fun permanentlyDeleteFile(id: String) {
+        throw UnsupportedOperationException()
     }
 
     override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity? {
@@ -109,7 +114,7 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
         fileId: String,
         exportedMimeType: String
     ): ByteArrayOutputStream {
-        throw OmhStorageException.NotSupportedException("Exporting files is not supported in OneDrive.")
+        throw UnsupportedOperationException("Exporting files is not supported in OneDrive.")
     }
 
     override suspend fun updateFile(
@@ -132,17 +137,15 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
     }
 
     override suspend fun getFilePermissions(fileId: String): List<OmhPermission> {
-        // To be implemented
-        return emptyList()
+        return repository.getFilePermissions(fileId)
     }
 
-    override suspend fun getFileMetadata(fileId: String): OmhStorageMetadata {
+    override suspend fun getFileMetadata(fileId: String): OmhStorageMetadata? {
         return repository.getFileMetadata(fileId)
     }
 
-    override suspend fun deletePermission(fileId: String, permissionId: String): Boolean {
-        // To be implemented
-        return true
+    override suspend fun deletePermission(fileId: String, permissionId: String) {
+        return repository.deletePermission(fileId, permissionId)
     }
 
     override suspend fun updatePermission(
@@ -150,8 +153,7 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
         permissionId: String,
         role: OmhPermissionRole
     ): OmhPermission {
-        // To be implemented
-        return OmhPermission.AnyonePermission("", OmhPermissionRole.READER)
+        return repository.updatePermission(fileId, permissionId, role)
     }
 
     override suspend fun createPermission(
@@ -160,12 +162,10 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
         sendNotificationEmail: Boolean,
         emailMessage: String?
     ): OmhPermission {
-        // To be implemented
-        return OmhPermission.AnyonePermission("", OmhPermissionRole.READER)
+        return repository.createPermission(fileId, permission, sendNotificationEmail, emailMessage)
     }
 
     override suspend fun getWebUrl(fileId: String): String? {
-        // To be implemented
-        return null
+        return repository.getWebUrl(fileId)
     }
 }

@@ -18,3 +18,77 @@ Module plugin-dropbox
 </p>
 
 ---
+
+## Prerequisites
+
+Ensure you have the following packages installed before proceeding with the integration:
+
+- [`com.openmobilehub.android.storage:core:2.0.0`](https://miniature-adventure-4gle9ye.pages.github.io/docs/core)
+- [`com.openmobilehub.android.auth:core:2.0.2`](https://github.com/openmobilehub/android-omh-auth)
+
+## Installation
+
+To integrate the Dropbox storage provider into your Android project, follow these steps:
+
+### 1. Configure Maven Central repository
+
+Ensure Maven Central is included as a repository in your root **build.gradle** file:
+
+```gradle
+allprojects {
+  repositories {
+    mavenCentral()
+  }
+}
+```
+
+### 2. Add dependency for the Dropbox Drive storage provider
+
+Add the dependency for the Dropbox storage provider to your project's **build.gradle** file:
+
+```gradle
+dependencies {
+  implementation("com.openmobilehub.android.storage:plugin-dropbox-gms:2.0.0")
+}
+```
+
+## Configuration
+
+### Console App
+
+To access Dropbox APIs, follow these steps to obtain the **Client ID**:
+
+1. [Create a new app](https://developers.dropbox.com/oauth-guide) in [Dropbox Console](https://www.dropbox.com/developers/apps/create).
+2. Enable the `account_info.read`, `files.metadata.read`, `files.content.write` and `files.content.read` permission for your app.
+
+### Secrets
+
+To securely configure the Dropbox storage provider, add the following entry to your project's **local.properties** file:
+
+```bash
+DROPBOX_CLIENT_ID=<YOUR_DROPBOX_APP_KEY>
+```
+
+## Usage
+
+### Initializing
+
+To interact with the Dropbox storage provider, you must first initialize both the OMH Auth Client and OMH Storage Client with the necessary configurations.
+
+```kotlin
+val omhAuthClient = DropboxAuthClient(
+    scopes = arrayListOf("account_info.read", "files.metadata.read", "files.content.write", "files.content.read"),
+    context = context,
+    appId = BuildConfig.DROPBOX_CLIENT_ID,
+)
+
+val omhStorageClient = DropboxOmhStorageFactory().getStorageClient(omhAuthClient)
+```
+
+### Other methods
+
+Interacting with the Dropbox storage provider follows the same pattern as other storage providers since they all implement the [`OmhStorageClient`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client) interface. This uniformity ensures consistent functionality across different storage providers, so you won’t need to learn new methods regardless of the storage provider you choose! For a comprehensive list of available methods, refer to the [Getting Started](https://miniature-adventure-4gle9ye.pages.github.io/docs/getting-started) guide.
+
+## License
+
+- See [LICENSE](https://github.com/openmobilehub/android-omh-storage/blob/main/LICENSE)

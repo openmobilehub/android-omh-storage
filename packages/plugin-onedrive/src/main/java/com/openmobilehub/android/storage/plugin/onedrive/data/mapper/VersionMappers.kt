@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles
+@file:Suppress("TooManyFunctions")
 
+package com.openmobilehub.android.storage.plugin.onedrive.data.mapper
+
+import com.microsoft.graph.models.DriveItemVersion
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
-import com.openmobilehub.android.storage.core.utils.fromRFC3339StringToDate
+import java.util.Date
 
-const val TEST_VERSION_FILE_ID = "123"
-const val TEST_VERSION_ID = "456"
-val TEST_VERSION_FILE_MODIFIED_TIME = TEST_FIRST_MAY_2024_RFC_3339.fromRFC3339StringToDate()!!
-
-val testOmhVersion = OmhFileVersion(
-    TEST_VERSION_FILE_ID,
-    TEST_VERSION_ID,
-    TEST_VERSION_FILE_MODIFIED_TIME
-)
+internal fun DriveItemVersion.toOmhVersion(fileId: String): OmhFileVersion {
+    return OmhFileVersion(
+        fileId,
+        id,
+        Date.from(lastModifiedDateTime.toInstant())
+    )
+}

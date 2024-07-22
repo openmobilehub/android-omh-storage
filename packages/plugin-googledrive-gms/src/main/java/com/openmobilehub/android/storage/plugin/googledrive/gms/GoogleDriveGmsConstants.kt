@@ -30,8 +30,6 @@ object GoogleDriveGmsConstants {
     internal const val ANYONE_TYPE = "anyone"
 
     internal const val OWNER_ROLE = "owner"
-    internal const val ORGANIZER_ROLE = "organizer"
-    internal const val FILE_ORGANIZER_ROLE = "fileOrganizer"
     internal const val WRITER_ROLE = "writer"
     internal const val COMMENTER_ROLE = "commenter"
     internal const val READER_ROLE = "reader"

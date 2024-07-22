@@ -19,11 +19,13 @@ package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.openmobilehub.android.storage.core.model.OmhIdentity
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.PermissionsAdapterBinding
@@ -59,31 +61,11 @@ class FilePermissionAdapter(
                 id.value.text = permission.id
                 type.value.text = permission.getType(context)
                 role.value.text = permission.role.toString()
+                inheritedFrom.value.text = permission.inheritedFromEntity.toString()
 
                 when (permission) {
-                    is OmhPermission.AnyonePermission -> {
-                        // ignore, view already setup
-                    }
-
-                    is OmhPermission.DomainPermission -> {
-                        showDisplayName(permission.displayName)
-                        showDomain(permission.domain)
-                    }
-
-                    is OmhPermission.GroupPermission -> {
-                        showDisplayName(permission.displayName)
-                        showEmail(permission.emailAddress)
-                        showExpirationTime(permission.expirationTime)
-                        showDeleted(permission.deleted)
-                    }
-
-                    is OmhPermission.UserPermission -> {
-                        showDisplayName(permission.displayName)
-                        showEmail(permission.emailAddress)
-                        showExpirationTime(permission.expirationTime)
-                        showDeleted(permission.deleted)
-                        showPhoto(context, permission.photoLink)
-                        showPendingOwner(permission.pendingOwner)
+                    is OmhPermission.IdentityPermission -> {
+                        setupBindingWithIdentity(permission.identity)
                     }
                 }
 
@@ -96,6 +78,50 @@ class FilePermissionAdapter(
             }
         }
 
+        private fun setupBindingWithIdentity(identity: OmhIdentity) {
+            val context = binding.root.context
+            when (identity) {
+                is OmhIdentity.Anyone -> {
+                    // ignore, view already setup
+                }
+
+                is OmhIdentity.Domain -> {
+                    showDisplayName(identity.displayName)
+                    showDomain(identity.domain)
+                }
+
+                is OmhIdentity.Group -> {
+                    showIdentityId(identity.id)
+                    showDisplayName(identity.displayName)
+                    showEmail(identity.emailAddress)
+                    showExpirationTime(identity.expirationTime)
+                    showDeleted(identity.deleted)
+                }
+
+                is OmhIdentity.User -> {
+                    showIdentityId(identity.id)
+                    showDisplayName(identity.displayName)
+                    showEmail(identity.emailAddress)
+                    showExpirationTime(identity.expirationTime)
+                    showDeleted(identity.deleted)
+                    showPhoto(context, identity.photoLink)
+                    showPendingOwner(identity.pendingOwner)
+                }
+
+                is OmhIdentity.Application -> {
+                    showIdentityId(identity.id)
+                    showDisplayName(identity.displayName)
+                    showExpirationTime(identity.expirationTime)
+                }
+
+                is OmhIdentity.Device -> {
+                    showIdentityId(identity.id)
+                    showDisplayName(identity.displayName)
+                    showExpirationTime(identity.expirationTime)
+                }
+            }
+        }
+
         private fun setupDefaultState(context: Context) = with(binding) {
             photo.isVisible = false
             email.root.isVisible = false
@@ -104,22 +130,30 @@ class FilePermissionAdapter(
             pendingOwner.root.isVisible = false
             domain.root.isVisible = false
             displayName.root.isVisible = false
+            identityId.root.isVisible = false
 
             id.label.text = context.getString(R.string.permission_label_id)
             displayName.label.text = context.getString(R.string.permission_label_display_name)
             type.label.text = context.getString(R.string.permission_label_type)
             role.label.text = context.getString(R.string.permission_label_role)
+            inheritedFrom.label.text = context.getString(R.string.permission_label_inherited_from)
             photoText.label.text = context.getString(R.string.permission_label_user_photo)
             email.label.text = context.getString(R.string.permission_label_email)
             expirationTime.label.text = context.getString(R.string.permission_label_expiration_time)
             deleted.label.text = context.getString(R.string.permission_label_deleted)
             pendingOwner.label.text = context.getString(R.string.permission_label_pending_owner)
             domain.label.text = context.getString(R.string.permission_label_domain)
+            identityId.label.text = context.getString(R.string.permission_label_identity_id)
         }
 
-        private fun showDisplayName(value: String) = with(binding) {
+        private fun showIdentityId(value: String?) = with(binding) {
+            identityId.root.isVisible = true
+            identityId.value.text = value.toString()
+        }
+
+        private fun showDisplayName(value: String?) = with(binding) {
             displayName.root.isVisible = true
-            displayName.value.text = value
+            displayName.value.text = value.toString()
         }
 
         private fun showEmail(value: String?) = with(binding) {
@@ -180,9 +214,20 @@ class FilePermissionAdapter(
 
 private fun OmhPermission.getType(context: Context): String = context.getString(
     when (this) {
-        is OmhPermission.AnyonePermission -> R.string.permission_type_anyone
-        is OmhPermission.DomainPermission -> R.string.permission_type_domain
-        is OmhPermission.GroupPermission -> R.string.permission_type_group
-        is OmhPermission.UserPermission -> R.string.permission_type_user
+        is OmhPermission.IdentityPermission -> {
+            getType()
+        }
     }
 )
+
+@StringRes
+private fun OmhPermission.IdentityPermission.getType(): Int {
+    return when (this.identity) {
+        is OmhIdentity.Anyone -> R.string.permission_type_anyone
+        is OmhIdentity.Domain -> R.string.permission_type_domain
+        is OmhIdentity.Group -> R.string.permission_type_group
+        is OmhIdentity.User -> R.string.permission_type_user
+        is OmhIdentity.Application -> R.string.permission_type_application
+        is OmhIdentity.Device -> R.string.permission_type_device
+    }
+}

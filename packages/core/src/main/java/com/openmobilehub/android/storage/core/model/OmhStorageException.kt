@@ -27,7 +27,6 @@ sealed class OmhStorageException(
     class DeveloperErrorException(message: String, cause: Throwable? = null) :
         OmhStorageException(message, cause)
 
-    class NotSupportedException(message: String? = null) : OmhStorageException(message)
     class ApiException(val code: Int? = null, message: String? = null, cause: Throwable? = null) :
         OmhStorageException(message, cause)
 }

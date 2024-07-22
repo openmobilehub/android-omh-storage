@@ -29,21 +29,21 @@ import com.google.api.services.drive.model.RevisionList
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_EMAIL_MESSAGE
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_FILE_ID
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_FILE_MIME_TYPE
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_FILE_NAME
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_FILE_PARENT_ID
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_PERMISSION_ID
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_VERSION_FILE_ID
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_VERSION_ID
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.TEST_WEB_URL
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.setUpMock
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.testOmhCreatePermission
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.testOmhFile
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.testOmhPermission
-import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.testdoubles.testOmhVersion
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.service.GoogleDriveApiService
+import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.TEST_EMAIL_MESSAGE
+import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.TEST_FILE_ID
+import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.TEST_FILE_MIME_TYPE
+import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.TEST_FILE_NAME
+import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.TEST_FILE_PARENT_ID
+import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.TEST_FILE_WEB_URL
+import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.TEST_PERMISSION_ID
+import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.TEST_VERSION_FILE_ID
+import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.TEST_VERSION_ID
+import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.setUpMock
+import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.testOmhCreatePermission
+import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.testOmhFile
+import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.testOmhPermission
+import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.testOmhVersion
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -57,8 +57,6 @@ import org.junit.Before
 import org.junit.Test
 import java.io.File
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 import com.google.api.services.drive.model.File as GoogleDriveFile
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -181,22 +179,20 @@ internal class GmsFileRepositoryTest {
         }
 
     @Test
-    fun `given a fileId, when permanentlyDeleteFile is success, then true is returned`() = runTest {
+    fun `given a fileId, when permanentlyDeleteFile is success, then exceptions is not thrown`() = runTest {
         every { apiService.deleteFile(any()) } returns driveFilesDeleteRequest
 
-        val result = fileRepositoryImpl.permanentlyDeleteFile(TEST_FILE_ID)
+        fileRepositoryImpl.permanentlyDeleteFile(TEST_FILE_ID)
 
-        assertTrue(result)
         verify { apiService.deleteFile(TEST_FILE_ID) }
     }
 
     @Test
-    fun `given a fileId, when deleteFile is success, then true is returned`() = runTest {
+    fun `given a fileId, when deleteFile is success, then exceptions is not thrown`() = runTest {
         every { apiService.updateFile(any(), any()) } returns driveFilesUpdateRequest
 
-        val result = fileRepositoryImpl.deleteFile(TEST_FILE_ID)
+        fileRepositoryImpl.deleteFile(TEST_FILE_ID)
 
-        assertTrue(result)
         verify { apiService.updateFile(TEST_FILE_ID, any()) }
     }
 
@@ -298,7 +294,7 @@ internal class GmsFileRepositoryTest {
         }
 
     @Test
-    fun `given a fileId and permissionId, when deletePermission is success, then true is returned`() =
+    fun `given a fileId and permissionId, when deletePermission is success, then exceptions is not thrown`() =
         runTest {
             every {
                 apiService.deletePermission(
@@ -307,14 +303,13 @@ internal class GmsFileRepositoryTest {
                 )
             } returns drivePermissionsDeleteRequest
 
-            val result = fileRepositoryImpl.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
+            fileRepositoryImpl.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
 
-            assertTrue(result)
             verify { apiService.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID) }
         }
 
-    @Test
-    fun `given a fileId and permissionId, when deletePermission fails, then false is returned`() =
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given a fileId and permissionId, when deletePermission fails, then ApiException is thrown`() =
         runTest {
             every {
                 apiService.deletePermission(
@@ -323,10 +318,7 @@ internal class GmsFileRepositoryTest {
                 )
             }.throws(responseException)
 
-            val result = fileRepositoryImpl.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
-
-            assertFalse(result)
-            verify { apiService.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID) }
+            fileRepositoryImpl.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
         }
 
     @Test
@@ -561,13 +553,13 @@ internal class GmsFileRepositoryTest {
 
     @Test
     fun `given a file id, when getWebUrl is success, then an URL to the file is returned`() {
-        every { googleDriveFile.webViewLink } returns TEST_WEB_URL
+        every { googleDriveFile.webViewLink } returns TEST_FILE_WEB_URL
         every { driveFilesGetRequest.execute() } returns googleDriveFile
         every { apiService.getWebUrl(any()) } returns driveFilesGetRequest
 
         val result = fileRepositoryImpl.getWebUrl(TEST_VERSION_FILE_ID)
 
-        assertEquals(TEST_WEB_URL, result)
+        assertEquals(TEST_FILE_WEB_URL, result)
         verify { apiService.getWebUrl(TEST_FILE_ID) }
     }
 

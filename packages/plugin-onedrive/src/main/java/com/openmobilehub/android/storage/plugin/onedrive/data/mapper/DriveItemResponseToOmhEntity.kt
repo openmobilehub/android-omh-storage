@@ -1,3 +1,5 @@
+@file:Suppress("MaximumLineLength", "MaxLineLength")
+
 package com.openmobilehub.android.storage.plugin.onedrive.data.mapper
 
 import android.webkit.MimeTypeMap
@@ -10,9 +12,11 @@ import com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit.r
 class DriveItemResponseToOmhEntity(private val mimeTypeMap: MimeTypeMap) {
     operator fun invoke(driveItem: DriveItemResponse): OmhStorageEntity? {
         driveItem.run {
+            @Suppress("ComplexCondition")
             if (id == null || name == null || createdTime == null || modifiedTime == null || parentReference == null || size == null) {
                 return null
             }
+
             val isFolder = folder != null
 
             val createdTime = createdTime.fromRFC3339StringToDate()

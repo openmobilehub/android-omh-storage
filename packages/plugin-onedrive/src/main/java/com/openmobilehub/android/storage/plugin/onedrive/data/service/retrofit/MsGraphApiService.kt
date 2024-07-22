@@ -33,7 +33,7 @@ interface MsGraphApiService {
         private const val PARENT_ID = "parentId"
     }
 
-    @POST("${DRIVES_PARTICLE}/{$DRIVE_ID}/items/{$PARENT_ID}/children")
+    @POST("$DRIVES_PARTICLE/{$DRIVE_ID}/items/{$PARENT_ID}/children")
     suspend fun createFolder(
         @Path(DRIVE_ID) driveId: String,
         @Path(PARENT_ID) parentId: String,

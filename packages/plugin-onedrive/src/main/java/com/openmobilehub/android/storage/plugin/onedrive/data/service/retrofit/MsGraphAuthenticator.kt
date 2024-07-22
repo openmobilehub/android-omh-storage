@@ -16,7 +16,6 @@
 
 package com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit
 
-import com.openmobilehub.android.auth.core.OmhCredentials
 import okhttp3.Authenticator
 import okhttp3.Request
 import okhttp3.Response

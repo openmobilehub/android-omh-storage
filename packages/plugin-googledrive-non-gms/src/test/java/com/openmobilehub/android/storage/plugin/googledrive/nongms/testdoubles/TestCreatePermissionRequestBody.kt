@@ -14,24 +14,23 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.testdoubles
+package com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles
 
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.COMMENTER_ROLE
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.OWNER_ROLE
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants.USER_TYPE
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.PermissionResponse
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.PermissionsListResponse
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body.CreatePermissionRequestBody
 
-internal val testPermissionResponse = PermissionResponse(
-    id = TEST_PERMISSION_ID,
+internal val createOwnerPermissionRequestBody = CreatePermissionRequestBody(
     type = USER_TYPE,
-    emailAddress = TEST_PERMISSION_EMAIL_ADDRESS,
-    domain = null,
     role = OWNER_ROLE,
-    displayName = TEST_PERMISSION_DISPLAY_NAME,
-    photoLink = TEST_PERMISSION_PHOTO_LINK,
-    deleted = false,
-    pendingOwner = null,
-    expirationTime = TEST_FIRST_MAY_2024_RFC_3339,
+    emailAddress = TEST_PERMISSION_EMAIL_ADDRESS,
+    domain = null
 )
 
-internal val testPermissionsListResponse = PermissionsListResponse(listOf(testPermissionResponse))
+internal val createCommenterPermissionRequestBody = CreatePermissionRequestBody(
+    type = USER_TYPE,
+    role = COMMENTER_ROLE,
+    emailAddress = TEST_PERMISSION_EMAIL_ADDRESS,
+    domain = null
+)
