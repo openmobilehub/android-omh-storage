@@ -362,7 +362,7 @@ internal class OneDriveOmhStorageClientTest {
             )
 
             // Assert
-            assertEquals(omhFolder, result)
+            assertEquals(omhFile, result)
         }
 
     @Test
