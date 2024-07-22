@@ -126,7 +126,7 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 
 <summary>Show details</summary>
 
-[`OmhPermission.IdentityPermission`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-permission)
+[`OmhPermission.IdentityPermission`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-permission/-identity-permission)
 
 | Property            | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
 |---------------------|:------------------:|:----------------------:|:--------:|:-------:|
