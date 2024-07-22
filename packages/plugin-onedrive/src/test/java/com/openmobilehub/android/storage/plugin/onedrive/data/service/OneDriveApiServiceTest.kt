@@ -23,6 +23,7 @@ import com.microsoft.graph.models.DriveItem
 import com.microsoft.graph.models.DriveItemVersionCollectionResponse
 import com.microsoft.graph.models.Permission
 import com.microsoft.graph.models.UploadSession
+import com.microsoft.kiota.ApiException
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.utils.toInputStream
 import com.openmobilehub.android.storage.plugin.onedrive.OneDriveConstants.WRITE_ROLE
@@ -82,6 +83,7 @@ class OneDriveApiServiceTest {
         every { file.toInputStream() } returns mockk<FileInputStream>()
 
         every { apiClient.graphServiceClient.me().drive().get().id } returns "driveId"
+        every { apiClient.authProvider.accessToken } returns "accessToken"
 
         every {
             apiClient.graphServiceClient.drives()
@@ -98,17 +100,6 @@ class OneDriveApiServiceTest {
     @After
     fun tearDown() {
         clearAllMocks()
-    }
-
-    @Test
-    fun `given retrieving drive id throws an error, when retrieving the drive id, then throw an ApiException`() {
-        // Arrange
-        every { apiClient.graphServiceClient.me().drive().get().id } throws Exception()
-
-        // Act & Assert
-        Assert.assertThrows(OmhStorageException.ApiException::class.java) {
-            apiService.retrieveDriveId()
-        }
     }
 
     @Test
@@ -364,5 +355,83 @@ class OneDriveApiServiceTest {
 
         // Assert
         Assert.assertEquals(permission.roles, permissionSlot.captured.roles)
+    }
+}
+
+class DriveIdCacheTest {
+
+    @MockK
+    private lateinit var apiClient: OneDriveApiClient
+
+    private lateinit var driveIdCache: OneDriveApiService.DriveIdCache
+
+    @Before
+    fun setUp() {
+        MockKAnnotations.init(this)
+
+        driveIdCache = OneDriveApiService.DriveIdCache(apiClient)
+    }
+
+    @After
+    fun tearDown() {
+        clearAllMocks()
+    }
+
+    @Test
+    fun `given retrieving drive id throws an error, when retrieving the drive id, then throw an ApiException`() {
+        // Arrange
+        every { apiClient.graphServiceClient.me().drive().get().id } throws ApiException()
+
+        // Act & Assert
+        Assert.assertThrows(OmhStorageException.ApiException::class.java) {
+            driveIdCache.retrieveDriveId()
+        }
+    }
+
+    @Test
+    fun `given retrieving drive id succeeds, when retrieving the drive id, then return drive id`() {
+        // Arrange
+        every { apiClient.graphServiceClient.me().drive().get().id } returns "driveId"
+
+        // Act
+        val result = driveIdCache.retrieveDriveId()
+
+        // Assert
+        Assert.assertEquals("driveId", result)
+    }
+
+    @Test
+    fun `given drive id was cached, when getting driveId, then return drive id from cache`() {
+        // Arrange
+        every { apiClient.graphServiceClient.me().drive().get().id } returns "driveId"
+        every { apiClient.authProvider.accessToken } returns "accessToken"
+        driveIdCache.driveId
+
+        // Act
+        val result = driveIdCache.driveId
+
+        // Assert
+        Assert.assertEquals("driveId", result)
+        verify(exactly = 1) {
+            apiClient.graphServiceClient.me().drive().get().id
+        }
+    }
+
+    @Test
+    fun `given access token changed, when getting driveId, then re-fetch drive id`() {
+        // Arrange
+        every { apiClient.graphServiceClient.me().drive().get().id } returns "driveId"
+        every { apiClient.authProvider.accessToken } returns "accessToken1"
+        driveIdCache.driveId
+        every { apiClient.authProvider.accessToken } returns "accessToken2"
+
+        // Act
+        val result = driveIdCache.driveId
+
+        // Assert
+        Assert.assertEquals("driveId", result)
+        verify(exactly = 2) {
+            apiClient.graphServiceClient.me().drive().get().id
+        }
     }
 }

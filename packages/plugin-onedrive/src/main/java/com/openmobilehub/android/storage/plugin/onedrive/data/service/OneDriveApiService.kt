@@ -149,6 +149,7 @@ internal class OneDriveApiService(private val apiClient: OneDriveApiClient) {
             )
     }
 
+    @VisibleForTesting
     internal class DriveIdCache(private val apiClient: OneDriveApiClient) {
         private var cachedDriveId: String? = null
         private var previousAccessToken: String? = null

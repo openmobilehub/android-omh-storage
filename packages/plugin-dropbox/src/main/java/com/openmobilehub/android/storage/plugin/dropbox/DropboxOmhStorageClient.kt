@@ -47,7 +47,7 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         }
     }
 
-    private class RepositoryBuilder : DropboxFileRepository.Builder {
+    internal class RepositoryBuilder : DropboxFileRepository.Builder {
         private val metadataToOmhStorageEntity: MetadataToOmhStorageEntity by lazy {
             MetadataToOmhStorageEntity(
                 MimeTypeMap.getSingleton()

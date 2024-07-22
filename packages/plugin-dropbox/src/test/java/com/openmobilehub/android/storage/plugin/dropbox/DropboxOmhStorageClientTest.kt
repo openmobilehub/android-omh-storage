@@ -53,10 +53,53 @@ internal class DropboxOmhStorageClientBuilderTest {
     @MockK
     private lateinit var authClient: OmhAuthClient
 
+    private val builder = DropboxOmhStorageClient.Builder()
+
+    @Before
+    fun setUp() {
+        MockKAnnotations.init(this)
+    }
+
+    @After
+    fun tearDown() {
+        clearAllMocks()
+    }
+
+    @Test
+    fun `given valid credentials, when building, then return DropboxOmhStorageClient`() {
+        // Arrange
+        every { authClient.getCredentials().accessToken } returns "validToken"
+
+        // Act
+        val client = builder.build(authClient)
+
+        // Assert
+        assertNotNull(client)
+    }
+
+    // Credentials validation is postponed to the first API call
+    @Test
+    fun `given invalid credentials, when building, then return DropboxOmhStorageClient`() {
+        // Arrange
+        every { authClient.getCredentials().accessToken } returns null
+
+        // Act
+        val client = builder.build(authClient)
+
+        // Assert
+        assertNotNull(client)
+    }
+}
+
+internal class DropboxOmhStorageRepositoryBuilderTest {
+
+    @MockK
+    private lateinit var authClient: OmhAuthClient
+
     @MockK(relaxed = true)
     private lateinit var mimeTypeMap: MimeTypeMap
 
-    private val builder = DropboxOmhStorageClient.Builder()
+    private val builder = DropboxOmhStorageClient.RepositoryBuilder()
 
     @Before
     fun setUp() {
@@ -127,7 +170,14 @@ internal class DropboxOmhStorageClientTest {
 
         omhStorageEntityList = listOf(omhStorageEntity, omhStorageEntity)
 
-        client = DropboxOmhStorageClient(authClient, repository)
+        client = DropboxOmhStorageClient(
+            authClient,
+            object : DropboxFileRepository.Builder {
+                override fun build(authClient: OmhAuthClient): DropboxFileRepository {
+                    return repository
+                }
+            }
+        )
     }
 
     @After
@@ -136,57 +186,61 @@ internal class DropboxOmhStorageClientTest {
     }
 
     @Test
-    fun `given a repository, when listing files, then return files from the repository`() = runTest {
-        // Arrange
-        val parentId = "parentId"
+    fun `given a repository, when listing files, then return files from the repository`() =
+        runTest {
+            // Arrange
+            val parentId = "parentId"
 
-        every { repository.getFilesList(parentId) } returns omhStorageEntityList
+            every { repository.getFilesList(parentId) } returns omhStorageEntityList
 
-        // Act
-        val result = client.listFiles(parentId)
+            // Act
+            val result = client.listFiles(parentId)
 
-        // Assert
-        assertEquals(omhStorageEntityList, result)
-    }
-
-    @Test
-    fun `given a repository, when uploading a file to unknown parent, then upload a file from repository to root`() = runTest {
-        // Arrange
-        val parentId = null
-        every { repository.uploadFile(any(), any()) } returns omhStorageEntity
-
-        // Act
-        val result = client.uploadFile(fileToUpload, parentId)
-
-        // Assert
-        assertEquals(omhStorageEntity, result)
-        verify { repository.uploadFile(fileToUpload, DropboxConstants.ROOT_FOLDER) }
-    }
+            // Assert
+            assertEquals(omhStorageEntityList, result)
+        }
 
     @Test
-    fun `given a repository, when uploading a file to known parent, then upload a file from repository to a given parent`() = runTest {
-        // Arrange
-        every { repository.uploadFile(any(), any()) } returns omhStorageEntity
+    fun `given a repository, when uploading a file to unknown parent, then upload a file from repository to root`() =
+        runTest {
+            // Arrange
+            val parentId = null
+            every { repository.uploadFile(any(), any()) } returns omhStorageEntity
 
-        // Act
-        val result = client.uploadFile(fileToUpload, TEST_FILE_PARENT_ID)
+            // Act
+            val result = client.uploadFile(fileToUpload, parentId)
 
-        // Assert
-        assertEquals(omhStorageEntity, result)
-        verify { repository.uploadFile(fileToUpload, TEST_FILE_PARENT_ID) }
-    }
+            // Assert
+            assertEquals(omhStorageEntity, result)
+            verify { repository.uploadFile(fileToUpload, DropboxConstants.ROOT_FOLDER) }
+        }
 
     @Test
-    fun `given a repository, when downloading a file, then return ByteArrayOutputStream`() = runTest {
-        // Arrange
-        every { repository.downloadFile(any()) } returns byteArrayOutputStream
+    fun `given a repository, when uploading a file to known parent, then upload a file from repository to a given parent`() =
+        runTest {
+            // Arrange
+            every { repository.uploadFile(any(), any()) } returns omhStorageEntity
 
-        // Act
-        val result = client.downloadFile(TEST_FILE_ID)
+            // Act
+            val result = client.uploadFile(fileToUpload, TEST_FILE_PARENT_ID)
 
-        // Assert
-        assertEquals(byteArrayOutputStream, result)
-    }
+            // Assert
+            assertEquals(omhStorageEntity, result)
+            verify { repository.uploadFile(fileToUpload, TEST_FILE_PARENT_ID) }
+        }
+
+    @Test
+    fun `given a repository, when downloading a file, then return ByteArrayOutputStream`() =
+        runTest {
+            // Arrange
+            every { repository.downloadFile(any()) } returns byteArrayOutputStream
+
+            // Act
+            val result = client.downloadFile(TEST_FILE_ID)
+
+            // Assert
+            assertEquals(byteArrayOutputStream, result)
+        }
 
     @Test
     fun `given a repository, when exporting a file, throw OmhStorageException_NotSupportedException `() {
@@ -199,29 +253,31 @@ internal class DropboxOmhStorageClientTest {
     }
 
     @Test
-    fun `given a repository, when listing file versions, then return versions from the repository`() = runTest {
-        // Arrange
-        val versions: List<OmhFileVersion> = mockk()
-        every { repository.getFileVersions(any()) } returns versions
+    fun `given a repository, when listing file versions, then return versions from the repository`() =
+        runTest {
+            // Arrange
+            val versions: List<OmhFileVersion> = mockk()
+            every { repository.getFileVersions(any()) } returns versions
 
-        // Act
-        val result = client.getFileVersions(TEST_VERSION_FILE_ID)
+            // Act
+            val result = client.getFileVersions(TEST_VERSION_FILE_ID)
 
-        // Assert
-        assertEquals(versions, result)
-    }
+            // Assert
+            assertEquals(versions, result)
+        }
 
     @Test
-    fun `given a repository, when downloading a file version, then return ByteArrayOutputStream`() = runTest {
-        // Arrange
-        every { repository.downloadFileVersion(any()) } returns byteArrayOutputStream
+    fun `given a repository, when downloading a file version, then return ByteArrayOutputStream`() =
+        runTest {
+            // Arrange
+            every { repository.downloadFileVersion(any()) } returns byteArrayOutputStream
 
-        // Act
-        val result = client.downloadFileVersion(TEST_VERSION_FILE_ID, TEST_VERSION_ID)
+            // Act
+            val result = client.downloadFileVersion(TEST_VERSION_FILE_ID, TEST_VERSION_ID)
 
-        // Assert
-        assertEquals(byteArrayOutputStream, result)
-    }
+            // Assert
+            assertEquals(byteArrayOutputStream, result)
+        }
 
     @Test
     fun `given a repository, when deleting a file succeeds, then it succeeds`() = runTest {
@@ -243,26 +299,28 @@ internal class DropboxOmhStorageClientTest {
     }
 
     @Test
-    fun `given a repository, when searching files, then return files from the repository`() = runTest {
-        // Arrange
-        every { repository.search(any()) } returns omhStorageEntityList
+    fun `given a repository, when searching files, then return files from the repository`() =
+        runTest {
+            // Arrange
+            every { repository.search(any()) } returns omhStorageEntityList
 
-        // Act
-        val result = client.search("test")
+            // Act
+            val result = client.search("test")
 
-        // Assert
-        assertEquals(omhStorageEntityList, result)
-    }
+            // Assert
+            assertEquals(omhStorageEntityList, result)
+        }
 
     @Test
-    fun `given a repository, when getting file metadata, then return OmhStorageMetadata`() = runTest {
-        // Arrange
-        every { repository.getFileMetadata(any()) } returns omhStorageMetadata
+    fun `given a repository, when getting file metadata, then return OmhStorageMetadata`() =
+        runTest {
+            // Arrange
+            every { repository.getFileMetadata(any()) } returns omhStorageMetadata
 
-        // Act
-        val result = client.getFileMetadata(TEST_FILE_ID)
+            // Act
+            val result = client.getFileMetadata(TEST_FILE_ID)
 
-        // Assert
-        assertEquals(omhStorageMetadata, result)
-    }
+            // Assert
+            assertEquals(omhStorageMetadata, result)
+        }
 }
