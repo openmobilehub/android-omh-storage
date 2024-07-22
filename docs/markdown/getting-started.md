@@ -121,17 +121,39 @@ Lists files with names containing the specified query value.
 val searchResults = omhStorageClient.search(query = "fileName")
 ```
 
-### Create file
+### Create folder
+
+Creates a folder in a specific folder.
+
+```kotlin
+val newFile = omhStorageClient.createFolder(
+    name = "fileName",
+    parentId = "folderId"
+)
+```
+
+### Create file (with mime type)
 
 Creates a file in a specific folder.
 
 ```kotlin
-val newFile = omhStorageClient.createFile(
+val newFile = omhStorageClient.createFileWithMimeType(
     name = "fileName",
     mimeType = "fileMimeType",
     parentId = "folderId"
 )
 ```
+
+### Create file (with extension)
+
+Creates a file in a specific folder.
+
+```kotlin
+val newFile = omhStorageClient.createFileWithExtension(
+    name = "fileName",
+    extension = "ext",
+    parentId = "folderId"
+)
 
 ### Update file
 
