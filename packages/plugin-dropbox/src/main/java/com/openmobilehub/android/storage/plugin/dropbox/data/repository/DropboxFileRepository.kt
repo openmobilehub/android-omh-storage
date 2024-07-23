@@ -119,17 +119,16 @@ internal class DropboxFileRepository(
 
     @VisibleForTesting
     fun getNewFolderPath(parentId: String, name: String): String {
-        var path = "/$name"
-
-        if (parentId != DropboxConstants.ROOT_FOLDER) {
+        if (parentId == DropboxConstants.ROOT_FOLDER) {
+            return "/$name"
+        } else {
             val metadata = apiService.getFile(parentId)
-            metadata.pathLower?.let { path = "${it}$path" }
+
+            metadata.pathLower?.let { return "$it/$name" }
                 ?: throw OmhStorageException.ApiException(
                     message = "Failed to get path for parent folder with ID: $parentId"
                 )
         }
-
-        return path
     }
 
     fun createFolder(name: String, parentId: String): OmhStorageEntity? = try {
