@@ -16,6 +16,7 @@
 
 package com.openmobilehub.android.storage.plugin.dropbox.data.service
 
+import com.dropbox.core.v2.files.CreateFolderResult
 import com.dropbox.core.v2.files.DeleteResult
 import com.dropbox.core.v2.files.FileMetadata
 import com.dropbox.core.v2.files.ListFolderResult
@@ -66,5 +67,9 @@ internal class DropboxApiService(private val apiClient: DropboxApiClient) {
 
     fun getFile(fileId: String): Metadata {
         return apiClient.dropboxApiService.files().getMetadata(fileId)
+    }
+
+    fun createFolder(path: String): CreateFolderResult {
+        return apiClient.dropboxApiService.files().createFolderV2(path)
     }
 }

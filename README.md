@@ -52,8 +52,9 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 |------------------------------|:------------------:|:----------------------:|:--------:|:-------:|
 | File listing                 |         ✅          |           ✅          |    ✅    |    ✅   |
 | File searching               |         ✅          |           ✅          |          |    ✅   |
-| File creation (by mime type) |         ✅          |           ✅          |    ❌    |         |
-| File creation (by extension) |         ❌          |           ❌          |    ✅    |         |
+| Folder creation              |         ✅          |           ✅          |    ✅    |    ✅   |
+| File creation (by mime type) |         ✅          |           ✅          |    ❌    |    ❌   |
+| File creation (by extension) |         ❌          |           ❌          |    ✅    |    ✅   |
 | File update                  |         ✅          |           ✅          |          |         |
 | File deletion                |         ✅          |           ✅          |    ✅    |    ✅   |
 | File permanent deletion      |         ✅          |           ✅          |    ❌    |    ❌   |

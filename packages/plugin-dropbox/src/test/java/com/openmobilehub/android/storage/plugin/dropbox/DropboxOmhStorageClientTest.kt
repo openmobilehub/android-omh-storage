@@ -25,9 +25,13 @@ import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.plugin.dropbox.data.repository.DropboxFileRepository
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_EXTENSION
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_MIME_TYPE
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_NAME
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_PARENT_ID
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FOLDER_NAME
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FOLDER_PARENT_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_VERSION_FILE_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_VERSION_ID
 import io.mockk.MockKAnnotations
@@ -243,7 +247,7 @@ internal class DropboxOmhStorageClientTest {
         }
 
     @Test
-    fun `given a repository, when exporting a file, throw OmhStorageException_NotSupportedException `() {
+    fun `given a repository, when exporting a file, throw UnsupportedOperationException `() {
         // Act & Assert
         assertThrows(UnsupportedOperationException::class.java) {
             runTest {
@@ -289,7 +293,7 @@ internal class DropboxOmhStorageClientTest {
     }
 
     @Test
-    fun `given a repository, when permanently deleting a file, then return throw OmhStorageException_NotSupportedException`() {
+    fun `given a repository, when permanently deleting a file, then throw UnsupportedOperationException`() {
         // Act & Assert
         assertThrows(UnsupportedOperationException::class.java) {
             runTest {
@@ -323,4 +327,38 @@ internal class DropboxOmhStorageClientTest {
             // Assert
             assertEquals(omhStorageMetadata, result)
         }
+
+    @Test
+    fun `given a repository, when creating a folder, then return OmhStorageEntity`() = runTest {
+        // Arrange
+        every { repository.createFolder(any(), any()) } returns omhStorageEntity
+
+        // Act
+        val result = client.createFolder(TEST_FOLDER_NAME, TEST_FOLDER_PARENT_ID)
+
+        // Assert
+        assertEquals(omhStorageEntity, result)
+    }
+
+    @Test
+    fun `given a repository, when creating a file with extension, then return OmhStorageEntity`() = runTest {
+        // Arrange
+        every { repository.createFileWithExtension(any(), any(), any()) } returns omhStorageEntity
+
+        // Act
+        val result = client.createFileWithExtension(TEST_FILE_NAME, TEST_FILE_EXTENSION, TEST_FILE_PARENT_ID)
+
+        // Assert
+        assertEquals(omhStorageEntity, result)
+    }
+
+    @Test
+    fun `given a repository, when creating a file with mime type, then throw UnsupportedOperationException`() {
+        // Act & Assert
+        assertThrows(UnsupportedOperationException::class.java) {
+            runTest {
+                client.createFileWithMimeType(TEST_FILE_NAME, TEST_FILE_MIME_TYPE, TEST_FILE_PARENT_ID)
+            }
+        }
+    }
 }

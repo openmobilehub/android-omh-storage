@@ -97,7 +97,7 @@ class OneDriveFileRepositoryTest {
     private lateinit var oneDriveRestApiServiceProvider: OneDriveRestApiServiceProvider
 
     @MockK
-    lateinit var oneDriveRestApiService: OneDriveRestApiService
+    private lateinit var oneDriveRestApiService: OneDriveRestApiService
 
     @MockK
     private lateinit var driveItemToOmhStorageEntity: DriveItemToOmhStorageEntity
