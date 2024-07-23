@@ -18,6 +18,7 @@
 
 package com.openmobilehub.android.storage.plugin.dropbox.data.service
 
+import com.dropbox.core.v2.files.CreateFolderResult
 import com.dropbox.core.v2.files.DeleteResult
 import com.dropbox.core.v2.files.FileMetadata
 import com.dropbox.core.v2.files.ListFolderResult
@@ -25,6 +26,7 @@ import com.dropbox.core.v2.files.ListRevisionsResult
 import com.dropbox.core.v2.files.SearchV2Result
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_PARENT_ID
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FOLDER_NAME
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_VERSION_FILE_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_VERSION_ID
 import io.mockk.MockKAnnotations
@@ -51,6 +53,9 @@ class DropboxApiServiceTest {
 
     @MockK
     private lateinit var searchResult: SearchV2Result
+
+    @MockK
+    private lateinit var createFolderResult: CreateFolderResult
 
     @MockK
     private lateinit var apiClient: DropboxApiClient
@@ -191,5 +196,19 @@ class DropboxApiServiceTest {
 
         // Assert
         assertEquals(metadata, result)
+    }
+
+    @Test
+    fun `given apiClient returns CreateFolderResult, when creating a folder, then return CreateFolderResult`() {
+        // Arrange
+        every {
+            apiClient.dropboxApiService.files().createFolderV2(any())
+        } returns createFolderResult
+
+        // Act
+        val result = apiService.createFolder(TEST_FOLDER_NAME)
+
+        // Assert
+        assertEquals(createFolderResult, result)
     }
 }

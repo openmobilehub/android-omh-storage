@@ -16,19 +16,23 @@
 
 package com.openmobilehub.android.storage.plugin.dropbox.data.repository
 
+import androidx.annotation.VisibleForTesting
 import com.dropbox.core.DbxApiException
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.core.utils.toInputStream
+import com.openmobilehub.android.storage.plugin.dropbox.DropboxConstants
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.ExceptionMapper
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.MetadataToOmhStorageEntity
+import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.toOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.toOmhVersion
 import com.openmobilehub.android.storage.plugin.dropbox.data.service.DropboxApiService
 import java.io.ByteArrayOutputStream
 import java.io.File
 
+@SuppressWarnings("TooManyFunctions")
 internal class DropboxFileRepository(
     private val apiService: DropboxApiService,
     private val metadataToOmhStorageEntity: MetadataToOmhStorageEntity
@@ -107,5 +111,52 @@ internal class DropboxFileRepository(
         OmhStorageMetadata(omhStorageEntity, metadata)
     } catch (exception: DbxApiException) {
         throw ExceptionMapper.toOmhApiException(exception)
+    }
+
+    @VisibleForTesting
+    fun getNewFolderPath(parentId: String, name: String): String {
+        var path = "/$name"
+
+        if (parentId != DropboxConstants.ROOT_FOLDER) {
+            val metadata = apiService.getFile(parentId)
+            metadata.pathLower?.let { path = "${it}$path" }
+                ?: throw OmhStorageException.ApiException(
+                    message = "Failed to get path for parent folder with ID: $parentId"
+                )
+        }
+
+        return path
+    }
+
+    fun createFolder(name: String, parentId: String): OmhStorageEntity? = try {
+        val path = getNewFolderPath(parentId, name)
+        val createFolderResult = apiService.createFolder(path)
+
+        createFolderResult.metadata.toOmhStorageEntity()
+    } catch (exception: DbxApiException) {
+        throw ExceptionMapper.toOmhApiException(exception)
+    }
+
+    fun createFileWithExtension(
+        name: String,
+        extension: String,
+        parentId: String
+    ): OmhStorageEntity? {
+        val tempFile = File.createTempFile("tempFile", extension)
+
+        try {
+            val inputStream = tempFile.toInputStream()
+
+            val fullFileName = "$name.$extension"
+            val path = "$parentId/$fullFileName"
+
+            val response = apiService.uploadFile(inputStream, path)
+
+            return metadataToOmhStorageEntity(response)
+        } catch (exception: DbxApiException) {
+            throw ExceptionMapper.toOmhApiException(exception)
+        } finally {
+            tempFile.delete()
+        }
     }
 }
