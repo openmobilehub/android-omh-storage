@@ -27,6 +27,7 @@ import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
+import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.ExceptionMapper
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhFileVersions
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.toOmhPermission
@@ -76,6 +77,10 @@ internal class GmsFileRepository(
         responseFile.toOmhStorageEntity()
     } catch (exception: HttpResponseException) {
         throw ExceptionMapper.toOmhApiException(exception)
+    }
+
+    fun createFolder(name: String, parentId: String?): OmhStorageEntity? {
+        return createFile(name, GoogleDriveGmsConstants.FOLDER_MIME_TYPE, parentId)
     }
 
     fun deleteFile(fileId: String): Unit = try {

@@ -59,12 +59,26 @@ internal class GoogleDriveNonGmsOmhStorageClient private constructor(
         return fileRepository.search(query)
     }
 
-    override suspend fun createFile(
+    override suspend fun createFileWithMimeType(
         name: String,
         mimeType: String,
         parentId: String
     ): OmhStorageEntity? {
         return fileRepository.createFile(name, mimeType, parentId)
+    }
+
+    override suspend fun createFileWithExtension(
+        name: String,
+        extension: String,
+        parentId: String
+    ): OmhStorageEntity? {
+        throw UnsupportedOperationException(
+            "Google Drive does not support creating files with extensions. Use createFileWithMimeType instead."
+        )
+    }
+
+    override suspend fun createFolder(name: String, parentId: String): OmhStorageEntity? {
+        return fileRepository.createFolder(name, parentId)
     }
 
     override suspend fun deleteFile(id: String) {

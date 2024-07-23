@@ -26,10 +26,14 @@ import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.plugin.onedrive.data.repository.OneDriveFileRepository
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_EMAIL_MESSAGE
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_EXTENSION
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_MIME_TYPE
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_NAME
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_PARENT_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_WEB_URL
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FOLDER_NAME
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FOLDER_PARENT_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_PERMISSION_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_VERSION_FILE_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_VERSION_ID
@@ -37,6 +41,7 @@ import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.createWrite
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.testOmhPermission
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
@@ -117,6 +122,12 @@ internal class OneDriveOmhStorageClientTest {
 
     @MockK
     private lateinit var uploadedFile: OmhStorageEntity
+
+    @MockK
+    private lateinit var omhFolder: OmhStorageEntity.OmhFolder
+
+    @MockK
+    private lateinit var omhFile: OmhStorageEntity.OmhFile
 
     @MockK
     private lateinit var omhStorageMetadata: OmhStorageMetadata
@@ -324,5 +335,48 @@ internal class OneDriveOmhStorageClientTest {
 
         // Assert
         assertEquals(testOmhPermission, result)
+    }
+
+    @Test
+    fun `given a repository, when creating a folder, then return created folder`() = runTest {
+        // Arrange
+        coEvery { repository.createFolder(any(), any()) } returns omhFolder
+
+        // Act
+        val result = client.createFolder(TEST_FOLDER_NAME, TEST_FOLDER_PARENT_ID)
+
+        // Assert
+        assertEquals(omhFolder, result)
+    }
+
+    @Test
+    fun `given a repository, when creating a file with extension, then return created file`() =
+        runTest {
+            // Arrange
+            every { repository.createFile(any(), any(), any()) } returns omhFile
+
+            // Act
+            val result = client.createFileWithExtension(
+                TEST_FILE_NAME,
+                TEST_FILE_EXTENSION,
+                TEST_FILE_PARENT_ID
+            )
+
+            // Assert
+            assertEquals(omhFile, result)
+        }
+
+    @Test
+    fun `given a repository, when creating a file with mime type, then throw UnsupportedOperationException`() {
+        // Act && Assert
+        assertThrows(UnsupportedOperationException::class.java) {
+            runTest {
+                client.createFileWithMimeType(
+                    TEST_FILE_NAME,
+                    TEST_FILE_MIME_TYPE,
+                    TEST_FILE_PARENT_ID
+                )
+            }
+        }
     }
 }

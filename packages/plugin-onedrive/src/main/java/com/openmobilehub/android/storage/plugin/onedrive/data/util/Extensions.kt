@@ -14,8 +14,15 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.sample.presentation.file_viewer.model
+package com.openmobilehub.android.storage.plugin.onedrive.data.util
 
-import com.openmobilehub.android.storage.sample.domain.model.FileType
+import com.openmobilehub.android.auth.core.OmhAuthClient
+import com.openmobilehub.android.storage.core.model.OmhStorageException
+import retrofit2.HttpException
+import retrofit2.Response
 
-data class DisplayFileType(val name: String, val fileType: FileType? = null)
+fun <T> Response<T>.toApiException(): OmhStorageException.ApiException =
+    OmhStorageException.ApiException(code(), errorBody()?.string(), HttpException(this))
+
+val OmhAuthClient.accessToken: String?
+    get() = getCredentials().accessToken

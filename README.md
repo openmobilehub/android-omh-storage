@@ -48,21 +48,22 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 - 🟨 - partially supported
 - ❌ - not supported
 
-| Features                | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
-|-------------------------|:------------------:|:----------------------:|:--------:|:-------:|
-| File listing            |         ✅          |           ✅            |    ✅     |    ✅    |
-| File searching          |         ✅          |           ✅            |          |    ✅    |
-| File creation           |         ✅          |           ✅            |         |         |
-| File update             |         ✅          |           ✅            |         |         |
-| File deletion           |         ✅          |           ✅            |    ✅     |    ✅    |
-| File permanent deletion |         ✅          |           ✅            |    ❌     |    ❌    |
-| File upload             |         ✅          |           ✅            |    ✅     |    ✅    |
-| File download           |         ✅          |           ✅            |    ✅     |    ✅    |
-| File export             |         ✅          |           ✅            |    ❌     |    ❌    |
-| File metadata           |         ✅          |           ✅            |    🟨     |    🟨    |
-| File versioning         |         ✅          |           ✅            |    ✅     |    ✅    |
-| File permissions        |         🟨          |           🟨            |    🟨     |         |
-| File URL                |         ✅          |           ✅            |    ✅     |         |
+| Features                     | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
+|------------------------------|:------------------:|:----------------------:|:--------:|:-------:|
+| File listing                 |         ✅          |           ✅          |    ✅    |    ✅   |
+| File searching               |         ✅          |           ✅          |          |    ✅   |
+| File creation (by mime type) |         ✅          |           ✅          |    ❌    |         |
+| File creation (by extension) |         ❌          |           ❌          |    ✅    |         |
+| File update                  |         ✅          |           ✅          |          |         |
+| File deletion                |         ✅          |           ✅          |    ✅    |    ✅   |
+| File permanent deletion      |         ✅          |           ✅          |    ❌    |    ❌   |
+| File upload                  |         ✅          |           ✅          |    ✅    |    ✅   |
+| File download                |         ✅          |           ✅          |    ✅    |    ✅   |
+| File export                  |         ✅          |           ✅          |    ❌    |    ❌   |
+| File metadata                |         ✅          |           ✅          |    🟨    |    🟨   |
+| File versioning              |         ✅          |           ✅          |    ✅    |    ✅   |
+| File permissions             |         🟨          |           🟨          |    🟨    |         |
+| File URL                     |         ✅          |           ✅          |    ✅    |         |
 
 ### File metadata
 

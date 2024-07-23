@@ -25,6 +25,7 @@ import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.core.utils.toInputStream
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.LocalFileToMimeType
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toCreateRequestBody
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toFileList
@@ -107,6 +108,10 @@ internal class NonGmsFileRepository(
         } else {
             throw response.toApiException()
         }
+    }
+
+    suspend fun createFolder(name: String, parentId: String): OmhStorageEntity? {
+        return createFile(name, GoogleDriveNonGmsConstants.FOLDER_MIME_TYPE, parentId)
     }
 
     suspend fun permanentlyDeleteFile(fileId: String) {

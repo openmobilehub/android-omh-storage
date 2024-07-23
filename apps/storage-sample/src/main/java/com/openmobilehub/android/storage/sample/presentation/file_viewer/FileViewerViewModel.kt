@@ -61,15 +61,22 @@ import java.io.ByteArrayOutputStream
 class FileViewerViewModel @Inject constructor(
     private val authClient: OmhAuthClient,
     private val omhStorageClient: OmhStorageClient,
-    sessionRepository: SessionRepository
+    private val sessionRepository: SessionRepository
 ) : BaseViewModel<FileViewerViewState, FileViewerViewEvent>() {
 
     companion object {
-        val listOfFileTypes = listOf(
-            DisplayFileType("Folder", FileType.GOOGLE_FOLDER),
+        val googleListOfFileTypes = listOf(
+            DisplayFileType("Folder"),
             DisplayFileType("Document", FileType.GOOGLE_DOCUMENT),
             DisplayFileType("Sheet", FileType.GOOGLE_SPREADSHEET),
             DisplayFileType("Presentation", FileType.GOOGLE_PRESENTATION),
+        )
+
+        val commonListOfFileTypes = listOf(
+            DisplayFileType("Folder"),
+            DisplayFileType("Document", FileType.MICROSOFT_WORD),
+            DisplayFileType("Sheet", FileType.MICROSOFT_EXCEL),
+            DisplayFileType("Presentation", FileType.MICROSOFT_POWERPOINT),
         )
 
         const val ANY_MIME_TYPE = "*/*"
@@ -86,6 +93,8 @@ class FileViewerViewModel @Inject constructor(
         private set
     var lastFileClicked: OmhStorageEntity? = null
         private set
+
+    val storageAuthProvider = sessionRepository.getStorageAuthProvider()
 
     private var lastFileVersionClicked: OmhFileVersion? = null
 
@@ -149,7 +158,9 @@ class FileViewerViewModel @Inject constructor(
             is FileViewerViewEvent.FileClicked -> fileClickedEvent(event)
             is FileViewerViewEvent.FileVersionClicked -> fileVersionClicked(event)
             is FileViewerViewEvent.BackPressed -> backPressedEvent()
-            is FileViewerViewEvent.CreateFile -> createFileEvent(event)
+            is FileViewerViewEvent.CreateFileWithMimeType -> createFileWithMimeTypeEvent(event)
+            is FileViewerViewEvent.CreateFileWithExtension -> createFileWithExtensionEvent(event)
+            is FileViewerViewEvent.CreateFolder -> createFolderEvent(event)
             is FileViewerViewEvent.DeleteFile -> deleteFileEvent(event)
             is FileViewerViewEvent.PermanentlyDeleteFileClicked -> permanentlyDeleteFileEventClicked(
                 event
@@ -297,13 +308,24 @@ class FileViewerViewModel @Inject constructor(
         }
     }
 
-    private fun createFileEvent(event: FileViewerViewEvent.CreateFile) {
+    private fun createFileWithExtensionEvent(event: FileViewerViewEvent.CreateFileWithExtension) {
+        handleFileCreationEvent { omhStorageClient.createFileWithExtension(event.name, event.extension, parentId.peek()) }
+    }
+
+    private fun createFileWithMimeTypeEvent(event: FileViewerViewEvent.CreateFileWithMimeType) {
+        handleFileCreationEvent { omhStorageClient.createFileWithMimeType(event.name, event.mimeType, parentId.peek()) }
+    }
+
+    private fun createFolderEvent(event: FileViewerViewEvent.CreateFolder) {
+        handleFileCreationEvent { omhStorageClient.createFolder(event.name, parentId.peek()) }
+    }
+
+    private fun handleFileCreationEvent(fileCreation: suspend () -> Unit) {
         setState(FileViewerViewState.Loading)
-        val parentId = parentId.peek()
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                omhStorageClient.createFile(event.name, event.mimeType, parentId)
+                fileCreation()
                 refreshFileListEvent()
             } catch (exception: Exception) {
                 errorDialogMessage.postValue(exception.message)

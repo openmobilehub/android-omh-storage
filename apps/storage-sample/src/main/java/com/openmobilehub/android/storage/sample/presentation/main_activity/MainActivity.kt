@@ -17,9 +17,6 @@
 package com.openmobilehub.android.storage.sample.presentation.main_activity
 
 import android.os.Bundle
-import android.util.Log
-import android.webkit.MimeTypeMap
-import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
@@ -34,10 +31,10 @@ import com.openmobilehub.android.storage.sample.presentation.BaseFragment
 import com.openmobilehub.android.storage.sample.util.coInitialize
 import com.openmobilehub.android.storage.sample.util.isUserLoggedIn
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
-import javax.inject.Provider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import javax.inject.Provider
 
 @AndroidEntryPoint
 open class MainActivity : AppCompatActivity(), BaseFragment.BaseFragmentListener {

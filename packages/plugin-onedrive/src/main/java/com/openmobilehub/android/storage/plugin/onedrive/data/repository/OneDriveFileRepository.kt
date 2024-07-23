@@ -25,6 +25,8 @@ import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
+import com.openmobilehub.android.storage.core.utils.toInputStream
+import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemResponseToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.ExceptionMapper
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.toDriveRecipient
@@ -32,6 +34,9 @@ import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.toOmhPermis
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.toOmhVersion
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.toOneDriveString
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiService
+import com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit.OneDriveRestApiServiceProvider
+import com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit.body.CreateFolderRequestBody
+import com.openmobilehub.android.storage.plugin.onedrive.data.util.toApiException
 import com.openmobilehub.android.storage.plugin.onedrive.data.util.toByteArrayOutputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -39,7 +44,9 @@ import java.io.File
 @Suppress("TooManyFunctions")
 internal class OneDriveFileRepository(
     private val apiService: OneDriveApiService,
-    private val driveItemToOmhStorageEntity: DriveItemToOmhStorageEntity
+    private val retrofitImpl: OneDriveRestApiServiceProvider,
+    private val driveItemToOmhStorageEntity: DriveItemToOmhStorageEntity,
+    private val driveItemResponseToOmhStorageEntity: DriveItemResponseToOmhStorageEntity
 ) {
     fun getFilesList(parentId: String): List<OmhStorageEntity> = try {
         apiService.getFilesList(parentId).map {
@@ -151,5 +158,44 @@ internal class OneDriveFileRepository(
             )
     } catch (exception: ApiException) {
         throw ExceptionMapper.toOmhApiException(exception)
+    }
+
+    suspend fun createFolder(name: String, parentId: String): OmhStorageEntity {
+        val driveId = apiService.driveId
+
+        val response = retrofitImpl.getOneDriveApiService().createFolder(
+            driveId = driveId,
+            parentId = parentId,
+            body = CreateFolderRequestBody(name),
+        )
+
+        return if (response.isSuccessful) {
+            response.body()?.let { driveItemResponseToOmhStorageEntity(it) }
+                ?: throw OmhStorageException.ApiException(
+                    message = "Create succeeded but API failed to return expected folder"
+                )
+        } else {
+            throw response.toApiException()
+        }
+    }
+
+    fun createFile(name: String, extension: String, parentId: String): OmhStorageEntity {
+        val tempFile = File.createTempFile("tempFile", extension)
+
+        try {
+            val inputStream = tempFile.toInputStream()
+            val fullFileName = "$name.$extension"
+
+            val driveItem = apiService.createNewFile(fullFileName, parentId, inputStream)
+
+            return driveItem?.let { driveItemToOmhStorageEntity(it) }
+                ?: throw OmhStorageException.ApiException(
+                    message = "Create succeeded but API failed to return expected file"
+                )
+        } catch (exception: ApiException) {
+            throw ExceptionMapper.toOmhApiException(exception)
+        } finally {
+            tempFile.delete()
+        }
     }
 }

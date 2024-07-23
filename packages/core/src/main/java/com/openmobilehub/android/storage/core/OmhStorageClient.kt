@@ -76,17 +76,45 @@ abstract class OmhStorageClient protected constructor(
     abstract suspend fun search(query: String): List<OmhStorageEntity>
 
     /**
-     * This method create files in an specific folder
+     * This method create file in an specific folder
      *
      * @param name The name of the file to be created
      * @param mimeType The mimeType of the file to be created
      * @param parentId The id of the folder where the file will be created
      *
-     * @return An OmhStorageEntity with the information of the created file. Null in case the file was not created
+     * @return An OmhStorageEntity with the information of the created file.
      */
-    abstract suspend fun createFile(
+    abstract suspend fun createFileWithMimeType(
         name: String,
         mimeType: String,
+        parentId: String
+    ): OmhStorageEntity?
+
+    /**
+     * This method create file in an specific folder
+     *
+     * @param name The name of the file to be created
+     * @param extension The extension of the file to be created
+     * @param parentId The id of the folder where the file will be created
+     *
+     * @return An OmhStorageEntity with the information of the created file.
+     */
+    abstract suspend fun createFileWithExtension(
+        name: String,
+        extension: String,
+        parentId: String
+    ): OmhStorageEntity?
+
+    /**
+     * This method create folder in an specific folder
+     *
+     * @param name The name of the folder to be created
+     * @param parentId The id of the folder where the folder will be created
+     *
+     * @return An OmhStorageEntity with the information of the created folder.
+     */
+    abstract suspend fun createFolder(
+        name: String,
         parentId: String
     ): OmhStorageEntity?
 
