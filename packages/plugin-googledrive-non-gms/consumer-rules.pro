@@ -85,3 +85,16 @@
 -keepclassmembers class kotlin.Metadata {
     public <methods>;
 }
+
+# Jackson
+# Source: https://github.com/FasterXML/jackson-docs/wiki/JacksonOnAndroid
+-keep class com.fasterxml.jackson.databind.ObjectMapper {
+    public <methods>;
+    protected <methods>;
+}
+-keep class com.fasterxml.jackson.databind.ObjectWriter {
+    public ** writeValueAsString(**);
+}
+-keepnames class com.fasterxml.jackson.** { *; }
+-dontwarn com.fasterxml.jackson.databind.**
+-keep @com.fasterxml.jackson.annotation.JsonIgnoreProperties class * { *; }
