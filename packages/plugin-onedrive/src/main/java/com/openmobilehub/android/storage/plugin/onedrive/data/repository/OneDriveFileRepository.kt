@@ -122,6 +122,7 @@ internal class OneDriveFileRepository(
             recipients = listOf(permission.toDriveRecipient())
             message = emailMessage
             sendInvitation = sendNotificationEmail
+            requireSignIn = true
         }
 
         apiService.createPermission(fileId, requestBody).firstOrNull()?.toOmhPermission()
