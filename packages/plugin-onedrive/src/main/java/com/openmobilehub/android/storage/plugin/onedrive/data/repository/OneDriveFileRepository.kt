@@ -34,7 +34,7 @@ import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.toOmhPermis
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.toOmhVersion
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.toOneDriveString
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiService
-import com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit.OneDriveRestApiService
+import com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit.OneDriveRestApiServiceProvider
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit.body.CreateFolderRequestBody
 import com.openmobilehub.android.storage.plugin.onedrive.data.util.toApiException
 import com.openmobilehub.android.storage.plugin.onedrive.data.util.toByteArrayOutputStream
@@ -42,9 +42,9 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 
 @Suppress("TooManyFunctions")
-class OneDriveFileRepository(
+internal class OneDriveFileRepository(
     private val apiService: OneDriveApiService,
-    private val oneDriveRestApiService: OneDriveRestApiService,
+    private val retrofitImpl: OneDriveRestApiServiceProvider,
     private val driveItemToOmhStorageEntity: DriveItemToOmhStorageEntity,
     private val driveItemResponseToOmhStorageEntity: DriveItemResponseToOmhStorageEntity
 ) {
@@ -129,6 +129,7 @@ class OneDriveFileRepository(
             recipients = listOf(permission.toDriveRecipient())
             message = emailMessage
             sendInvitation = sendNotificationEmail
+            requireSignIn = true
         }
 
         apiService.createPermission(fileId, requestBody).firstOrNull()?.toOmhPermission()
@@ -162,7 +163,7 @@ class OneDriveFileRepository(
     suspend fun createFolder(name: String, parentId: String): OmhStorageEntity {
         val driveId = apiService.driveId
 
-        val response = oneDriveRestApiService.createFolder(
+        val response = retrofitImpl.getOneDriveApiService().createFolder(
             driveId = driveId,
             parentId = parentId,
             body = CreateFolderRequestBody(name),
@@ -187,16 +188,14 @@ class OneDriveFileRepository(
 
             val driveItem = apiService.createNewFile(fullFileName, parentId, inputStream)
 
-            tempFile.delete()
-
             return driveItem?.let { driveItemToOmhStorageEntity(it) }
                 ?: throw OmhStorageException.ApiException(
                     message = "Create succeeded but API failed to return expected file"
                 )
         } catch (exception: ApiException) {
-            tempFile.delete()
-
             throw ExceptionMapper.toOmhApiException(exception)
+        } finally {
+            tempFile.delete()
         }
     }
 }

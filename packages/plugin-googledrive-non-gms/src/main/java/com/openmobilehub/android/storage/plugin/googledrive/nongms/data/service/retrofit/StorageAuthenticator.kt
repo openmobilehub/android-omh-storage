@@ -16,16 +16,17 @@
 
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit
 
-import com.openmobilehub.android.auth.core.OmhCredentials
+import com.openmobilehub.android.auth.core.OmhAuthClient
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.accessToken
 import okhttp3.Authenticator
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.Route
 
-internal class StorageAuthenticator(private val credentials: OmhCredentials) : Authenticator {
+internal class StorageAuthenticator(private val omhAuthClient: OmhAuthClient) : Authenticator {
 
     override fun authenticate(route: Route?, response: Response): Request? {
-        val refreshedToken = credentials.accessToken ?: return null
+        val refreshedToken = omhAuthClient.accessToken ?: return null
         return response.request
             .newBuilder()
             .header(

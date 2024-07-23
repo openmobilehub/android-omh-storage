@@ -18,6 +18,7 @@ package com.openmobilehub.android.storage.plugin.dropbox.data.repository
 
 import androidx.annotation.VisibleForTesting
 import com.dropbox.core.DbxApiException
+import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
@@ -37,6 +38,9 @@ internal class DropboxFileRepository(
     private val apiService: DropboxApiService,
     private val metadataToOmhStorageEntity: MetadataToOmhStorageEntity
 ) {
+    internal interface Builder {
+        fun build(authClient: OmhAuthClient): DropboxFileRepository
+    }
 
     fun getFilesList(parentId: String): List<OmhStorageEntity> = try {
         val dropboxFiles = apiService.getFilesList(parentId)

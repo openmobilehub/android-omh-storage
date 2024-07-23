@@ -16,48 +16,33 @@
 
 package com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit
 
+import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.plugin.onedrive.BuildConfig
+import com.openmobilehub.android.storage.plugin.onedrive.data.util.accessToken
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
 
-class OneDriveRestApiServiceProvider(private val accessToken: String) {
+class OneDriveRestApiServiceProvider(private val omhAuthClient: OmhAuthClient) {
 
     companion object {
         internal const val HEADER_AUTHORIZATION_NAME = "Authorization"
         internal const val BEARER = "Bearer %s"
-
-        private var instance: OneDriveRestApiServiceProvider? = null
-
-        internal fun getInstance(accessToken: String): OneDriveRestApiServiceProvider {
-            if (instance == null) {
-                instance = OneDriveRestApiServiceProvider(accessToken)
-            }
-
-            return instance!!
-        }
     }
 
-    private var apiService: OneDriveRestApiService? = null
-
     fun getOneDriveApiService(): OneDriveRestApiService {
-        if (apiService != null) {
-            return apiService!!
-        }
-
         val retrofit = Retrofit.Builder()
             .client(createOkHttpClient())
             .addConverterFactory(createConverterFactory())
             .baseUrl(BuildConfig.ONEDRIVE_API_URL)
             .build()
 
-        apiService = retrofit.create(OneDriveRestApiService::class.java)
-        return apiService!!
+        return retrofit.create(OneDriveRestApiService::class.java)
     }
 
     private fun createOkHttpClient(): OkHttpClient {
-        val authenticator = OneDriveRestAuthenticator(accessToken)
+        val authenticator = OneDriveRestAuthenticator(omhAuthClient)
 
         return OkHttpClient.Builder()
             .addInterceptor { chain ->
@@ -73,7 +58,7 @@ class OneDriveRestApiServiceProvider(private val accessToken: String) {
         .newBuilder()
         .addHeader(
             HEADER_AUTHORIZATION_NAME,
-            BEARER.format(accessToken)
+            BEARER.format(omhAuthClient.accessToken.orEmpty())
         )
         .build()
 

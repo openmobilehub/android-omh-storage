@@ -18,14 +18,12 @@ package com.openmobilehub.android.storage.plugin.googledrive.nongms
 
 import android.webkit.MimeTypeMap
 import com.openmobilehub.android.auth.core.OmhAuthClient
-import com.openmobilehub.android.auth.core.OmhCredentials
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
-import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.LocalFileToMimeType
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.NonGmsFileRepository
@@ -42,10 +40,7 @@ internal class GoogleDriveNonGmsOmhStorageClient private constructor(
     internal class Builder : OmhStorageClient.Builder {
 
         override fun build(authClient: OmhAuthClient): OmhStorageClient {
-            val omhCredentials = authClient.getCredentials() as? OmhCredentials
-                ?: throw OmhStorageException.InvalidCredentialsException()
-
-            val retrofitImpl = GoogleStorageApiServiceProvider.getInstance(omhCredentials)
+            val retrofitImpl = GoogleStorageApiServiceProvider(authClient)
             val localFileToMimeType = LocalFileToMimeType(MimeTypeMap.getSingleton())
             val fileRepository = NonGmsFileRepository(retrofitImpl, localFileToMimeType)
 

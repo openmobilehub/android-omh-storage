@@ -21,7 +21,7 @@ sealed class OmhStorageException(
     override val cause: Throwable? = null
 ) : Exception(message, cause) {
 
-    class InvalidCredentialsException(message: String? = "A non-recoverable sign in failure occurred") :
+    class InvalidCredentialsException(message: String?) :
         OmhStorageException(message = message)
 
     class DeveloperErrorException(message: String, cause: Throwable? = null) :
