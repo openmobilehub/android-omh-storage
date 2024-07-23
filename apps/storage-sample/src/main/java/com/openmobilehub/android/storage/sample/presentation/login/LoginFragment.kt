@@ -55,7 +55,8 @@ class LoginFragment : BaseFragment<LoginViewModel, LoginViewState, LoginViewEven
                }
            })
         } else {
-            displayErrorDialog(getString(R.string.login_error, result.resultCode))
+            val errorMessage = result.data?.getStringExtra("errorMessage").toString()
+            displayErrorDialog(getString(R.string.login_error, result.resultCode, errorMessage))
         }
     }
 

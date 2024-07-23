@@ -38,23 +38,34 @@ import java.io.File
 @Suppress("TooManyFunctions")
 internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
     authClient: OmhAuthClient,
-    private val repository: DropboxFileRepository,
+    private val repositoryBuilder: DropboxFileRepository.Builder,
 ) : OmhStorageClient(authClient) {
 
     internal class Builder : OmhStorageClient.Builder {
-
         override fun build(authClient: OmhAuthClient): OmhStorageClient {
+            return DropboxOmhStorageClient(authClient, RepositoryBuilder())
+        }
+    }
+
+    internal class RepositoryBuilder : DropboxFileRepository.Builder {
+        private val metadataToOmhStorageEntity: MetadataToOmhStorageEntity by lazy {
+            MetadataToOmhStorageEntity(
+                MimeTypeMap.getSingleton()
+            )
+        }
+
+        override fun build(authClient: OmhAuthClient): DropboxFileRepository {
             val accessToken = authClient.getCredentials().accessToken
-                ?: throw OmhStorageException.InvalidCredentialsException()
+                ?: throw OmhStorageException.InvalidCredentialsException("Couldn't get access token from auth client")
 
             val client = DropboxApiClient.getInstance(accessToken)
             val apiService = DropboxApiService(client)
-            val metadataToOmhStorageEntity = MetadataToOmhStorageEntity(MimeTypeMap.getSingleton())
-            val repository = DropboxFileRepository(apiService, metadataToOmhStorageEntity)
-
-            return DropboxOmhStorageClient(authClient, repository)
+            return DropboxFileRepository(apiService, metadataToOmhStorageEntity)
         }
     }
+
+    private val repository: DropboxFileRepository
+        get() = repositoryBuilder.build(authClient)
 
     override val rootFolder: String
         get() = DropboxConstants.ROOT_FOLDER

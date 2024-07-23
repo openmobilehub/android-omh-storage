@@ -23,7 +23,6 @@ import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
-import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.plugin.onedrive.data.repository.OneDriveFileRepository
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_EMAIL_MESSAGE
@@ -90,15 +89,17 @@ internal class OneDriveOmhStorageClientBuilderTest {
         assertNotNull(client)
     }
 
+    // Credentials validation is postponed to the first API call
     @Test
-    fun `given invalid credentials, when building, then throw InvalidCredentialsException`() {
+    fun `given invalid credentials, when building, then return OneDriveOmhStorageClient`() {
         // Arrange
         every { authClient.getCredentials().accessToken } returns null
 
-        // Act & Assert
-        assertThrows(OmhStorageException.InvalidCredentialsException::class.java) {
-            builder.build(authClient)
-        }
+        // Act
+        val client = builder.build(authClient)
+
+        // Assert
+        assertNotNull(client)
     }
 }
 

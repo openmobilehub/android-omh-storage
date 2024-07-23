@@ -23,27 +23,16 @@ import com.microsoft.graph.models.DriveItem
 import com.microsoft.graph.models.DriveItemUploadableProperties
 import com.microsoft.graph.models.DriveItemVersionCollectionResponse
 import com.microsoft.graph.models.Permission
+import com.microsoft.kiota.ApiException
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.utils.toInputStream
 import java.io.File
 import java.io.InputStream
 
 @Suppress("TooManyFunctions")
-class OneDriveApiService(private val apiClient: OneDriveApiClient) {
-    private val driveId by lazy { retrieveDriveId() }
-
-    @Suppress("TooGenericExceptionCaught")
-    @VisibleForTesting
-    internal fun retrieveDriveId(): String {
-        try {
-            return apiClient.graphServiceClient.me().drive().get().id
-        } catch (exception: Exception) {
-            throw OmhStorageException.ApiException(
-                message = "Couldn't get drive id",
-                cause = exception
-            )
-        }
-    }
+internal class OneDriveApiService(private val apiClient: OneDriveApiClient) {
+    private val driveIdCache = DriveIdCache(apiClient)
+    private val driveId get() = driveIdCache.driveId
 
     fun getFilesList(parentId: String): List<DriveItem> {
         return apiClient.graphServiceClient.drives().byDriveId(driveId).items()
@@ -158,5 +147,37 @@ class OneDriveApiService(private val apiClient: OneDriveApiClient) {
                     this.roles = listOf(role)
                 }
             )
+    }
+
+    @VisibleForTesting
+    internal class DriveIdCache(private val apiClient: OneDriveApiClient) {
+        private var cachedDriveId: String? = null
+        private var previousAccessToken: String? = null
+
+        val driveId: String
+            get() {
+                val accessToken = apiClient.authProvider.accessToken
+                cachedDriveId.let { driveId ->
+                    if (driveId == null || previousAccessToken != accessToken) {
+                        return retrieveDriveId().also {
+                            previousAccessToken = accessToken
+                            cachedDriveId = it
+                        }
+                    }
+                    return driveId
+                }
+            }
+
+        @VisibleForTesting
+        internal fun retrieveDriveId(): String {
+            try {
+                return apiClient.graphServiceClient.me().drive().get().id
+            } catch (exception: ApiException) {
+                throw OmhStorageException.ApiException(
+                    message = "Couldn't get drive id",
+                    cause = exception
+                )
+            }
+        }
     }
 }

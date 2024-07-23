@@ -19,6 +19,7 @@ package com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository
 import android.webkit.MimeTypeMap
 import com.google.api.client.http.FileContent
 import com.google.api.client.http.HttpResponseException
+import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhPermission
@@ -43,6 +44,10 @@ internal class GmsFileRepository(
 ) {
     companion object {
         private const val ANY_MIME_TYPE = "*/*"
+    }
+
+    internal interface Builder {
+        fun build(authClient: OmhAuthClient): GmsFileRepository
     }
 
     fun getFilesList(parentId: String): List<OmhStorageEntity> = try {

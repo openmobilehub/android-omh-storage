@@ -16,6 +16,7 @@
 
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils
 
+import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
@@ -68,6 +69,7 @@ fun ResponseBody?.toOmhStorageEntityMetadata(): OmhStorageMetadata {
                 parentId
             )
         }
+
         else -> {
             omhStorageEntity = OmhStorageEntity.OmhFile(
                 id,
@@ -90,3 +92,6 @@ fun <T> Response<T>.toApiException(): OmhStorageException.ApiException =
 
 val <T> Response<T>.isNotSuccessful: Boolean
     get() = !isSuccessful
+
+val OmhAuthClient.accessToken: String?
+    get() = getCredentials().accessToken
