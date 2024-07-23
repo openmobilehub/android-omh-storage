@@ -16,50 +16,34 @@
 
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit
 
-import com.openmobilehub.android.auth.core.OmhCredentials
+import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.BuildConfig
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.GoogleStorageApiService
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.accessToken
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.jackson.JacksonConverterFactory
 
-internal class GoogleStorageApiServiceProvider(private val omhCredentials: OmhCredentials) {
+internal class GoogleStorageApiServiceProvider(private val omhAuthClient: OmhAuthClient) {
 
     companion object {
         internal const val HEADER_AUTHORIZATION_NAME = "Authorization"
         internal const val BEARER = "Bearer %s"
-
-        private var instance: GoogleStorageApiServiceProvider? = null
-
-        internal fun getInstance(omhCredentials: OmhCredentials): GoogleStorageApiServiceProvider {
-            if (instance == null) {
-                instance = GoogleStorageApiServiceProvider(omhCredentials)
-            }
-
-            return instance!!
-        }
     }
 
-    private var apiService: GoogleStorageApiService? = null
-
     fun getGoogleStorageApiService(): GoogleStorageApiService {
-        if (apiService != null) {
-            return apiService!!
-        }
-
         val retrofit = Retrofit.Builder()
             .client(createOkHttpClient())
             .addConverterFactory(createConverterFactory())
             .baseUrl(BuildConfig.G_STORAGE_URL)
             .build()
 
-        apiService = retrofit.create(GoogleStorageApiService::class.java)
-        return apiService!!
+        return retrofit.create(GoogleStorageApiService::class.java)
     }
 
     private fun createOkHttpClient(): OkHttpClient {
-        val authenticator = StorageAuthenticator(omhCredentials)
+        val authenticator = StorageAuthenticator(omhAuthClient)
         return OkHttpClient.Builder()
             .addInterceptor { chain ->
                 val request = setupRequestInterceptor(chain)
@@ -74,7 +58,7 @@ internal class GoogleStorageApiServiceProvider(private val omhCredentials: OmhCr
         .newBuilder()
         .addHeader(
             HEADER_AUTHORIZATION_NAME,
-            BEARER.format(omhCredentials.accessToken.orEmpty())
+            BEARER.format(omhAuthClient.accessToken.orEmpty())
         )
         .build()
 

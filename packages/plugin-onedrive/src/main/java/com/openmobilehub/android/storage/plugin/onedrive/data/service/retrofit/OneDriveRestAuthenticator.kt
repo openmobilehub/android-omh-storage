@@ -16,19 +16,22 @@
 
 package com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit
 
+import com.openmobilehub.android.auth.core.OmhAuthClient
+import com.openmobilehub.android.storage.plugin.onedrive.data.util.accessToken
 import okhttp3.Authenticator
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.Route
 
-internal class OneDriveRestAuthenticator(private val accessToken: String) : Authenticator {
+internal class OneDriveRestAuthenticator(private val omhAuthClient: OmhAuthClient) : Authenticator {
 
-    override fun authenticate(route: Route?, response: Response): Request {
+    override fun authenticate(route: Route?, response: Response): Request? {
+        val refreshedToken = omhAuthClient.accessToken ?: return null
         return response.request
             .newBuilder()
             .header(
                 name = OneDriveRestApiServiceProvider.HEADER_AUTHORIZATION_NAME,
-                value = OneDriveRestApiServiceProvider.BEARER.format(accessToken)
+                value = OneDriveRestApiServiceProvider.BEARER.format(refreshedToken)
             )
             .build()
     }

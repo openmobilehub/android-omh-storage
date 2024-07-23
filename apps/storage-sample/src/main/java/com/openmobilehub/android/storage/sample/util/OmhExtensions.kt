@@ -35,7 +35,9 @@ private val NON_SUPPORTED_MIME_TYPES_FOR_DOWNLOAD = listOf(
     FileType.GOOGLE_UNKNOWN
 )
 
-fun OmhStorageEntity.OmhFile.isDownloadable(): Boolean = !NON_SUPPORTED_MIME_TYPES_FOR_DOWNLOAD.contains(getFileType())
+fun OmhStorageEntity.OmhFile.isDownloadable(): Boolean =
+    !NON_SUPPORTED_MIME_TYPES_FOR_DOWNLOAD.contains(getFileType())
+
 fun OmhStorageEntity.OmhFile.getFileType() = mimeType?.let {
     FileTypeMapper.getFileTypeWithMime(it)
 } ?: FileType.OTHER
@@ -51,6 +53,7 @@ fun OmhStorageEntity.OmhFile.normalizedFileType(): FileType = when (getFileType(
     FileType.GOOGLE_SPREADSHEET -> FileType.MICROSOFT_EXCEL
     FileType.GOOGLE_VIDEO,
     FileType.GOOGLE_AUDIO -> FileType.MP4
+
     else -> FileType.OTHER
 }
 
@@ -63,7 +66,27 @@ suspend fun OmhAuthClient.isUserLoggedIn(): Boolean = suspendCoroutine { continu
             continuation.resume(true)
         }
         .addOnFailure {
-            continuation.resume(false)
+            getCredentials().apply {
+                if (accessToken == null) {
+                    continuation.resume(false)
+                } else {
+                    refreshAccessToken()
+                        .addOnSuccess {
+                            continuation.resume(true)
+                        }
+                        .addOnFailure {
+                            signOut()
+                                .addOnSuccess {
+                                    continuation.resume(false)
+                                }
+                                .addOnFailure {
+                                    continuation.resume(false)
+                                }
+                                .execute()
+                        }
+                        .execute()
+                }
+            }
         }
         .execute()
 }

@@ -16,9 +16,13 @@
 
 package com.openmobilehub.android.storage.plugin.onedrive.data.util
 
+import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import retrofit2.HttpException
 import retrofit2.Response
 
 fun <T> Response<T>.toApiException(): OmhStorageException.ApiException =
     OmhStorageException.ApiException(code(), errorBody()?.string(), HttpException(this))
+
+val OmhAuthClient.accessToken: String?
+    get() = getCredentials().accessToken

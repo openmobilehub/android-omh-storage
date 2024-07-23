@@ -31,8 +31,8 @@ internal class GoogleDriveApiProvider private constructor(internal val credentia
 
         internal fun getInstance(newCred: GoogleAccountCredential): GoogleDriveApiProvider {
             val oldCred: GoogleAccountCredential? = instance?.credential
-            val isDifferentAccount = oldCred?.selectedAccountName != newCred.selectedAccountName
-            if (instance == null || isDifferentAccount) {
+            val newToken = oldCred?.token != newCred.token
+            if (instance == null || newToken) {
                 instance = GoogleDriveApiProvider(newCred)
             }
 

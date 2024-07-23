@@ -36,6 +36,7 @@ import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.toOmhPermis
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.toOmhVersion
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiService
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit.OneDriveRestApiService
+import com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit.OneDriveRestApiServiceProvider
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit.response.DriveItemResponse
 import com.openmobilehub.android.storage.plugin.onedrive.data.util.toByteArrayOutputStream
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_EMAIL_MESSAGE
@@ -92,7 +93,11 @@ class OneDriveFileRepositoryTest {
     @MockK
     private lateinit var apiService: OneDriveApiService
 
-    @MockK lateinit var oneDriveRestApiService: OneDriveRestApiService
+    @MockK
+    private lateinit var oneDriveRestApiServiceProvider: OneDriveRestApiServiceProvider
+
+    @MockK
+    lateinit var oneDriveRestApiService: OneDriveRestApiService
 
     @MockK
     private lateinit var driveItemToOmhStorageEntity: DriveItemToOmhStorageEntity
@@ -130,9 +135,11 @@ class OneDriveFileRepositoryTest {
         mockkStatic("com.openmobilehub.android.storage.plugin.onedrive.data.mapper.VersionMappersKt")
         mockkStatic("com.openmobilehub.android.storage.plugin.onedrive.data.mapper.PermissionMapperKt")
 
+        every { oneDriveRestApiServiceProvider.getOneDriveApiService() } returns oneDriveRestApiService
+
         repository = OneDriveFileRepository(
             apiService,
-            oneDriveRestApiService,
+            oneDriveRestApiServiceProvider,
             driveItemToOmhStorageEntity,
             driveItemResponseToOmhStorageEntity
         )
