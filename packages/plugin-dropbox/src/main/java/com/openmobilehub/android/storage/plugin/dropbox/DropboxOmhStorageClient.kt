@@ -148,7 +148,7 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
     }
 
     override suspend fun getFilePermissions(fileId: String): List<OmhPermission> {
-        return repository.getFilePermissions(fileId)
+        return repository.getPermissions(fileId)
     }
 
     override suspend fun getFileMetadata(fileId: String): OmhStorageMetadata {
@@ -165,7 +165,9 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         sendNotificationEmail: Boolean,
         emailMessage: String?
     ): OmhPermission? {
-        return repository.createPermission(fileId, permission, sendNotificationEmail, emailMessage)
+        repository.createPermission(fileId, permission, sendNotificationEmail, emailMessage)
+        // Dropbox does not return created permission as a result
+        return null
     }
 
     override suspend fun updatePermission(

@@ -18,6 +18,8 @@ package com.openmobilehub.android.storage.plugin.dropbox.data.repository
 
 import androidx.annotation.VisibleForTesting
 import com.dropbox.core.DbxApiException
+import com.dropbox.core.v2.files.FolderMetadata
+import com.dropbox.core.v2.sharing.SharedFolderMetadata
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
@@ -30,11 +32,13 @@ import com.openmobilehub.android.storage.plugin.dropbox.DropboxConstants
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.ExceptionMapper
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.MetadataToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.toAccessLevel
+import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.toAddMember
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.toMemberSelector
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.toOmhPermission
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.toOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.toOmhVersion
 import com.openmobilehub.android.storage.plugin.dropbox.data.service.DropboxApiService
+import kotlinx.coroutines.delay
 import java.io.ByteArrayOutputStream
 import java.io.File
 
@@ -43,6 +47,12 @@ internal class DropboxFileRepository(
     private val apiService: DropboxApiService,
     private val metadataToOmhStorageEntity: MetadataToOmhStorageEntity
 ) {
+
+    companion object {
+        const val CHECK_JOB_STATUS_RETRY_TIMES = 10
+        const val CHECK_JOB_STATUS_DELAY = 1_000L // one sec
+    }
+
     internal interface Builder {
         fun build(authClient: OmhAuthClient): DropboxFileRepository
     }
@@ -168,26 +178,55 @@ internal class DropboxFileRepository(
         }
     }
 
-    fun createPermission(
+    suspend fun createPermission(
         fileId: String,
         permission: OmhCreatePermission,
         sendNotificationEmail: Boolean,
         emailMessage: String?
-    ): OmhPermission? {
+    ) {
+        val folderMetadata = isFolder(fileId)
         try {
-            val result = apiService.createPermission(
-                fileId,
-                permission.toMemberSelector(),
-                permission.toAccessLevel(),
-                sendNotificationEmail,
-                emailMessage
-            ).firstOrNull()
+            if (folderMetadata != null) {
+                val sharedFolderId = folderMetadata.sharedFolderId
 
-            if (result?.result?.isSuccess == true) {
-                // Dropbox does not return created permission as a result
-                return null
+                if (sharedFolderId == null) {
+                    shareFolder(
+                        fileId,
+                        permission,
+                        sendNotificationEmail,
+                        emailMessage
+                    )
+                } else {
+                    createFolderPermission(
+                        sharedFolderId,
+                        permission,
+                        sendNotificationEmail,
+                        emailMessage
+                    )
+                }
+            } else {
+                createFilePermission(fileId, permission, sendNotificationEmail, emailMessage)
             }
+        } catch (exception: DbxApiException) {
+            throw ExceptionMapper.toOmhApiException(exception)
+        }
+    }
 
+    private fun createFilePermission(
+        fileId: String,
+        permission: OmhCreatePermission,
+        sendNotificationEmail: Boolean,
+        emailMessage: String?
+    ) {
+        val result = apiService.createFilePermission(
+            fileId,
+            permission.toMemberSelector(),
+            permission.toAccessLevel(),
+            sendNotificationEmail,
+            emailMessage
+        ).firstOrNull()
+
+        if (result?.result?.isSuccess != true) {
             val errorMessage = if (result?.result?.isMemberError == true) {
                 result.result.memberErrorValue.toStringMultiline()
             } else {
@@ -195,9 +234,59 @@ internal class DropboxFileRepository(
             }
 
             throw OmhStorageException.ApiException(message = errorMessage)
-        } catch (exception: DbxApiException) {
-            throw ExceptionMapper.toOmhApiException(exception)
         }
+    }
+
+    private suspend fun shareFolder(
+        folderId: String,
+        permission: OmhCreatePermission,
+        sendNotificationEmail: Boolean,
+        emailMessage: String?
+    ) {
+        val shareFolderLaunch = apiService.shareFolder(
+            folderId,
+        )
+
+        val sharedFolderId = if (!shareFolderLaunch.isComplete) {
+            waitForShareJobToFinish(shareFolderLaunch.asyncJobIdValue)
+        } else {
+            shareFolderLaunch.completeValue
+        }.sharedFolderId
+
+        createFolderPermission(
+            sharedFolderId,
+            permission,
+            sendNotificationEmail,
+            emailMessage
+        )
+    }
+
+    private suspend fun waitForShareJobToFinish(
+        asyncJobIdValue: String
+    ): SharedFolderMetadata {
+        repeat(CHECK_JOB_STATUS_RETRY_TIMES) {
+            val result = apiService.checkShareFolderJobStatus(asyncJobIdValue)
+            if (result.isComplete) {
+                return result.completeValue
+            }
+            delay(CHECK_JOB_STATUS_DELAY)
+        }
+
+        throw OmhStorageException.ApiException(message = "Sharing folder job did not finish in expected time")
+    }
+
+    private fun createFolderPermission(
+        sharedFolderId: String,
+        permission: OmhCreatePermission,
+        sendNotificationEmail: Boolean,
+        emailMessage: String?
+    ) {
+        apiService.createFolderPermission(
+            sharedFolderId,
+            permission.toAddMember(),
+            sendNotificationEmail,
+            emailMessage
+        )
     }
 
     fun getWebUrl(fileId: String): String = try {
@@ -206,11 +295,33 @@ internal class DropboxFileRepository(
         throw ExceptionMapper.toOmhApiException(exception)
     }
 
-    fun getFilePermissions(fileId: String): List<OmhPermission> {
+    fun getPermissions(fileId: String): List<OmhPermission> {
+        val folderMetadata = isFolder(fileId)
+
+        return if (folderMetadata != null) {
+            getFolderPermissions(folderMetadata.sharedFolderId ?: return emptyList())
+        } else {
+            getFilePermissions(fileId)
+        }
+    }
+
+    private fun getFilePermissions(fileId: String): List<OmhPermission> {
         val result = apiService.getFilePermissions(fileId)
 
         return result.users.mapNotNull { it.toOmhPermission() }.plus(
             result.groups.mapNotNull { it.toOmhPermission() }
         )
+    }
+
+    private fun getFolderPermissions(sharedFolderId: String): List<OmhPermission> {
+        val result = apiService.getFolderPermissions(sharedFolderId)
+
+        return result.users.mapNotNull { it.toOmhPermission() }.plus(
+            result.groups.mapNotNull { it.toOmhPermission() }
+        )
+    }
+
+    private fun isFolder(fileId: String): FolderMetadata? {
+        return apiService.getFile(fileId) as? FolderMetadata
     }
 }

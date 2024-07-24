@@ -35,6 +35,7 @@ const val TEST_EMAIL_MESSAGE = "Test message"
 val testOmhPermission = OmhPermission.IdentityPermission(
     TEST_PERMISSION_ID,
     OmhPermissionRole.OWNER,
+    null,
     OmhIdentity.User(
         null,
         TEST_PERMISSION_DISPLAY_NAME,
@@ -44,7 +45,6 @@ val testOmhPermission = OmhPermission.IdentityPermission(
         TEST_PERMISSION_PHOTO_LINK,
         null
     ),
-    null,
 )
 
 val createOwnerPermission = OmhCreatePermission.CreateIdentityPermission(

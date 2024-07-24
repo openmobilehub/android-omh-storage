@@ -17,11 +17,12 @@
 package com.openmobilehub.android.storage.plugin.dropbox.data.mapper
 
 import com.dropbox.core.v2.sharing.AccessLevel
+import com.dropbox.core.v2.sharing.AddMember
 import com.dropbox.core.v2.sharing.GroupInfo
 import com.dropbox.core.v2.sharing.GroupMembershipInfo
 import com.dropbox.core.v2.sharing.MemberSelector
-import com.dropbox.core.v2.sharing.UserFileMembershipInfo
 import com.dropbox.core.v2.sharing.UserInfo
+import com.dropbox.core.v2.sharing.UserMembershipInfo
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhIdentity
 import com.openmobilehub.android.storage.core.model.OmhPermission
@@ -29,7 +30,7 @@ import com.openmobilehub.android.storage.core.model.OmhPermissionRecipient
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 
 @Suppress("ReturnCount")
-internal fun UserFileMembershipInfo.toOmhPermission(): OmhPermission? {
+internal fun UserMembershipInfo.toOmhPermission(): OmhPermission? {
     val user = user.toOmhUserIdentity()
 
     return OmhPermission.IdentityPermission(
@@ -71,6 +72,13 @@ internal fun GroupInfo.toOmhGroupIdentity(): OmhIdentity.Group = OmhIdentity.Gro
 
 internal fun OmhCreatePermission.toMemberSelector(): MemberSelector = when (this) {
     is OmhCreatePermission.CreateIdentityPermission -> this.toMemberSelector()
+}
+
+internal fun OmhCreatePermission.toAddMember(): AddMember = when (this) {
+    is OmhCreatePermission.CreateIdentityPermission -> AddMember(
+        this.toMemberSelector(),
+        this.toAccessLevel()
+    )
 }
 
 internal fun OmhCreatePermission.CreateIdentityPermission.toMemberSelector(): MemberSelector =

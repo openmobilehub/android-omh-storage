@@ -112,10 +112,12 @@ internal fun PermissionResponse.toPermission(): OmhPermission? {
         return null
     }
 
+    val inheritedFrom = permissionDetails?.firstOrNull { it.inheritedFrom != null }
     return OmhPermission.IdentityPermission(
         id,
         omhRole,
-        permissionDetails?.firstOrNull { it.inheritedFrom != null }?.inheritedFrom != null,
+        // permissionDetails are present only for shared drive items
+        if (permissionDetails.isNullOrEmpty()) null else inheritedFrom != null,
         getOmhIdentity() ?: return null,
     )
 }

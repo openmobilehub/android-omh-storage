@@ -20,6 +20,7 @@ dependencies {
 
     // Annotation
     implementation(Libs.androidxAnnotation)
+    implementation(Libs.coroutinesCore)
 
     // Test dependencies
     testImplementation(kotlin("test"))

@@ -114,7 +114,7 @@ class DropboxFileRepositoryTest {
         mockkStatic("com.openmobilehub.android.storage.core.utils.FileExtensionsKt")
         every { file.toInputStream() } returns mockk<FileInputStream>()
 
-        mockkStatic("com.openmobilehub.android.storage.plugin.dropbox.data.mapper.DataMappersKt")
+        mockkStatic("com.openmobilehub.android.storage.plugin.dropbox.data.mapper.VersionMappersKt")
 
         repository = DropboxFileRepository(apiService, metadataToOmhStorageEntity)
     }
