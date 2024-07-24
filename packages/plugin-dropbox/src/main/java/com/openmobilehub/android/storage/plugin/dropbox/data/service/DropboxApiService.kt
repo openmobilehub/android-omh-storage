@@ -22,7 +22,9 @@ import com.dropbox.core.v2.files.FileMetadata
 import com.dropbox.core.v2.files.ListFolderResult
 import com.dropbox.core.v2.files.ListRevisionsResult
 import com.dropbox.core.v2.files.Metadata
+import com.dropbox.core.v2.files.RelocationResult
 import com.dropbox.core.v2.files.SearchV2Result
+import com.dropbox.core.v2.files.WriteMode
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 
@@ -32,10 +34,18 @@ internal class DropboxApiService(private val apiClient: DropboxApiClient) {
         return apiClient.dropboxApiService.files().listFolder(parentId)
     }
 
-    fun uploadFile(inputStream: InputStream, path: String): FileMetadata {
+    fun uploadFile(
+        inputStream: InputStream,
+        path: String,
+        withAutorename: Boolean = true,
+        writeMode: WriteMode = WriteMode.ADD
+    ): FileMetadata {
         // withAutorename(true) is used to avoid conflicts with existing files
         // by renaming the uploaded file. It matches the Google Drive API behavior.
-        return apiClient.dropboxApiService.files().uploadBuilder(path).withAutorename(true)
+
+        return apiClient.dropboxApiService.files().uploadBuilder(path)
+            .withAutorename(withAutorename)
+            .withMode(writeMode)
             .uploadAndFinish(inputStream)
     }
 
@@ -71,5 +81,9 @@ internal class DropboxApiService(private val apiClient: DropboxApiClient) {
 
     fun createFolder(path: String): CreateFolderResult {
         return apiClient.dropboxApiService.files().createFolderV2(path)
+    }
+
+    fun moveFile(fromPath: String, toPath: String): RelocationResult? {
+        return apiClient.dropboxApiService.files().moveV2Builder(fromPath, toPath).withAutorename(true).start()
     }
 }

@@ -18,6 +18,7 @@ package com.openmobilehub.android.storage.plugin.dropbox.data.repository
 
 import androidx.annotation.VisibleForTesting
 import com.dropbox.core.DbxApiException
+import com.dropbox.core.v2.files.WriteMode
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
@@ -161,5 +162,42 @@ internal class DropboxFileRepository(
         } finally {
             tempFile.delete()
         }
+    }
+
+    private fun renameFile(fileId: String, newName: String): OmhStorageEntity? {
+        try {
+            val fileMetadata = apiService.getFile(fileId)
+
+            val pathWithoutFileName =
+                fileMetadata.pathLower!!.substringBeforeLast(fileMetadata.name.lowercase())
+            val newPath = "$pathWithoutFileName$newName"
+
+            if (fileMetadata.name == newName) {
+                return metadataToOmhStorageEntity(fileMetadata)
+            }
+
+            val result = apiService.moveFile(fileMetadata.pathLower!!, newPath)
+
+            return metadataToOmhStorageEntity(result?.metadata!!)
+        } catch (exception: DbxApiException) {
+            throw ExceptionMapper.toOmhApiException(exception)
+        }
+    }
+
+    fun updateFile(newFile: File, fileId: String): OmhStorageEntity? = try {
+        val inputStream = newFile.toInputStream()
+
+        val fileMetadata = apiService.getFile(fileId)
+
+        apiService.uploadFile(
+            inputStream,
+            fileMetadata.pathLower!!,
+            false,
+            WriteMode.OVERWRITE
+        )
+
+        renameFile(fileId, newFile.name)
+    } catch (exception: DbxApiException) {
+        throw ExceptionMapper.toOmhApiException(exception)
     }
 }
