@@ -76,9 +76,14 @@ class AuthModule {
     @Singleton
     fun providesDropboxAuthClient(@ApplicationContext context: Context): DropboxAuthClient {
         return DropboxAuthClient(
-            scopes = arrayListOf("account_info.read", "files.metadata.read", "files.content.write", "files.content.read"),
+            scopes = arrayListOf(
+                "account_info.read",
+                "files.metadata.read",
+                "files.content.write",
+                "files.content.read"
+            ),
             context = context,
-            appId = BuildConfig.DROPBOX_APP_KEY,
+            appId = BuildConfig.DROPBOX_CLIENT_ID,
         )
     }
 

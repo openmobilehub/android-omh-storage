@@ -23,4 +23,14 @@ object GoogleDriveNonGmsConstants {
 
     internal const val ROOT_FOLDER = "root"
     internal const val FOLDER_MIME_TYPE = "application/vnd.google-apps.folder"
+
+    internal const val USER_TYPE = "user"
+    internal const val GROUP_TYPE = "group"
+    internal const val DOMAIN_TYPE = "domain"
+    internal const val ANYONE_TYPE = "anyone"
+
+    internal const val OWNER_ROLE = "owner"
+    internal const val WRITER_ROLE = "writer"
+    internal const val COMMENTER_ROLE = "commenter"
+    internal const val READER_ROLE = "reader"
 }

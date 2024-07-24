@@ -20,6 +20,7 @@ import android.webkit.MimeTypeMap
 import com.microsoft.graph.models.DriveItem
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.utils.getMimeTypeFromUrl
+import com.openmobilehub.android.storage.core.utils.removeSpecialCharacters
 import com.openmobilehub.android.storage.core.utils.removeWhitespaces
 import java.util.Date
 
@@ -27,6 +28,8 @@ class DriveItemToOmhStorageEntity(private val mimeTypeMap: MimeTypeMap) {
     operator fun invoke(driveItem: DriveItem): OmhStorageEntity {
         driveItem.run {
             val isFolder = folder != null
+
+            val createdTime = null // Microsoft does not provide a created date
             val modifiedTime = Date.from(lastModifiedDateTime.toInstant())
             val parentId = parentReference.id
 
@@ -34,21 +37,24 @@ class DriveItemToOmhStorageEntity(private val mimeTypeMap: MimeTypeMap) {
                 OmhStorageEntity.OmhFolder(
                     id,
                     name,
+                    createdTime,
                     modifiedTime,
                     parentId,
                 )
             } else {
-                val sanitizedName = name.removeWhitespaces()
+                val sanitizedName = name.removeWhitespaces().removeSpecialCharacters()
                 val mimeType = mimeTypeMap.getMimeTypeFromUrl(sanitizedName)
                 val extension = MimeTypeMap.getFileExtensionFromUrl(sanitizedName)?.ifEmpty { null }
 
                 OmhStorageEntity.OmhFile(
                     id,
                     name,
+                    createdTime,
                     modifiedTime,
                     parentId,
                     mimeType,
                     extension,
+                    size.toInt()
                 )
             }
         }

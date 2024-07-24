@@ -17,7 +17,9 @@
 package com.openmobilehub.android.storage.plugin.dropbox.data.mapper
 
 import com.dropbox.core.v2.files.FileMetadata
+import com.dropbox.core.v2.files.FolderMetadata
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.utils.DateUtils
 
 fun FileMetadata.toOmhVersion(): OmhFileVersion {
@@ -27,5 +29,18 @@ fun FileMetadata.toOmhVersion(): OmhFileVersion {
         id,
         rev,
         lastModifiedDate
+    )
+}
+
+fun FolderMetadata.toOmhStorageEntity(): OmhStorageEntity {
+    val createdTime = null // Dropbox does not provide a created date
+    val modifiedDate = null // Dropbox does not provide a modified date for folders
+
+    return OmhStorageEntity.OmhFolder(
+        id,
+        name,
+        createdTime,
+        modifiedDate,
+        parentSharedFolderId
     )
 }

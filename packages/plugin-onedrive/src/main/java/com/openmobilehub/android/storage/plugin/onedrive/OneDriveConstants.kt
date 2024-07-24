@@ -23,4 +23,8 @@ object OneDriveConstants {
 
     internal const val ROOT_FOLDER = "root"
     internal const val BUFFER_SIZE = 65536 // 64 KB
+
+    internal const val OWNER_ROLE = "owner"
+    internal const val WRITE_ROLE = "write"
+    internal const val READ_ROLE = "read"
 }

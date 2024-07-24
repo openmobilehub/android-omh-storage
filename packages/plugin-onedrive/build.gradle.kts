@@ -6,6 +6,11 @@ android {
     namespace = "com.openmobilehub.android.storage.plugin.onedrive"
     defaultConfig {
         minSdk = 26
+        buildConfigField(
+            type = "String",
+            name = "ONEDRIVE_API_URL",
+            value = getRequiredValueFromEnvOrProperties("oneDriveStorageUrl")
+        )
     }
 }
 
@@ -19,7 +24,13 @@ dependencies {
     }
 
     // MsGraph
-    implementation(Libs.msGraph)
+    api(Libs.msGraph)
+
+    // Retrofit setup
+    implementation(Libs.retrofit)
+    implementation(Libs.retrofitJacksonConverter)
+    implementation(Libs.okHttp)
+    implementation(Libs.okHttpLoggingInterceptor)
 
     // Annotation
     implementation(Libs.androidxAnnotation)

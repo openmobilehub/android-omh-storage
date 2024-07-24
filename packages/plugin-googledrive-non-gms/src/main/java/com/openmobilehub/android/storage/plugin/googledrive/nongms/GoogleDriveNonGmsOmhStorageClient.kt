@@ -16,14 +16,16 @@
 
 package com.openmobilehub.android.storage.plugin.googledrive.nongms
 
+import android.webkit.MimeTypeMap
 import com.openmobilehub.android.auth.core.OmhAuthClient
-import com.openmobilehub.android.auth.core.OmhCredentials
-import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 import com.openmobilehub.android.storage.core.OmhStorageClient
-import com.openmobilehub.android.storage.core.model.OmhFilePermission
+import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhPermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
-import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.LocalFileToMimeType
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.NonGmsFileRepository
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit.GoogleStorageApiServiceProvider
 import java.io.ByteArrayOutputStream
@@ -38,12 +40,9 @@ internal class GoogleDriveNonGmsOmhStorageClient private constructor(
     internal class Builder : OmhStorageClient.Builder {
 
         override fun build(authClient: OmhAuthClient): OmhStorageClient {
-            val omhCredentials = authClient.getCredentials() as? OmhCredentials
-                ?: throw OmhStorageException.InvalidCredentialsException(OmhAuthStatusCodes.SIGN_IN_FAILED)
-
-            val retrofitImpl = GoogleStorageApiServiceProvider.getInstance(omhCredentials)
-
-            val fileRepository = NonGmsFileRepository(retrofitImpl)
+            val retrofitImpl = GoogleStorageApiServiceProvider(authClient)
+            val localFileToMimeType = LocalFileToMimeType(MimeTypeMap.getSingleton())
+            val fileRepository = NonGmsFileRepository(retrofitImpl, localFileToMimeType)
 
             return GoogleDriveNonGmsOmhStorageClient(authClient, fileRepository)
         }
@@ -60,7 +59,7 @@ internal class GoogleDriveNonGmsOmhStorageClient private constructor(
         return fileRepository.search(query)
     }
 
-    override suspend fun createFile(
+    override suspend fun createFileWithMimeType(
         name: String,
         mimeType: String,
         parentId: String
@@ -68,23 +67,47 @@ internal class GoogleDriveNonGmsOmhStorageClient private constructor(
         return fileRepository.createFile(name, mimeType, parentId)
     }
 
-    override suspend fun deleteFile(id: String): Boolean {
-        return fileRepository.deleteFile(id)
+    override suspend fun createFileWithExtension(
+        name: String,
+        extension: String,
+        parentId: String
+    ): OmhStorageEntity? {
+        throw UnsupportedOperationException(
+            "Google Drive does not support creating files with extensions. Use createFileWithMimeType instead."
+        )
     }
 
-    override suspend fun permanentlyDeleteFile(id: String): Boolean {
-        return fileRepository.permanentlyDeleteFile(id)
+    override suspend fun createFolder(name: String, parentId: String): OmhStorageEntity? {
+        return fileRepository.createFolder(name, parentId)
+    }
+
+    override suspend fun deleteFile(id: String) {
+        fileRepository.deleteFile(id)
+    }
+
+    override suspend fun permanentlyDeleteFile(id: String) {
+        fileRepository.permanentlyDeleteFile(id)
     }
 
     override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity? {
         return fileRepository.uploadFile(localFileToUpload, parentId)
     }
 
-    override suspend fun downloadFile(fileId: String, mimeType: String?): ByteArrayOutputStream {
-        return fileRepository.downloadFile(fileId, mimeType)
+    override suspend fun downloadFile(fileId: String): ByteArrayOutputStream {
+        return fileRepository.downloadFile(fileId)
     }
 
-    override suspend fun updateFile(localFileToUpload: File, fileId: String): OmhStorageEntity.OmhFile? {
+    override suspend fun exportFile(
+        fileId: String,
+        exportedMimeType: String
+    ): ByteArrayOutputStream {
+        return fileRepository.exportFile(fileId, exportedMimeType)
+    }
+
+    override suspend fun updateFile(
+        localFileToUpload: File,
+        fileId: String
+    ): OmhStorageEntity.OmhFile? {
         return fileRepository.updateFile(localFileToUpload, fileId)
     }
 
@@ -99,8 +122,41 @@ internal class GoogleDriveNonGmsOmhStorageClient private constructor(
         return fileRepository.downloadFileVersion(fileId, versionId)
     }
 
-    override suspend fun getFilePermissions(fileId: String): List<OmhFilePermission> {
-        // To be implemented
-        return emptyList()
+    override suspend fun getFilePermissions(fileId: String): List<OmhPermission> {
+        return fileRepository.getFilePermissions(fileId)
+    }
+
+    override suspend fun deletePermission(fileId: String, permissionId: String) {
+        fileRepository.deletePermission(fileId, permissionId)
+    }
+
+    override suspend fun updatePermission(
+        fileId: String,
+        permissionId: String,
+        role: OmhPermissionRole
+    ): OmhPermission {
+        return fileRepository.updatePermission(fileId, permissionId, role)
+    }
+
+    override suspend fun createPermission(
+        fileId: String,
+        permission: OmhCreatePermission,
+        sendNotificationEmail: Boolean,
+        emailMessage: String?
+    ): OmhPermission {
+        return fileRepository.createPermission(
+            fileId,
+            permission,
+            sendNotificationEmail,
+            emailMessage
+        )
+    }
+
+    override suspend fun getWebUrl(fileId: String): String? {
+        return fileRepository.getWebUrl(fileId)
+    }
+
+    override suspend fun getFileMetadata(fileId: String): OmhStorageMetadata {
+        return fileRepository.getFileMetadata(fileId)
     }
 }

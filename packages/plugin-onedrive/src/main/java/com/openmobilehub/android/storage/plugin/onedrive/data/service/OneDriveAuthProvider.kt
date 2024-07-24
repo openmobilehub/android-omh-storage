@@ -18,8 +18,15 @@ package com.openmobilehub.android.storage.plugin.onedrive.data.service
 
 import com.microsoft.kiota.RequestInformation
 import com.microsoft.kiota.authentication.AuthenticationProvider
+import com.openmobilehub.android.auth.core.OmhAuthClient
+import com.openmobilehub.android.storage.core.model.OmhStorageException
 
-class OneDriveAuthProvider(internal val accessToken: String) : AuthenticationProvider {
+internal class OneDriveAuthProvider(private val authClient: OmhAuthClient) : AuthenticationProvider {
+
+    val accessToken: String
+        get() = authClient.getCredentials().accessToken
+            ?: throw OmhStorageException.InvalidCredentialsException("Couldn't get access token from auth client")
+
     override fun authenticateRequest(
         request: RequestInformation,
         additionalAuthenticationContext: MutableMap<String, Any>?

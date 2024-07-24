@@ -17,13 +17,15 @@
 package com.openmobilehub.android.storage.plugin.googledrive.gms
 
 import com.openmobilehub.android.auth.core.OmhAuthClient
-import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 import com.openmobilehub.android.auth.plugin.google.gms.GmsCredentials
 import com.openmobilehub.android.storage.core.OmhStorageClient
-import com.openmobilehub.android.storage.core.model.OmhFilePermission
+import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhPermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.GmsFileRepository
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.service.GoogleDriveApiProvider
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.service.GoogleDriveApiService
@@ -33,23 +35,32 @@ import java.io.File
 @Suppress("TooManyFunctions")
 internal class GoogleDriveGmsOmhStorageClient private constructor(
     authClient: OmhAuthClient,
-    private val fileRepository: GmsFileRepository,
+    private val repositoryBuilder: RepositoryBuilder,
 ) : OmhStorageClient(authClient) {
 
     internal class Builder : OmhStorageClient.Builder {
 
         override fun build(authClient: OmhAuthClient): OmhStorageClient {
+            return GoogleDriveGmsOmhStorageClient(authClient, RepositoryBuilder())
+        }
+    }
+
+    private class RepositoryBuilder : GmsFileRepository.Builder {
+        override fun build(authClient: OmhAuthClient): GmsFileRepository {
             val credentials =
                 (authClient.getCredentials() as? GmsCredentials)?.googleAccountCredential
-                    ?: throw OmhStorageException.InvalidCredentialsException(OmhAuthStatusCodes.SIGN_IN_FAILED)
+                    ?: throw OmhStorageException.InvalidCredentialsException(
+                        "Couldn't get access token from auth client"
+                    )
 
             val apiProvider = GoogleDriveApiProvider.getInstance(credentials)
             val apiService = GoogleDriveApiService(apiProvider)
-            val repository = GmsFileRepository(apiService)
-
-            return GoogleDriveGmsOmhStorageClient(authClient, repository)
+            return GmsFileRepository(apiService)
         }
     }
+
+    private val fileRepository: GmsFileRepository
+        get() = repositoryBuilder.build(authClient)
 
     override val rootFolder: String
         get() = GoogleDriveGmsConstants.ROOT_FOLDER
@@ -62,7 +73,7 @@ internal class GoogleDriveGmsOmhStorageClient private constructor(
         return fileRepository.search(query)
     }
 
-    override suspend fun createFile(
+    override suspend fun createFileWithMimeType(
         name: String,
         mimeType: String,
         parentId: String
@@ -70,23 +81,50 @@ internal class GoogleDriveGmsOmhStorageClient private constructor(
         return fileRepository.createFile(name, mimeType, parentId)
     }
 
-    override suspend fun deleteFile(id: String): Boolean {
-        return fileRepository.deleteFile(id)
+    override suspend fun createFileWithExtension(
+        name: String,
+        extension: String,
+        parentId: String
+    ): OmhStorageEntity? {
+        throw UnsupportedOperationException(
+            "Google Drive does not support creating files with extensions. Use createFileWithMimeType instead."
+        )
     }
 
-    override suspend fun permanentlyDeleteFile(id: String): Boolean {
-        return fileRepository.permanentlyDeleteFile(id)
+    override suspend fun createFolder(
+        name: String,
+        parentId: String
+    ): OmhStorageEntity? {
+        return fileRepository.createFolder(name, parentId)
+    }
+
+    override suspend fun deleteFile(id: String) {
+        fileRepository.deleteFile(id)
+    }
+
+    override suspend fun permanentlyDeleteFile(id: String) {
+        fileRepository.permanentlyDeleteFile(id)
     }
 
     override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity? {
         return fileRepository.uploadFile(localFileToUpload, parentId)
     }
 
-    override suspend fun downloadFile(fileId: String, mimeType: String?): ByteArrayOutputStream {
-        return fileRepository.downloadFile(fileId, mimeType)
+    override suspend fun downloadFile(fileId: String): ByteArrayOutputStream {
+        return fileRepository.downloadFile(fileId)
     }
 
-    override suspend fun updateFile(localFileToUpload: File, fileId: String): OmhStorageEntity.OmhFile? {
+    override suspend fun exportFile(
+        fileId: String,
+        exportedMimeType: String
+    ): ByteArrayOutputStream {
+        return fileRepository.exportFile(fileId, exportedMimeType)
+    }
+
+    override suspend fun updateFile(
+        localFileToUpload: File,
+        fileId: String
+    ): OmhStorageEntity.OmhFile? {
         return fileRepository.updateFile(localFileToUpload, fileId)
     }
 
@@ -94,12 +132,48 @@ internal class GoogleDriveGmsOmhStorageClient private constructor(
         return fileRepository.getFileVersions(fileId)
     }
 
-    override suspend fun downloadFileVersion(fileId: String, versionId: String): ByteArrayOutputStream {
+    override suspend fun downloadFileVersion(
+        fileId: String,
+        versionId: String
+    ): ByteArrayOutputStream {
         return fileRepository.downloadFileVersion(fileId, versionId)
     }
 
-    override suspend fun getFilePermissions(fileId: String): List<OmhFilePermission> {
-        // To be implemented
-        return emptyList()
+    override suspend fun getFilePermissions(fileId: String): List<OmhPermission> {
+        return fileRepository.getFilePermissions(fileId)
+    }
+
+    override suspend fun deletePermission(fileId: String, permissionId: String) {
+        return fileRepository.deletePermission(fileId, permissionId)
+    }
+
+    override suspend fun updatePermission(
+        fileId: String,
+        permissionId: String,
+        role: OmhPermissionRole
+    ): OmhPermission {
+        return fileRepository.updatePermission(fileId, permissionId, role)
+    }
+
+    override suspend fun createPermission(
+        fileId: String,
+        permission: OmhCreatePermission,
+        sendNotificationEmail: Boolean,
+        emailMessage: String?
+    ): OmhPermission {
+        return fileRepository.createPermission(
+            fileId,
+            permission,
+            sendNotificationEmail,
+            emailMessage
+        )
+    }
+
+    override suspend fun getFileMetadata(fileId: String): OmhStorageMetadata? {
+        return fileRepository.getFileMetadata(fileId)
+    }
+
+    override suspend fun getWebUrl(fileId: String): String? {
+        return fileRepository.getWebUrl(fileId)
     }
 }

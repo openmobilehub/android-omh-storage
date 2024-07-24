@@ -18,11 +18,15 @@
 
 package com.openmobilehub.android.storage.plugin.dropbox.data.service
 
+import com.dropbox.core.v2.files.CreateFolderResult
+import com.dropbox.core.v2.files.DeleteResult
 import com.dropbox.core.v2.files.FileMetadata
 import com.dropbox.core.v2.files.ListFolderResult
 import com.dropbox.core.v2.files.ListRevisionsResult
+import com.dropbox.core.v2.files.SearchV2Result
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_PARENT_ID
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FOLDER_NAME
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_VERSION_FILE_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_VERSION_ID
 import io.mockk.MockKAnnotations
@@ -43,6 +47,15 @@ class DropboxApiServiceTest {
 
     @MockK
     private lateinit var listRevisionsResult: ListRevisionsResult
+
+    @MockK
+    private lateinit var deleteResult: DeleteResult
+
+    @MockK
+    private lateinit var searchResult: SearchV2Result
+
+    @MockK
+    private lateinit var createFolderResult: CreateFolderResult
 
     @MockK
     private lateinit var apiClient: DropboxApiClient
@@ -141,5 +154,61 @@ class DropboxApiServiceTest {
 
         // Assert
         assertEquals(metadata, result)
+    }
+
+    @Test
+    fun `given api client return DeleteResult, when deleting the file, then return DeleteResult`() {
+        // Arrange
+        every {
+            apiClient.dropboxApiService.files().deleteV2(any())
+        } returns deleteResult
+
+        // Act
+        val result = apiService.deleteFile(TEST_FILE_ID)
+
+        // Assert
+        assertEquals(deleteResult, result)
+    }
+
+    @Test
+    fun `given apiClient returns SearchResultV2, when searching the files, then return SearchResultV2`() {
+        // Arrange
+        every {
+            apiClient.dropboxApiService.files().searchV2(any())
+        } returns searchResult
+
+        // Act
+        val result = apiService.search("test")
+
+        // Assert
+        assertEquals(searchResult, result)
+    }
+
+    @Test
+    fun `given apiClient returns Metadata, when getting the file, then return Metadata`() {
+        // Arrange
+        every {
+            apiClient.dropboxApiService.files().getMetadata(any())
+        } returns metadata
+
+        // Act
+        val result = apiService.getFile(TEST_FILE_ID)
+
+        // Assert
+        assertEquals(metadata, result)
+    }
+
+    @Test
+    fun `given apiClient returns CreateFolderResult, when creating a folder, then return CreateFolderResult`() {
+        // Arrange
+        every {
+            apiClient.dropboxApiService.files().createFolderV2(any())
+        } returns createFolderResult
+
+        // Act
+        val result = apiService.createFolder(TEST_FOLDER_NAME)
+
+        // Assert
+        assertEquals(createFolderResult, result)
     }
 }

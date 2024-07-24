@@ -1,19 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
         <include
-                android:id="@+id/header"
-                layout="@layout/row_dialog_header"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+            android:id="@+id/header"
+            layout="@layout/row_dialog_header"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/header" />
+
+        <LinearLayout
+            android:id="@+id/metadata_rows"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/header"
+            app:layout_constraintVertical_bias="0.0">
+
+            <include
+                android:id="@+id/file_id"
+                layout="@layout/row_textview" />
+
+            <include
+                android:id="@+id/file_created_time"
+                layout="@layout/row_textview" />
+
+            <include
+                android:id="@+id/file_modified_time"
+                layout="@layout/row_textview" />
+
+            <include
+                android:id="@+id/file_parent_id"
+                layout="@layout/row_textview" />
+
+            <include
+                android:id="@+id/file_mime_type"
+                layout="@layout/row_textview" />
+
+            <include
+                android:id="@+id/file_extension"
+                layout="@layout/row_textview" />
+
+            <include
+                android:id="@+id/file_size"
+                layout="@layout/row_textview" />
+
+            <CheckBox
+                android:id="@+id/checkbox_show_original_metadata"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:text="@string/text_show_original_metadata" />
+
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/extra_metadata_scroll_view"
+                android:layout_width="match_parent"
+                android:layout_height="200dp">
+
+                <include
+                    android:id="@+id/extra_metadata"
+                    layout="@layout/row_textview" />
+            </androidx.core.widget.NestedScrollView>
+
+        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

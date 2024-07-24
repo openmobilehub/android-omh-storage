@@ -20,7 +20,6 @@ import android.content.Context
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.openmobilehub.android.auth.core.OmhAuthClient
-import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
@@ -66,7 +65,10 @@ class OmhStorageProvider private constructor(
         val storageFactory: OmhStorageFactory = try {
             getOmhStorageFactory(context)
         } catch (exception: ClassNotFoundException) {
-            throw OmhStorageException.ApiException(OmhAuthStatusCodes.DEVELOPER_ERROR, exception)
+            throw OmhStorageException.DeveloperErrorException(
+                "Couldn't create instance of OmhStorageFactory. Check the reflection paths.",
+                exception
+            )
         }
 
         return storageFactory.getStorageClient(authClient)
@@ -76,7 +78,9 @@ class OmhStorageProvider private constructor(
         isSingleBuild -> reflectSingleBuild(context)
         gmsPath != null -> getFactoryImplementation(gmsPath)
         nonGmsPath != null -> getFactoryImplementation(nonGmsPath)
-        else -> throw OmhStorageException.ApiException(OmhAuthStatusCodes.DEVELOPER_ERROR)
+        else -> throw throw OmhStorageException.DeveloperErrorException(
+            "Couldn't create instance of OmhStorageFactory. Did you forgot to provide the reflection path?",
+        )
     }
 
     private fun reflectSingleBuild(context: Context): OmhStorageFactory {

@@ -26,6 +26,7 @@ import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_MIME_TYPE
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_NAME
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_PARENT_ID
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_SIZE
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FIRST_JUNE_2024_MILLIS
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FIRST_MAY_2024_MILLIS
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FOLDER_ID
@@ -81,11 +82,12 @@ class MetadataToOmhStorageEntityTest {
     @Test
     fun `given a file metadata with specific properties, when mapped, then return the expected OmhStorageEntity`() {
         // Arrange
-        every { fileMetadata.name } returns TEST_FILE_NAME
         every { fileMetadata.id } returns TEST_FILE_ID
+        every { fileMetadata.name } returns TEST_FILE_NAME
         every { fileMetadata.parentSharedFolderId } returns TEST_FILE_PARENT_ID
         every { fileMetadata.clientModified } returns Date(TEST_FIRST_MAY_2024_MILLIS)
         every { fileMetadata.serverModified } returns Date(TEST_FIRST_JUNE_2024_MILLIS)
+        every { fileMetadata.size } returns TEST_FILE_SIZE
 
         // Act
         val result = mapper(fileMetadata)
@@ -97,8 +99,8 @@ class MetadataToOmhStorageEntityTest {
     @Test
     fun `given a folder metadata with specific properties, when mapped, then return the expected OmhStorageEntity`() {
         // Arrange
-        every { folderMetadata.name } returns TEST_FOLDER_NAME
         every { folderMetadata.id } returns TEST_FOLDER_ID
+        every { folderMetadata.name } returns TEST_FOLDER_NAME
         every { folderMetadata.parentSharedFolderId } returns TEST_FOLDER_PARENT_ID
 
         // Act

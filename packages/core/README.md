@@ -35,7 +35,7 @@ allprojects {
 }
 ```
 
-### 2. Add Dependency for the Core package
+### 2. Add dependency for the Core package
 
 Add the dependency for the Core package to your project's **build.gradle** file:
 

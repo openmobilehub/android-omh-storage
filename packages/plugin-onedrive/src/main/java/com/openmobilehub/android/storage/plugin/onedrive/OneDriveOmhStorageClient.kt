@@ -19,17 +19,20 @@ package com.openmobilehub.android.storage.plugin.onedrive
 import android.webkit.MimeTypeMap
 import androidx.annotation.VisibleForTesting
 import com.openmobilehub.android.auth.core.OmhAuthClient
-import com.openmobilehub.android.auth.core.models.OmhAuthStatusCodes
 import com.openmobilehub.android.storage.core.OmhStorageClient
-import com.openmobilehub.android.storage.core.model.OmhFilePermission
+import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhPermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
-import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
+import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemResponseToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.onedrive.data.repository.OneDriveFileRepository
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiClient
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiService
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveAuthProvider
+import com.openmobilehub.android.storage.plugin.onedrive.data.service.retrofit.OneDriveRestApiServiceProvider
 import java.io.ByteArrayOutputStream
 import java.io.File
 
@@ -42,17 +45,21 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
     internal class Builder : OmhStorageClient.Builder {
 
         override fun build(authClient: OmhAuthClient): OmhStorageClient {
-            val accessToken = authClient.getCredentials().accessToken
-                ?: throw OmhStorageException.InvalidCredentialsException(
-                    OmhAuthStatusCodes.SIGN_IN_FAILED
-                )
-
-            val authProvider = OneDriveAuthProvider(accessToken)
-            val apiClient = OneDriveApiClient.getInstance(authProvider)
+            val authProvider = OneDriveAuthProvider(authClient)
+            val apiClient = OneDriveApiClient(authProvider)
             val apiService = OneDriveApiService(apiClient)
             val driveItemToOmhStorageEntity =
                 DriveItemToOmhStorageEntity(MimeTypeMap.getSingleton())
-            val repository = OneDriveFileRepository(apiService, driveItemToOmhStorageEntity)
+            val driveItemResponseToOmhStorageEntity = DriveItemResponseToOmhStorageEntity(MimeTypeMap.getSingleton())
+
+            val oneDriveRestApiServiceProvider = OneDriveRestApiServiceProvider(authClient)
+
+            val repository = OneDriveFileRepository(
+                apiService,
+                oneDriveRestApiServiceProvider,
+                driveItemToOmhStorageEntity,
+                driveItemResponseToOmhStorageEntity
+            )
 
             return OneDriveOmhStorageClient(authClient, repository)
         }
@@ -69,23 +76,34 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
         return repository.search(query)
     }
 
-    override suspend fun createFile(
+    override suspend fun createFileWithMimeType(
         name: String,
         mimeType: String,
         parentId: String
     ): OmhStorageEntity? {
-        // To be implemented
-        return null
+        throw UnsupportedOperationException(
+            "OneDrive does not support creating files with mime type. Use createFileWithExtension instead."
+        )
     }
 
-    override suspend fun deleteFile(id: String): Boolean {
-        // To be implemented
-        return true
+    override suspend fun createFileWithExtension(
+        name: String,
+        extension: String,
+        parentId: String
+    ): OmhStorageEntity? {
+        return repository.createFile(name, extension, parentId)
     }
 
-    override suspend fun permanentlyDeleteFile(id: String): Boolean {
-        // To be implemented
-        return false
+    override suspend fun createFolder(name: String, parentId: String): OmhStorageEntity? {
+        return repository.createFolder(name, parentId)
+    }
+
+    override suspend fun deleteFile(id: String) {
+        return repository.deleteFile(id)
+    }
+
+    override suspend fun permanentlyDeleteFile(id: String) {
+        throw UnsupportedOperationException()
     }
 
     override suspend fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity? {
@@ -93,13 +111,22 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
         return repository.uploadFile(localFileToUpload, safeParentId)
     }
 
-    override suspend fun downloadFile(fileId: String, mimeType: String?): ByteArrayOutputStream {
+    override suspend fun downloadFile(fileId: String): ByteArrayOutputStream {
         return repository.downloadFile(fileId)
     }
 
-    override suspend fun updateFile(localFileToUpload: File, fileId: String): OmhStorageEntity.OmhFile? {
-        // To be implemented
-        return null
+    override suspend fun exportFile(
+        fileId: String,
+        exportedMimeType: String
+    ): ByteArrayOutputStream {
+        throw UnsupportedOperationException("Exporting files is not supported in OneDrive.")
+    }
+
+    override suspend fun updateFile(
+        localFileToUpload: File,
+        fileId: String
+    ): OmhStorageEntity {
+        return repository.updateFile(localFileToUpload, fileId)
     }
 
     override suspend fun getFileVersions(fileId: String): List<OmhFileVersion> {
@@ -113,8 +140,36 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
         return repository.downloadFileVersion(fileId, versionId)
     }
 
-    override suspend fun getFilePermissions(fileId: String): List<OmhFilePermission> {
-        // To be implemented
-        return emptyList()
+    override suspend fun getFilePermissions(fileId: String): List<OmhPermission> {
+        return repository.getFilePermissions(fileId)
+    }
+
+    override suspend fun getFileMetadata(fileId: String): OmhStorageMetadata? {
+        return repository.getFileMetadata(fileId)
+    }
+
+    override suspend fun deletePermission(fileId: String, permissionId: String) {
+        return repository.deletePermission(fileId, permissionId)
+    }
+
+    override suspend fun updatePermission(
+        fileId: String,
+        permissionId: String,
+        role: OmhPermissionRole
+    ): OmhPermission {
+        return repository.updatePermission(fileId, permissionId, role)
+    }
+
+    override suspend fun createPermission(
+        fileId: String,
+        permission: OmhCreatePermission,
+        sendNotificationEmail: Boolean,
+        emailMessage: String?
+    ): OmhPermission {
+        return repository.createPermission(fileId, permission, sendNotificationEmail, emailMessage)
+    }
+
+    override suspend fun getWebUrl(fileId: String): String? {
+        return repository.getWebUrl(fileId)
     }
 }

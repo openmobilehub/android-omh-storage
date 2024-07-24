@@ -53,13 +53,15 @@ import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.DialogCreateFileBinding
 import com.openmobilehub.android.storage.sample.databinding.DialogUploadFileBinding
 import com.openmobilehub.android.storage.sample.databinding.FragmentFileViewerBinding
+import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
 import com.openmobilehub.android.storage.sample.presentation.BaseFragment
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.menu.FileMenuDialog
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.FilePermissionsDialog
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.versions.FileVersionsDialog
-import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerAction
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.metadata.FileMetadataDialog
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewAction
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewEvent
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewState
-import com.openmobilehub.android.storage.sample.presentation.util.displayToast
 import com.openmobilehub.android.storage.sample.presentation.util.navigateTo
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.ByteArrayOutputStream
@@ -156,10 +158,10 @@ class FileViewerFragment :
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.action.collect {
                     when (it) {
-                        FileViewerAction.ShowFileMetadata -> showFileMetadata()
-                        FileViewerAction.ShowFilePermissions -> showFilePermissions()
-                        FileViewerAction.ShowFileVersions -> showFileVersions()
-                        FileViewerAction.ShowMoreOptions -> showMoreOptions()
+                        FileViewerViewAction.ShowFileMetadata -> showFileMetadata()
+                        FileViewerViewAction.ShowFilePermissions -> showFilePermissions()
+                        FileViewerViewAction.ShowFileVersions -> showFileVersions()
+                        FileViewerViewAction.ShowMoreOptions -> showMoreOptions()
                     }
                 }
             }
@@ -180,17 +182,13 @@ class FileViewerFragment :
     private fun uploadFile() = filePickerUpload.launch(FileViewerViewModel.ANY_MIME_TYPE)
     private fun signOut() = dispatchEvent(FileViewerViewEvent.SignOut)
 
-    private fun showFileMetadata() = displayToast("To be implemented")
-//    FileMetadataDialog().show(
-//        childFragmentManager,
-//        FILE_METADATA_DIALOG_TAG
-//    )
+    private fun showFileMetadata() =
+        FileMetadataDialog().show(childFragmentManager, FILE_METADATA_DIALOG_TAG)
 
-    private fun showFilePermissions() = displayToast("To be implemented")
-//    FilePermissionsDialog().show(
-//        childFragmentManager,
-//        FILE_PERMISSIONS_DIALOG_TAG
-//    )
+    private fun showFilePermissions() = FilePermissionsDialog().show(
+        childFragmentManager,
+        FILE_PERMISSIONS_DIALOG_TAG
+    )
 
     private fun showFileVersions() = FileVersionsDialog().show(
         childFragmentManager,
@@ -420,18 +418,45 @@ class FileViewerFragment :
     private fun configureCreateFilePositiveButtonEvent(
         view: DialogCreateFileBinding, dialog: DialogInterface
     ) {
-        val fileName = view.fileName.text.toString()
-        val fileType = viewModel.createFileSelectedType?.mimeType
+        val isGoogleDrive =
+            viewModel.storageAuthProvider === StorageAuthProvider.GOOGLE
 
-        if (fileName.isNotBlank() && !fileType.isNullOrEmpty()) {
-            dispatchEvent(FileViewerViewEvent.CreateFile(fileName, fileType))
+        val fileName = view.fileName.text.toString()
+        val fileType = viewModel.createFileSelectedType
+
+        // Empty file name is not allowed
+        if (fileName.isBlank()) {
+            dialog.dismiss()
         }
 
+        // Folder creation
+        if (fileType == null) {
+            dispatchEvent(FileViewerViewEvent.CreateFolder(fileName))
+            return dialog.dismiss()
+        }
+
+        // Google Drive file creation
+        if (isGoogleDrive) {
+            dispatchEvent(FileViewerViewEvent.CreateFileWithMimeType(fileName, fileType.mimeType))
+            return dialog.dismiss()
+        }
+
+        // Extension for other providers cannot be null
+        if (fileType.extension == null) {
+            dialog.dismiss()
+            throw IllegalStateException("File type extension cannot be null")
+        }
+
+        // Other providers file creation
+        dispatchEvent(FileViewerViewEvent.CreateFileWithExtension(fileName, fileType.extension))
         dialog.dismiss()
     }
 
     private fun configureCreateFileDialogSpinner(view: DialogCreateFileBinding) {
-        val fileTypes = FileViewerViewModel.listOfFileTypes
+        val isGoogleDrive =
+            viewModel.storageAuthProvider === StorageAuthProvider.GOOGLE
+        val fileTypes =
+            if (isGoogleDrive) FileViewerViewModel.googleListOfFileTypes else FileViewerViewModel.commonListOfFileTypes
 
         context?.let { context ->
 

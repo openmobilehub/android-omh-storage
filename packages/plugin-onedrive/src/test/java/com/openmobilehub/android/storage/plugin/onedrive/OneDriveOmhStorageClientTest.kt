@@ -21,15 +21,27 @@ package com.openmobilehub.android.storage.plugin.onedrive
 import android.webkit.MimeTypeMap
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
-import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.plugin.onedrive.data.repository.OneDriveFileRepository
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_EMAIL_MESSAGE
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_EXTENSION
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_ID
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_MIME_TYPE
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_NAME
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_PARENT_ID
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_WEB_URL
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FOLDER_NAME
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FOLDER_PARENT_ID
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_PERMISSION_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_VERSION_FILE_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_VERSION_ID
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.createWriterPermission
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.testOmhPermission
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
@@ -82,15 +94,17 @@ internal class OneDriveOmhStorageClientBuilderTest {
         assertNotNull(client)
     }
 
+    // Credentials validation is postponed to the first API call
     @Test
-    fun `given invalid credentials, when building, then throw InvalidCredentialsException`() {
+    fun `given invalid credentials, when building, then return OneDriveOmhStorageClient`() {
         // Arrange
         every { authClient.getCredentials().accessToken } returns null
 
-        // Act & Assert
-        assertThrows(OmhStorageException.InvalidCredentialsException::class.java) {
-            builder.build(authClient)
-        }
+        // Act
+        val client = builder.build(authClient)
+
+        // Assert
+        assertNotNull(client)
     }
 }
 
@@ -107,9 +121,21 @@ internal class OneDriveOmhStorageClientTest {
     private lateinit var fileToUpload: File
 
     @MockK
+    private lateinit var uploadedFile: OmhStorageEntity
+
+    @MockK
     private lateinit var omhStorageEntity: OmhStorageEntity
 
     private lateinit var omhStorageEntityList: List<OmhStorageEntity>
+
+    @MockK
+    private lateinit var omhFolder: OmhStorageEntity.OmhFolder
+
+    @MockK
+    private lateinit var omhFile: OmhStorageEntity.OmhFile
+
+    @MockK
+    private lateinit var omhStorageMetadata: OmhStorageMetadata
 
     @MockK
     private lateinit var byteArrayOutputStream: ByteArrayOutputStream
@@ -131,81 +157,246 @@ internal class OneDriveOmhStorageClientTest {
     }
 
     @Test
-    fun `given a repository, when listing files, then return files from the repository`() = runTest {
-        // Arrange
-        val parentId = "parentId"
+    fun `given a repository, when listing files, then return files from the repository`() =
+        runTest {
+            // Arrange
+            val parentId = "parentId"
+            val files: List<OmhStorageEntity> = mockk()
 
-        every { repository.getFilesList(parentId) } returns omhStorageEntityList
+            every { repository.getFilesList(parentId) } returns files
 
-        // Act
-        val result = client.listFiles(parentId)
+            // Act
+            val result = client.listFiles(parentId)
 
-        // Assert
-        assertEquals(omhStorageEntityList, result)
+            // Assert
+            assertEquals(files, result)
+        }
+
+    @Test
+    fun `given a repository, when uploading a file to unknown parent, then upload a file from repository to root`() =
+        runTest {
+            // Arrange
+            val parentId = null
+            every { repository.uploadFile(any(), any()) } returns uploadedFile
+
+            // Act
+            val result = client.uploadFile(fileToUpload, parentId)
+
+            // Assert
+            assertEquals(uploadedFile, result)
+            verify { repository.uploadFile(fileToUpload, OneDriveConstants.ROOT_FOLDER) }
+        }
+
+    @Test
+    fun `given a repository, when uploading a file to known parent, then upload a file from repository to a given parent`() =
+        runTest {
+            // Arrange
+            every { repository.uploadFile(any(), any()) } returns uploadedFile
+
+            // Act
+            val result = client.uploadFile(fileToUpload, TEST_FILE_PARENT_ID)
+
+            // Assert
+            assertEquals(uploadedFile, result)
+            verify { repository.uploadFile(fileToUpload, TEST_FILE_PARENT_ID) }
+        }
+
+    @Test
+    fun `given a repository, when downloading a file, then return ByteArrayOutputStream`() =
+        runTest {
+            // Arrange
+            every { repository.downloadFile(any()) } returns byteArrayOutputStream
+
+            // Act
+            val result = client.downloadFile(TEST_FILE_ID)
+
+            // Assert
+            assertEquals(byteArrayOutputStream, result)
+        }
+
+    @Test
+    fun `given a repository, when exporting a file, throw OmhStorageException_NotSupportedException `() {
+        // Act & Assert
+        assertThrows(UnsupportedOperationException::class.java) {
+            runTest {
+                client.exportFile(TEST_FILE_ID, TEST_FILE_MIME_TYPE)
+            }
+        }
     }
 
     @Test
-    fun `given a repository, when uploading a file to unknown parent, then upload a file from repository to root`() = runTest {
+    fun `given a repository, when listing file versions, then return versions from the repository`() =
+        runTest {
+            // Arrange
+            val versions: List<OmhFileVersion> = mockk()
+            every { repository.getFileVersions(any()) } returns versions
+
+            // Act
+            val result = client.getFileVersions(TEST_VERSION_FILE_ID)
+
+            // Assert
+            assertEquals(versions, result)
+        }
+
+    @Test
+    fun `given a repository, when downloading a file version, then return ByteArrayOutputStream`() =
+        runTest {
+            // Arrange
+            every { repository.downloadFileVersion(any(), any()) } returns byteArrayOutputStream
+
+            // Act
+            val result = client.downloadFileVersion(TEST_VERSION_FILE_ID, TEST_VERSION_ID)
+
+            // Assert
+            assertEquals(byteArrayOutputStream, result)
+        }
+
+    @Test
+    fun `given a repository, when deleting a file, then exceptions is not thrown`() = runTest {
         // Arrange
-        val parentId = null
-        every { repository.uploadFile(any(), any()) } returns omhStorageEntity
+        every { repository.deleteFile(any()) } returns Unit
 
-        // Act
-        val result = client.uploadFile(fileToUpload, parentId)
-
-        // Assert
-        assertEquals(omhStorageEntity, result)
-        verify { repository.uploadFile(fileToUpload, OneDriveConstants.ROOT_FOLDER) }
+        // Act & Assert
+        client.deleteFile(TEST_FILE_ID)
     }
 
     @Test
-    fun `given a repository, when uploading a file to known parent, then upload a file from repository to a given parent`() = runTest {
-        // Arrange
-        every { repository.uploadFile(any(), any()) } returns omhStorageEntity
-
-        // Act
-        val result = client.uploadFile(fileToUpload, TEST_FILE_PARENT_ID)
-
-        // Assert
-        assertEquals(omhStorageEntity, result)
-        verify { repository.uploadFile(fileToUpload, TEST_FILE_PARENT_ID) }
+    fun `given a repository, when permanently deleting a file, then throw OmhStorageException_NotSupportedException`() {
+        // Act & Assert
+        assertThrows(UnsupportedOperationException::class.java) {
+            runTest {
+                client.permanentlyDeleteFile(TEST_FILE_ID)
+            }
+        }
     }
 
     @Test
-    fun `given a repository, when downloading a file, then return ByteArrayOutputStream`() = runTest {
+    fun `given a repository, when getting file metadata, then return OmhStorageMetadata`() =
+        runTest {
+            // Arrange
+            every { repository.getFileMetadata(any()) } returns omhStorageMetadata
+
+            // Act
+            val result = client.getFileMetadata(TEST_FILE_ID)
+
+            // Assert
+            assertEquals(omhStorageMetadata, result)
+        }
+
+    @Test
+    fun `given a repository, when getting file permission, then return list of permissions`() =
+        runTest {
+            // Arrange
+            every { repository.getFilePermissions(any()) } returns listOf(testOmhPermission)
+
+            // Act
+            val result = client.getFilePermissions(TEST_FILE_ID)
+
+            // Assert
+            assertEquals(listOf(testOmhPermission), result)
+        }
+
+    @Test
+    fun `given a repository, when deleting a permission, then exceptions is not thrown`() =
+        runTest {
+            // Arrange
+            every { repository.deletePermission(any(), any()) } returns Unit
+
+            // Act & Assert
+            client.deletePermission(TEST_FILE_ID, TEST_PERMISSION_ID)
+        }
+
+    @Test
+    fun `given a repository, when getting file web URL, then return URL`() = runTest {
         // Arrange
-        every { repository.downloadFile(any()) } returns byteArrayOutputStream
+        every { repository.getWebUrl(any()) } returns TEST_FILE_WEB_URL
 
         // Act
-        val result = client.downloadFile(TEST_FILE_ID, null)
+        val result = client.getWebUrl(TEST_FILE_ID)
 
         // Assert
-        assertEquals(byteArrayOutputStream, result)
+        assertEquals(TEST_FILE_WEB_URL, result)
     }
 
     @Test
-    fun `given a repository, when listing file versions, then return versions from the repository`() = runTest {
+    fun `given a repository, when updating a permission, then return permission`() = runTest {
         // Arrange
-        val versions: List<OmhFileVersion> = mockk()
-        every { repository.getFileVersions(any()) } returns versions
+        every { repository.updatePermission(any(), any(), any()) } returns testOmhPermission
 
         // Act
-        val result = client.getFileVersions(TEST_VERSION_FILE_ID)
+        val result =
+            client.updatePermission(TEST_FILE_ID, TEST_PERMISSION_ID, OmhPermissionRole.WRITER)
 
         // Assert
-        assertEquals(versions, result)
+        assertEquals(testOmhPermission, result)
     }
 
     @Test
-    fun `given a repository, when downloading a file version, then return ByteArrayOutputStream`() = runTest {
+    fun `given a repository, when creating a permission, then return permission`() = runTest {
         // Arrange
-        every { repository.downloadFileVersion(any(), any()) } returns byteArrayOutputStream
+        every { repository.createPermission(any(), any(), any(), any()) } returns testOmhPermission
 
         // Act
-        val result = client.downloadFileVersion(TEST_VERSION_FILE_ID, TEST_VERSION_ID)
+        val result =
+            client.createPermission(TEST_FILE_ID, createWriterPermission, true, TEST_EMAIL_MESSAGE)
 
         // Assert
-        assertEquals(byteArrayOutputStream, result)
+        assertEquals(testOmhPermission, result)
+    }
+
+    @Test
+    fun `given a repository, when creating a folder, then return created folder`() = runTest {
+        // Arrange
+        coEvery { repository.createFolder(any(), any()) } returns omhFolder
+
+        // Act
+        val result = client.createFolder(TEST_FOLDER_NAME, TEST_FOLDER_PARENT_ID)
+
+        // Assert
+        assertEquals(omhFolder, result)
+    }
+
+    @Test
+    fun `given a repository, when creating a file with extension, then return created file`() =
+        runTest {
+            // Arrange
+            every { repository.createFile(any(), any(), any()) } returns omhFile
+
+            // Act
+            val result = client.createFileWithExtension(
+                TEST_FILE_NAME,
+                TEST_FILE_EXTENSION,
+                TEST_FILE_PARENT_ID
+            )
+
+            // Assert
+            assertEquals(omhFile, result)
+        }
+
+    @Test
+    fun `given a repository, when creating a file with mime type, then throw UnsupportedOperationException`() {
+        // Act && Assert
+        assertThrows(UnsupportedOperationException::class.java) {
+            runTest {
+                client.createFileWithMimeType(
+                    TEST_FILE_NAME,
+                    TEST_FILE_MIME_TYPE,
+                    TEST_FILE_PARENT_ID
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `given a repository, when updating a file, then return OmhFile`() = runTest {
+        // Arrange
+        every { repository.updateFile(any(), any()) } returns omhFile
+
+        // Act
+        val result = client.updateFile(fileToUpload, TEST_FILE_ID)
+
+        // Assert
+        assertEquals(omhFile, result)
     }
 
     @Test

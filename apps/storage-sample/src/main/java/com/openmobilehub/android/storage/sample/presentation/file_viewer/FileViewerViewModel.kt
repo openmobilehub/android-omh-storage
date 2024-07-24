@@ -23,16 +23,20 @@ import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
+import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.sample.domain.model.FileType
+import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
+import com.openmobilehub.android.storage.sample.domain.repository.SessionRepository
 import com.openmobilehub.android.storage.sample.presentation.BaseViewModel
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.DisplayFileType
-import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerAction
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewAction
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewEvent
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewState
 import com.openmobilehub.android.storage.sample.util.coSignOut
 import com.openmobilehub.android.storage.sample.util.isDownloadable
+import com.openmobilehub.android.storage.sample.util.isFile
 import com.openmobilehub.android.storage.sample.util.isFolder
-import com.openmobilehub.android.storage.sample.util.normalizedMimeType
+import com.openmobilehub.android.storage.sample.util.normalizedFileType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.File
 import javax.inject.Inject
@@ -51,20 +55,29 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
 
 @OptIn(FlowPreview::class)
 @HiltViewModel
 class FileViewerViewModel @Inject constructor(
     private val authClient: OmhAuthClient,
-    private val omhStorageClient: OmhStorageClient
+    private val omhStorageClient: OmhStorageClient,
+    private val sessionRepository: SessionRepository
 ) : BaseViewModel<FileViewerViewState, FileViewerViewEvent>() {
 
     companion object {
-        val listOfFileTypes = listOf(
-            DisplayFileType("Folder", FileType.GOOGLE_FOLDER),
+        val googleListOfFileTypes = listOf(
+            DisplayFileType("Folder"),
             DisplayFileType("Document", FileType.GOOGLE_DOCUMENT),
             DisplayFileType("Sheet", FileType.GOOGLE_SPREADSHEET),
             DisplayFileType("Presentation", FileType.GOOGLE_PRESENTATION),
+        )
+
+        val commonListOfFileTypes = listOf(
+            DisplayFileType("Folder"),
+            DisplayFileType("Document", FileType.MICROSOFT_WORD),
+            DisplayFileType("Sheet", FileType.MICROSOFT_EXCEL),
+            DisplayFileType("Presentation", FileType.MICROSOFT_POWERPOINT),
         )
 
         const val ANY_MIME_TYPE = "*/*"
@@ -72,7 +85,7 @@ class FileViewerViewModel @Inject constructor(
         private const val SEARCH_QUERY_DEBOUNCE_MILLIS = 250L
     }
 
-    private val _action = Channel<FileViewerAction>()
+    private val _action = Channel<FileViewerViewAction>()
     val action = _action.receiveAsFlow()
 
     var createFileSelectedType: FileType? = null
@@ -82,11 +95,27 @@ class FileViewerViewModel @Inject constructor(
     var lastFileClicked: OmhStorageEntity? = null
         private set
 
+    val storageAuthProvider = sessionRepository.getStorageAuthProvider()
+
     private var lastFileVersionClicked: OmhFileVersion? = null
 
     private val parentId = StackWithFlow(omhStorageClient.rootFolder)
     private var searchQuery: MutableStateFlow<String?> = MutableStateFlow(null)
     private var forceRefresh: MutableStateFlow<Int> = MutableStateFlow(0)
+
+    private val isPermanentlyDeleteSupported: Boolean =
+        when (storageAuthProvider) {
+            StorageAuthProvider.GOOGLE -> true
+            StorageAuthProvider.DROPBOX -> false
+            StorageAuthProvider.MICROSOFT -> false
+        }
+
+    private val isFolderUpdateSupported: Boolean =
+        when (storageAuthProvider) {
+            StorageAuthProvider.GOOGLE -> true
+            StorageAuthProvider.DROPBOX -> false
+            StorageAuthProvider.MICROSOFT -> false
+        }
 
     init {
         viewModelScope.launch {
@@ -105,7 +134,7 @@ class FileViewerViewModel @Inject constructor(
                 }
 
                 return@combine files.sortedWith(
-                    compareBy<OmhStorageEntity> { it is OmhStorageEntity.OmhFile  }
+                    compareBy<OmhStorageEntity> { it is OmhStorageEntity.OmhFile }
                         .thenBy { (it as? OmhStorageEntity.OmhFile)?.mimeType }
                         .thenBy { it.name }
                 )
@@ -137,9 +166,14 @@ class FileViewerViewModel @Inject constructor(
             is FileViewerViewEvent.FileClicked -> fileClickedEvent(event)
             is FileViewerViewEvent.FileVersionClicked -> fileVersionClicked(event)
             is FileViewerViewEvent.BackPressed -> backPressedEvent()
-            is FileViewerViewEvent.CreateFile -> createFileEvent(event)
+            is FileViewerViewEvent.CreateFileWithMimeType -> createFileWithMimeTypeEvent(event)
+            is FileViewerViewEvent.CreateFileWithExtension -> createFileWithExtensionEvent(event)
+            is FileViewerViewEvent.CreateFolder -> createFolderEvent(event)
             is FileViewerViewEvent.DeleteFile -> deleteFileEvent(event)
-            is FileViewerViewEvent.PermanentlyDeleteFileClicked -> permanentlyDeleteFileEventClicked(event)
+            is FileViewerViewEvent.PermanentlyDeleteFileClicked -> permanentlyDeleteFileEventClicked(
+                event
+            )
+
             is FileViewerViewEvent.PermanentlyDeleteFile -> permanentlyDeleteFileEvent(event)
             is FileViewerViewEvent.UploadFile -> uploadFile(event)
             is FileViewerViewEvent.UpdateFile -> updateFileEvent(event)
@@ -206,18 +240,34 @@ class FileViewerViewModel @Inject constructor(
                 return
             }
 
-            val mimeTypeToSave = file.normalizedMimeType()
-
             viewModelScope.launch(Dispatchers.IO) {
                 try {
-                    val data = lastFileVersionClicked?.let {
-                        omhStorageClient.downloadFileVersion(
-                            it.fileId,
-                            it.versionId
-                        )
-                    } ?: omhStorageClient.downloadFile(file.id, mimeTypeToSave)
+                    val data: ByteArrayOutputStream?
+                    var fileToSave = file
 
-                    setState(FileViewerViewState.SaveFile(file, data))
+                    if (lastFileVersionClicked !== null) {
+                        data = omhStorageClient.downloadFileVersion(
+                            file.id,
+                            lastFileVersionClicked!!.versionId
+                        )
+                    } else {
+                        val isGoogleWorkspaceFile =
+                            file.mimeType?.startsWith("application/vnd.google-apps")
+
+                        if (isGoogleWorkspaceFile == true) {
+                            val normalizedFileType = file.normalizedFileType()
+                            data = omhStorageClient.exportFile(file.id, normalizedFileType.mimeType)
+                            fileToSave = file.copy(
+                                name = "${file.name}.${normalizedFileType.extension}",
+                                mimeType = normalizedFileType.mimeType,
+                                extension = normalizedFileType.extension
+                            )
+                        } else {
+                            data = omhStorageClient.downloadFile(file.id)
+                        }
+                    }
+
+                    setState(FileViewerViewState.SaveFile(fileToSave, data))
                 } catch (exception: Exception) {
                     errorDialogMessage.postValue(exception.message)
                     toastMessage.postValue("ERROR: ${file.name} was NOT downloaded")
@@ -267,13 +317,36 @@ class FileViewerViewModel @Inject constructor(
         }
     }
 
-    private fun createFileEvent(event: FileViewerViewEvent.CreateFile) {
+    private fun createFileWithExtensionEvent(event: FileViewerViewEvent.CreateFileWithExtension) {
+        handleFileCreationEvent {
+            omhStorageClient.createFileWithExtension(
+                event.name,
+                event.extension,
+                parentId.peek()
+            )
+        }
+    }
+
+    private fun createFileWithMimeTypeEvent(event: FileViewerViewEvent.CreateFileWithMimeType) {
+        handleFileCreationEvent {
+            omhStorageClient.createFileWithMimeType(
+                event.name,
+                event.mimeType,
+                parentId.peek()
+            )
+        }
+    }
+
+    private fun createFolderEvent(event: FileViewerViewEvent.CreateFolder) {
+        handleFileCreationEvent { omhStorageClient.createFolder(event.name, parentId.peek()) }
+    }
+
+    private fun handleFileCreationEvent(fileCreation: suspend () -> Unit) {
         setState(FileViewerViewState.Loading)
-        val parentId = parentId.peek()
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                omhStorageClient.createFile(event.name, event.mimeType, parentId)
+                fileCreation()
                 refreshFileListEvent()
             } catch (exception: Exception) {
                 errorDialogMessage.postValue(exception.message)
@@ -333,10 +406,10 @@ class FileViewerViewModel @Inject constructor(
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val isSuccess = omhStorageClient.deleteFile(file.id)
-                handleDeleteSuccess(isSuccess, file)
+                omhStorageClient.deleteFile(file.id)
+                handleDeleteSuccess(file)
                 refreshFileListEvent()
-            } catch (exception: Exception) {
+            } catch (exception: OmhStorageException.ApiException) {
                 errorDialogMessage.postValue(exception.message)
                 toastMessage.postValue("ERROR: ${file.name} was NOT deleted")
                 exception.printStackTrace()
@@ -347,7 +420,11 @@ class FileViewerViewModel @Inject constructor(
     }
 
     private fun permanentlyDeleteFileEventClicked(event: FileViewerViewEvent.PermanentlyDeleteFileClicked) {
-        setState(FileViewerViewState.ShowPermanentlyDeleteDialog(event.file))
+        if (isPermanentlyDeleteSupported) {
+            setState(FileViewerViewState.ShowPermanentlyDeleteDialog(event.file))
+        } else {
+            toastMessage.postValue("Permanent deleting is not supported by provider")
+        }
     }
 
     private fun permanentlyDeleteFileEvent(event: FileViewerViewEvent.PermanentlyDeleteFile) {
@@ -357,10 +434,10 @@ class FileViewerViewModel @Inject constructor(
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val isSuccess = omhStorageClient.permanentlyDeleteFile(file.id)
-                handleDeleteSuccess(isSuccess, file)
+                omhStorageClient.permanentlyDeleteFile(file.id)
+                handleDeleteSuccess(file)
                 refreshFileListEvent()
-            } catch (exception: Exception) {
+            } catch (exception: OmhStorageException.ApiException) {
                 errorDialogMessage.postValue(exception.message)
                 toastMessage.postValue("ERROR: ${file.name} was NOT permanently deleted")
                 exception.printStackTrace()
@@ -370,14 +447,8 @@ class FileViewerViewModel @Inject constructor(
         }
     }
 
-    private fun handleDeleteSuccess(isSuccessful: Boolean, file: OmhStorageEntity) {
-        val toastText = if (isSuccessful) {
-            "${file.name} was successfully deleted"
-        } else {
-            "${file.name} was NOT deleted"
-        }
-
-        toastMessage.postValue(toastText)
+    private fun handleDeleteSuccess(file: OmhStorageEntity) {
+        toastMessage.postValue("${file.name} was successfully deleted")
     }
 
     private fun signOut() {
@@ -392,8 +463,12 @@ class FileViewerViewModel @Inject constructor(
     }
 
     private fun updateFileClickEvent(event: FileViewerViewEvent.UpdateFileClicked) {
-        lastFileClicked = event.file
-        setState(FileViewerViewState.ShowUpdateFilePicker)
+        if (event.file.isFile() || isFolderUpdateSupported) {
+            lastFileClicked = event.file
+            setState(FileViewerViewState.ShowUpdateFilePicker)
+        } else {
+            toastMessage.postValue("Updating folders is not supported by provider")
+        }
     }
 
     private fun updateSearchQuery(event: FileViewerViewEvent.UpdateSearchQuery) {
@@ -416,28 +491,28 @@ class FileViewerViewModel @Inject constructor(
     private fun onFileVersions(event: FileViewerViewEvent.FileVersionsClicked) {
         lastFileClicked = event.file
         viewModelScope.launch {
-            _action.send(FileViewerAction.ShowFileVersions)
+            _action.send(FileViewerViewAction.ShowFileVersions)
         }
     }
 
     private fun onFilePermissions(event: FileViewerViewEvent.FilePermissionsClicked) {
         lastFileClicked = event.file
         viewModelScope.launch {
-            _action.send(FileViewerAction.ShowFilePermissions)
+            _action.send(FileViewerViewAction.ShowFilePermissions)
         }
     }
 
     private fun onFileMetadata(event: FileViewerViewEvent.FileMetadataClicked) {
         lastFileClicked = event.file
         viewModelScope.launch {
-            _action.send(FileViewerAction.ShowFileMetadata)
+            _action.send(FileViewerViewAction.ShowFileMetadata)
         }
     }
 
     private fun onMoreOptions(event: FileViewerViewEvent.MoreOptionsClicked) {
         lastFileClicked = event.file
         viewModelScope.launch {
-            _action.send(FileViewerAction.ShowMoreOptions)
+            _action.send(FileViewerViewAction.ShowMoreOptions)
         }
     }
 
