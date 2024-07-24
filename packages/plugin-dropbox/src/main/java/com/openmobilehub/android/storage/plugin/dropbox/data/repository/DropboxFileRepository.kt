@@ -19,7 +19,9 @@ package com.openmobilehub.android.storage.plugin.dropbox.data.repository
 import androidx.annotation.VisibleForTesting
 import com.dropbox.core.DbxApiException
 import com.openmobilehub.android.auth.core.OmhAuthClient
+import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
@@ -27,6 +29,9 @@ import com.openmobilehub.android.storage.core.utils.toInputStream
 import com.openmobilehub.android.storage.plugin.dropbox.DropboxConstants
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.ExceptionMapper
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.MetadataToOmhStorageEntity
+import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.toAccessLevel
+import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.toMemberSelector
+import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.toOmhPermission
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.toOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.toOmhVersion
 import com.openmobilehub.android.storage.plugin.dropbox.data.service.DropboxApiService
@@ -161,5 +166,51 @@ internal class DropboxFileRepository(
         } finally {
             tempFile.delete()
         }
+    }
+
+    fun createPermission(
+        fileId: String,
+        permission: OmhCreatePermission,
+        sendNotificationEmail: Boolean,
+        emailMessage: String?
+    ): OmhPermission? {
+        try {
+            val result = apiService.createPermission(
+                fileId,
+                permission.toMemberSelector(),
+                permission.toAccessLevel(),
+                sendNotificationEmail,
+                emailMessage
+            ).firstOrNull()
+
+            if (result?.result?.isSuccess == true) {
+                // Dropbox does not return created permission as a result
+                return null
+            }
+
+            val errorMessage = if (result?.result?.isMemberError == true) {
+                result.result.memberErrorValue.toStringMultiline()
+            } else {
+                "Unknown error"
+            }
+
+            throw OmhStorageException.ApiException(message = errorMessage)
+        } catch (exception: DbxApiException) {
+            throw ExceptionMapper.toOmhApiException(exception)
+        }
+    }
+
+    fun getWebUrl(fileId: String): String = try {
+        apiService.getWebUrl(fileId)
+    } catch (exception: DbxApiException) {
+        throw ExceptionMapper.toOmhApiException(exception)
+    }
+
+    fun getFilePermissions(fileId: String): List<OmhPermission> {
+        val result = apiService.getFilePermissions(fileId)
+
+        return result.users.mapNotNull { it.toOmhPermission() }.plus(
+            result.groups.mapNotNull { it.toOmhPermission() }
+        )
     }
 }

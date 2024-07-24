@@ -43,8 +43,8 @@ internal fun Permission.toOmhPermission(): OmhPermission? {
     return OmhPermission.IdentityPermission(
         id,
         omhRole,
+        inheritedFrom?.id != null,
         omhIdentity,
-        inheritedFrom?.id
     )
 }
 
@@ -144,6 +144,8 @@ internal fun OmhPermissionRole.toOneDriveString(): String =
         OmhPermissionRole.WRITER -> WRITE_ROLE
         OmhPermissionRole.COMMENTER -> throw UnsupportedOperationException("Unsupported role")
         OmhPermissionRole.READER -> READ_ROLE
+        OmhPermissionRole.TRAVERSE -> throw UnsupportedOperationException("Unsupported role")
+        OmhPermissionRole.OTHER -> throw UnsupportedOperationException("Unsupported role")
     }
 
 internal fun OmhCreatePermission.toDriveRecipient(): DriveRecipient = when (this) {

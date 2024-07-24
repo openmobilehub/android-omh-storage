@@ -125,8 +125,7 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
     }
 
     override suspend fun getWebUrl(fileId: String): String? {
-        // To be implemented
-        return null
+        return repository.getWebUrl(fileId)
     }
 
     override suspend fun updateFile(
@@ -149,8 +148,7 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
     }
 
     override suspend fun getFilePermissions(fileId: String): List<OmhPermission> {
-        // To be implemented
-        return emptyList()
+        return repository.getFilePermissions(fileId)
     }
 
     override suspend fun getFileMetadata(fileId: String): OmhStorageMetadata {
@@ -166,9 +164,8 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         permission: OmhCreatePermission,
         sendNotificationEmail: Boolean,
         emailMessage: String?
-    ): OmhPermission {
-        // To be implemented
-        return OmhPermission.IdentityPermission("", OmhPermissionRole.READER, OmhIdentity.Anyone, null)
+    ): OmhPermission? {
+        return repository.createPermission(fileId, permission, sendNotificationEmail, emailMessage)
     }
 
     override suspend fun updatePermission(
@@ -177,6 +174,6 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         role: OmhPermissionRole
     ): OmhPermission {
         // To be implemented
-        return OmhPermission.IdentityPermission("", OmhPermissionRole.READER, OmhIdentity.Anyone, null)
+        return OmhPermission.IdentityPermission("", OmhPermissionRole.READER, null, OmhIdentity.Anyone)
     }
 }

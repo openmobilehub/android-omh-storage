@@ -54,7 +54,7 @@
                     layout="@layout/row_label_value" />
 
             <include
-                    android:id="@+id/inheritedFrom"
+                    android:id="@+id/isInherited"
                     layout="@layout/row_label_value" />
 
             <include

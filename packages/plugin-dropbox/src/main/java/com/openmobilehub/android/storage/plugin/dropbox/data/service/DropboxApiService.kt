@@ -23,9 +23,14 @@ import com.dropbox.core.v2.files.ListFolderResult
 import com.dropbox.core.v2.files.ListRevisionsResult
 import com.dropbox.core.v2.files.Metadata
 import com.dropbox.core.v2.files.SearchV2Result
+import com.dropbox.core.v2.sharing.AccessLevel
+import com.dropbox.core.v2.sharing.FileMemberActionResult
+import com.dropbox.core.v2.sharing.MemberSelector
+import com.dropbox.core.v2.sharing.SharedFileMembers
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 
+@Suppress("TooManyFunctions")
 internal class DropboxApiService(private val apiClient: DropboxApiClient) {
 
     fun getFilesList(parentId: String): ListFolderResult {
@@ -71,5 +76,35 @@ internal class DropboxApiService(private val apiClient: DropboxApiClient) {
 
     fun createFolder(path: String): CreateFolderResult {
         return apiClient.dropboxApiService.files().createFolderV2(path)
+    }
+
+    fun createPermission(
+        fileId: String,
+        memberSelector: MemberSelector,
+        accessLevel: AccessLevel,
+        sendNotificationEmail: Boolean,
+        emailMessage: String?
+    ): List<FileMemberActionResult> {
+        // TODO dn: handle add folder member
+        return apiClient.dropboxApiService
+            .sharing()
+            .addFileMemberBuilder(fileId, listOf(memberSelector))
+            .withQuiet(!sendNotificationEmail)
+            .withAccessLevel(accessLevel)
+            .withCustomMessage(emailMessage)
+            .start()
+    }
+
+    fun getWebUrl(fileId: String): String {
+        return apiClient.dropboxApiService.sharing().getFileMetadata(fileId).previewUrl
+    }
+
+    fun getFilePermissions(fileId: String): SharedFileMembers {
+        // TODO dn: list folder members
+        return apiClient.dropboxApiService
+            .sharing()
+            .listFileMembersBuilder(fileId)
+            .withIncludeInherited(true) // mimic Google Drive behaviour
+            .start()
     }
 }

@@ -115,8 +115,8 @@ internal fun PermissionResponse.toPermission(): OmhPermission? {
     return OmhPermission.IdentityPermission(
         id,
         omhRole,
+        permissionDetails?.firstOrNull { it.inheritedFrom != null }?.inheritedFrom != null,
         getOmhIdentity() ?: return null,
-        permissionDetails?.firstOrNull { it.inheritedFrom != null }?.inheritedFrom
     )
 }
 
@@ -174,6 +174,8 @@ internal fun OmhPermissionRole.toStringRole(): String = when (this) {
     OmhPermissionRole.WRITER -> WRITER_ROLE
     OmhPermissionRole.COMMENTER -> COMMENTER_ROLE
     OmhPermissionRole.READER -> READER_ROLE
+    OmhPermissionRole.TRAVERSE -> throw UnsupportedOperationException("Unsupported role")
+    OmhPermissionRole.OTHER -> throw UnsupportedOperationException("Unsupported role")
 }
 
 internal fun PermissionsListResponse.toPermissions(): List<OmhPermission> =

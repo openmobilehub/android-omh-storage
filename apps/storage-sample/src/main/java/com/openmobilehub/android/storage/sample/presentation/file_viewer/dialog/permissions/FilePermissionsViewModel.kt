@@ -103,7 +103,7 @@ class FilePermissionsViewModel @Inject constructor(
     }
 
     fun remove(permission: OmhPermission) = viewModelScope.launch(Dispatchers.IO) {
-        if (permission.inheritedFromEntity != null && !isDeletingInheritedPermissionsSupported) {
+        if (permission.isInherited == true && !isDeletingInheritedPermissionsSupported) {
             showErrorDialog(
                 R.string.permission_remove_error,
                 UnsupportedOperationException("Removing inherited permissions is not supported by provider")
@@ -184,4 +184,6 @@ private fun OmhPermission.orderRole(): Int = when (this.role) {
     OmhPermissionRole.WRITER -> 1
     OmhPermissionRole.COMMENTER -> 2
     OmhPermissionRole.READER -> 3
+    OmhPermissionRole.TRAVERSE -> 4
+    OmhPermissionRole.OTHER -> 5
 }

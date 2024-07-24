@@ -30,14 +30,14 @@ import java.util.Date
 sealed class OmhPermission(
     open val id: String,
     open val role: OmhPermissionRole,
-    open val inheritedFromEntity: String?
+    open val isInherited: Boolean?
 ) {
     data class IdentityPermission(
         override val id: String,
         override val role: OmhPermissionRole,
+        override val isInherited: Boolean?,
         val identity: OmhIdentity,
-        override val inheritedFromEntity: String?
-    ) : OmhPermission(id, role, inheritedFromEntity)
+    ) : OmhPermission(id, role, isInherited)
 }
 
 sealed class OmhIdentity {
@@ -84,4 +84,6 @@ enum class OmhPermissionRole {
     WRITER,
     COMMENTER,
     READER,
+    TRAVERSE,
+    OTHER,
 }

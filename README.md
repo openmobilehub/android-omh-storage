@@ -63,8 +63,8 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 | File export                  |         ✅          |           ✅          |    ❌    |    ❌   |
 | File metadata                |         ✅          |           ✅          |    🟨    |    🟨   |
 | File versioning              |         ✅          |           ✅          |    ✅    |    ✅   |
-| File permissions             |         🟨          |           🟨          |    🟨    |         |
-| File URL                     |         ✅          |           ✅          |    ✅    |         |
+| File permissions             |         🟨          |           🟨          |    🟨    |    🟨   |
+| File URL                     |         ✅          |           ✅          |    ✅    |    ✅   |
 
 ### File metadata
 
@@ -130,67 +130,75 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 
 [`OmhPermission.IdentityPermission`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-permission/-identity-permission)
 
-| Property            | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
-|---------------------|:------------------:|:----------------------:|:--------:|:-------:|
-| id                  |         ✅         |           ✅           |    ✅    |         |
-| role                |         ✅         |           ✅           |    ✅    |         |
-| identity            |         ✅         |           ✅           |    ✅    |         |
-| inheritedFromEntity |         🟨         |           🟨           |    ✅    |         |
+| Property    | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
+|-------------|:------------------:|:----------------------:|:--------:|:-------:|
+| id          |         ✅         |           ✅           |    ✅    |    🟨   |
+| role        |         ✅         |           ✅           |    ✅    |    ✅   |
+| isInherited |         🟨         |           🟨           |    ✅    |    ✅   |
+| identity    |         ✅         |           ✅           |    ✅    |    ✅   |
 
-> Google Drive: `inheritedFromEntity` is present only for shared drive items.
+> Google Drive: `isInherited` is present only for shared drive items.
+> Dropbox: `id` equals to underlying identity ID.
 
 [`OmhIdentity`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-identity)
 
 | Type        | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
-| ----------- | :----------------: | :--------------------: | :------: | :-----: |
-| User        |         ✅         |           ✅           |    ✅    |         |
-| Group       |         ✅         |           ✅           |    ✅    |         |
-| Domain      |         ✅         |           ✅           |    ❌    |         |
-| Anyone      |         ✅         |           ✅           |    ❌    |         |
-| Device      |         ❌         |           ❌           |    ✅    |         |
-| Application |         ❌         |           ❌           |    ✅    |         |
+|-------------|:------------------:|:----------------------:|:--------:|:-------:|
+| User        |         ✅         |           ✅           |    ✅    |    ✅   |
+| Group       |         ✅         |           ✅           |    ✅    |    ✅   |
+| Domain      |         ✅         |           ✅           |    ❌    |    ❌   |
+| Anyone      |         ✅         |           ✅           |    ❌    |    ❌   |
+| Device      |         ❌         |           ❌           |    ✅    |    ❌   |
+| Application |         ❌         |           ❌           |    ✅    |    ❌   |
 
 [`OmhIdentity.User`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-identity/-user)
 
 | Property       | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
-| -------------- | :----------------: | :--------------------: | :------: | :-----: |
-| id             |         ❌         |           ❌           |    ✅    |         |
-| displayName    |         ✅         |           ✅           |    ✅    |         |
-| emailAddress   |         ✅         |           ✅           |    ❌    |         |
-| expirationTime |         ✅         |           ✅           |    ✅    |         |
-| deleted        |         ✅         |           ✅           |    ❌    |         |
-| photoLink      |         ✅         |           ✅           |    ❌    |         |
-| pendingOwner   |         ❌         |           ✅           |    ❌    |         |
+|----------------|:------------------:|:----------------------:|:--------:|:-------:|
+| id             |         ❌         |           ❌           |    ✅    |    ✅   |
+| displayName    |         ✅         |           ✅           |    ✅    |    ✅   |
+| emailAddress   |         ✅         |           ✅           |    ❌    |    ✅   |
+| expirationTime |         ✅         |           ✅           |    ✅    |    ❌   |
+| deleted        |         ✅         |           ✅           |    ❌    |    ❌   |
+| photoLink      |         ✅         |           ✅           |    ❌    |    ❌   |
+| pendingOwner   |         ❌         |           ✅           |    ❌    |    ❌   |
 
 [`OmhIdentity.Group`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-identity/-group)
 
 | Property       | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
-| -------------- | :----------------: | :--------------------: | :------: | :-----: |
-| id             |         ❌         |           ❌           |    ✅    |         |
-| displayName    |         ✅         |           ✅           |    ✅    |         |
-| emailAddress   |         ✅         |           ✅           |    ❌    |         |
-| expirationTime |         ✅         |           ✅           |    ✅    |         |
-| deleted        |         ✅         |           ✅           |    ❌    |         |
+|----------------|:------------------:|:----------------------:|:--------:|:-------:|
+| id             |         ❌         |           ❌           |    ✅    |    ✅   |
+| displayName    |         ✅         |           ✅           |    ✅    |    ✅   |
+| emailAddress   |         ✅         |           ✅           |    ❌    |    ❌   |
+| expirationTime |         ✅         |           ✅           |    ✅    |    ❌   |
+| deleted        |         ✅         |           ✅           |    ❌    |    ❌   |
 
 [`OmhPermissionRole`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-permission-role)
 
 | Role      | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
-| --------- | :----------------: | :--------------------: | :------: | :-----: |
-| OWNER     |         ✅         |           ✅           |    ✅    |         |
-| WRITER    |         ✅         |           ✅           |    ✅    |         |
-| COMMENTER |         ✅         |           ✅           |    ❌    |         |
-| READER    |         ✅         |           ✅           |    ✅    |         |
+|-----------|:------------------:|:----------------------:|:--------:|:-------:|
+| OWNER     |         ✅         |           ✅           |    ✅    |    ✅   |
+| WRITER    |         ✅         |           ✅           |    ✅    |    ✅   |
+| COMMENTER |         ✅         |           ✅           |    ❌    |    ✅   |
+| READER    |         ✅         |           ✅           |    ✅    |    ✅   |
+| TRAVERSE  |         ❌         |           ❌           |    ❌    |    ✅   |
+| OTHER     |         ❌         |           ❌           |    ❌    |    ✅   |
 
 [`OmhPermissionRecipient`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-permission-recipient)
 
 | Type         | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
-| ------------ | :----------------: | :--------------------: | :------: | :-----: |
-| User         |         ✅         |           ✅           |    ✅    |         |
-| Group        |         ✅         |           ✅           |    ✅    |         |
-| Domain       |         ✅         |           ✅           |    ❌    |         |
-| Anyone       |         ✅         |           ✅           |    ❌    |         |
-| WithObjectId |         ❌         |           ❌           |    ✅    |         |
-| WithAlias    |         ❌         |           ❌           |    ✅    |         |
+|--------------|:------------------:|:----------------------:|:--------:|:-------:|
+| User         |         ✅         |           ✅           |    ✅    |    ✅   |
+| Group        |         ✅         |           ✅           |    ✅    |    ❌   |
+| Domain       |         ✅         |           ✅           |    ❌    |    ❌   |
+| Anyone       |         ✅         |           ✅           |    ❌    |    ❌   |
+| WithObjectId |         ❌         |           ❌           |    ✅    |    ✅   |
+| WithAlias    |         ❌         |           ❌           |    ✅    |    ❌   |
+
+> Dropbox: to invite Group, use WithObjectId and provide group ID
+
+[`OmhStorageClient.createPermission`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client)
+> Dropbox: this method returns null when permission is successfully created.
 
 </details>
 

@@ -80,7 +80,9 @@ class AuthModule {
                 "account_info.read",
                 "files.metadata.read",
                 "files.content.write",
-                "files.content.read"
+                "files.content.read",
+                "sharing.read",
+                "sharing.write"
             ),
             context = context,
             appId = BuildConfig.DROPBOX_CLIENT_ID,
