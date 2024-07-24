@@ -493,4 +493,37 @@ class OneDriveFileRepositoryTest {
         // Act & Assert
         repository.createFolder(TEST_FOLDER_NAME, TEST_FOLDER_PARENT_ID)
     }
+
+    @Test
+    fun `given an apiService uploads and renames file, when updating the file, then return an OmhStorageEntity`() {
+        // Arrange
+        every { apiService.uploadFile(any(), any(), any()) } returns driveItem
+        every { apiService.updateFileMetadata(any(), any()) } returns driveItem
+        every { driveItemToOmhStorageEntity(any()) } returns omhStorageEntity
+
+        // Act
+        val result = repository.updateFile(file, TEST_FILE_ID)
+
+        // Assert
+        assertEquals(omhStorageEntity, result)
+    }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given an apiService throws an exception, when uploading a file, then an ApiException is thrown`() {
+        // Arrange
+        every { apiService.uploadFile(any(), any(), any()) } throws OmhStorageException.ApiException()
+
+        // Act & Assert
+        repository.updateFile(file, TEST_FILE_ID)
+    }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given an apiService throws an exception, when updating a file metadata, then an ApiException is thrown`() {
+        // Arrange
+        every { apiService.uploadFile(any(), any(), any()) } returns driveItem
+        every { apiService.updateFileMetadata(any(), any()) } throws OmhStorageException.ApiException()
+
+        // Act & Assert
+        repository.updateFile(file, TEST_FILE_ID)
+    }
 }

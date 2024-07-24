@@ -379,4 +379,16 @@ internal class OneDriveOmhStorageClientTest {
             }
         }
     }
+
+    @Test
+    fun `given a repository, when updating a file, then return OmhFile`() = runTest {
+        // Arrange
+        every { repository.updateFile(any(), any()) } returns omhFile
+
+        // Act
+        val result = client.updateFile(fileToUpload, TEST_FILE_ID)
+
+        // Assert
+        assertEquals(omhFile, result)
+    }
 }
