@@ -17,6 +17,7 @@
 package com.openmobilehub.android.storage.plugin.onedrive.data.repository
 
 import com.microsoft.graph.drives.item.items.item.invite.InvitePostRequestBody
+import com.microsoft.graph.models.DriveItem
 import com.microsoft.kiota.ApiException
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
@@ -57,7 +58,8 @@ internal class OneDriveFileRepository(
     }
 
     fun uploadFile(localFileToUpload: File, parentId: String): OmhStorageEntity? = try {
-        val driveItem = apiService.uploadFile(localFileToUpload, parentId)
+        val path = "$parentId:/${localFileToUpload.name}:"
+        val driveItem = apiService.uploadFile(localFileToUpload, path)
 
         driveItem?.let { driveItemToOmhStorageEntity(it) }
     } catch (exception: ApiException) {
@@ -196,6 +198,22 @@ internal class OneDriveFileRepository(
             throw ExceptionMapper.toOmhApiException(exception)
         } finally {
             tempFile.delete()
+        }
+    }
+
+    fun updateFile(localFileToUpload: File, fileId: String): OmhStorageEntity {
+        try {
+            apiService.uploadFile(localFileToUpload, fileId, "replace")
+
+            // By default, the file name is not updated when uploading a new file version.
+            val updatedDriveItem = DriveItem().apply {
+                name = localFileToUpload.name
+            }
+            val response = apiService.updateFileMetadata(fileId, updatedDriveItem)
+
+            return driveItemToOmhStorageEntity(response)
+        } catch (exception: ApiException) {
+            throw ExceptionMapper.toOmhApiException(exception)
         }
     }
 }

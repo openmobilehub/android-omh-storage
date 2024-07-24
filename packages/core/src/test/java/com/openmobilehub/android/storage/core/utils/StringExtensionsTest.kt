@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("MaximumLineLength", "MaxLineLength")
+
 package com.openmobilehub.android.storage.core.utils
 
 import com.openmobilehub.android.storage.core.testdoubles.TEST_FIRST_MAY_2024_MILLIS
@@ -33,6 +35,19 @@ class StringExtensionsTest {
 
         // Act
         val result = input.removeWhitespaces()
+
+        // Assert
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `given a string with special characters, when removing special characters, then return a string without special characters`() {
+        // Arrange
+        val input = "fileśćżźę@0#2.txt"
+        val expected = "file______0_2.txt"
+
+        // Act
+        val result = input.removeSpecialCharacters()
 
         // Assert
         assertEquals(expected, result)

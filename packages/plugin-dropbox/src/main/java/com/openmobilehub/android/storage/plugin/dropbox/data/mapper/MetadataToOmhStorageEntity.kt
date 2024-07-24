@@ -23,6 +23,7 @@ import com.dropbox.core.v2.files.Metadata
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.utils.DateUtils
 import com.openmobilehub.android.storage.core.utils.getMimeTypeFromUrl
+import com.openmobilehub.android.storage.core.utils.removeSpecialCharacters
 import com.openmobilehub.android.storage.core.utils.removeWhitespaces
 
 class MetadataToOmhStorageEntity(private val mimeTypeMap: MimeTypeMap) {
@@ -33,7 +34,7 @@ class MetadataToOmhStorageEntity(private val mimeTypeMap: MimeTypeMap) {
 
             return when (this) {
                 is FileMetadata -> {
-                    val sanitizedName = name.removeWhitespaces()
+                    val sanitizedName = name.removeWhitespaces().removeSpecialCharacters()
                     val modifiedDate = DateUtils.getNewerDate(clientModified, serverModified)
                     val mimeType = mimeTypeMap.getMimeTypeFromUrl(sanitizedName)
                     val extension = MimeTypeMap.getFileExtensionFromUrl(sanitizedName)?.ifEmpty { null }

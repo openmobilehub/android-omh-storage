@@ -26,6 +26,10 @@ fun String.removeWhitespaces(): String {
     return this.replace("\\s".toRegex(), "_")
 }
 
+fun String.removeSpecialCharacters(): String {
+    return this.replace("[^a-zA-Z0-9.]".toRegex(), "_")
+}
+
 fun String.fromRFC3339StringToDate(): Date? {
     val rfc3339Format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
     rfc3339Format.timeZone = TimeZone.getTimeZone("UTC")

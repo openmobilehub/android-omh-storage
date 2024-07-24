@@ -34,6 +34,7 @@ import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.F
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewState
 import com.openmobilehub.android.storage.sample.util.coSignOut
 import com.openmobilehub.android.storage.sample.util.isDownloadable
+import com.openmobilehub.android.storage.sample.util.isFile
 import com.openmobilehub.android.storage.sample.util.isFolder
 import com.openmobilehub.android.storage.sample.util.normalizedFileType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -103,7 +104,14 @@ class FileViewerViewModel @Inject constructor(
     private var forceRefresh: MutableStateFlow<Int> = MutableStateFlow(0)
 
     private val isPermanentlyDeleteSupported: Boolean =
-        when (sessionRepository.getStorageAuthProvider()) {
+        when (storageAuthProvider) {
+            StorageAuthProvider.GOOGLE -> true
+            StorageAuthProvider.DROPBOX -> false
+            StorageAuthProvider.MICROSOFT -> false
+        }
+
+    private val isFolderUpdateSupported: Boolean =
+        when (storageAuthProvider) {
             StorageAuthProvider.GOOGLE -> true
             StorageAuthProvider.DROPBOX -> false
             StorageAuthProvider.MICROSOFT -> false
@@ -165,6 +173,7 @@ class FileViewerViewModel @Inject constructor(
             is FileViewerViewEvent.PermanentlyDeleteFileClicked -> permanentlyDeleteFileEventClicked(
                 event
             )
+
             is FileViewerViewEvent.PermanentlyDeleteFile -> permanentlyDeleteFileEvent(event)
             is FileViewerViewEvent.UploadFile -> uploadFile(event)
             is FileViewerViewEvent.UpdateFile -> updateFileEvent(event)
@@ -309,11 +318,23 @@ class FileViewerViewModel @Inject constructor(
     }
 
     private fun createFileWithExtensionEvent(event: FileViewerViewEvent.CreateFileWithExtension) {
-        handleFileCreationEvent { omhStorageClient.createFileWithExtension(event.name, event.extension, parentId.peek()) }
+        handleFileCreationEvent {
+            omhStorageClient.createFileWithExtension(
+                event.name,
+                event.extension,
+                parentId.peek()
+            )
+        }
     }
 
     private fun createFileWithMimeTypeEvent(event: FileViewerViewEvent.CreateFileWithMimeType) {
-        handleFileCreationEvent { omhStorageClient.createFileWithMimeType(event.name, event.mimeType, parentId.peek()) }
+        handleFileCreationEvent {
+            omhStorageClient.createFileWithMimeType(
+                event.name,
+                event.mimeType,
+                parentId.peek()
+            )
+        }
     }
 
     private fun createFolderEvent(event: FileViewerViewEvent.CreateFolder) {
@@ -442,8 +463,12 @@ class FileViewerViewModel @Inject constructor(
     }
 
     private fun updateFileClickEvent(event: FileViewerViewEvent.UpdateFileClicked) {
-        lastFileClicked = event.file
-        setState(FileViewerViewState.ShowUpdateFilePicker)
+        if (event.file.isFile() || isFolderUpdateSupported) {
+            lastFileClicked = event.file
+            setState(FileViewerViewState.ShowUpdateFilePicker)
+        } else {
+            toastMessage.postValue("Updating folders is not supported by provider")
+        }
     }
 
     private fun updateSearchQuery(event: FileViewerViewEvent.UpdateSearchQuery) {
