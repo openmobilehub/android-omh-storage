@@ -104,14 +104,14 @@ class FileViewerViewModel @Inject constructor(
     private var forceRefresh: MutableStateFlow<Int> = MutableStateFlow(0)
 
     private val isPermanentlyDeleteSupported: Boolean =
-        when (sessionRepository.getStorageAuthProvider()) {
+        when (storageAuthProvider) {
             StorageAuthProvider.GOOGLE -> true
             StorageAuthProvider.DROPBOX -> false
             StorageAuthProvider.MICROSOFT -> false
         }
 
     private val isFolderUpdateSupported: Boolean =
-        when (sessionRepository.getStorageAuthProvider()) {
+        when (storageAuthProvider) {
             StorageAuthProvider.GOOGLE -> true
             StorageAuthProvider.DROPBOX -> false
             StorageAuthProvider.MICROSOFT -> false
