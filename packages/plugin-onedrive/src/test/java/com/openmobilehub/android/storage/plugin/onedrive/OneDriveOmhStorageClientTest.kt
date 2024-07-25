@@ -161,15 +161,14 @@ internal class OneDriveOmhStorageClientTest {
         runTest {
             // Arrange
             val parentId = "parentId"
-            val files: List<OmhStorageEntity> = mockk()
 
-            every { repository.getFilesList(parentId) } returns files
+            every { repository.getFilesList(parentId) } returns omhStorageEntityList
 
             // Act
             val result = client.listFiles(parentId)
 
             // Assert
-            assertEquals(files, result)
+            assertEquals(omhStorageEntityList, result)
         }
 
     @Test

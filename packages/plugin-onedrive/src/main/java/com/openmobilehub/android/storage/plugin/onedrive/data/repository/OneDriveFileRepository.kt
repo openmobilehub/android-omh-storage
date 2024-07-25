@@ -217,9 +217,11 @@ internal class OneDriveFileRepository(
         }
     }
 
-    fun search(query: String): List<OmhStorageEntity> {
-        return apiService.search(query).value.map {
+    fun search(query: String): List<OmhStorageEntity> = try {
+        apiService.search(query).value.map {
             driveItemToOmhStorageEntity(it)
         }
+    } catch (exception: ApiException) {
+        throw ExceptionMapper.toOmhApiException(exception)
     }
 }
