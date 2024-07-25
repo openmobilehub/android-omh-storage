@@ -290,10 +290,20 @@ internal class DropboxFileRepository(
         )
     }
 
-    fun getWebUrl(fileId: String): String = try {
-        apiService.getWebUrl(fileId)
-    } catch (exception: DbxApiException) {
-        throw ExceptionMapper.toOmhApiException(exception)
+    fun getWebUrl(fileId: String): String? {
+        try {
+            val folderMetadata = isFolder(fileId)
+
+            return if (folderMetadata != null) {
+                apiService.getFolderWebUrl(
+                    folderMetadata.sharedFolderId ?: return null
+                )
+            } else {
+                apiService.getFileWebUrl(fileId)
+            }
+        } catch (exception: DbxApiException) {
+            throw ExceptionMapper.toOmhApiException(exception)
+        }
     }
 
     fun deletePermission(fileId: String, permissionId: String) {

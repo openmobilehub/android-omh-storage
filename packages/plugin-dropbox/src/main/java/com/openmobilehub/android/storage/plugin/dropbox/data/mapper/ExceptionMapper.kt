@@ -23,5 +23,5 @@ object ExceptionMapper {
     // Note that extensions function couldn't be used here due to SwallowedException warning:
     // https://github.com/detekt/detekt/issues/4520
     fun toOmhApiException(exception: DbxApiException): OmhStorageException.ApiException =
-        OmhStorageException.ApiException(null, exception.userMessage.toString(), exception)
+        OmhStorageException.ApiException(null, exception.userMessage?.toString() ?: exception.message, exception)
 }

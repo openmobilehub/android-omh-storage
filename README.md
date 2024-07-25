@@ -182,7 +182,7 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 | COMMENTER |         ✅         |           ✅           |    ❌    |    ✅   |
 | READER    |         ✅         |           ✅           |    ✅    |    🟨   |
 
-> Dropbox: When trying to create permissions with role `READER`, Dropbox will
+> Dropbox: when trying to create permissions with role `READER`, Dropbox will
 > throw `AddFileMemberErrorException` with user message: `viewer_no_comment isn’t yet supported`.
 
 [`OmhPermissionRecipient`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-permission-recipient)
@@ -204,6 +204,11 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 [`OmhStorageClient.updatePermission`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client)
 > Dropbox: this method returns null when permission is successfully updated.
 
+[`OmhStorageClient.getWebUrl`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client)
+> Dropbox: a folder needs to be a shared folder to return web URL.
+
+[`OmhStorageClient.getFilePermissions`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client)
+> Dropbox: a folder needs to be a shared folder to return any permissions, including OWNER permission.
 
 </details>
 

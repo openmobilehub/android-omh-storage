@@ -31,6 +31,7 @@ import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
 import com.openmobilehub.android.storage.sample.domain.repository.SessionRepository
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model.FilePermissionsViewAction
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model.FilePermissionsViewState
+import com.openmobilehub.android.storage.sample.util.isFolder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -45,6 +46,8 @@ class FilePermissionsViewModel @Inject constructor(
     private val omhStorageClient: OmhStorageClient,
     sessionRepository: SessionRepository
 ) : ViewModel() {
+    private val storageAuthProvider = sessionRepository.getStorageAuthProvider()
+
     private val _state = MutableStateFlow(
         FilePermissionsViewState(
             isLoading = false,
@@ -61,7 +64,7 @@ class FilePermissionsViewModel @Inject constructor(
         private set
 
     private val isDeletingInheritedPermissionsSupported: Boolean =
-        when (sessionRepository.getStorageAuthProvider()) {
+        when (storageAuthProvider) {
             StorageAuthProvider.GOOGLE -> true
             StorageAuthProvider.DROPBOX -> true
             StorageAuthProvider.MICROSOFT -> false
@@ -147,7 +150,15 @@ class FilePermissionsViewModel @Inject constructor(
         @Suppress("SwallowedException")
         try {
             val webUrl = omhStorageClient.getWebUrl(file.id) ?: run {
-                _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_no_url))
+                _action.send(
+                    FilePermissionsViewAction.ShowToast(
+                        if (storageAuthProvider == StorageAuthProvider.DROPBOX && file.isFolder()) {
+                            R.string.permission_no_url_dropbox_folder
+                        } else {
+                            R.string.permission_no_url
+                        }
+                    )
+                )
                 return@launch
             }
             _action.send(FilePermissionsViewAction.CopyUrlToClipboard(webUrl))

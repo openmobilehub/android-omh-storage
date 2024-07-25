@@ -134,8 +134,18 @@ internal class DropboxApiService(private val apiClient: DropboxApiClient) {
             .start()
     }
 
-    fun getWebUrl(fileId: String): String {
-        return apiClient.dropboxApiService.sharing().getFileMetadata(fileId).previewUrl
+    fun getFileWebUrl(fileId: String): String {
+        return apiClient.dropboxApiService
+            .sharing()
+            .getFileMetadata(fileId)
+            .previewUrl
+    }
+
+    fun getFolderWebUrl(sharedFolderId: String): String {
+        return apiClient.dropboxApiService
+            .sharing()
+            .getFolderMetadata(sharedFolderId)
+            .previewUrl
     }
 
     fun getFilePermissions(fileId: String): SharedFileMembers {
