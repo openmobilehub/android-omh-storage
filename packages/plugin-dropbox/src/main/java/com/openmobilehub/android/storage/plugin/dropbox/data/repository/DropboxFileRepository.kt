@@ -295,6 +295,24 @@ internal class DropboxFileRepository(
         throw ExceptionMapper.toOmhApiException(exception)
     }
 
+    fun deletePermission(fileId: String, permissionId: String) {
+        try {
+            val folderMetadata = isFolder(fileId)
+
+            if (folderMetadata != null) {
+                apiService.deleteFolderPermission(
+                    folderMetadata.sharedFolderId
+                        ?: throw OmhStorageException.ApiException(message = "This is not a shared folder"),
+                    permissionId
+                )
+            } else {
+                apiService.deleteFilePermission(fileId, permissionId)
+            }
+        } catch (exception: DbxApiException) {
+            throw ExceptionMapper.toOmhApiException(exception)
+        }
+    }
+
     fun getPermissions(fileId: String): List<OmhPermission> {
         val folderMetadata = isFolder(fileId)
 

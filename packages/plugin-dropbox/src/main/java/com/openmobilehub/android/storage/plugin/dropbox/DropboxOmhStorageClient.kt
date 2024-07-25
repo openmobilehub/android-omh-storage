@@ -156,7 +156,7 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
     }
 
     override suspend fun deletePermission(fileId: String, permissionId: String) {
-        // To be implemented
+        return repository.deletePermission(fileId, permissionId)
     }
 
     override suspend fun createPermission(

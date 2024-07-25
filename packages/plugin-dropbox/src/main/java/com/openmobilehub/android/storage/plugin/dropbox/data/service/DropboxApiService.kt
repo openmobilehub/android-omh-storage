@@ -16,6 +16,7 @@
 
 package com.openmobilehub.android.storage.plugin.dropbox.data.service
 
+import com.dropbox.core.v2.async.LaunchResultBase
 import com.dropbox.core.v2.files.CreateFolderResult
 import com.dropbox.core.v2.files.DeleteResult
 import com.dropbox.core.v2.files.FileMetadata
@@ -27,6 +28,7 @@ import com.dropbox.core.v2.sharing.AccessInheritance
 import com.dropbox.core.v2.sharing.AccessLevel
 import com.dropbox.core.v2.sharing.AddMember
 import com.dropbox.core.v2.sharing.FileMemberActionResult
+import com.dropbox.core.v2.sharing.FileMemberRemoveActionResult
 import com.dropbox.core.v2.sharing.MemberSelector
 import com.dropbox.core.v2.sharing.ShareFolderJobStatus
 import com.dropbox.core.v2.sharing.ShareFolderLaunch
@@ -147,5 +149,20 @@ internal class DropboxApiService(private val apiClient: DropboxApiClient) {
         return apiClient.dropboxApiService
             .sharing()
             .listFolderMembers(sharedFolderId)
+    }
+
+    fun deleteFolderPermission(
+        sharedFolderId: String,
+        permissionId: String
+    ): LaunchResultBase {
+        return apiClient.dropboxApiService
+            .sharing()
+            .removeFolderMember(sharedFolderId, MemberSelector.dropboxId(permissionId), false)
+    }
+
+    fun deleteFilePermission(fileId: String, permissionId: String): FileMemberRemoveActionResult {
+        return apiClient.dropboxApiService
+            .sharing()
+            .removeFileMember2(fileId, MemberSelector.dropboxId(permissionId))
     }
 }
