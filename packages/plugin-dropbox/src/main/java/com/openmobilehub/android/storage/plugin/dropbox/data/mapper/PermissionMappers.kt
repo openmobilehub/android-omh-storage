@@ -100,8 +100,6 @@ internal fun OmhPermissionRole.toAccessLevel(): AccessLevel = when (this) {
     OmhPermissionRole.WRITER -> AccessLevel.EDITOR
     OmhPermissionRole.COMMENTER -> AccessLevel.VIEWER
     OmhPermissionRole.READER -> AccessLevel.VIEWER_NO_COMMENT
-    OmhPermissionRole.TRAVERSE -> AccessLevel.TRAVERSE
-    OmhPermissionRole.OTHER -> AccessLevel.OTHER
 }
 
 internal fun AccessLevel.toOmhPermissionRole(): OmhPermissionRole? = when (this) {
@@ -109,7 +107,8 @@ internal fun AccessLevel.toOmhPermissionRole(): OmhPermissionRole? = when (this)
     AccessLevel.EDITOR -> OmhPermissionRole.WRITER
     AccessLevel.VIEWER -> OmhPermissionRole.COMMENTER
     AccessLevel.VIEWER_NO_COMMENT -> OmhPermissionRole.READER
-    AccessLevel.TRAVERSE -> OmhPermissionRole.TRAVERSE
+    // They are documented but not actually supported by Dropbox in any of the use cases
+    AccessLevel.TRAVERSE -> null
     AccessLevel.NO_ACCESS -> null
-    AccessLevel.OTHER -> OmhPermissionRole.OTHER
+    AccessLevel.OTHER -> null
 }

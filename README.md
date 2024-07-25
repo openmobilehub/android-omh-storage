@@ -180,9 +180,10 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 | OWNER     |         ✅         |           ✅           |    ✅    |    ✅   |
 | WRITER    |         ✅         |           ✅           |    ✅    |    ✅   |
 | COMMENTER |         ✅         |           ✅           |    ❌    |    ✅   |
-| READER    |         ✅         |           ✅           |    ✅    |    ✅   |
-| TRAVERSE  |         ❌         |           ❌           |    ❌    |    ✅   |
-| OTHER     |         ❌         |           ❌           |    ❌    |    ✅   |
+| READER    |         ✅         |           ✅           |    ✅    |    🟨   |
+
+> Dropbox: When trying to create permissions with role `READER`, Dropbox will
+> throw `AddFileMemberErrorException` with user message: `viewer_no_comment isn’t yet supported`.
 
 [`OmhPermissionRecipient`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-permission-recipient)
 

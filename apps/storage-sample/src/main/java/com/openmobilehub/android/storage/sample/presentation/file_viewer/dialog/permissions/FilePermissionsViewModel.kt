@@ -136,6 +136,7 @@ class FilePermissionsViewModel @Inject constructor(
             _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_created))
         } catch (exception: OmhStorageException.ApiException) {
             showErrorDialog(R.string.permission_create_error, exception)
+            exception.cause?.printStackTrace()
         }
         getPermissions()
     }
@@ -184,6 +185,4 @@ private fun OmhPermission.orderRole(): Int = when (this.role) {
     OmhPermissionRole.WRITER -> 1
     OmhPermissionRole.COMMENTER -> 2
     OmhPermissionRole.READER -> 3
-    OmhPermissionRole.TRAVERSE -> 4
-    OmhPermissionRole.OTHER -> 5
 }

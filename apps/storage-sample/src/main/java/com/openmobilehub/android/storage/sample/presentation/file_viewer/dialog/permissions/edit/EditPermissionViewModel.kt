@@ -27,17 +27,16 @@ import javax.inject.Inject
 class EditPermissionViewModel @Inject constructor(
     sessionRepository: SessionRepository
 ) : ViewModel() {
-    val roles = OmhPermissionRole.values()
+    // Changing the owner of a file requires a separate flow that is not covered by the sample app
+    val roles = OmhPermissionRole.values().filter { it != OmhPermissionRole.OWNER }.toTypedArray()
     var role: OmhPermissionRole? = null
     val disabledRoles: Set<OmhPermissionRole> = when (sessionRepository.getStorageAuthProvider()) {
-        StorageAuthProvider.GOOGLE -> setOf(
-            // Changing the owner of a file requires a separate flow that is not covered by the sample app
-            OmhPermissionRole.OWNER
+        StorageAuthProvider.GOOGLE -> emptySet()
+        StorageAuthProvider.DROPBOX -> setOf(
+            OmhPermissionRole.READER
         )
-        StorageAuthProvider.DROPBOX -> emptySet()
+
         StorageAuthProvider.MICROSOFT -> setOf(
-            // Changing the owner of a file requires a separate flow that is not covered by the sample app
-            OmhPermissionRole.OWNER,
             OmhPermissionRole.COMMENTER
         )
     }

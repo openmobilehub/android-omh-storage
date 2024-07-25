@@ -84,6 +84,4 @@ enum class OmhPermissionRole {
     WRITER,
     COMMENTER,
     READER,
-    TRAVERSE,
-    OTHER,
 }
