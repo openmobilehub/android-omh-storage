@@ -49,6 +49,7 @@ class EditPermissionDialog : DialogFragment(), AdapterView.OnItemSelectedListene
             false
         ).also {
             binding = it
+            viewModel.setup(parentViewModel.file)
             setupBinding()
         }.root
     }
@@ -83,7 +84,7 @@ class EditPermissionDialog : DialogFragment(), AdapterView.OnItemSelectedListene
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
-        viewModel.role = null
+        // not needed
     }
 
     companion object {

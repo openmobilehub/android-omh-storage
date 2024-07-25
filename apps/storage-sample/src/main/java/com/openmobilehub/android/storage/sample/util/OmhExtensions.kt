@@ -60,35 +60,30 @@ fun OmhStorageEntity.OmhFile.normalizedFileType(): FileType = when (getFileType(
 fun OmhStorageEntity.isFolder() = this is OmhStorageEntity.OmhFolder
 fun OmhStorageEntity.isFile() = this is OmhStorageEntity.OmhFile
 
+// We can't rely on getUser, as on Dropbox, the user will be returned even when the access token
+// expires, while on Microsoft, 401 will be thrown as expected.
 suspend fun OmhAuthClient.isUserLoggedIn(): Boolean = suspendCoroutine { continuation ->
-    getUser()
-        .addOnSuccess {
-            continuation.resume(true)
-        }
-        .addOnFailure {
-            getCredentials().apply {
-                if (accessToken == null) {
-                    continuation.resume(false)
-                } else {
-                    refreshAccessToken()
+    getCredentials().apply {
+        if (accessToken == null) {
+            continuation.resume(false)
+        } else {
+            refreshAccessToken()
+                .addOnSuccess {
+                    continuation.resume(true)
+                }
+                .addOnFailure {
+                    signOut()
                         .addOnSuccess {
-                            continuation.resume(true)
+                            continuation.resume(false)
                         }
                         .addOnFailure {
-                            signOut()
-                                .addOnSuccess {
-                                    continuation.resume(false)
-                                }
-                                .addOnFailure {
-                                    continuation.resume(false)
-                                }
-                                .execute()
+                            continuation.resume(false)
                         }
                         .execute()
                 }
-            }
+                .execute()
         }
-        .execute()
+    }
 }
 
 suspend fun OmhAuthClient.coSignOut() = suspendCancellableCoroutine { continuation ->

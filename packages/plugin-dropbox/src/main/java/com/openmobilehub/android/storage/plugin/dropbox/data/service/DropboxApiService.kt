@@ -29,6 +29,7 @@ import com.dropbox.core.v2.sharing.AccessLevel
 import com.dropbox.core.v2.sharing.AddMember
 import com.dropbox.core.v2.sharing.FileMemberActionResult
 import com.dropbox.core.v2.sharing.FileMemberRemoveActionResult
+import com.dropbox.core.v2.sharing.MemberAccessLevelResult
 import com.dropbox.core.v2.sharing.MemberSelector
 import com.dropbox.core.v2.sharing.ShareFolderJobStatus
 import com.dropbox.core.v2.sharing.ShareFolderLaunch
@@ -164,5 +165,33 @@ internal class DropboxApiService(private val apiClient: DropboxApiClient) {
         return apiClient.dropboxApiService
             .sharing()
             .removeFileMember2(fileId, MemberSelector.dropboxId(permissionId))
+    }
+
+    fun updateFolderPermissions(
+        sharedFolderId: String,
+        permissionId: String,
+        accessLevel: AccessLevel,
+    ): MemberAccessLevelResult {
+        return apiClient.dropboxApiService
+            .sharing()
+            .updateFolderMember(
+                sharedFolderId,
+                MemberSelector.dropboxId(permissionId),
+                accessLevel
+            )
+    }
+
+    fun updateFilePermissions(
+        fileId: String,
+        permissionId: String,
+        accessLevel: AccessLevel,
+    ): MemberAccessLevelResult {
+        return apiClient.dropboxApiService
+            .sharing()
+            .updateFileMember(
+                fileId,
+                MemberSelector.dropboxId(permissionId),
+                accessLevel
+            )
     }
 }

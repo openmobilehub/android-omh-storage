@@ -96,7 +96,7 @@ class FilePermissionsDialog : BottomSheetDialogFragment(), FilePermissionAdapter
         super.onViewCreated(view, savedInstanceState)
         val file = requireNotNull(parentViewModel.lastFileClicked)
 
-        permissionsViewModel.getPermissions(file.id)
+        permissionsViewModel.getPermissions(file)
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {

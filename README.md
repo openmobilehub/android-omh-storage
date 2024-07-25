@@ -201,6 +201,10 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 [`OmhStorageClient.createPermission`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client)
 > Dropbox: this method returns null when permission is successfully created.
 
+[`OmhStorageClient.updatePermission`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client)
+> Dropbox: this method returns null when permission is successfully updated.
+
+
 </details>
 
 ## Contributing

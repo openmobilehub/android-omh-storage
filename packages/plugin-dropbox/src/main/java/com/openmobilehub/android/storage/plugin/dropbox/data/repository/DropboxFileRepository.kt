@@ -24,6 +24,7 @@ import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhPermission
+import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
@@ -311,6 +312,26 @@ internal class DropboxFileRepository(
         } catch (exception: DbxApiException) {
             throw ExceptionMapper.toOmhApiException(exception)
         }
+    }
+
+    fun updatePermission(
+        fileId: String,
+        permissionId: String,
+        role: OmhPermissionRole
+    ) = try {
+        val folderMetadata = isFolder(fileId)
+        if (folderMetadata != null) {
+            apiService.updateFolderPermissions(
+                folderMetadata.sharedFolderId
+                    ?: throw OmhStorageException.ApiException(message = "This is not a shared folder"),
+                permissionId,
+                role.toAccessLevel()
+            )
+        } else {
+            apiService.updateFilePermissions(fileId, permissionId, role.toAccessLevel())
+        }
+    } catch (exception: DbxApiException) {
+        throw ExceptionMapper.toOmhApiException(exception)
     }
 
     fun getPermissions(fileId: String): List<OmhPermission> {

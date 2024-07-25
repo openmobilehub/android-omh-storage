@@ -24,6 +24,7 @@ import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhIdentity
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
@@ -56,7 +57,8 @@ class FilePermissionsViewModel @Inject constructor(
     private val _action = Channel<FilePermissionsViewAction>()
     val action = _action.receiveAsFlow()
 
-    private lateinit var fileId: String
+    lateinit var file: OmhStorageEntity
+        private set
 
     private val isDeletingInheritedPermissionsSupported: Boolean =
         when (sessionRepository.getStorageAuthProvider()) {
@@ -65,15 +67,15 @@ class FilePermissionsViewModel @Inject constructor(
             StorageAuthProvider.MICROSOFT -> false
         }
 
-    fun getPermissions(fileId: String) {
-        this.fileId = fileId
+    fun getPermissions(file: OmhStorageEntity) {
+        this.file = file
         getPermissions()
     }
 
     private fun getPermissions() = viewModelScope.launch(Dispatchers.IO) {
         _state.value = _state.value.copy(isLoading = true)
         val permissions = omhStorageClient
-            .getFilePermissions(fileId)
+            .getFilePermissions(file.id)
             .sortedWith(compareBy({ it.orderByType() }, { it.orderRole() }))
         _state.value = _state.value.copy(permissions = permissions, isLoading = false)
     }
@@ -92,7 +94,7 @@ class FilePermissionsViewModel @Inject constructor(
 
         @Suppress("SwallowedException")
         try {
-            omhStorageClient.updatePermission(fileId, editedPermission.id, selectedRole)
+            omhStorageClient.updatePermission(file.id, editedPermission.id, selectedRole)
             _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_updated))
         } catch (exception: OmhStorageException.ApiException) {
             showErrorDialog(R.string.permission_update_error, exception)
@@ -112,7 +114,7 @@ class FilePermissionsViewModel @Inject constructor(
         }
 
         try {
-            omhStorageClient.deletePermission(fileId, permission.id)
+            omhStorageClient.deletePermission(file.id, permission.id)
             _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_removed))
             getPermissions()
         } catch (exception: OmhStorageException.ApiException) {
@@ -128,7 +130,7 @@ class FilePermissionsViewModel @Inject constructor(
         @Suppress("SwallowedException")
         try {
             omhStorageClient.createPermission(
-                fileId,
+                file.id,
                 permission,
                 sendNotificationEmail,
                 emailMessage?.ifBlank { null }
@@ -144,7 +146,7 @@ class FilePermissionsViewModel @Inject constructor(
     fun getWebUrl() = viewModelScope.launch(Dispatchers.IO) {
         @Suppress("SwallowedException")
         try {
-            val webUrl = omhStorageClient.getWebUrl(fileId) ?: run {
+            val webUrl = omhStorageClient.getWebUrl(file.id) ?: run {
                 _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_no_url))
                 return@launch
             }

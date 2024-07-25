@@ -22,7 +22,6 @@ import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
-import com.openmobilehub.android.storage.core.model.OmhIdentity
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
@@ -174,8 +173,9 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         fileId: String,
         permissionId: String,
         role: OmhPermissionRole
-    ): OmhPermission {
-        // To be implemented
-        return OmhPermission.IdentityPermission("", OmhPermissionRole.READER, null, OmhIdentity.Anyone)
+    ): OmhPermission? {
+        repository.updatePermission(fileId, permissionId, role)
+        // Dropbox does not return updated permission as a result
+        return null
     }
 }
