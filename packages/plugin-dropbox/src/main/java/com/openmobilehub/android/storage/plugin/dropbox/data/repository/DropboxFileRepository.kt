@@ -164,7 +164,8 @@ internal class DropboxFileRepository(
         }
     }
 
-    private fun renameFile(fileId: String, newName: String): OmhStorageEntity? {
+    @VisibleForTesting
+    fun renameFile(fileId: String, newName: String): OmhStorageEntity? {
         try {
             val fileMetadata = apiService.getFile(fileId)
 

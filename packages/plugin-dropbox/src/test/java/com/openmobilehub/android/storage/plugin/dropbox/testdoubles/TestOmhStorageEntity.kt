@@ -28,6 +28,7 @@ const val TEST_FILE_PARENT_ID = "parentId"
 const val TEST_FILE_MIME_TYPE = "test/mime-type"
 const val TEST_FILE_EXTENSION = "txt"
 const val TEST_FILE_SIZE: Long = 10
+const val TEST_FILE_PATH = "/$TEST_FILE_NAME"
 
 val testOmhFile: OmhStorageEntity.OmhFile = OmhStorageEntity.OmhFile(
     TEST_FILE_ID,

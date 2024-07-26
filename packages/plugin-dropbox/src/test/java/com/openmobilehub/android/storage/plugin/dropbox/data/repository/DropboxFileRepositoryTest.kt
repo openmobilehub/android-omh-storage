@@ -26,6 +26,7 @@ import com.dropbox.core.v2.files.FolderMetadata
 import com.dropbox.core.v2.files.ListFolderResult
 import com.dropbox.core.v2.files.ListRevisionsResult
 import com.dropbox.core.v2.files.Metadata
+import com.dropbox.core.v2.files.RelocationResult
 import com.dropbox.core.v2.files.SearchMatchV2
 import com.dropbox.core.v2.files.SearchV2Result
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
@@ -40,6 +41,7 @@ import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_EX
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_NAME
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_PARENT_ID
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_PATH
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FOLDER_NAME
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_VERSION_FILE_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_VERSION_ID
@@ -52,6 +54,7 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.slot
+import io.mockk.verify
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -80,6 +83,9 @@ class DropboxFileRepositoryTest {
 
     @MockK
     private lateinit var createFolderResult: CreateFolderResult
+
+    @MockK
+    private lateinit var relocationResult: RelocationResult
 
     @MockK
     private lateinit var apiService: DropboxApiService
@@ -364,6 +370,120 @@ class DropboxFileRepositoryTest {
                 TEST_FILE_NAME,
                 TEST_FILE_EXTENSION,
                 TEST_FILE_PARENT_ID
+            )
+        }
+    }
+
+//    fun renameFile(fileId: String, newName: String): OmhStorageEntity? {
+//        try {
+//            val fileMetadata = apiService.getFile(fileId)
+//
+//            val pathWithoutFileName =
+//                fileMetadata.pathLower!!.substringBeforeLast(fileMetadata.name.lowercase())
+//            val newPath = "$pathWithoutFileName$newName"
+//
+//            if (fileMetadata.name == newName) {
+//                return metadataToOmhStorageEntity(fileMetadata)
+//            }
+//
+//            val result = apiService.moveFile(fileMetadata.pathLower!!, newPath)
+//
+//            return metadataToOmhStorageEntity(result?.metadata!!)
+//        } catch (exception: DbxApiException) {
+//            throw ExceptionMapper.toOmhApiException(exception)
+//        }
+//    }
+
+    @Test
+    fun `given a new name is the same as existing, when renaming the file, then move file is not called`() {
+        // Arrange
+        every { apiService.getFile(any()) } returns fileMetadata
+        every { fileMetadata.pathLower } returns TEST_FILE_PATH
+        every { fileMetadata.name } returns TEST_FILE_NAME
+
+        every { metadataToOmhStorageEntity(any()) } returns omhStorageEntity
+
+        // Act
+        val result = repository.renameFile(TEST_FILE_ID, TEST_FILE_NAME)
+
+        // Assert
+        verify(exactly = 0) { apiService.moveFile(any(), any()) }
+        assertEquals(omhStorageEntity, result)
+    }
+
+    @Test
+    fun `given a new name is not the same as existing, when renaming the file, then move file is called`() {
+        // Arrange
+        every { apiService.getFile(any()) } returns fileMetadata
+        every { fileMetadata.pathLower } returns TEST_FILE_PATH
+        every { fileMetadata.name } returns TEST_FILE_NAME
+
+        every { apiService.moveFile(any(), any()) } returns relocationResult
+        every { relocationResult.metadata } returns fileMetadata
+
+        every { metadataToOmhStorageEntity(any()) } returns omhStorageEntity
+
+        val updatedName = "updatedName.txt"
+
+        // Act
+        val result = repository.renameFile(TEST_FILE_ID, updatedName)
+
+        // Assert
+        verify(exactly = 1) { apiService.moveFile(any(), any()) }
+        assertEquals(omhStorageEntity, result)
+    }
+
+    @Test
+    fun `given an apiService throws an exception, when renaming a file, then an ApiException is thrown`() {
+        // Arrange
+        every { apiService.getFile(any()) } throws dbxApiException
+
+        val updatedName = "updatedName.txt"
+
+        // Act & Assert
+        assertThrows(OmhStorageException.ApiException::class.java) {
+            repository.renameFile(
+                TEST_FILE_ID,
+                updatedName,
+            )
+        }
+    }
+
+    @Test
+    fun `given an api service returns file metadata, when updating the file, then return OmhStorageEntity`() {
+        // Arrange
+        every { apiService.getFile(any()) } returns fileMetadata
+        every { fileMetadata.pathLower } returns TEST_FILE_PATH
+        every { fileMetadata.name } returns TEST_FILE_NAME
+
+        every { apiService.uploadFile(any(), any(), any(), any()) } returns fileMetadata
+
+        every { apiService.moveFile(any(), any()) } returns relocationResult
+        every { relocationResult.metadata } returns fileMetadata
+
+        every { metadataToOmhStorageEntity(any()) } returns omhStorageEntity
+
+        // Act
+        val result = repository.updateFile(file, TEST_FILE_ID)
+
+        // Assert
+        assertEquals(omhStorageEntity, result)
+    }
+
+    @Test
+    fun `given an apiService throws an exception, when updating a file, then an ApiException is thrown`() {
+        // Arrange
+        every { apiService.getFile(any()) } returns fileMetadata
+        every { fileMetadata.pathLower } returns TEST_FILE_PATH
+        every { fileMetadata.name } returns TEST_FILE_NAME
+
+        every { apiService.uploadFile(any(), any(), any(), any()) } throws dbxApiException
+
+        // Act & Assert
+        assertThrows(OmhStorageException.ApiException::class.java) {
+            repository.updateFile(
+                file,
+                TEST_FILE_ID,
             )
         }
     }
