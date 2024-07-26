@@ -60,7 +60,7 @@
     <string name="permission_label_display_name">Display name</string>
     <string name="permission_label_type">Type</string>
     <string name="permission_label_role">Role</string>
-    <string name="permission_label_inherited_from">Inherited from</string>
+    <string name="permission_label_is_inherited">Inherited</string>
     <string name="permission_label_user_photo">User photo</string>
     <string name="permission_label_email">Email</string>
     <string name="permission_label_expiration_time">Expiration time</string>
@@ -71,6 +71,7 @@
     <string name="permission_add">Add permission</string>
     <string name="permission_get_url">Get URL</string>
     <string name="permission_no_url">There is no URL</string>
+    <string name="permission_no_url_dropbox_folder">There is no URL - provided only in Shared Folders</string>
     <string name="permission_url_copied">URL copied to clipboard</string>
     <string name="permission_url_to_file">URL to file</string>
     <string name="permission_url_error">Couldn\'t get url</string>

@@ -18,8 +18,10 @@ package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog
 
 import androidx.lifecycle.ViewModel
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
 import com.openmobilehub.android.storage.sample.domain.repository.SessionRepository
+import com.openmobilehub.android.storage.sample.util.isFile
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -27,19 +29,34 @@ import javax.inject.Inject
 class EditPermissionViewModel @Inject constructor(
     sessionRepository: SessionRepository
 ) : ViewModel() {
-    val roles = OmhPermissionRole.values()
-    var role: OmhPermissionRole? = null
-    val disabledRoles: Set<OmhPermissionRole> = when (sessionRepository.getStorageAuthProvider()) {
-        StorageAuthProvider.GOOGLE -> setOf(
-            // Changing the owner of a file requires a separate flow that is not covered by the sample app
-            OmhPermissionRole.OWNER
+
+    private val storageAuthProvider = sessionRepository.getStorageAuthProvider()
+
+    // Changing the owner of a file requires a separate flow that is not covered by the sample app
+    val roles = OmhPermissionRole.values().filter { it != OmhPermissionRole.OWNER }.toTypedArray()
+    var role: OmhPermissionRole = when (storageAuthProvider) {
+        StorageAuthProvider.GOOGLE -> OmhPermissionRole.READER
+        StorageAuthProvider.DROPBOX -> OmhPermissionRole.COMMENTER
+        StorageAuthProvider.MICROSOFT -> OmhPermissionRole.READER
+    }
+    var disabledRoles: Set<OmhPermissionRole> = when (storageAuthProvider) {
+        StorageAuthProvider.GOOGLE -> emptySet()
+        StorageAuthProvider.DROPBOX -> setOf(
+            OmhPermissionRole.READER
         )
-        StorageAuthProvider.DROPBOX -> emptySet()
+
         StorageAuthProvider.MICROSOFT -> setOf(
-            // Changing the owner of a file requires a separate flow that is not covered by the sample app
-            OmhPermissionRole.OWNER,
             OmhPermissionRole.COMMENTER
         )
+    }
+
+    fun setup(file: OmhStorageEntity) {
+        if (storageAuthProvider == StorageAuthProvider.DROPBOX && file.isFile()) {
+            // Dropbox does not allow to grant writer permissions to files, only folders
+            disabledRoles = disabledRoles.toMutableSet().apply {
+                add(OmhPermissionRole.WRITER)
+            }
+        }
     }
 
     var roleIndex: Int

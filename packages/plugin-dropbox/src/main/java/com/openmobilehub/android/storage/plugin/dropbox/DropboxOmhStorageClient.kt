@@ -22,7 +22,6 @@ import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
-import com.openmobilehub.android.storage.core.model.OmhIdentity
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
@@ -125,8 +124,7 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
     }
 
     override suspend fun getWebUrl(fileId: String): String? {
-        // To be implemented
-        return null
+        return repository.getWebUrl(fileId)
     }
 
     override suspend fun updateFile(
@@ -148,8 +146,7 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
     }
 
     override suspend fun getFilePermissions(fileId: String): List<OmhPermission> {
-        // To be implemented
-        return emptyList()
+        return repository.getPermissions(fileId)
     }
 
     override suspend fun getFileMetadata(fileId: String): OmhStorageMetadata {
@@ -157,7 +154,7 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
     }
 
     override suspend fun deletePermission(fileId: String, permissionId: String) {
-        // To be implemented
+        return repository.deletePermission(fileId, permissionId)
     }
 
     override suspend fun createPermission(
@@ -165,17 +162,19 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         permission: OmhCreatePermission,
         sendNotificationEmail: Boolean,
         emailMessage: String?
-    ): OmhPermission {
-        // To be implemented
-        return OmhPermission.IdentityPermission("", OmhPermissionRole.READER, OmhIdentity.Anyone, null)
+    ): OmhPermission? {
+        repository.createPermission(fileId, permission, sendNotificationEmail, emailMessage)
+        // Dropbox does not return created permission as a result
+        return null
     }
 
     override suspend fun updatePermission(
         fileId: String,
         permissionId: String,
         role: OmhPermissionRole
-    ): OmhPermission {
-        // To be implemented
-        return OmhPermission.IdentityPermission("", OmhPermissionRole.READER, OmhIdentity.Anyone, null)
+    ): OmhPermission? {
+        repository.updatePermission(fileId, permissionId, role)
+        // Dropbox does not return updated permission as a result
+        return null
     }
 }

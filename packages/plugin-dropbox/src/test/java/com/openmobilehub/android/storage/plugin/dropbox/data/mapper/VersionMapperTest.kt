@@ -1,9 +1,7 @@
 package com.openmobilehub.android.storage.plugin.dropbox.data.mapper
 
 import com.dropbox.core.v2.files.FileMetadata
-import com.dropbox.core.v2.files.FolderMetadata
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.setUpMock
-import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhFolder
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhVersion
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
@@ -13,19 +11,16 @@ import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
 
-class DataMappersTest {
-    @MockK
-    private lateinit var fileMetadata: FileMetadata
+class VersionMapperTest {
 
     @MockK
-    private lateinit var folderMetadata: FolderMetadata
+    private lateinit var fileMetadata: FileMetadata
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
 
         fileMetadata.setUpMock()
-        folderMetadata.setUpMock()
     }
 
     @After
@@ -40,14 +35,5 @@ class DataMappersTest {
 
         // Assert
         assertEquals(testOmhVersion, result)
-    }
-
-    @Test
-    fun `given a FolderMetadata with specific properties, when mapped, then return the expected OmhStorageEntity`() {
-        // Act
-        val result = folderMetadata.toOmhStorageEntity()
-
-        // Assert
-        assertEquals(testOmhFolder, result)
     }
 }

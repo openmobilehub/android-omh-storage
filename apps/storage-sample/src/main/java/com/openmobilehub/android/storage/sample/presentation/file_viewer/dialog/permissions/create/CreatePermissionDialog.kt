@@ -40,7 +40,6 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class CreatePermissionDialog : DialogFragment() {
-
     private val viewModel: CreatePermissionViewModel by viewModels()
     private val parentViewModel: FilePermissionsViewModel by viewModels({ requireParentFragment() })
 
@@ -57,6 +56,7 @@ class CreatePermissionDialog : DialogFragment() {
             false
         ).also {
             binding = it
+            viewModel.setup(parentViewModel.file)
             setupBinding()
         }.root
     }

@@ -238,14 +238,14 @@ abstract class OmhStorageClient protected constructor(
      * @param permissionId The id of the permission to be edited
      * @param role The desired role value
      *
-     * @return Updated permission
+     * @return Updated permission or null
      * @throws OmhStorageException.ApiException if permission was not updated
      */
     abstract suspend fun updatePermission(
         fileId: String,
         permissionId: String,
         role: OmhPermissionRole
-    ): OmhPermission
+    ): OmhPermission?
 
     /**
      * This method update permission role in a given file
@@ -255,7 +255,7 @@ abstract class OmhStorageClient protected constructor(
      * @param sendNotificationEmail Whether to send a notification email when sharing to users or groups
      * @param emailMessage A plain text custom message to include in the notification email
      *
-     * @return Created permission
+     * @return Created permission or null
      * @throws OmhStorageException.ApiException if permission was not created
      */
     abstract suspend fun createPermission(
@@ -263,7 +263,7 @@ abstract class OmhStorageClient protected constructor(
         permission: OmhCreatePermission,
         sendNotificationEmail: Boolean,
         emailMessage: String?
-    ): OmhPermission
+    ): OmhPermission?
 
     /**
      * This method provides a URL that displays the file in the browse

@@ -16,12 +16,16 @@
 
 package com.openmobilehub.android.storage.plugin.dropbox.data.mapper
 
-import com.dropbox.core.DbxApiException
-import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.dropbox.core.v2.files.FileMetadata
+import com.openmobilehub.android.storage.core.model.OmhFileVersion
+import com.openmobilehub.android.storage.core.utils.DateUtils
 
-object ExceptionMapper {
-    // Note that extensions function couldn't be used here due to SwallowedException warning:
-    // https://github.com/detekt/detekt/issues/4520
-    fun toOmhApiException(exception: DbxApiException): OmhStorageException.ApiException =
-        OmhStorageException.ApiException(null, exception.userMessage?.toString() ?: exception.message, exception)
+fun FileMetadata.toOmhVersion(): OmhFileVersion {
+    val lastModifiedDate = DateUtils.getNewerDate(clientModified, serverModified)
+
+    return OmhFileVersion(
+        id,
+        rev,
+        lastModifiedDate
+    )
 }

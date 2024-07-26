@@ -21,10 +21,12 @@ import androidx.lifecycle.viewModelScope
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhPermissionRecipient
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
 import com.openmobilehub.android.storage.sample.domain.repository.SessionRepository
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.create.model.CreatePermissionsViewAction
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.create.model.PermissionType
+import com.openmobilehub.android.storage.sample.util.isFile
 import com.openmobilehub.android.storage.sample.util.isValidEmail
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -39,26 +41,41 @@ class CreatePermissionViewModel @Inject constructor(
     sessionRepository: SessionRepository
 ) : ViewModel() {
 
+    private val storageAuthProvider = sessionRepository.getStorageAuthProvider()
+
     private val _action = Channel<CreatePermissionsViewAction>()
     val action = _action.receiveAsFlow()
 
-    val roles = OmhPermissionRole.values()
-    val disabledRoles: Set<OmhPermissionRole> = when (sessionRepository.getStorageAuthProvider()) {
-        StorageAuthProvider.GOOGLE -> setOf(
-            // Changing the owner of a file requires a separate flow that is not covered by the sample app
-            OmhPermissionRole.OWNER
+    // Changing the owner of a file requires a separate flow that is not covered by the sample app
+    val roles = OmhPermissionRole.values().filter { it != OmhPermissionRole.OWNER }.toTypedArray()
+    var disabledRoles: Set<OmhPermissionRole> = when (storageAuthProvider) {
+        StorageAuthProvider.GOOGLE -> emptySet()
+        StorageAuthProvider.DROPBOX -> setOf(
+            OmhPermissionRole.READER
         )
 
-        StorageAuthProvider.DROPBOX -> emptySet()
         StorageAuthProvider.MICROSOFT -> setOf(
-            // Changing the owner of a file requires a separate flow that is not covered by the sample app
-            OmhPermissionRole.OWNER,
             OmhPermissionRole.COMMENTER
         )
     }
 
+    fun setup(file: OmhStorageEntity) {
+        if (storageAuthProvider == StorageAuthProvider.DROPBOX && file.isFile()) {
+            // Dropbox does not allow to grant writer permissions to files, only folders
+            disabledRoles = disabledRoles.toMutableSet().apply {
+                add(OmhPermissionRole.WRITER)
+            }
+        }
+    }
+
     private val _role: MutableStateFlow<OmhPermissionRole> =
-        MutableStateFlow(OmhPermissionRole.READER)
+        MutableStateFlow(
+            when (storageAuthProvider) {
+                StorageAuthProvider.GOOGLE -> OmhPermissionRole.READER
+                StorageAuthProvider.DROPBOX -> OmhPermissionRole.COMMENTER
+                StorageAuthProvider.MICROSOFT -> OmhPermissionRole.READER
+            }
+        )
     val role: StateFlow<OmhPermissionRole> = _role
 
     var roleIndex: Int
@@ -70,9 +87,13 @@ class CreatePermissionViewModel @Inject constructor(
         }
 
     val types = PermissionType.values()
-    val disabledTypes: Set<PermissionType> = when (sessionRepository.getStorageAuthProvider()) {
+    val disabledTypes: Set<PermissionType> = when (storageAuthProvider) {
         StorageAuthProvider.GOOGLE -> emptySet()
-        StorageAuthProvider.DROPBOX -> emptySet()
+        StorageAuthProvider.DROPBOX -> setOf(
+            PermissionType.ANYONE,
+            PermissionType.DOMAIN
+        )
+
         StorageAuthProvider.MICROSOFT -> setOf(
             PermissionType.ANYONE,
             PermissionType.DOMAIN
