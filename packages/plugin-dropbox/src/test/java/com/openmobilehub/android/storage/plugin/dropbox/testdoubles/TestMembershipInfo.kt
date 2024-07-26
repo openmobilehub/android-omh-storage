@@ -17,12 +17,15 @@
 package com.openmobilehub.android.storage.plugin.dropbox.testdoubles
 
 import com.dropbox.core.v2.sharing.AccessLevel
+import com.dropbox.core.v2.sharing.AddMember
 import com.dropbox.core.v2.sharing.GroupInfo
 import com.dropbox.core.v2.sharing.GroupMembershipInfo
 import com.dropbox.core.v2.sharing.MemberSelector
 import com.dropbox.core.v2.sharing.UserInfo
 import com.dropbox.core.v2.sharing.UserMembershipInfo
 import io.mockk.every
+
+const val TEST_SHARED_FOLDER_ID = "111"
 
 internal fun UserMembershipInfo.setUpMock(userInfo: UserInfo) {
     every { user } returns userInfo
@@ -49,3 +52,8 @@ internal fun GroupInfo.setUpMock() {
 
 internal val emailMemberSelector = MemberSelector.email(TEST_PERMISSION_EMAIL_ADDRESS)
 internal val dropboxIdMemberSelector = MemberSelector.dropboxId(TEST_IDENTITY_ID)
+
+internal val addUserMember = AddMember(
+    emailMemberSelector,
+    AccessLevel.VIEWER
+)

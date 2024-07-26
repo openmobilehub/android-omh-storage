@@ -28,6 +28,7 @@ const val TEST_IDENTITY_ID = "789"
 const val TEST_PERMISSION_ID = TEST_IDENTITY_ID
 const val TEST_PERMISSION_DISPLAY_NAME = "Tester"
 const val TEST_PERMISSION_EMAIL_ADDRESS = "test@test.com"
+const val TEST_FILE_WEB_URL = "https://test.com/file_123"
 
 const val TEST_EMAIL_MESSAGE = "Test message"
 
