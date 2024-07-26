@@ -83,7 +83,7 @@ internal class DropboxApiService(private val apiClient: DropboxApiClient) {
         return apiClient.dropboxApiService.files().createFolderV2(path)
     }
 
-    fun moveFile(fromPath: String, toPath: String): RelocationResult? {
+    fun moveFile(fromPath: String, toPath: String): RelocationResult {
         return apiClient.dropboxApiService.files().moveV2Builder(fromPath, toPath).withAutorename(true).start()
     }
 }

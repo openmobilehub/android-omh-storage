@@ -374,26 +374,6 @@ class DropboxFileRepositoryTest {
         }
     }
 
-//    fun renameFile(fileId: String, newName: String): OmhStorageEntity? {
-//        try {
-//            val fileMetadata = apiService.getFile(fileId)
-//
-//            val pathWithoutFileName =
-//                fileMetadata.pathLower!!.substringBeforeLast(fileMetadata.name.lowercase())
-//            val newPath = "$pathWithoutFileName$newName"
-//
-//            if (fileMetadata.name == newName) {
-//                return metadataToOmhStorageEntity(fileMetadata)
-//            }
-//
-//            val result = apiService.moveFile(fileMetadata.pathLower!!, newPath)
-//
-//            return metadataToOmhStorageEntity(result?.metadata!!)
-//        } catch (exception: DbxApiException) {
-//            throw ExceptionMapper.toOmhApiException(exception)
-//        }
-//    }
-
     @Test
     fun `given a new name is the same as existing, when renaming the file, then move file is not called`() {
         // Arrange
