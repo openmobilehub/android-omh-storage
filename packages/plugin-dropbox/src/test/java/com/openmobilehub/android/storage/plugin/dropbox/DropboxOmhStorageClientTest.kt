@@ -361,4 +361,16 @@ internal class DropboxOmhStorageClientTest {
             }
         }
     }
+
+    @Test
+    fun `given a repository, when updating a file, then return OmhStorageEntity`() = runTest {
+        // Arrange
+        every { repository.updateFile(any(), any()) } returns omhStorageEntity
+
+        // Act
+        val result = client.updateFile(fileToUpload, TEST_FILE_ID)
+
+        // Assert
+        assertEquals(omhStorageEntity, result)
+    }
 }

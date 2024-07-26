@@ -23,9 +23,11 @@ import com.dropbox.core.v2.files.DeleteResult
 import com.dropbox.core.v2.files.FileMetadata
 import com.dropbox.core.v2.files.ListFolderResult
 import com.dropbox.core.v2.files.ListRevisionsResult
+import com.dropbox.core.v2.files.RelocationResult
 import com.dropbox.core.v2.files.SearchV2Result
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_PARENT_ID
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_PATH
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FOLDER_NAME
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_VERSION_FILE_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_VERSION_ID
@@ -56,6 +58,9 @@ class DropboxApiServiceTest {
 
     @MockK
     private lateinit var createFolderResult: CreateFolderResult
+
+    @MockK
+    private lateinit var relocationResult: RelocationResult
 
     @MockK
     private lateinit var apiClient: DropboxApiClient
@@ -101,7 +106,9 @@ class DropboxApiServiceTest {
     fun `given apiClient returns FileMetadata, when uploading a file, then return FileMetadata`() {
         // Arrange
         every {
-            apiClient.dropboxApiService.files().uploadBuilder(any()).withAutorename(any())
+            apiClient.dropboxApiService.files().uploadBuilder(any())
+                .withAutorename(any())
+                .withMode(any())
                 .uploadAndFinish(inputStream)
         } returns metadata
 
@@ -210,5 +217,21 @@ class DropboxApiServiceTest {
 
         // Assert
         assertEquals(createFolderResult, result)
+    }
+
+    @Test
+    fun `given apiClient returns RelocationResult, when moving a file, then return RelocationResult`() {
+        // Arrange
+        every {
+            apiClient.dropboxApiService.files().moveV2Builder(any(), any()).withAutorename(any()).start()
+        } returns relocationResult
+
+        val updatedPath = "/updateFile.txt"
+
+        // Act
+        val result = apiService.moveFile(TEST_FILE_PATH, updatedPath)
+
+        // Assert
+        assertEquals(relocationResult, result)
     }
 }
