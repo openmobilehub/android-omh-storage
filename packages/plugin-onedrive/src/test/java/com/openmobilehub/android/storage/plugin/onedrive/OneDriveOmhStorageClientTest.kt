@@ -124,6 +124,11 @@ internal class OneDriveOmhStorageClientTest {
     private lateinit var uploadedFile: OmhStorageEntity
 
     @MockK
+    private lateinit var omhStorageEntity: OmhStorageEntity
+
+    private lateinit var omhStorageEntityList: List<OmhStorageEntity>
+
+    @MockK
     private lateinit var omhFolder: OmhStorageEntity.OmhFolder
 
     @MockK
@@ -141,6 +146,8 @@ internal class OneDriveOmhStorageClientTest {
     fun setUp() {
         MockKAnnotations.init(this)
 
+        omhStorageEntityList = listOf(omhStorageEntity, omhStorageEntity)
+
         client = OneDriveOmhStorageClient(authClient, repository)
     }
 
@@ -154,15 +161,14 @@ internal class OneDriveOmhStorageClientTest {
         runTest {
             // Arrange
             val parentId = "parentId"
-            val files: List<OmhStorageEntity> = mockk()
 
-            every { repository.getFilesList(parentId) } returns files
+            every { repository.getFilesList(parentId) } returns omhStorageEntityList
 
             // Act
             val result = client.listFiles(parentId)
 
             // Assert
-            assertEquals(files, result)
+            assertEquals(omhStorageEntityList, result)
         }
 
     @Test
@@ -390,5 +396,17 @@ internal class OneDriveOmhStorageClientTest {
 
         // Assert
         assertEquals(omhFile, result)
+    }
+
+    @Test
+    fun `given a repository, when searching files, then return files from the repository`() = runTest {
+        // Arrange
+        every { repository.search(any()) } returns omhStorageEntityList
+
+        // Act
+        val result = client.search("test")
+
+        // Assert
+        assertEquals(omhStorageEntityList, result)
     }
 }

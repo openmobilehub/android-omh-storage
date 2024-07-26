@@ -54,7 +54,7 @@ class DriveItemToOmhStorageEntity(private val mimeTypeMap: MimeTypeMap) {
                     parentId,
                     mimeType,
                     extension,
-                    size.toInt()
+                    size?.toInt()
                 )
             }
         }

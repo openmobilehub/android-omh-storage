@@ -19,6 +19,7 @@
 package com.openmobilehub.android.storage.plugin.onedrive.data.service
 
 import com.microsoft.graph.core.models.UploadResult
+import com.microsoft.graph.drives.item.items.item.searchwithq.SearchWithQGetResponse
 import com.microsoft.graph.models.DriveItem
 import com.microsoft.graph.models.DriveItemVersionCollectionResponse
 import com.microsoft.graph.models.Permission
@@ -73,6 +74,9 @@ class OneDriveRestApiServiceTest {
 
     @MockK
     private lateinit var driveItemVersionCollectionResponse: DriveItemVersionCollectionResponse
+
+    @MockK
+    private lateinit var searchWithQGetResponse: SearchWithQGetResponse
 
     @MockK
     private lateinit var permission: Permission
@@ -398,6 +402,20 @@ class OneDriveRestApiServiceTest {
 
         // Assert
         Assert.assertEquals(driveItem, result)
+    }
+
+    @Test
+    fun `given apiClient returns list of drive items, when searching the files, then return list of drive items`() {
+        // Arrange
+        every {
+            apiClient.graphServiceClient.drives().byDriveId(any()).items().byDriveItemId(any()).searchWithQ(any()).get()
+        } returns searchWithQGetResponse
+
+        // Act
+        val result = apiService.search("test")
+
+        // Assert
+        Assert.assertEquals(searchWithQGetResponse, result)
     }
 }
 

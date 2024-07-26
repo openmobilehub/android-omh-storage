@@ -19,6 +19,7 @@
 package com.openmobilehub.android.storage.plugin.onedrive.data.repository
 
 import com.microsoft.graph.drives.item.items.item.invite.InvitePostRequestBody
+import com.microsoft.graph.drives.item.items.item.searchwithq.SearchWithQGetResponse
 import com.microsoft.graph.models.DriveItem
 import com.microsoft.graph.models.DriveItemVersion
 import com.microsoft.graph.models.DriveItemVersionCollectionResponse
@@ -116,6 +117,9 @@ class OneDriveFileRepositoryTest {
 
     @MockK
     private lateinit var driveItemCollectionVersionCollectionResponse: DriveItemVersionCollectionResponse
+
+    @MockK
+    private lateinit var searchWithQGetResponse: SearchWithQGetResponse
 
     @MockK
     private lateinit var driveItemVersion: DriveItemVersion
@@ -257,6 +261,32 @@ class OneDriveFileRepositoryTest {
     }
 
     @Test
+    fun `given an apiService returns a non-empty list, when searching the files, then return a non-empty list`() {
+        // Arrange
+        every { apiService.search(any()) } returns searchWithQGetResponse
+        every { searchWithQGetResponse.value } returns mutableListOf(driveItem, driveItem)
+        every { driveItemToOmhStorageEntity(any()) } returns omhStorageEntity
+
+        // Act
+        val result = repository.search("test")
+
+        // Assert
+        assertEquals(listOf(omhStorageEntity, omhStorageEntity), result)
+    }
+
+    @Test
+    fun `given an apiService returns an empty list, when searching the files, then return an empty list`() {
+        // Arrange
+        every { apiService.search(any()) } returns searchWithQGetResponse
+        every { searchWithQGetResponse.value } returns emptyList()
+
+        // Act
+        val result = repository.search("test")
+
+        // Assert
+        assertEquals(emptyList<OmhStorageEntity>(), result)
+    }
+
     fun `given an api service, when deleting the file, then exceptions is not thrown`() {
         // Arrange
         every { apiService.deleteFile(any()) } returns Unit
