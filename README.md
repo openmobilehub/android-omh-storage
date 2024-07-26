@@ -51,7 +51,7 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 | Features                     | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
 |------------------------------|:------------------:|:----------------------:|:--------:|:-------:|
 | File listing                 |         ✅          |           ✅          |    ✅    |    ✅   |
-| File searching               |         ✅          |           ✅          |          |    ✅   |
+| File searching               |         ✅          |           ✅          |    ✅    |    ✅   |
 | Folder creation              |         ✅          |           ✅          |    ✅    |    ✅   |
 | File creation (by mime type) |         ✅          |           ✅          |    ❌    |    ❌   |
 | File creation (by extension) |         ❌          |           ❌          |    ✅    |    ✅   |
