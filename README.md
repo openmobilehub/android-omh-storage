@@ -55,7 +55,7 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 | Folder creation              |         ✅          |           ✅          |    ✅    |    ✅   |
 | File creation (by mime type) |         ✅          |           ✅          |    ❌    |    ❌   |
 | File creation (by extension) |         ❌          |           ❌          |    ✅    |    ✅   |
-| File update                  |         ✅          |           ✅          |          |         |
+| File update                  |         ✅          |           ✅          |          |    ✅*  |
 | File deletion                |         ✅          |           ✅          |    ✅    |    ✅   |
 | File permanent deletion      |         ✅          |           ✅          |    ❌    |    ❌   |
 | File upload                  |         ✅          |           ✅          |    ✅    |    ✅   |
@@ -65,6 +65,8 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 | File versioning              |         ✅          |           ✅          |    ✅    |    ✅   |
 | File permissions             |         🟨          |           🟨          |    🟨    |         |
 | File URL                     |         ✅          |           ✅          |    ✅    |         |
+
+* If existing and updated files are the same, no new version will be added. If the existing file has a different name, the file will be overridden with no previous revisions.
 
 ### File metadata
 
