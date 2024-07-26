@@ -17,12 +17,12 @@
 package com.openmobilehub.android.storage.sample.util
 
 import com.openmobilehub.android.auth.core.OmhAuthClient
+import com.openmobilehub.android.auth.core.OmhCredentials
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.sample.domain.model.FileType
 import com.openmobilehub.android.storage.sample.domain.model.FileTypeMapper
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.suspendCancellableCoroutine
 
 private val NON_SUPPORTED_MIME_TYPES_FOR_DOWNLOAD = listOf(
@@ -62,29 +62,35 @@ fun OmhStorageEntity.isFile() = this is OmhStorageEntity.OmhFile
 
 // We can't rely on getUser, as on Dropbox, the user will be returned even when the access token
 // expires, while on Microsoft, 401 will be thrown as expected.
-suspend fun OmhAuthClient.isUserLoggedIn(): Boolean = suspendCoroutine { continuation ->
+@Suppress("ReturnCount")
+suspend fun OmhAuthClient.isUserLoggedIn(): Boolean {
     getCredentials().apply {
         if (accessToken == null) {
-            continuation.resume(false)
-        } else {
-            refreshAccessToken()
-                .addOnSuccess {
-                    continuation.resume(true)
-                }
-                .addOnFailure {
-                    signOut()
-                        .addOnSuccess {
-                            continuation.resume(false)
-                        }
-                        .addOnFailure {
-                            continuation.resume(false)
-                        }
-                        .execute()
-                }
-                .execute()
+            return false
         }
+
+        if (coRefreshAccessToken() != null) {
+            return true
+        }
+
+        // Some providers treat user with expired access token as a still logged in
+        coSignOut()
+        return false
     }
 }
+
+suspend fun OmhCredentials.coRefreshAccessToken(): String? =
+    suspendCancellableCoroutine { continuation ->
+        val cancellable = refreshAccessToken()
+            .addOnSuccess { result ->
+                continuation.resume(result)
+            }
+            .addOnFailure {
+                continuation.resume(null)
+            }
+            .execute()
+        continuation.invokeOnCancellation { cancellable.cancel() }
+    }
 
 suspend fun OmhAuthClient.coSignOut() = suspendCancellableCoroutine { continuation ->
     val cancellable = signOut()
