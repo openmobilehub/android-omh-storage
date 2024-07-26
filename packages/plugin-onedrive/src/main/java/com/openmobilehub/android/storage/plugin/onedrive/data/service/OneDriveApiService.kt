@@ -40,14 +40,13 @@ internal class OneDriveApiService(private val apiClient: OneDriveApiClient) {
             .byDriveItemId(parentId).children().get().value
     }
 
-    fun uploadFile(file: File, parentId: String): DriveItem? {
+    fun uploadFile(file: File, path: String, conflictBehavior: String = "rename"): DriveItem? {
         val fileStream = file.toInputStream()
-        val path = "$parentId:/${file.name}:"
 
         val uploadSessionRequest = CreateUploadSessionPostRequestBody().apply {
             item = DriveItemUploadableProperties().apply {
                 additionalData["@microsoft.graph.conflictBehavior"] =
-                    "rename" // To match GoogleDrive behavior
+                    conflictBehavior
             }
         }
 
@@ -163,6 +162,14 @@ internal class OneDriveApiService(private val apiClient: OneDriveApiClient) {
             .byDriveItemId1(fileName)
             .content()
             .put(inputStream)
+    }
+
+    fun updateFileMetadata(fileId: String, driveItem: DriveItem): DriveItem {
+        return apiClient.graphServiceClient.drives()
+            .byDriveId(driveId)
+            .items()
+            .byDriveItemId(fileId)
+            .patch(driveItem)
     }
 
     @VisibleForTesting

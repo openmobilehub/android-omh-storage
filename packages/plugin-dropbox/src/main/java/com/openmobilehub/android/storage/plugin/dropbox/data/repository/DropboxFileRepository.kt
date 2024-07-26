@@ -19,6 +19,7 @@ package com.openmobilehub.android.storage.plugin.dropbox.data.repository
 import androidx.annotation.VisibleForTesting
 import com.dropbox.core.DbxApiException
 import com.dropbox.core.v2.files.FolderMetadata
+import com.dropbox.core.v2.files.WriteMode
 import com.dropbox.core.v2.sharing.SharedFolderMetadata
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
@@ -177,6 +178,53 @@ internal class DropboxFileRepository(
         } finally {
             tempFile.delete()
         }
+    }
+
+    fun renameFile(fileId: String, newName: String): OmhStorageEntity? {
+        try {
+            val fileMetadata = apiService.getFile(fileId)
+
+            if (fileMetadata.name == newName) {
+                return metadataToOmhStorageEntity(fileMetadata)
+            }
+
+            val pathLower = fileMetadata.pathLower
+                ?: throw OmhStorageException.ApiException(
+                    message = "Failed to get path for file with ID: $fileId"
+                )
+
+            val pathWithoutFileName =
+                pathLower.substringBeforeLast(fileMetadata.name.lowercase())
+            val newPath = "$pathWithoutFileName$newName"
+
+            val result = apiService.moveFile(pathLower, newPath)
+
+            return metadataToOmhStorageEntity(result.metadata)
+        } catch (exception: DbxApiException) {
+            throw ExceptionMapper.toOmhApiException(exception)
+        }
+    }
+
+    fun updateFile(newFile: File, fileId: String): OmhStorageEntity? = try {
+        val inputStream = newFile.toInputStream()
+
+        val fileMetadata = apiService.getFile(fileId)
+
+        val pathLower = fileMetadata.pathLower
+            ?: throw OmhStorageException.ApiException(
+                message = "Failed to get path for file with ID: $fileId"
+            )
+
+        apiService.uploadFile(
+            inputStream,
+            pathLower,
+            false,
+            WriteMode.OVERWRITE
+        )
+
+        renameFile(fileId, newFile.name)
+    } catch (exception: DbxApiException) {
+        throw ExceptionMapper.toOmhApiException(exception)
     }
 
     suspend fun createPermission(

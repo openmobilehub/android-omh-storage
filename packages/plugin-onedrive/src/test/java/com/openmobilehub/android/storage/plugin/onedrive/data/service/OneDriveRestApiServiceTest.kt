@@ -381,6 +381,24 @@ class OneDriveRestApiServiceTest {
         // Assert
         Assert.assertEquals(driveItem, result)
     }
+
+    @Test
+    fun `given apiClient, when updating a file metadata, then return drive item`() {
+        // Arrange
+        every {
+            apiClient.graphServiceClient.drives()
+                .byDriveId(any())
+                .items()
+                .byDriveItemId(any())
+                .patch(any())
+        } returns driveItem
+
+        // Act
+        val result = apiService.updateFileMetadata(TEST_FILE_ID, driveItem)
+
+        // Assert
+        Assert.assertEquals(driveItem, result)
+    }
 }
 
 class DriveIdCacheTest {

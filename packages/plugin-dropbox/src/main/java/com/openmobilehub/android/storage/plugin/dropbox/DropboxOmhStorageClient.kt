@@ -130,9 +130,8 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
     override suspend fun updateFile(
         localFileToUpload: File,
         fileId: String
-    ): OmhStorageEntity.OmhFile? {
-        // To be implemented
-        return null
+    ): OmhStorageEntity? {
+        return repository.updateFile(localFileToUpload, fileId)
     }
 
     override suspend fun getFileVersions(fileId: String): List<OmhFileVersion> {
