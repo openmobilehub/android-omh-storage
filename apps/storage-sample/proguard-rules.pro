@@ -24,3 +24,6 @@
 -dontwarn aQute.bnd.annotation.spi.ServiceProvider
 -dontwarn javax.xml.stream.**
 -dontwarn org.codehaus.stax2.validation.**
+
+# Hotfix: this rule should be declared by the plugin itself
+-keep class com.openmobilehub.android.auth.plugin.microsoft.ApiService { *; }
