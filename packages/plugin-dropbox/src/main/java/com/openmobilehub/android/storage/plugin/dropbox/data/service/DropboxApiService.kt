@@ -99,7 +99,8 @@ internal class DropboxApiService(private val apiClient: DropboxApiClient) {
     }
 
     fun moveFile(fromPath: String, toPath: String): RelocationResult {
-        return apiClient.dropboxApiService.files().moveV2Builder(fromPath, toPath).withAutorename(true).start()
+        return apiClient.dropboxApiService.files().moveV2Builder(fromPath, toPath)
+            .withAutorename(true).start()
     }
 
     fun createFilePermission(
@@ -180,43 +181,46 @@ internal class DropboxApiService(private val apiClient: DropboxApiClient) {
 
     fun deleteFolderPermission(
         sharedFolderId: String,
-        permissionId: String
+        memberSelector: MemberSelector
     ): LaunchResultBase {
         return apiClient.dropboxApiService
             .sharing()
-            .removeFolderMember(sharedFolderId, MemberSelector.dropboxId(permissionId), false)
+            .removeFolderMember(sharedFolderId, memberSelector, false)
     }
 
-    fun deleteFilePermission(fileId: String, permissionId: String): FileMemberRemoveActionResult {
+    fun deleteFilePermission(
+        fileId: String,
+        memberSelector: MemberSelector
+    ): FileMemberRemoveActionResult {
         return apiClient.dropboxApiService
             .sharing()
-            .removeFileMember2(fileId, MemberSelector.dropboxId(permissionId))
+            .removeFileMember2(fileId, memberSelector)
     }
 
     fun updateFolderPermissions(
         sharedFolderId: String,
-        permissionId: String,
+        memberSelector: MemberSelector,
         accessLevel: AccessLevel,
     ): MemberAccessLevelResult {
         return apiClient.dropboxApiService
             .sharing()
             .updateFolderMember(
                 sharedFolderId,
-                MemberSelector.dropboxId(permissionId),
+                memberSelector,
                 accessLevel
             )
     }
 
     fun updateFilePermissions(
         fileId: String,
-        permissionId: String,
+        memberSelector: MemberSelector,
         accessLevel: AccessLevel,
     ): MemberAccessLevelResult {
         return apiClient.dropboxApiService
             .sharing()
             .updateFileMember(
                 fileId,
-                MemberSelector.dropboxId(permissionId),
+                memberSelector,
                 accessLevel
             )
     }

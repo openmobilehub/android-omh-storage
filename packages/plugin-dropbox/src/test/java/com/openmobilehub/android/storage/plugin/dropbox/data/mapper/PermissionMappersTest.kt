@@ -24,6 +24,8 @@ import com.dropbox.core.v2.sharing.InviteeInfo
 import com.dropbox.core.v2.sharing.InviteeMembershipInfo
 import com.dropbox.core.v2.sharing.UserInfo
 import com.dropbox.core.v2.sharing.UserMembershipInfo
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_PERMISSION_EMAIL_ADDRESS
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_PERMISSION_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.createGroupPermission
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.createPermissionForIdentity
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.createUserPermission
@@ -147,5 +149,29 @@ class PermissionMappersTest {
     fun `given a OmhCreatePermission with Group recipient, when mapped, then throws UnsupportedOperationException`() {
         // Act & Assert
         createGroupPermission.toMemberSelector()
+    }
+
+    @Test
+    fun `given a permissionId is an email, when mapped, then return the email MemberSelector`() {
+        // Arrange
+        val permissionId = TEST_PERMISSION_EMAIL_ADDRESS
+
+        // Act
+        val result = permissionId.toMemberSelector()
+
+        // Assert
+        Assert.assertEquals(emailMemberSelector, result)
+    }
+
+    @Test
+    fun `given a permissionId is not an email, when mapped, then return the dropboxId MemberSelector`() {
+        // Arrange
+        val permissionId = TEST_PERMISSION_ID
+
+        // Act
+        val result = permissionId.toMemberSelector()
+
+        // Assert
+        Assert.assertEquals(dropboxIdMemberSelector, result)
     }
 }

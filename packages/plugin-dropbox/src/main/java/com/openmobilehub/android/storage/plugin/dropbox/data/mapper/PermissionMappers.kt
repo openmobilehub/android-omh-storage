@@ -31,6 +31,7 @@ import com.openmobilehub.android.storage.core.model.OmhIdentity
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRecipient
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
+import com.openmobilehub.android.storage.plugin.dropbox.DropboxConstants.EMAIL_REGEX
 
 @Suppress("ReturnCount")
 internal fun UserMembershipInfo.toOmhPermission(): OmhPermission? {
@@ -107,6 +108,14 @@ internal fun InviteeMembershipInfo.toOmhUserIdentity(): OmhIdentity.User? {
 
 internal fun OmhCreatePermission.toMemberSelector(): MemberSelector = when (this) {
     is OmhCreatePermission.CreateIdentityPermission -> this.toMemberSelector()
+}
+
+internal fun String.toMemberSelector(): MemberSelector {
+    return if (EMAIL_REGEX.matches(this)) {
+        MemberSelector.email(this)
+    } else {
+        MemberSelector.dropboxId(this)
+    }
 }
 
 internal fun OmhCreatePermission.toAddMember(): AddMember = when (this) {
