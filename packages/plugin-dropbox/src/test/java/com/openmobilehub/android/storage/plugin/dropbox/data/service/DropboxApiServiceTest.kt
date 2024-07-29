@@ -138,7 +138,7 @@ class DropboxApiServiceTest {
     fun `given apiClient returns ListRevisionResult, when getting the file versions list, then return ListRevisionResult`() {
         // Arrange
         every {
-            apiClient.dropboxApiService.files().listRevisions(any<String>())
+            apiClient.dropboxApiService.files().listRevisionsBuilder(any<String>()).withMode(any()).start()
         } returns listRevisionsResult
 
         // Act

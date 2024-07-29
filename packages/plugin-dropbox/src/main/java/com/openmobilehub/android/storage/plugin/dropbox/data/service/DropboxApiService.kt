@@ -21,6 +21,7 @@ import com.dropbox.core.v2.files.CreateFolderResult
 import com.dropbox.core.v2.files.DeleteResult
 import com.dropbox.core.v2.files.FileMetadata
 import com.dropbox.core.v2.files.ListFolderResult
+import com.dropbox.core.v2.files.ListRevisionsMode
 import com.dropbox.core.v2.files.ListRevisionsResult
 import com.dropbox.core.v2.files.Metadata
 import com.dropbox.core.v2.files.RelocationResult
@@ -67,7 +68,8 @@ internal class DropboxApiService(private val apiClient: DropboxApiClient) {
     }
 
     fun getFileRevisions(fileId: String): ListRevisionsResult {
-        return apiClient.dropboxApiService.files().listRevisions(fileId)
+        return apiClient.dropboxApiService.files().listRevisionsBuilder(fileId)
+            .withMode(ListRevisionsMode.ID).start()
     }
 
     fun downloadFileRevision(
