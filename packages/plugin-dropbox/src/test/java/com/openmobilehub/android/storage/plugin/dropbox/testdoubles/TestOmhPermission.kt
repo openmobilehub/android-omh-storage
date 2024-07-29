@@ -28,6 +28,7 @@ const val TEST_IDENTITY_ID = "789"
 const val TEST_PERMISSION_ID = TEST_IDENTITY_ID
 const val TEST_PERMISSION_DISPLAY_NAME = "Tester"
 const val TEST_PERMISSION_EMAIL_ADDRESS = "test@test.com"
+const val TEST_PERMISSION_EMAIL_ADDRESS_2 = "test@test.com"
 const val TEST_FILE_WEB_URL = "https://test.com/file_123"
 
 const val TEST_EMAIL_MESSAGE = "Test message"
@@ -62,6 +63,23 @@ val testOmhGroupPermission = OmhPermission.IdentityPermission(
     OmhPermissionRole.WRITER,
     true,
     testOmhGroupIdentity,
+)
+
+val testInvitedUserOmhIdentity = OmhIdentity.User(
+    TEST_PERMISSION_EMAIL_ADDRESS_2,
+    null,
+    TEST_PERMISSION_EMAIL_ADDRESS_2,
+    null,
+    null,
+    null,
+    null
+)
+
+val testInvitedOmhPermission = OmhPermission.IdentityPermission(
+    TEST_PERMISSION_EMAIL_ADDRESS_2,
+    OmhPermissionRole.COMMENTER,
+    false,
+    testInvitedUserOmhIdentity,
 )
 
 val createUserPermission = OmhCreatePermission.CreateIdentityPermission(

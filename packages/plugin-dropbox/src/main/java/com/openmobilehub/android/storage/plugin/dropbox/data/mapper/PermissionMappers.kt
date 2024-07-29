@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
+@file:Suppress("TooManyFunctions")
+
 package com.openmobilehub.android.storage.plugin.dropbox.data.mapper
 
 import com.dropbox.core.v2.sharing.AccessLevel
 import com.dropbox.core.v2.sharing.AddMember
 import com.dropbox.core.v2.sharing.GroupInfo
 import com.dropbox.core.v2.sharing.GroupMembershipInfo
+import com.dropbox.core.v2.sharing.InviteeMembershipInfo
 import com.dropbox.core.v2.sharing.MemberSelector
 import com.dropbox.core.v2.sharing.UserInfo
 import com.dropbox.core.v2.sharing.UserMembershipInfo
@@ -69,6 +72,38 @@ internal fun GroupInfo.toOmhGroupIdentity(): OmhIdentity.Group = OmhIdentity.Gro
     expirationTime = null,
     deleted = null,
 )
+
+@Suppress("ReturnCount")
+internal fun InviteeMembershipInfo.toOmhPermission(): OmhPermission? {
+    val user = this.toOmhUserIdentity() ?: return null
+
+    return OmhPermission.IdentityPermission(
+        id = user.id ?: return null, // Dropbox identify permissions by member
+        role = accessType.toOmhPermissionRole() ?: return null,
+        isInherited = isInherited,
+        identity = user
+    )
+}
+
+internal fun InviteeMembershipInfo.toOmhUserIdentity(): OmhIdentity.User? {
+    return user?.toOmhUserIdentity() ?: run {
+        if (!invitee.isEmail) {
+            return@run null
+        }
+
+        val email = invitee.emailValue
+
+        return@run OmhIdentity.User(
+            id = email,
+            displayName = null,
+            emailAddress = email,
+            expirationTime = null,
+            deleted = null,
+            photoLink = null,
+            pendingOwner = null
+        )
+    }
+}
 
 internal fun OmhCreatePermission.toMemberSelector(): MemberSelector = when (this) {
     is OmhCreatePermission.CreateIdentityPermission -> this.toMemberSelector()

@@ -36,6 +36,8 @@ import com.dropbox.core.v2.sharing.FileMemberActionResult
 import com.dropbox.core.v2.sharing.FileMemberRemoveActionResult
 import com.dropbox.core.v2.sharing.GroupInfo
 import com.dropbox.core.v2.sharing.GroupMembershipInfo
+import com.dropbox.core.v2.sharing.InviteeInfo
+import com.dropbox.core.v2.sharing.InviteeMembershipInfo
 import com.dropbox.core.v2.sharing.MemberAccessLevelResult
 import com.dropbox.core.v2.sharing.ShareFolderJobStatus
 import com.dropbox.core.v2.sharing.ShareFolderLaunch
@@ -70,6 +72,7 @@ import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.addUserMembe
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.createUserPermission
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.emailMemberSelector
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.setUpMock
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testInvitedOmhPermission
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhFolder
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhGroupPermission
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhUserPermission
@@ -164,6 +167,12 @@ class DropboxFileRepositoryTest {
     private lateinit var groupMembershipInfo: GroupMembershipInfo
 
     @MockK
+    private lateinit var inviteeMembershipInfo: InviteeMembershipInfo
+
+    @MockK
+    private lateinit var inviteeInfo: InviteeInfo
+
+    @MockK
     private lateinit var groupInfo: GroupInfo
 
     @MockK
@@ -200,6 +209,9 @@ class DropboxFileRepositoryTest {
         userMembershipInfo.setUpMock(userInfo)
         groupInfo.setUpMock()
         groupMembershipInfo.setUpMock(groupInfo)
+
+        inviteeInfo.setUpMock()
+        inviteeMembershipInfo.setUpMock(inviteeInfo)
 
         repository = DropboxFileRepository(apiService, metadataToOmhStorageEntity)
     }
@@ -755,6 +767,7 @@ class DropboxFileRepositoryTest {
         every { apiService.getFolderPermissions(any()) } returns sharedFolderMembers
         every { sharedFolderMembers.users } returns listOf(userMembershipInfo)
         every { sharedFolderMembers.groups } returns listOf(groupMembershipInfo)
+        every { sharedFolderMembers.invitees } returns listOf(inviteeMembershipInfo)
         every { folderMetadata.sharedFolderId } returns TEST_SHARED_FOLDER_ID
 
         // Act
@@ -763,7 +776,7 @@ class DropboxFileRepositoryTest {
         )
 
         // Assert
-        assertEquals(listOf(testOmhUserPermission, testOmhGroupPermission), result)
+        assertEquals(listOf(testInvitedOmhPermission, testOmhUserPermission, testOmhGroupPermission), result)
         verify {
             apiService.getFolderPermissions(
                 TEST_SHARED_FOLDER_ID,
@@ -779,6 +792,7 @@ class DropboxFileRepositoryTest {
         every { apiService.getFilePermissions(any()) } returns sharedFileMembers
         every { sharedFileMembers.users } returns listOf(userMembershipInfo)
         every { sharedFileMembers.groups } returns listOf(groupMembershipInfo)
+        every { sharedFileMembers.invitees } returns listOf(inviteeMembershipInfo)
 
         // Act
         val result = repository.getPermissions(
@@ -786,7 +800,7 @@ class DropboxFileRepositoryTest {
         )
 
         // Assert
-        assertEquals(listOf(testOmhUserPermission, testOmhGroupPermission), result)
+        assertEquals(listOf(testInvitedOmhPermission, testOmhUserPermission, testOmhGroupPermission), result)
         verify {
             apiService.getFilePermissions(
                 TEST_FILE_ID,

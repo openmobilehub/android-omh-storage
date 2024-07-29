@@ -20,6 +20,8 @@ import com.dropbox.core.v2.sharing.AccessLevel
 import com.dropbox.core.v2.sharing.AddMember
 import com.dropbox.core.v2.sharing.GroupInfo
 import com.dropbox.core.v2.sharing.GroupMembershipInfo
+import com.dropbox.core.v2.sharing.InviteeInfo
+import com.dropbox.core.v2.sharing.InviteeMembershipInfo
 import com.dropbox.core.v2.sharing.MemberSelector
 import com.dropbox.core.v2.sharing.UserInfo
 import com.dropbox.core.v2.sharing.UserMembershipInfo
@@ -48,6 +50,18 @@ internal fun GroupMembershipInfo.setUpMock(groupInfo: GroupInfo) {
 internal fun GroupInfo.setUpMock() {
     every { groupId } returns TEST_PERMISSION_ID
     every { groupName } returns TEST_PERMISSION_DISPLAY_NAME
+}
+
+internal fun InviteeMembershipInfo.setUpMock(inviteeInfo: InviteeInfo, userInfo: UserInfo? = null) {
+    every { user } returns userInfo
+    every { accessType } returns AccessLevel.VIEWER
+    every { isInherited } returns false
+    every { invitee } returns inviteeInfo
+}
+
+internal fun InviteeInfo.setUpMock() {
+    every { isEmail } returns true
+    every { emailValue } returns TEST_PERMISSION_EMAIL_ADDRESS_2
 }
 
 internal val emailMemberSelector = MemberSelector.email(TEST_PERMISSION_EMAIL_ADDRESS)

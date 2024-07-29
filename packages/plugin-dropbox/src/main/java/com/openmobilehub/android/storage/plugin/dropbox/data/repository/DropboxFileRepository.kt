@@ -405,17 +405,17 @@ internal class DropboxFileRepository(
     private fun getFilePermissions(fileId: String): List<OmhPermission> {
         val result = apiService.getFilePermissions(fileId)
 
-        return result.users.mapNotNull { it.toOmhPermission() }.plus(
-            result.groups.mapNotNull { it.toOmhPermission() }
-        )
+        return result.invitees.mapNotNull { it.toOmhPermission() }
+            .plus(result.users.mapNotNull { it.toOmhPermission() })
+            .plus(result.groups.mapNotNull { it.toOmhPermission() })
     }
 
     private fun getFolderPermissions(sharedFolderId: String): List<OmhPermission> {
         val result = apiService.getFolderPermissions(sharedFolderId)
 
-        return result.users.mapNotNull { it.toOmhPermission() }.plus(
-            result.groups.mapNotNull { it.toOmhPermission() }
-        )
+        return result.invitees.mapNotNull { it.toOmhPermission() }
+            .plus(result.users.mapNotNull { it.toOmhPermission() })
+            .plus(result.groups.mapNotNull { it.toOmhPermission() })
     }
 
     private fun isFolder(fileId: String): FolderMetadata? {
