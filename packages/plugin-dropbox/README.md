@@ -89,6 +89,10 @@ val omhStorageClient = DropboxOmhStorageFactory().getStorageClient(omhAuthClient
 
 Interacting with the Dropbox storage provider follows the same pattern as other storage providers since they all implement the [`OmhStorageClient`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client) interface. This uniformity ensures consistent functionality across different storage providers, so you won’t need to learn new methods regardless of the storage provider you choose! For a comprehensive list of available methods, refer to the [Getting Started](https://miniature-adventure-4gle9ye.pages.github.io/docs/getting-started) guide.
 
+#### Caveats
+
+> When updating a file, if the new file has a different name than the updated file, two additional versions might sometimes appear in the system. One version comes from updating the content of the file, and the other comes from updating the file name. However, this behavior is non-deterministic, and sometimes only one new version is added. This is why it is listed under the Caveats section.
+
 ## License
 
 - See [LICENSE](https://github.com/openmobilehub/android-omh-storage/blob/main/LICENSE)
