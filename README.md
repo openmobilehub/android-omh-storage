@@ -157,12 +157,14 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 | Property       | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
 |----------------|:------------------:|:----------------------:|:--------:|:-------:|
 | id             |         ❌         |           ❌           |    ✅    |    ✅   |
-| displayName    |         ✅         |           ✅           |    ✅    |    ✅   |
+| displayName    |         ✅         |           ✅           |    ✅    |    🟨   |
 | emailAddress   |         ✅         |           ✅           |    ❌    |    ✅   |
 | expirationTime |         ✅         |           ✅           |    ✅    |    ❌   |
 | deleted        |         ✅         |           ✅           |    ❌    |    ❌   |
 | photoLink      |         ✅         |           ✅           |    ❌    |    ❌   |
 | pendingOwner   |         ❌         |           ✅           |    ❌    |    ❌   |
+
+> Dropbox: Invited users without a Dropbox account will not have a `displayName`.
 
 [`OmhIdentity.Group`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-identity/-group)
 

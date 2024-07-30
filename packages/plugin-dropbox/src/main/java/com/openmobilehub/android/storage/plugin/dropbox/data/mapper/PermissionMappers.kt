@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
+@file:Suppress("TooManyFunctions")
+
 package com.openmobilehub.android.storage.plugin.dropbox.data.mapper
 
 import com.dropbox.core.v2.sharing.AccessLevel
 import com.dropbox.core.v2.sharing.AddMember
 import com.dropbox.core.v2.sharing.GroupInfo
 import com.dropbox.core.v2.sharing.GroupMembershipInfo
+import com.dropbox.core.v2.sharing.InviteeMembershipInfo
 import com.dropbox.core.v2.sharing.MemberSelector
 import com.dropbox.core.v2.sharing.UserInfo
 import com.dropbox.core.v2.sharing.UserMembershipInfo
@@ -28,6 +31,7 @@ import com.openmobilehub.android.storage.core.model.OmhIdentity
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRecipient
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
+import com.openmobilehub.android.storage.plugin.dropbox.DropboxConstants.EMAIL_REGEX
 
 @Suppress("ReturnCount")
 internal fun UserMembershipInfo.toOmhPermission(): OmhPermission? {
@@ -70,8 +74,48 @@ internal fun GroupInfo.toOmhGroupIdentity(): OmhIdentity.Group = OmhIdentity.Gro
     deleted = null,
 )
 
+@Suppress("ReturnCount")
+internal fun InviteeMembershipInfo.toOmhPermission(): OmhPermission? {
+    val user = this.toOmhUserIdentity() ?: return null
+
+    return OmhPermission.IdentityPermission(
+        id = user.id ?: return null, // Dropbox identify permissions by member
+        role = accessType.toOmhPermissionRole() ?: return null,
+        isInherited = isInherited,
+        identity = user
+    )
+}
+
+internal fun InviteeMembershipInfo.toOmhUserIdentity(): OmhIdentity.User? {
+    return user?.toOmhUserIdentity() ?: run {
+        if (!invitee.isEmail) {
+            return@run null
+        }
+
+        val email = invitee.emailValue
+
+        return@run OmhIdentity.User(
+            id = email,
+            displayName = null,
+            emailAddress = email,
+            expirationTime = null,
+            deleted = null,
+            photoLink = null,
+            pendingOwner = null
+        )
+    }
+}
+
 internal fun OmhCreatePermission.toMemberSelector(): MemberSelector = when (this) {
     is OmhCreatePermission.CreateIdentityPermission -> this.toMemberSelector()
+}
+
+internal fun String.toMemberSelector(): MemberSelector {
+    return if (EMAIL_REGEX.matches(this)) {
+        MemberSelector.email(this)
+    } else {
+        MemberSelector.dropboxId(this)
+    }
 }
 
 internal fun OmhCreatePermission.toAddMember(): AddMember = when (this) {

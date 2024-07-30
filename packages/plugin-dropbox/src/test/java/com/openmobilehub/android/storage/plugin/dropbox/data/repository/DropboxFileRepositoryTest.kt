@@ -36,6 +36,8 @@ import com.dropbox.core.v2.sharing.FileMemberActionResult
 import com.dropbox.core.v2.sharing.FileMemberRemoveActionResult
 import com.dropbox.core.v2.sharing.GroupInfo
 import com.dropbox.core.v2.sharing.GroupMembershipInfo
+import com.dropbox.core.v2.sharing.InviteeInfo
+import com.dropbox.core.v2.sharing.InviteeMembershipInfo
 import com.dropbox.core.v2.sharing.MemberAccessLevelResult
 import com.dropbox.core.v2.sharing.ShareFolderJobStatus
 import com.dropbox.core.v2.sharing.ShareFolderLaunch
@@ -62,14 +64,17 @@ import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_PA
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_PATH
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_WEB_URL
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FOLDER_NAME
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_PERMISSION_EMAIL_ADDRESS
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_PERMISSION_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_SHARED_FOLDER_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_VERSION_FILE_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_VERSION_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.addUserMember
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.createUserPermission
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.dropboxIdMemberSelector
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.emailMemberSelector
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.setUpMock
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testInvitedOmhPermission
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhFolder
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhGroupPermission
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhUserPermission
@@ -94,6 +99,7 @@ import java.io.File
 import java.io.FileInputStream
 import kotlin.test.assertNull
 
+@Suppress("LargeClass")
 @OptIn(ExperimentalCoroutinesApi::class)
 class DropboxFileRepositoryTest {
 
@@ -164,6 +170,12 @@ class DropboxFileRepositoryTest {
     private lateinit var groupMembershipInfo: GroupMembershipInfo
 
     @MockK
+    private lateinit var inviteeMembershipInfo: InviteeMembershipInfo
+
+    @MockK
+    private lateinit var inviteeInfo: InviteeInfo
+
+    @MockK
     private lateinit var groupInfo: GroupInfo
 
     @MockK
@@ -200,6 +212,9 @@ class DropboxFileRepositoryTest {
         userMembershipInfo.setUpMock(userInfo)
         groupInfo.setUpMock()
         groupMembershipInfo.setUpMock(groupInfo)
+
+        inviteeInfo.setUpMock()
+        inviteeMembershipInfo.setUpMock(inviteeInfo)
 
         repository = DropboxFileRepository(apiService, metadataToOmhStorageEntity)
     }
@@ -755,6 +770,7 @@ class DropboxFileRepositoryTest {
         every { apiService.getFolderPermissions(any()) } returns sharedFolderMembers
         every { sharedFolderMembers.users } returns listOf(userMembershipInfo)
         every { sharedFolderMembers.groups } returns listOf(groupMembershipInfo)
+        every { sharedFolderMembers.invitees } returns listOf(inviteeMembershipInfo)
         every { folderMetadata.sharedFolderId } returns TEST_SHARED_FOLDER_ID
 
         // Act
@@ -763,7 +779,7 @@ class DropboxFileRepositoryTest {
         )
 
         // Assert
-        assertEquals(listOf(testOmhUserPermission, testOmhGroupPermission), result)
+        assertEquals(listOf(testInvitedOmhPermission, testOmhUserPermission, testOmhGroupPermission), result)
         verify {
             apiService.getFolderPermissions(
                 TEST_SHARED_FOLDER_ID,
@@ -779,6 +795,7 @@ class DropboxFileRepositoryTest {
         every { apiService.getFilePermissions(any()) } returns sharedFileMembers
         every { sharedFileMembers.users } returns listOf(userMembershipInfo)
         every { sharedFileMembers.groups } returns listOf(groupMembershipInfo)
+        every { sharedFileMembers.invitees } returns listOf(inviteeMembershipInfo)
 
         // Act
         val result = repository.getPermissions(
@@ -786,7 +803,7 @@ class DropboxFileRepositoryTest {
         )
 
         // Assert
-        assertEquals(listOf(testOmhUserPermission, testOmhGroupPermission), result)
+        assertEquals(listOf(testInvitedOmhPermission, testOmhUserPermission, testOmhGroupPermission), result)
         verify {
             apiService.getFilePermissions(
                 TEST_FILE_ID,
@@ -826,7 +843,29 @@ class DropboxFileRepositoryTest {
         verify {
             apiService.deleteFolderPermission(
                 TEST_SHARED_FOLDER_ID,
-                TEST_PERMISSION_ID
+                dropboxIdMemberSelector
+            )
+        }
+    }
+
+    @Test
+    fun `given a permissionId is an email, when deleting permission, then folder permissions is deleted`() {
+        // Arrange
+        every { apiService.getFile(any()) } returns folderMetadata
+        every { apiService.deleteFolderPermission(any(), any()) } returns launchResultBase
+        every { folderMetadata.sharedFolderId } returns TEST_SHARED_FOLDER_ID
+
+        // Act
+        repository.deletePermission(
+            TEST_FILE_ID,
+            TEST_PERMISSION_EMAIL_ADDRESS
+        )
+
+        // Assert
+        verify {
+            apiService.deleteFolderPermission(
+                TEST_SHARED_FOLDER_ID,
+                emailMemberSelector
             )
         }
     }
@@ -847,7 +886,28 @@ class DropboxFileRepositoryTest {
         verify {
             apiService.deleteFilePermission(
                 TEST_FILE_ID,
-                TEST_PERMISSION_ID
+                dropboxIdMemberSelector
+            )
+        }
+    }
+
+    @Test
+    fun `given a permissionId is an email, when deleting permission, then file permissions is deleted`() {
+        // Arrange
+        every { apiService.getFile(any()) } returns fileMetadata
+        every { apiService.deleteFilePermission(any(), any()) } returns fileMemberRemoveActionResult
+
+        // Act
+        repository.deletePermission(
+            TEST_FILE_ID,
+            TEST_PERMISSION_EMAIL_ADDRESS
+        )
+
+        // Assert
+        verify {
+            apiService.deleteFilePermission(
+                TEST_FILE_ID,
+                emailMemberSelector
             )
         }
     }
@@ -892,7 +952,37 @@ class DropboxFileRepositoryTest {
         verify {
             apiService.updateFolderPermissions(
                 TEST_SHARED_FOLDER_ID,
-                TEST_PERMISSION_ID,
+                dropboxIdMemberSelector,
+                AccessLevel.VIEWER
+            )
+        }
+    }
+
+    @Test
+    fun `given a permissionId is an email, when updating permission, then folder permissions is updated`() {
+        // Arrange
+        every { apiService.getFile(any()) } returns folderMetadata
+        every {
+            apiService.updateFolderPermissions(
+                any(),
+                any(),
+                any()
+            )
+        } returns memberAccessLevelResult
+        every { folderMetadata.sharedFolderId } returns TEST_SHARED_FOLDER_ID
+
+        // Act
+        repository.updatePermission(
+            TEST_FILE_ID,
+            TEST_PERMISSION_ID,
+            OmhPermissionRole.COMMENTER
+        )
+
+        // Assert
+        verify {
+            apiService.updateFolderPermissions(
+                TEST_SHARED_FOLDER_ID,
+                dropboxIdMemberSelector,
                 AccessLevel.VIEWER
             )
         }
@@ -921,7 +1011,36 @@ class DropboxFileRepositoryTest {
         verify {
             apiService.updateFilePermissions(
                 TEST_FILE_ID,
-                TEST_PERMISSION_ID,
+                dropboxIdMemberSelector,
+                AccessLevel.EDITOR
+            )
+        }
+    }
+
+    @Test
+    fun `given a permissionId is an email, when updating permission, then file permissions is updated`() {
+        // Arrange
+        every { apiService.getFile(any()) } returns fileMetadata
+        every {
+            apiService.updateFilePermissions(
+                any(),
+                any(),
+                any()
+            )
+        } returns memberAccessLevelResult
+
+        // Act
+        repository.updatePermission(
+            TEST_FILE_ID,
+            TEST_PERMISSION_EMAIL_ADDRESS,
+            OmhPermissionRole.WRITER
+        )
+
+        // Assert
+        verify {
+            apiService.updateFilePermissions(
+                TEST_FILE_ID,
+                emailMemberSelector,
                 AccessLevel.EDITOR
             )
         }

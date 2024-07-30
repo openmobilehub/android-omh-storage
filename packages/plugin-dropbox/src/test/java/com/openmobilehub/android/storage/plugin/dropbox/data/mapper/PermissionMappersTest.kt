@@ -20,14 +20,19 @@ package com.openmobilehub.android.storage.plugin.dropbox.data.mapper
 
 import com.dropbox.core.v2.sharing.GroupInfo
 import com.dropbox.core.v2.sharing.GroupMembershipInfo
+import com.dropbox.core.v2.sharing.InviteeInfo
+import com.dropbox.core.v2.sharing.InviteeMembershipInfo
 import com.dropbox.core.v2.sharing.UserInfo
 import com.dropbox.core.v2.sharing.UserMembershipInfo
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_PERMISSION_EMAIL_ADDRESS
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_PERMISSION_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.createGroupPermission
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.createPermissionForIdentity
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.createUserPermission
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.dropboxIdMemberSelector
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.emailMemberSelector
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.setUpMock
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testInvitedOmhPermission
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhGroupPermission
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhUserPermission
 import io.mockk.MockKAnnotations
@@ -51,6 +56,12 @@ class PermissionMappersTest {
 
     @MockK
     private lateinit var groupInfo: GroupInfo
+
+    @MockK
+    private lateinit var inviteeMembershipInfo: InviteeMembershipInfo
+
+    @MockK
+    private lateinit var inviteeInfo: InviteeInfo
 
     @Before
     fun setUp() {
@@ -89,6 +100,33 @@ class PermissionMappersTest {
     }
 
     @Test
+    fun `given a InviteeMembershipInfo with userInfo, when mapped, then return the expected OmhPermission`() {
+        // Arrange
+        userInfo.setUpMock()
+        inviteeInfo.setUpMock()
+        inviteeMembershipInfo.setUpMock(inviteeInfo, userInfo)
+
+        // Act
+        val result = inviteeMembershipInfo.toOmhPermission()
+
+        // Assert
+        Assert.assertEquals(testOmhUserPermission, result)
+    }
+
+    @Test
+    fun `given a InviteeMembershipInfo without userInfo, when mapped, then return the expected OmhPermission based on invitee`() {
+        // Arrange
+        inviteeInfo.setUpMock()
+        inviteeMembershipInfo.setUpMock(inviteeInfo)
+
+        // Act
+        val result = inviteeMembershipInfo.toOmhPermission()
+
+        // Assert
+        Assert.assertEquals(testInvitedOmhPermission, result)
+    }
+
+    @Test
     fun `given a OmhCreatePermission with User recipient, when mapped, then return MemberSelector with email`() {
         // Act
         val result = createUserPermission.toMemberSelector()
@@ -111,5 +149,29 @@ class PermissionMappersTest {
     fun `given a OmhCreatePermission with Group recipient, when mapped, then throws UnsupportedOperationException`() {
         // Act & Assert
         createGroupPermission.toMemberSelector()
+    }
+
+    @Test
+    fun `given a permissionId is an email, when mapped, then return the email MemberSelector`() {
+        // Arrange
+        val permissionId = TEST_PERMISSION_EMAIL_ADDRESS
+
+        // Act
+        val result = permissionId.toMemberSelector()
+
+        // Assert
+        Assert.assertEquals(emailMemberSelector, result)
+    }
+
+    @Test
+    fun `given a permissionId is not an email, when mapped, then return the dropboxId MemberSelector`() {
+        // Arrange
+        val permissionId = TEST_PERMISSION_ID
+
+        // Act
+        val result = permissionId.toMemberSelector()
+
+        // Assert
+        Assert.assertEquals(dropboxIdMemberSelector, result)
     }
 }

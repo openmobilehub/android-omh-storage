@@ -357,15 +357,16 @@ internal class DropboxFileRepository(
     fun deletePermission(fileId: String, permissionId: String) {
         try {
             val folderMetadata = isFolder(fileId)
+            val memberSelector = permissionId.toMemberSelector()
 
             if (folderMetadata != null) {
                 apiService.deleteFolderPermission(
                     folderMetadata.sharedFolderId
                         ?: throw OmhStorageException.ApiException(message = "This is not a shared folder"),
-                    permissionId
+                    memberSelector
                 )
             } else {
-                apiService.deleteFilePermission(fileId, permissionId)
+                apiService.deleteFilePermission(fileId, memberSelector)
             }
         } catch (exception: DbxApiException) {
             throw ExceptionMapper.toOmhApiException(exception)
@@ -378,15 +379,17 @@ internal class DropboxFileRepository(
         role: OmhPermissionRole
     ) = try {
         val folderMetadata = isFolder(fileId)
+        val memberSelector = permissionId.toMemberSelector()
+
         if (folderMetadata != null) {
             apiService.updateFolderPermissions(
                 folderMetadata.sharedFolderId
                     ?: throw OmhStorageException.ApiException(message = "This is not a shared folder"),
-                permissionId,
+                memberSelector,
                 role.toAccessLevel()
             )
         } else {
-            apiService.updateFilePermissions(fileId, permissionId, role.toAccessLevel())
+            apiService.updateFilePermissions(fileId, memberSelector, role.toAccessLevel())
         }
     } catch (exception: DbxApiException) {
         throw ExceptionMapper.toOmhApiException(exception)
@@ -405,17 +408,17 @@ internal class DropboxFileRepository(
     private fun getFilePermissions(fileId: String): List<OmhPermission> {
         val result = apiService.getFilePermissions(fileId)
 
-        return result.users.mapNotNull { it.toOmhPermission() }.plus(
-            result.groups.mapNotNull { it.toOmhPermission() }
-        )
+        return result.invitees.mapNotNull { it.toOmhPermission() }
+            .plus(result.users.mapNotNull { it.toOmhPermission() })
+            .plus(result.groups.mapNotNull { it.toOmhPermission() })
     }
 
     private fun getFolderPermissions(sharedFolderId: String): List<OmhPermission> {
         val result = apiService.getFolderPermissions(sharedFolderId)
 
-        return result.users.mapNotNull { it.toOmhPermission() }.plus(
-            result.groups.mapNotNull { it.toOmhPermission() }
-        )
+        return result.invitees.mapNotNull { it.toOmhPermission() }
+            .plus(result.users.mapNotNull { it.toOmhPermission() })
+            .plus(result.groups.mapNotNull { it.toOmhPermission() })
     }
 
     private fun isFolder(fileId: String): FolderMetadata? {
