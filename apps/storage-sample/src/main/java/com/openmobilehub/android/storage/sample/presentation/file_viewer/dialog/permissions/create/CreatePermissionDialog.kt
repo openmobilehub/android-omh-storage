@@ -56,7 +56,6 @@ class CreatePermissionDialog : DialogFragment() {
             false
         ).also {
             binding = it
-            viewModel.setup(parentViewModel.file)
             setupBinding()
         }.root
     }
