@@ -115,7 +115,7 @@ internal fun Permission.toOmhPermission(): OmhPermission? {
         id,
         omhRole,
         // permissionDetails are present only for shared drive items
-        if (permissionDetails.isEmpty()) null else inheritedFrom != null,
+        if (permissionDetails.isNullOrEmpty()) null else inheritedFrom != null,
         getOmhIdentity() ?: return null,
     )
 }

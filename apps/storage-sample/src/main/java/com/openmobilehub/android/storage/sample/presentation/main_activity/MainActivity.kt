@@ -17,7 +17,12 @@
 package com.openmobilehub.android.storage.sample.presentation.main_activity
 
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -51,10 +56,21 @@ open class MainActivity : AppCompatActivity(), BaseFragment.BaseFragmentListener
     lateinit var omhAuthClient: Provider<OmhAuthClient>
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        setupEdgeToEdgeInsets()
         setSupportActionBar(binding.toolbar)
         setupNavigation()
+    }
+
+    private fun setupEdgeToEdgeInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            binding.statusbarPlaceholder.updateLayoutParams { height = systemBars.top }
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
+            insets
+        }
     }
 
     private fun setupNavigation() {
