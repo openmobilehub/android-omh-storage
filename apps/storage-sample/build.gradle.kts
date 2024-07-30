@@ -127,6 +127,7 @@ dependencies {
     implementation(Libs.constraintlayout)
     implementation(Libs.dataStore)
     implementation(Libs.hiltAndroid)
+    implementation(Libs.activityKtx)
     kapt(Libs.hiltCompiler)
     kapt(Libs.glideCompiler)
 

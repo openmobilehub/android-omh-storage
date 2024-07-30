@@ -95,6 +95,7 @@ Interacting with the OneDrive storage provider follows the same pattern as other
 #### Caveats
 
 > The [Sharing Links](https://learn.microsoft.com/en-us/graph/api/resources/permission?view=graph-rest-1.0#sharing-links) permissions are not supported.
+> The [search](https://learn.microsoft.com/en-us/graph/api/driveitem-search?view=graph-rest-1.0&tabs=java) query takes several fields including filename, metadata, and file content when searching.
 
 ## License
 

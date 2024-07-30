@@ -9,7 +9,7 @@ object Versions {
     // KTX
     const val coreKtx = "1.9.0"
     const val lifecycleKtx = "2.5.1"
-    const val activityKtx = "1.6.1"
+    const val activityKtx = "1.8.2"
     const val fragmentKtx = "1.6.0"
 
     // Annotation

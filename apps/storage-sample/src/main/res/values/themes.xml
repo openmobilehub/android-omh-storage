@@ -12,6 +12,7 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <item name="bottomSheetDialogTheme">@style/Theme.BottomSheetDialog</item>
         <item name="bottomSheetDragHandleStyle">
             @style/Widget.MaterialComponents.BottomSheet.DragHandle
         </item>
@@ -34,4 +35,8 @@
         <item name="android:alpha">0.3</item>
     </style>
 
+    <style name="Theme.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:navigationBarColor">@color/transparent</item>
+    </style>
 </resources>
