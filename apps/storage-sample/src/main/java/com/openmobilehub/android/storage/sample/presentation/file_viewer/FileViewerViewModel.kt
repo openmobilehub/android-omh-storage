@@ -36,6 +36,7 @@ import com.openmobilehub.android.storage.sample.util.coSignOut
 import com.openmobilehub.android.storage.sample.util.isDownloadable
 import com.openmobilehub.android.storage.sample.util.isFile
 import com.openmobilehub.android.storage.sample.util.isFolder
+import com.openmobilehub.android.storage.sample.util.validateSession
 import com.openmobilehub.android.storage.sample.util.normalizedFileType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.File
@@ -56,14 +57,16 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
+import javax.net.ssl.HttpsURLConnection.HTTP_UNAUTHORIZED
 
+@Suppress("TooManyFunctions")
 @OptIn(FlowPreview::class)
 @HiltViewModel
 class FileViewerViewModel @Inject constructor(
     private val authClient: OmhAuthClient,
     private val omhStorageClient: OmhStorageClient,
-    private val sessionRepository: SessionRepository
-) : BaseViewModel<FileViewerViewState, FileViewerViewEvent>() {
+    sessionRepository: SessionRepository
+) : BaseViewModel<FileViewerViewState, FileViewerViewEvent>(), SessionDelegate {
 
     companion object {
         val googleListOfFileTypes = listOf(
@@ -140,9 +143,7 @@ class FileViewerViewModel @Inject constructor(
                 )
             }
                 .catch {
-                    errorDialogMessage.postValue(it.message)
-                    toastMessage.postValue(it.message)
-                    it.printStackTrace()
+                    handleException(it)
                     emit(emptyList())
                 }
                 .onEach {
@@ -269,9 +270,7 @@ class FileViewerViewModel @Inject constructor(
 
                     setState(FileViewerViewState.SaveFile(fileToSave, data))
                 } catch (exception: Exception) {
-                    errorDialogMessage.postValue(exception.message)
-                    toastMessage.postValue("ERROR: ${file.name} was NOT downloaded")
-                    exception.printStackTrace()
+                    handleException(exception, "ERROR: ${file.name} was NOT downloaded")
                     refreshFileListEvent()
                 } finally {
                     lastFileVersionClicked = null
@@ -305,15 +304,10 @@ class FileViewerViewModel @Inject constructor(
                 }
 
                 toastMessage.postValue(resultMessage)
-
-                refreshFileListEvent()
             } catch (exception: Exception) {
-                errorDialogMessage.postValue(exception.message)
-                toastMessage.postValue("ERROR: ${event.fileName} was not updated")
-                exception.printStackTrace()
-
-                refreshFileListEvent()
+                handleException(exception, "ERROR: ${event.fileName} was not updated")
             }
+            refreshFileListEvent()
         }
     }
 
@@ -349,10 +343,7 @@ class FileViewerViewModel @Inject constructor(
                 fileCreation()
                 refreshFileListEvent()
             } catch (exception: Exception) {
-                errorDialogMessage.postValue(exception.message)
-                toastMessage.postValue(exception.message)
-                exception.printStackTrace()
-
+                handleException(exception)
                 refreshFileListEvent()
             }
         }
@@ -378,10 +369,7 @@ class FileViewerViewModel @Inject constructor(
 
                 refreshFileListEvent()
             } catch (exception: Exception) {
-                errorDialogMessage.postValue(exception.message)
-                toastMessage.postValue("ERROR: ${event.fileName} was NOT uploaded")
-                exception.printStackTrace()
-
+                handleException(exception, "ERROR: ${event.fileName} was NOT uploaded")
                 refreshFileListEvent()
             }
         }
@@ -410,10 +398,7 @@ class FileViewerViewModel @Inject constructor(
                 handleDeleteSuccess(file)
                 refreshFileListEvent()
             } catch (exception: OmhStorageException.ApiException) {
-                errorDialogMessage.postValue(exception.message)
-                toastMessage.postValue("ERROR: ${file.name} was NOT deleted")
-                exception.printStackTrace()
-
+                handleException(exception, "ERROR: ${file.name} was NOT deleted")
                 refreshFileListEvent()
             }
         }
@@ -438,10 +423,7 @@ class FileViewerViewModel @Inject constructor(
                 handleDeleteSuccess(file)
                 refreshFileListEvent()
             } catch (exception: OmhStorageException.ApiException) {
-                errorDialogMessage.postValue(exception.message)
-                toastMessage.postValue("ERROR: ${file.name} was NOT permanently deleted")
-                exception.printStackTrace()
-
+                handleException(exception, "ERROR: ${file.name} was NOT permanently deleted")
                 refreshFileListEvent()
             }
         }
@@ -514,6 +496,32 @@ class FileViewerViewModel @Inject constructor(
         viewModelScope.launch {
             _action.send(FileViewerViewAction.ShowMoreOptions)
         }
+    }
+
+    private suspend fun handleException(exception: Throwable, message: String? = null) {
+        if (exception is OmhStorageException && handleUnauthorized(exception)) {
+            return
+        }
+
+        errorDialogMessage.postValue(exception.message)
+        toastMessage.postValue(message ?: exception.message)
+        exception.printStackTrace()
+    }
+
+    @Suppress("ReturnCount")
+    override suspend fun handleUnauthorized(exception: Exception): Boolean {
+        if (exception !is OmhStorageException.ApiException || exception.statusCode != HTTP_UNAUTHORIZED) {
+            return false
+        }
+
+        if (authClient.validateSession()) {
+            toastMessage.postValue("Access token refreshed. Please retry.")
+            return true
+        }
+
+        toastMessage.postValue("Session expired, singing out.")
+        setState(FileViewerViewState.SignOut)
+        return true
     }
 
     // Utility class for encapsulating stack operation and exposing a flow with the current peek value

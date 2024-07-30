@@ -50,6 +50,9 @@
     <string name="file_extension">Extension: %s</string>
     <string name="file_size">File Size: %s</string>
 
+    <string name="versions_get_error">Couldn\'t get versions</string>
+    <string name="metadata_get_error">Couldn\'t get metadata</string>
+
     <string name="permission_type_user">User</string>
     <string name="permission_type_group">Group</string>
     <string name="permission_type_domain">Domain</string>
@@ -75,6 +78,7 @@
     <string name="permission_url_copied">URL copied to clipboard</string>
     <string name="permission_url_to_file">URL to file</string>
     <string name="permission_url_error">Couldn\'t get url</string>
+    <string name="permission_get_error">Couldn\'t get permissions</string>
     <string name="permission_removed">Permission removed</string>
     <string name="permission_remove_error">Couldn\'t remove permission</string>
     <string name="permission_updated">Permission updated</string>

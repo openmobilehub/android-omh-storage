@@ -63,7 +63,7 @@ fun OmhStorageEntity.isFile() = this is OmhStorageEntity.OmhFile
 // We can't rely on getUser, as on Dropbox, the user will be returned even when the access token
 // expires, while on Microsoft, 401 will be thrown as expected.
 @Suppress("ReturnCount")
-suspend fun OmhAuthClient.isUserLoggedIn(): Boolean {
+suspend fun OmhAuthClient.validateSession(): Boolean {
     getCredentials().apply {
         if (accessToken == null) {
             return false

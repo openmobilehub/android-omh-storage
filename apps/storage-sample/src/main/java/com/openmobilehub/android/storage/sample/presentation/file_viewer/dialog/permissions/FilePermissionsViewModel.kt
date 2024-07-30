@@ -16,8 +16,6 @@
 
 package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions
 
-import androidx.annotation.StringRes
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
@@ -29,6 +27,7 @@ import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
 import com.openmobilehub.android.storage.sample.domain.repository.SessionRepository
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.BaseDialogViewModel
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model.FilePermissionsViewAction
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model.FilePermissionsViewState
 import com.openmobilehub.android.storage.sample.util.isFolder
@@ -45,7 +44,7 @@ import kotlinx.coroutines.launch
 class FilePermissionsViewModel @Inject constructor(
     private val omhStorageClient: OmhStorageClient,
     sessionRepository: SessionRepository
-) : ViewModel() {
+) : BaseDialogViewModel() {
     private val storageAuthProvider = sessionRepository.getStorageAuthProvider()
 
     private val _state = MutableStateFlow(
@@ -77,10 +76,17 @@ class FilePermissionsViewModel @Inject constructor(
 
     private fun getPermissions() = viewModelScope.launch(Dispatchers.IO) {
         _state.value = _state.value.copy(isLoading = true)
-        val permissions = omhStorageClient
-            .getFilePermissions(file.id)
-            .sortedWith(compareBy({ it.orderByType() }, { it.orderRole() }))
-        _state.value = _state.value.copy(permissions = permissions, isLoading = false)
+        try {
+            val permissions = omhStorageClient
+                .getFilePermissions(file.id)
+                .sortedWith(compareBy({ it.orderByType() }, { it.orderRole() }))
+            _state.value = _state.value.copy(permissions = permissions, isLoading = false)
+        } catch (
+            exception: OmhStorageException
+        ) {
+            handleException(R.string.permission_get_error, exception)
+            _state.value = _state.value.copy(permissions = emptyList(), isLoading = false)
+        }
     }
 
     fun edit(permission: OmhPermission) = viewModelScope.launch {
@@ -95,12 +101,11 @@ class FilePermissionsViewModel @Inject constructor(
             return@launch
         }
 
-        @Suppress("SwallowedException")
         try {
             omhStorageClient.updatePermission(file.id, editedPermission.id, selectedRole)
             _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_updated))
         } catch (exception: OmhStorageException.ApiException) {
-            showErrorDialog(R.string.permission_update_error, exception)
+            handleException(R.string.permission_update_error, exception)
         }
 
         _state.value = _state.value.copy(editedPermission = null)
@@ -140,8 +145,7 @@ class FilePermissionsViewModel @Inject constructor(
             )
             _action.send(FilePermissionsViewAction.ShowToast(R.string.permission_created))
         } catch (exception: OmhStorageException.ApiException) {
-            showErrorDialog(R.string.permission_create_error, exception)
-            exception.cause?.printStackTrace()
+            handleException(R.string.permission_create_error, exception)
         }
         getPermissions()
     }
@@ -163,17 +167,8 @@ class FilePermissionsViewModel @Inject constructor(
             }
             _action.send(FilePermissionsViewAction.CopyUrlToClipboard(webUrl))
         } catch (exception: OmhStorageException.ApiException) {
-            showErrorDialog(R.string.permission_url_error, exception)
+            handleException(R.string.permission_url_error, exception)
         }
-    }
-
-    private suspend fun showErrorDialog(@StringRes title: Int, exception: Exception) {
-        _action.send(
-            FilePermissionsViewAction.ShowErrorDialog(
-                title,
-                exception.message.orEmpty()
-            )
-        )
     }
 }
 

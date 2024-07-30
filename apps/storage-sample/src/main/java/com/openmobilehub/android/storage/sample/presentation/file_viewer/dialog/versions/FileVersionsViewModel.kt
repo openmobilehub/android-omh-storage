@@ -16,9 +16,11 @@
 
 package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.versions
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.openmobilehub.android.storage.core.OmhStorageClient
+import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.sample.R
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.BaseDialogViewModel
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.versions.model.FileVersionsViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +32,7 @@ import javax.inject.Inject
 @HiltViewModel
 class FileVersionsViewModel @Inject constructor(
     private val omhStorageClient: OmhStorageClient
-) : ViewModel() {
+) : BaseDialogViewModel() {
     private val _state = MutableStateFlow(
         FileVersionsViewState(
             isLoading = false,
@@ -42,8 +44,13 @@ class FileVersionsViewModel @Inject constructor(
     fun getFileVersions(fileId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             _state.value = _state.value.copy(isLoading = true)
-            val versions = omhStorageClient.getFileVersions(fileId)
-            _state.value = _state.value.copy( versions = versions , isLoading = false)
+            try {
+                val versions = omhStorageClient.getFileVersions(fileId)
+                _state.value = _state.value.copy(versions = versions, isLoading = false)
+            } catch (exception: OmhStorageException) {
+                handleException(R.string.versions_get_error, exception)
+                _state.value = _state.value.copy(versions = emptyList(), isLoading = false)
+            }
         }
     }
 }

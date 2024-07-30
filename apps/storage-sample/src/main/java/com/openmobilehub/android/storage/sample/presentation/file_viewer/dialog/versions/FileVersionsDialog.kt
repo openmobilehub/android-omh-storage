@@ -25,20 +25,19 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.DialogFileVersionsBinding
-import com.openmobilehub.android.storage.sample.presentation.file_viewer.FileViewerViewModel
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.BaseDialog
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class FileVersionsDialog : BottomSheetDialogFragment(), FileVersionAdapter.ItemListener {
+class FileVersionsDialog : BaseDialog(), FileVersionAdapter.ItemListener {
 
-    private val parentViewModel: FileViewerViewModel by viewModels({ requireParentFragment() })
-    private val versionsViewModel: FileVersionsViewModel by viewModels()
+    override val viewModel: FileVersionsViewModel by viewModels()
+
     private lateinit var binding: DialogFileVersionsBinding
 
     private var fileVersionAdapter: FileVersionAdapter? = null
@@ -74,7 +73,7 @@ class FileVersionsDialog : BottomSheetDialogFragment(), FileVersionAdapter.ItemL
             return
         }
 
-        fileVersionAdapter = FileVersionAdapter(this, versionsViewModel.state.value.versions.size)
+        fileVersionAdapter = FileVersionAdapter(this, viewModel.state.value.versions.size)
 
         context?.let { context ->
 
@@ -98,11 +97,11 @@ class FileVersionsDialog : BottomSheetDialogFragment(), FileVersionAdapter.ItemL
         super.onViewCreated(view, savedInstanceState)
         val file = requireNotNull(parentViewModel.lastFileClicked)
 
-        versionsViewModel.getFileVersions(file.id)
+        viewModel.getFileVersions(file.id)
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                versionsViewModel.state.collect {
+                viewModel.state.collect {
                     if (it.isLoading) {
                         buildLoadingState()
                     } else {

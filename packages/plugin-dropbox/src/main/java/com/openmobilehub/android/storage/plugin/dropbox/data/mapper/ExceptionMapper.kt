@@ -17,11 +17,33 @@
 package com.openmobilehub.android.storage.plugin.dropbox.data.mapper
 
 import com.dropbox.core.DbxApiException
+import com.dropbox.core.DbxException
+import com.dropbox.core.InvalidAccessTokenException
 import com.openmobilehub.android.storage.core.model.OmhStorageException
+import javax.net.ssl.HttpsURLConnection.HTTP_UNAUTHORIZED
 
 object ExceptionMapper {
     // Note that extensions function couldn't be used here due to SwallowedException warning:
     // https://github.com/detekt/detekt/issues/4520
-    fun toOmhApiException(exception: DbxApiException): OmhStorageException.ApiException =
-        OmhStorageException.ApiException(null, exception.userMessage?.toString() ?: exception.message, exception)
+    fun toOmhApiException(exception: DbxException): OmhStorageException.ApiException {
+        return when (exception) {
+            is InvalidAccessTokenException -> {
+                OmhStorageException.ApiException(
+                    HTTP_UNAUTHORIZED,
+                    exception.message,
+                    exception
+                )
+            }
+
+            is DbxApiException -> {
+                OmhStorageException.ApiException(
+                    null,
+                    exception.userMessage?.toString() ?: exception.message,
+                    exception
+                )
+            }
+
+            else -> OmhStorageException.ApiException(null, exception.message, exception)
+        }
+    }
 }

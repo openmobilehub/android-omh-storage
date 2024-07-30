@@ -17,7 +17,7 @@
 package com.openmobilehub.android.storage.plugin.dropbox.data.repository
 
 import androidx.annotation.VisibleForTesting
-import com.dropbox.core.DbxApiException
+import com.dropbox.core.DbxException
 import com.dropbox.core.v2.files.FolderMetadata
 import com.dropbox.core.v2.files.WriteMode
 import com.dropbox.core.v2.sharing.SharedFolderMetadata
@@ -64,7 +64,7 @@ internal class DropboxFileRepository(
         dropboxFiles.entries.mapNotNull {
             metadataToOmhStorageEntity(it)
         }
-    } catch (exception: DbxApiException) {
+    } catch (exception: DbxException) {
         throw ExceptionMapper.toOmhApiException(exception)
     }
 
@@ -76,7 +76,7 @@ internal class DropboxFileRepository(
         val response = apiService.uploadFile(inputStream, path)
 
         metadataToOmhStorageEntity(response)
-    } catch (exception: DbxApiException) {
+    } catch (exception: DbxException) {
         throw ExceptionMapper.toOmhApiException(exception)
     }
 
@@ -85,7 +85,7 @@ internal class DropboxFileRepository(
         apiService.downloadFile(fileId, outputStream)
 
         outputStream
-    } catch (exception: DbxApiException) {
+    } catch (exception: DbxException) {
         throw ExceptionMapper.toOmhApiException(exception)
     }
 
@@ -95,7 +95,7 @@ internal class DropboxFileRepository(
         revisions.entries.map {
             it.toOmhVersion()
         }
-    } catch (exception: DbxApiException) {
+    } catch (exception: DbxException) {
         throw ExceptionMapper.toOmhApiException(exception)
     }
 
@@ -104,14 +104,14 @@ internal class DropboxFileRepository(
         apiService.downloadFileRevision(versionId, outputStream)
 
         outputStream
-    } catch (exception: DbxApiException) {
+    } catch (exception: DbxException) {
         throw ExceptionMapper.toOmhApiException(exception)
     }
 
     fun deleteFile(fileId: String): Unit = try {
         apiService.deleteFile(fileId)
         Unit
-    } catch (exception: DbxApiException) {
+    } catch (exception: DbxException) {
         throw ExceptionMapper.toOmhApiException(exception)
     }
 
@@ -120,7 +120,7 @@ internal class DropboxFileRepository(
         searchResults.matches.mapNotNull {
             metadataToOmhStorageEntity(it.metadata.metadataValue)
         }
-    } catch (exception: DbxApiException) {
+    } catch (exception: DbxException) {
         throw ExceptionMapper.toOmhApiException(exception)
     }
 
@@ -130,7 +130,7 @@ internal class DropboxFileRepository(
             ?: throw OmhStorageException.ApiException(message = "Failed to get metadata for file with ID: $fileId")
 
         OmhStorageMetadata(omhStorageEntity, metadata)
-    } catch (exception: DbxApiException) {
+    } catch (exception: DbxException) {
         throw ExceptionMapper.toOmhApiException(exception)
     }
 
@@ -153,7 +153,7 @@ internal class DropboxFileRepository(
         val createFolderResult = apiService.createFolder(path)
 
         createFolderResult.metadata.toOmhStorageEntity()
-    } catch (exception: DbxApiException) {
+    } catch (exception: DbxException) {
         throw ExceptionMapper.toOmhApiException(exception)
     }
 
@@ -173,7 +173,7 @@ internal class DropboxFileRepository(
             val response = apiService.uploadFile(inputStream, path)
 
             return metadataToOmhStorageEntity(response)
-        } catch (exception: DbxApiException) {
+        } catch (exception: DbxException) {
             throw ExceptionMapper.toOmhApiException(exception)
         } finally {
             tempFile.delete()
@@ -200,7 +200,7 @@ internal class DropboxFileRepository(
             val result = apiService.moveFile(pathLower, newPath)
 
             return metadataToOmhStorageEntity(result.metadata)
-        } catch (exception: DbxApiException) {
+        } catch (exception: DbxException) {
             throw ExceptionMapper.toOmhApiException(exception)
         }
     }
@@ -223,7 +223,7 @@ internal class DropboxFileRepository(
         )
 
         renameFile(fileId, newFile.name)
-    } catch (exception: DbxApiException) {
+    } catch (exception: DbxException) {
         throw ExceptionMapper.toOmhApiException(exception)
     }
 
@@ -256,7 +256,7 @@ internal class DropboxFileRepository(
             } else {
                 createFilePermission(fileId, permission, sendNotificationEmail, emailMessage)
             }
-        } catch (exception: DbxApiException) {
+        } catch (exception: DbxException) {
             throw ExceptionMapper.toOmhApiException(exception)
         }
     }
@@ -349,7 +349,7 @@ internal class DropboxFileRepository(
             } else {
                 apiService.getFileWebUrl(fileId)
             }
-        } catch (exception: DbxApiException) {
+        } catch (exception: DbxException) {
             throw ExceptionMapper.toOmhApiException(exception)
         }
     }
@@ -367,7 +367,7 @@ internal class DropboxFileRepository(
             } else {
                 apiService.deleteFilePermission(fileId, permissionId)
             }
-        } catch (exception: DbxApiException) {
+        } catch (exception: DbxException) {
             throw ExceptionMapper.toOmhApiException(exception)
         }
     }
@@ -388,7 +388,7 @@ internal class DropboxFileRepository(
         } else {
             apiService.updateFilePermissions(fileId, permissionId, role.toAccessLevel())
         }
-    } catch (exception: DbxApiException) {
+    } catch (exception: DbxException) {
         throw ExceptionMapper.toOmhApiException(exception)
     }
 

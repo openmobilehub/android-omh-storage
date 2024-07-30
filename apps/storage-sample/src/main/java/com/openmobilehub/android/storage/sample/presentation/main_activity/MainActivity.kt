@@ -29,7 +29,7 @@ import com.openmobilehub.android.storage.sample.databinding.ActivityBaseBinding
 import com.openmobilehub.android.storage.sample.domain.repository.SessionRepository
 import com.openmobilehub.android.storage.sample.presentation.BaseFragment
 import com.openmobilehub.android.storage.sample.util.coInitialize
-import com.openmobilehub.android.storage.sample.util.isUserLoggedIn
+import com.openmobilehub.android.storage.sample.util.validateSession
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -80,7 +80,7 @@ open class MainActivity : AppCompatActivity(), BaseFragment.BaseFragmentListener
             sessionRepository.initialise()
             val isUserLoggedIn = omhAuthClient.get().run {
                 coInitialize()
-                isUserLoggedIn()
+                validateSession()
             }
             launch(Dispatchers.Main) {
                 val navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
