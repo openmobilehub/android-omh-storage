@@ -26,11 +26,16 @@ import java.io.FileInputStream
 
 internal class OneDriveApiClient(val authProvider: OneDriveAuthProvider) {
     companion object {
-        private const val CHUNK_SIZE_IN_BYTES = 1024 * 1024 // 1MB
+        // Almost 1MB, the size of each byte range MUST be a multiple of 320 KiB
+        // https://learn.microsoft.com/en-us/graph/api/driveitem-createuploadsession?view=graph-rest-1.0#upload-bytes-to-the-upload-session
+        private const val CHUNK_SIZE_IN_BYTES = 327_680 * 3
         private const val MAX_ATTEMPTS = 5
     }
 
     internal val graphServiceClient = GraphServiceClient(authProvider)
+    private val graphServiceClientNoAuth = GraphServiceClient { _, _ ->
+        // ignore
+    }
 
     internal fun uploadFile(
         uploadSession: UploadSession,
@@ -38,7 +43,10 @@ internal class OneDriveApiClient(val authProvider: OneDriveAuthProvider) {
         streamSize: Long,
     ): UploadResult<DriveItem> {
         val largeFileUploadTask = LargeFileUploadTask(
-            graphServiceClient.requestAdapter,
+            // Including the Authorization header when issuing the upload PUT call may result in an
+            // HTTP 401 Unauthorized response
+            // https://learn.microsoft.com/en-us/graph/api/driveitem-createuploadsession?view=graph-rest-1.0#upload-bytes-to-the-upload-session
+            graphServiceClientNoAuth.requestAdapter,
             uploadSession,
             fileInputStream,
             streamSize,
