@@ -39,7 +39,7 @@ class EditPermissionViewModel @Inject constructor(
         StorageAuthProvider.DROPBOX -> OmhPermissionRole.COMMENTER
         StorageAuthProvider.MICROSOFT -> OmhPermissionRole.READER
     }
-    var disabledRoles: Set<OmhPermissionRole> = when (storageAuthProvider) {
+    val disabledRoles: Set<OmhPermissionRole> = when (storageAuthProvider) {
         StorageAuthProvider.GOOGLE -> emptySet()
         StorageAuthProvider.DROPBOX -> setOf(
             OmhPermissionRole.READER
@@ -48,15 +48,6 @@ class EditPermissionViewModel @Inject constructor(
         StorageAuthProvider.MICROSOFT -> setOf(
             OmhPermissionRole.COMMENTER
         )
-    }
-
-    fun setup(file: OmhStorageEntity) {
-        if (storageAuthProvider == StorageAuthProvider.DROPBOX && file.isFile()) {
-            // Dropbox does not allow to grant writer permissions to files, only folders
-            disabledRoles = disabledRoles.toMutableSet().apply {
-                add(OmhPermissionRole.WRITER)
-            }
-        }
     }
 
     var roleIndex: Int

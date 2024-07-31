@@ -21,12 +21,10 @@ import androidx.lifecycle.viewModelScope
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhPermissionRecipient
-import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
 import com.openmobilehub.android.storage.sample.domain.repository.SessionRepository
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.create.model.CreatePermissionsViewAction
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.create.model.PermissionType
-import com.openmobilehub.android.storage.sample.util.isFile
 import com.openmobilehub.android.storage.sample.util.isValidEmail
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -59,15 +57,6 @@ class CreatePermissionViewModel @Inject constructor(
         )
     }
 
-    fun setup(file: OmhStorageEntity) {
-        if (storageAuthProvider == StorageAuthProvider.DROPBOX && file.isFile()) {
-            // Dropbox does not allow to grant writer permissions to files, only folders
-            disabledRoles = disabledRoles.toMutableSet().apply {
-                add(OmhPermissionRole.WRITER)
-            }
-        }
-    }
-
     private val _role: MutableStateFlow<OmhPermissionRole> =
         MutableStateFlow(
             when (storageAuthProvider) {
@@ -91,7 +80,8 @@ class CreatePermissionViewModel @Inject constructor(
         StorageAuthProvider.GOOGLE -> emptySet()
         StorageAuthProvider.DROPBOX -> setOf(
             PermissionType.ANYONE,
-            PermissionType.DOMAIN
+            PermissionType.DOMAIN,
+            PermissionType.GROUP,
         )
 
         StorageAuthProvider.MICROSOFT -> setOf(

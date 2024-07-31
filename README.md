@@ -181,12 +181,14 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 | Role      | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
 |-----------|:------------------:|:----------------------:|:--------:|:-------:|
 | OWNER     |         ✅         |           ✅           |    ✅    |    ✅   |
-| WRITER    |         ✅         |           ✅           |    ✅    |    ✅   |
+| WRITER    |         ✅         |           ✅           |    ✅    |    🟨   |
 | COMMENTER |         ✅         |           ✅           |    ❌    |    ✅   |
 | READER    |         ✅         |           ✅           |    ✅    |    🟨   |
 
 > Dropbox: when trying to create permissions with role `READER`, Dropbox will
 > throw `AddFileMemberErrorException` with user message: `viewer_no_comment isn’t yet supported`.
+> Folders support the role `WRITER` regardless of their location, but files must be in the root 
+> folder. File can inherit `WRITER` permission from its parent folder.
 
 [`OmhPermissionRecipient`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-permission-recipient)
 
