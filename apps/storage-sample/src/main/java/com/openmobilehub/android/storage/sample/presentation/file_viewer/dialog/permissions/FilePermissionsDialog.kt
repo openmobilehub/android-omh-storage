@@ -30,26 +30,22 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.DialogFilePermissionBinding
-import com.openmobilehub.android.storage.sample.presentation.file_viewer.FileViewerViewModel
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.BaseDialog
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.create.CreatePermissionDialog
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.edit.EditPermissionDialog
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model.FilePermissionsViewAction
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions.model.FilePermissionsViewState
 import com.openmobilehub.android.storage.sample.presentation.util.MarginItemDecoration
-import com.openmobilehub.android.storage.sample.presentation.util.displayErrorDialog
 import com.openmobilehub.android.storage.sample.presentation.util.displayToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class FilePermissionsDialog : BottomSheetDialogFragment(), FilePermissionAdapter.ItemListener {
-
-    private val parentViewModel: FileViewerViewModel by viewModels({ requireParentFragment() })
-    private val permissionsViewModel: FilePermissionsViewModel by viewModels()
+class FilePermissionsDialog : BaseDialog(), FilePermissionAdapter.ItemListener {
+    override val viewModel: FilePermissionsViewModel by viewModels()
 
     private lateinit var adapter: FilePermissionAdapter
     private lateinit var binding: DialogFilePermissionBinding
@@ -88,7 +84,7 @@ class FilePermissionsDialog : BottomSheetDialogFragment(), FilePermissionAdapter
         }
 
         binding.getUrl.setOnClickListener {
-            permissionsViewModel.getWebUrl()
+            viewModel.getWebUrl()
         }
     }
 
@@ -96,17 +92,17 @@ class FilePermissionsDialog : BottomSheetDialogFragment(), FilePermissionAdapter
         super.onViewCreated(view, savedInstanceState)
         val file = requireNotNull(parentViewModel.lastFileClicked)
 
-        permissionsViewModel.getPermissions(file)
+        viewModel.getPermissions(file)
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                permissionsViewModel.state.collect(::buildState)
+                viewModel.state.collect(::buildState)
             }
         }
 
         lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                permissionsViewModel.action.collect(::handleAction)
+                viewModel.action.collect(::handleAction)
             }
         }
     }
@@ -120,21 +116,16 @@ class FilePermissionsDialog : BottomSheetDialogFragment(), FilePermissionAdapter
         when (action) {
             is FilePermissionsViewAction.ShowToast -> displayToast(action.message)
             FilePermissionsViewAction.ShowEditView -> showEditView()
-            is FilePermissionsViewAction.ShowErrorDialog -> displayErrorDialog(
-                action.message,
-                action.title
-            )
-
             is FilePermissionsViewAction.CopyUrlToClipboard -> copyUrlToClipboard(action.url)
         }
     }
 
     override fun onEditClicked(permission: OmhPermission) {
-        permissionsViewModel.edit(permission)
+        viewModel.edit(permission)
     }
 
     override fun onRemoveClicked(permission: OmhPermission) {
-        permissionsViewModel.remove(permission)
+        viewModel.remove(permission)
     }
 
     private fun showEditView() {

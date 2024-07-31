@@ -14,19 +14,11 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.core.model
+package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog
 
-sealed class OmhStorageException(
-    override val message: String? = null,
-    override val cause: Throwable? = null
-) : Exception(message, cause) {
+import androidx.annotation.StringRes
 
-    class InvalidCredentialsException(message: String?) :
-        OmhStorageException(message = message)
-
-    class DeveloperErrorException(message: String, cause: Throwable? = null) :
-        OmhStorageException(message, cause)
-
-    class ApiException(val statusCode: Int? = null, message: String? = null, cause: Throwable? = null) :
-        OmhStorageException(message, cause)
+sealed class BaseDialogViewAction {
+    data class ShowErrorDialog(@StringRes val title: Int, val message: String) :
+        BaseDialogViewAction()
 }

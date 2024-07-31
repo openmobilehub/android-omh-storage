@@ -21,9 +21,6 @@ import androidx.annotation.StringRes
 sealed class FilePermissionsViewAction {
     data class ShowToast(@StringRes val message: Int) : FilePermissionsViewAction()
 
-    data class ShowErrorDialog(@StringRes val title: Int, val message: String) :
-        FilePermissionsViewAction()
-
     object ShowEditView : FilePermissionsViewAction()
 
     data class CopyUrlToClipboard(val url: String) : FilePermissionsViewAction()

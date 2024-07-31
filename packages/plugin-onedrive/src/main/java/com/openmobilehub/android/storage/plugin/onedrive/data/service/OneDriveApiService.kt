@@ -31,6 +31,7 @@ import com.openmobilehub.android.storage.plugin.onedrive.OneDriveConstants
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
+import javax.net.ssl.HttpsURLConnection.HTTP_UNAUTHORIZED
 
 @Suppress("TooManyFunctions")
 internal class OneDriveApiService(private val apiClient: OneDriveApiClient) {
@@ -204,6 +205,9 @@ internal class OneDriveApiService(private val apiClient: OneDriveApiClient) {
             try {
                 return apiClient.graphServiceClient.me().drive().get().id
             } catch (exception: ApiException) {
+                if (exception.responseStatusCode == HTTP_UNAUTHORIZED) {
+                    throw exception
+                }
                 throw OmhStorageException.ApiException(
                     message = "Couldn't get drive id",
                     cause = exception

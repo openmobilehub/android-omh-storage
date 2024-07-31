@@ -16,9 +16,11 @@
 
 package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.metadata
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.openmobilehub.android.storage.core.OmhStorageClient
+import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.sample.R
+import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.BaseDialogViewModel
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.metadata.model.FileMetadataViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +32,7 @@ import javax.inject.Inject
 @HiltViewModel
 class FileMetadataViewModel @Inject constructor(
     private val omhStorageClient: OmhStorageClient
-) : ViewModel() {
+) : BaseDialogViewModel() {
     private val _state = MutableStateFlow(
         FileMetadataViewState(
             metadata = null,
@@ -44,8 +46,13 @@ class FileMetadataViewModel @Inject constructor(
     fun getFileMetadata(fileId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             _state.value = _state.value.copy(isLoading = true)
-            val metadata = omhStorageClient.getFileMetadata(fileId)
-            _state.value = _state.value.copy(metadata = metadata, isLoading = false)
+            try {
+                val metadata = omhStorageClient.getFileMetadata(fileId)
+                _state.value = _state.value.copy(metadata = metadata, isLoading = false)
+            } catch (exception: OmhStorageException) {
+                handleException(R.string.metadata_get_error, exception)
+                _state.value = _state.value.copy(metadata = null, isLoading = false)
+            }
         }
     }
 
