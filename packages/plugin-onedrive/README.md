@@ -68,7 +68,6 @@ To access Microsoft APIs, follow these steps to obtain the **MSAL Configuration*
 To securely configure the OneDrive storage provider, add the following entry to your project's **local.properties** file:
 
 ```bash
-MICROSOFT_HOST_PATH=<YOUR_ANDROID_PACKAGE_NAME>.MainApplication
 MICROSOFT_SIGNATURE_HASH=<YOUR_MICROSOFT_SIGNATURE_HASH>
 ```
 
