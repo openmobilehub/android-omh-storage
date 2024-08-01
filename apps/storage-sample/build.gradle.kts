@@ -23,38 +23,32 @@ android {
         val microsoftSignatureHash = getValueFromEnvOrProperties("MICROSOFT_SIGNATURE_HASH")
 
         resValue("string", "db_login_protocol_scheme", "db-${dropboxAppKey}")
-
         resValue("string", "microsoft_path", "/${microsoftSignatureHash}")
 
         val rawDir = file("./src/main/res/raw")
         if (!rawDir.exists()) {
             rawDir.mkdirs()
         }
-        file("./src/main/res/raw/ms_auth_config.json").writeText(
-            """
-{
-  "client_id": "$microsoftClientId",
-  "authorization_user_agent": "DEFAULT",
-  "redirect_uri": "msauth://com.openmobilehub.android.storage.sample.AndroidApplication/${
-                URLEncoder.encode(
-                    microsoftSignatureHash,
-                    "UTF-8"
-                )
-            }",
-  "authorities": [
-    {
-      "type": "AAD",
-      "audience": {
-        "type": "PersonalMicrosoftAccount",
-        "tenant_id": "consumers"
-      }
-    }
-  ],
-  "account_mode": "SINGLE"
-}
-            """.trimIndent()
-        )
 
+        val configJson = """
+            {
+              "client_id": "$microsoftClientId",
+              "authorization_user_agent": "DEFAULT",
+              "redirect_uri": "msauth://$applicationId/${URLEncoder.encode(microsoftSignatureHash, "UTF-8")}",
+              "authorities": [
+                {
+                  "type": "AAD",
+                  "audience": {
+                    "type": "AzureADandPersonalMicrosoftAccount",
+                    "tenant_id": "common"
+                  }
+                }
+              ],
+              "account_mode": "SINGLE"
+            }
+        """.trimIndent()
+
+        file("./src/main/res/raw/ms_auth_config.json").writeText(configJson)
     }
 
     signingConfigs {
