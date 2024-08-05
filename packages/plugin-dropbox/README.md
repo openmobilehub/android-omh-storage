@@ -59,7 +59,7 @@ dependencies {
 To access Dropbox APIs, follow these steps to obtain the **Client ID**:
 
 1. [Create a new app](https://developers.dropbox.com/oauth-guide) in [Dropbox Console](https://www.dropbox.com/developers/apps/create).
-2. Enable the `account_info.read`, `files.metadata.read`, `files.content.write` and `files.content.read` permission for your app.
+2. Enable the `account_info.read`, `files.metadata.read`, `files.content.write`, `files.content.read`, `sharing.write` and `sharing.read` permission for your app.
 
 ### Secrets
 
@@ -77,7 +77,7 @@ To interact with the Dropbox storage provider, you must first initialize both th
 
 ```kotlin
 val omhAuthClient = DropboxAuthClient(
-    scopes = arrayListOf("account_info.read", "files.metadata.read", "files.content.write", "files.content.read"),
+    scopes = arrayListOf("account_info.read", "files.metadata.read", "files.content.write", "files.content.read", "sharing.write", "sharing.read"),
     context = context,
     appId = BuildConfig.DROPBOX_CLIENT_ID,
 )
