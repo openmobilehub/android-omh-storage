@@ -206,34 +206,33 @@ internal class OneDriveFileRepository(
         }
     }
 
-    private fun renameFile(fileId: String, fileName: String): OmhStorageEntity {
-        val updatedDriveItem = DriveItem().apply {
-            name = fileName
+    private fun renameFile(fileId: String, fileName: String, retry: Boolean): OmhStorageEntity {
+        try {
+            val updatedDriveItem = DriveItem().apply {
+                name = fileName
+            }
+            val response = apiService.updateFileMetadata(fileId, updatedDriveItem)
+            return driveItemToOmhStorageEntity(response)
+        } catch (exception: ApiException) {
+            // This is a workaround for the OneDrive API issue where the file name is not updated
+            // when uploading a new file version. The reason is related to the race condition when
+            // uploading a new file version and renaming the file at the same time.
+            if (exception.responseStatusCode == PRECONDITION_ERROR_STATUS_CODE && retry) {
+                return renameFile(fileId, fileName, false)
+            } else {
+                throw ExceptionMapper.toOmhApiException(exception)
+            }
         }
-        val response = apiService.updateFileMetadata(fileId, updatedDriveItem)
-
-        return driveItemToOmhStorageEntity(response)
     }
 
     fun updateFile(localFileToUpload: File, fileId: String): OmhStorageEntity {
         try {
             apiService.uploadFile(localFileToUpload, fileId, "replace")
             // By default, the file name is not updated when uploading a new file version.
-            val res = renameFile(fileId, localFileToUpload.name)
+            val res = renameFile(fileId, localFileToUpload.name, true)
             return res
         } catch (exception: ApiException) {
-            if (exception.responseStatusCode == PRECONDITION_ERROR_STATUS_CODE) {
-                try {
-                    // This is a workaround for the OneDrive API issue where the file name is not updated
-                    // when uploading a new file version. The reason is related to the race condition when
-                    // uploading a new file version and renaming the file at the same time.
-                    return renameFile(fileId, localFileToUpload.name)
-                } catch (exception: ApiException) {
-                    throw ExceptionMapper.toOmhApiException(exception)
-                }
-            } else {
-                throw ExceptionMapper.toOmhApiException(exception)
-            }
+            throw ExceptionMapper.toOmhApiException(exception)
         }
     }
 
