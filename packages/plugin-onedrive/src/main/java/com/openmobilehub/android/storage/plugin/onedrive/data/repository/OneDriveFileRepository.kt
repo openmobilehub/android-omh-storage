@@ -49,6 +49,11 @@ internal class OneDriveFileRepository(
     private val driveItemToOmhStorageEntity: DriveItemToOmhStorageEntity,
     private val driveItemResponseToOmhStorageEntity: DriveItemResponseToOmhStorageEntity
 ) {
+
+    companion object {
+        private const val PRECONDITION_ERROR_STATUS_CODE = 412
+    }
+
     fun getFilesList(parentId: String): List<OmhStorageEntity> = try {
         apiService.getFilesList(parentId).map {
             driveItemToOmhStorageEntity(it)
@@ -201,19 +206,34 @@ internal class OneDriveFileRepository(
         }
     }
 
+    private fun renameFile(fileId: String, fileName: String): OmhStorageEntity {
+        val updatedDriveItem = DriveItem().apply {
+            name = fileName
+        }
+        val response = apiService.updateFileMetadata(fileId, updatedDriveItem)
+
+        return driveItemToOmhStorageEntity(response)
+    }
+
     fun updateFile(localFileToUpload: File, fileId: String): OmhStorageEntity {
         try {
             apiService.uploadFile(localFileToUpload, fileId, "replace")
-
             // By default, the file name is not updated when uploading a new file version.
-            val updatedDriveItem = DriveItem().apply {
-                name = localFileToUpload.name
-            }
-            val response = apiService.updateFileMetadata(fileId, updatedDriveItem)
-
-            return driveItemToOmhStorageEntity(response)
+            val res = renameFile(fileId, localFileToUpload.name)
+            return res
         } catch (exception: ApiException) {
-            throw ExceptionMapper.toOmhApiException(exception)
+            if (exception.responseStatusCode == PRECONDITION_ERROR_STATUS_CODE) {
+                try {
+                    // This is a workaround for the OneDrive API issue where the file name is not updated
+                    // when uploading a new file version. The reason is related to the race condition when
+                    // uploading a new file version and renaming the file at the same time.
+                    return renameFile(fileId, localFileToUpload.name)
+                } catch (exception: ApiException) {
+                    throw ExceptionMapper.toOmhApiException(exception)
+                }
+            } else {
+                throw ExceptionMapper.toOmhApiException(exception)
+            }
         }
     }
 

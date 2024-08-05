@@ -25,6 +25,7 @@ import com.microsoft.graph.models.DriveItemVersion
 import com.microsoft.graph.models.DriveItemVersionCollectionResponse
 import com.microsoft.graph.models.DriveRecipient
 import com.microsoft.graph.models.Permission
+import com.microsoft.kiota.ApiException
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
@@ -129,6 +130,9 @@ class OneDriveFileRepositoryTest {
 
     @MockK(relaxed = true)
     private lateinit var driveRecipient: DriveRecipient
+
+    @MockK(relaxed = true)
+    private lateinit var apiException: ApiException
 
     private lateinit var repository: OneDriveFileRepository
 
@@ -541,7 +545,7 @@ class OneDriveFileRepositoryTest {
     @Test(expected = OmhStorageException.ApiException::class)
     fun `given an apiService throws an exception, when uploading a file, then an ApiException is thrown`() {
         // Arrange
-        every { apiService.uploadFile(any(), any(), any()) } throws OmhStorageException.ApiException()
+        every { apiService.uploadFile(any(), any(), any()) } throws apiException
 
         // Act & Assert
         repository.updateFile(file, TEST_FILE_ID)
@@ -551,9 +555,39 @@ class OneDriveFileRepositoryTest {
     fun `given an apiService throws an exception, when updating a file metadata, then an ApiException is thrown`() {
         // Arrange
         every { apiService.uploadFile(any(), any(), any()) } returns driveItem
-        every { apiService.updateFileMetadata(any(), any()) } throws OmhStorageException.ApiException()
+        every { apiService.updateFileMetadata(any(), any()) } throws apiException
 
         // Act & Assert
         repository.updateFile(file, TEST_FILE_ID)
+    }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given an apiService throws 412 exceptions when updating a file metadata, then the call is retried`() {
+        // Arrange
+        every { apiException.responseStatusCode } returns 412
+        every { apiService.uploadFile(any(), any(), any()) } returns driveItem
+        every { apiService.updateFileMetadata(any(), any()) } throws apiException
+
+        // Act
+        repository.updateFile(file, TEST_FILE_ID)
+
+        // Assert
+        verify(exactly = 2) { apiService.updateFileMetadata(any(), any()) }
+    }
+
+    @Test
+    fun `given an apiService return drive Item from retried call, when updating the file, then return an OmhStorageEntity`() {
+        // Arrange
+        every { apiException.responseStatusCode } returns 412
+        every { apiService.uploadFile(any(), any(), any()) } returns driveItem
+        every { apiService.updateFileMetadata(any(), any()) } throws apiException andThen driveItem
+        every { driveItemToOmhStorageEntity(any()) } returns omhStorageEntity
+
+        // Act
+        val result = repository.updateFile(file, TEST_FILE_ID)
+
+        // Assert
+        assertEquals(omhStorageEntity, result)
+        verify(exactly = 2) { apiService.updateFileMetadata(any(), any()) }
     }
 }
