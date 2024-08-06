@@ -28,7 +28,8 @@ android {
     }
 
     packagingOptions {
-        resources.excludes.add("META-INF/*")
+        resources.excludes.add("META-INF/MANIFEST.MF")
+        resources.excludes.add("META-INF/DEPENDENCIES")
         resources.excludes.add("**/LICENSE.txt")
         resources.excludes.add("**/README.txt")
     }
