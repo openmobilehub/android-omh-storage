@@ -53,7 +53,13 @@ jobs:
     secrets: inherit
     strategy:
       matrix:
-        plugin-name: ["plugin-googledrive-gms", "plugin-googledrive-non-gms"]
+        plugin-name:
+          [
+            "plugin-googledrive-gms",
+            "plugin-googledrive-non-gms",
+            "plugin-onedrive",
+            "plugin-dropbox",
+          ]
     uses: ./.github/workflows/build_and_publish_to_maven_remotely.yml
     with:
       package-name: :packages:${{ matrix.plugin-name }}

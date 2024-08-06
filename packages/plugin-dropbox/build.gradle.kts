@@ -12,7 +12,7 @@ dependencies {
     if (useLocalProjects) {
         api(project(":packages:core"))
     } else {
-        api("com.openmobilehub.android:storage-api:1.0.5-beta")
+        api("com.openmobilehub.android.storage:core:2.0.0-alpha")
     }
 
     // Dropbox
