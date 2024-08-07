@@ -19,7 +19,7 @@ Module plugin-googledrive-non-gms
 
 ---
 
-For further instructions, please refer to the [Google Drive (GMS) documentation](https://miniature-adventure-4gle9ye.pages.github.io/docs/plugin-googledrive-gms), as it shares a similar setup and behavior.
+For further instructions, please refer to the [Google Drive (GMS) documentation](https://github.com/openmobilehub/android-omh-storage/blob/main/packages/plugin-googledrive-gms/README.md), as it shares a similar setup and behavior.
 
 ## License
 
