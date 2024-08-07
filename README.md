@@ -31,11 +31,11 @@
 
 This is the main directory of the mono-repo for Android OMH Storage. If you're searching for a particular package, please click on the corresponding package link below.
 
-- [Core](https://miniature-adventure-4gle9ye.pages.github.io/docs/core)
-- [Google Drive (GMS)](https://miniature-adventure-4gle9ye.pages.github.io/docs/plugin-googledrive-gms)
-- [Google Drive (non-GMS)](https://miniature-adventure-4gle9ye.pages.github.io/docs/plugin-googledrive-non-gms)
-- [OneDrive](https://miniature-adventure-4gle9ye.pages.github.io/docs/plugin-onedrive)
-- [Dropbox](https://miniature-adventure-4gle9ye.pages.github.io/docs/plugin-dropbox)
+- [Core](https://github.com/openmobilehub/android-omh-storage/blob/main/packages/core/README.md)
+- [Google Drive (GMS)](https://github.com/openmobilehub/android-omh-storage/blob/main/packages/plugin-googledrive-gms/README.md)
+- [Google Drive (non-GMS)](https://github.com/openmobilehub/android-omh-storage/blob/main/packages/plugin-googledrive-non-gms/README.md)
+- [OneDrive](https://github.com/openmobilehub/android-omh-storage/blob/main/packages/plugin-onedrive/README.md)
+- [Dropbox](https://github.com/openmobilehub/android-omh-storage/blob/main/packages/plugin-dropbox/README.md)
 
 ## Documentation
 
