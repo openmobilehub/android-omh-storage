@@ -24,6 +24,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -85,6 +86,20 @@ class FilePermissionsDialog : BaseDialog(), FilePermissionAdapter.ItemListener {
 
         binding.getUrl.setOnClickListener {
             viewModel.getWebUrl()
+        }
+
+        binding.caveatsContainer.isVisible = viewModel.permissionCaveats != null
+        binding.caveatsLabel.setOnClickListener {
+            binding.caveatsContent.isVisible = !binding.caveatsContent.isVisible
+            val drawable = ContextCompat.getDrawable(
+                requireContext(),
+                if (binding.caveatsContent.isVisible)
+                    R.drawable.round_arrow_drop_up else R.drawable.round_arrow_drop_down
+            )
+            binding.caveatsLabel.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null)
+        }
+        viewModel.permissionCaveats?.let {
+            binding.caveatsContent.text = resources.getString(it)
         }
     }
 

@@ -232,33 +232,32 @@ internal class DropboxFileRepository(
         permission: OmhCreatePermission,
         sendNotificationEmail: Boolean,
         emailMessage: String?
-    ) {
+    ) = try {
         val folderMetadata = isFolder(fileId)
-        try {
-            if (folderMetadata != null) {
-                val sharedFolderId = folderMetadata.sharedFolderId
 
-                if (sharedFolderId == null) {
-                    shareFolder(
-                        fileId,
-                        permission,
-                        sendNotificationEmail,
-                        emailMessage
-                    )
-                } else {
-                    createFolderPermission(
-                        sharedFolderId,
-                        permission,
-                        sendNotificationEmail,
-                        emailMessage
-                    )
-                }
+        if (folderMetadata != null) {
+            val sharedFolderId = folderMetadata.sharedFolderId
+
+            if (sharedFolderId == null) {
+                shareFolder(
+                    fileId,
+                    permission,
+                    sendNotificationEmail,
+                    emailMessage
+                )
             } else {
-                createFilePermission(fileId, permission, sendNotificationEmail, emailMessage)
+                createFolderPermission(
+                    sharedFolderId,
+                    permission,
+                    sendNotificationEmail,
+                    emailMessage
+                )
             }
-        } catch (exception: DbxException) {
-            throw ExceptionMapper.toOmhApiException(exception)
+        } else {
+            createFilePermission(fileId, permission, sendNotificationEmail, emailMessage)
         }
+    } catch (exception: DbxException) {
+        throw ExceptionMapper.toOmhApiException(exception)
     }
 
     private fun createFilePermission(
@@ -396,12 +395,16 @@ internal class DropboxFileRepository(
     }
 
     fun getPermissions(fileId: String): List<OmhPermission> {
-        val folderMetadata = isFolder(fileId)
+        try {
+            val folderMetadata = isFolder(fileId)
 
-        return if (folderMetadata != null) {
-            getFolderPermissions(folderMetadata.sharedFolderId ?: return emptyList())
-        } else {
-            getFilePermissions(fileId)
+            return if (folderMetadata != null) {
+                getFolderPermissions(folderMetadata.sharedFolderId ?: return emptyList())
+            } else {
+                getFilePermissions(fileId)
+            }
+        } catch (exception: DbxException) {
+            throw ExceptionMapper.toOmhApiException(exception)
         }
     }
 

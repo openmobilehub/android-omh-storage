@@ -16,6 +16,7 @@
 
 package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog.permissions
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.viewModelScope
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
@@ -67,6 +68,14 @@ class FilePermissionsViewModel @Inject constructor(
             StorageAuthProvider.GOOGLE -> true
             StorageAuthProvider.DROPBOX -> true
             StorageAuthProvider.MICROSOFT -> false
+        }
+
+
+    @StringRes val permissionCaveats: Int? =
+        when (storageAuthProvider) {
+            StorageAuthProvider.GOOGLE -> null
+            StorageAuthProvider.DROPBOX -> R.string.permission_caveats_dropbox
+            StorageAuthProvider.MICROSOFT -> null
         }
 
     fun getPermissions(file: OmhStorageEntity) {
