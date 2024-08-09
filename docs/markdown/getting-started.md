@@ -17,7 +17,7 @@ Before integrating any storage provider into your Android project, ensure you me
 
 Additionally, ensure you have the following packages installed before proceeding with the integration:
 
-- [`com.openmobilehub.android.storage:core:2.0.0`](https://miniature-adventure-4gle9ye.pages.github.io/docs/core)
+- [`com.openmobilehub.android.storage:core:2.0.0`](https://openmobilehub.github.io/android-omh-storage/docs/core)
 - [`com.openmobilehub.android.auth:core:2.0.2`](https://github.com/openmobilehub/android-omh-auth)
 
 ## Installation
@@ -57,13 +57,13 @@ dependencies {
 
 Each storage provider requires specific secrets for configuration. Please follow the individual storage provider configuration guides:
 
-- [Google Drive](https://miniature-adventure-4gle9ye.pages.github.io/docs/plugin-googledrive-gms/#configuration)
-- [OneDrive](https://miniature-adventure-4gle9ye.pages.github.io/docs/plugin-onedrive/#configuration)
-- [Dropbox](https://miniature-adventure-4gle9ye.pages.github.io/docs/plugin-dropbox/#configuration)
+- [Google Drive](https://openmobilehub.github.io/android-omh-storage/docs/plugin-googledrive-gms/#configuration)
+- [OneDrive](https://openmobilehub.github.io/android-omh-storage/docs/plugin-onedrive/#configuration)
+- [Dropbox](https://openmobilehub.github.io/android-omh-storage/docs/plugin-dropbox/#configuration)
 
 ## Usage
 
-In this guide, we'll use the Google Drive storage provider as an example. You can choose any other storage provider since the exposed methods are identical across all storage storage providers. Each storage provider implements the [`OmhStorageClient`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client) interface, ensuring consistent functionality. This uniformity means you won't need to learn new methods regardless of the storage provider you choose!
+In this guide, we'll use the Google Drive storage provider as an example. You can choose any other storage provider since the exposed methods are identical across all storage storage providers. Each storage provider implements the [`OmhStorageClient`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client) interface, ensuring consistent functionality. This uniformity means you won't need to learn new methods regardless of the storage provider you choose!
 
 ### 💡 GOOD TO KNOW
 
@@ -220,7 +220,7 @@ Retrieves the metadata of a file with the given file ID.
 val fileMetadata = omhStorageClient.getFileMetadata(fileId = "fileId")
 ```
 
-> For more details on file metadata support for each provider, please refer to the [File metadata documentation](https://miniature-adventure-4gle9ye.pages.github.io/docs/#file-metadata).
+> For more details on file metadata support for each provider, please refer to the [File metadata documentation](https://openmobilehub.github.io/android-omh-storage/docs/#file-metadata).
 
 ### Get file versions
 
@@ -230,7 +230,7 @@ Retrieves the versions of a file with the given file ID.
 val fileVersions = omhStorageClient.getFileVersions(fileId = "fileId")
 ```
 
-> For more details on file versioning support for each provider, please refer to the [File versioning documentation](https://miniature-adventure-4gle9ye.pages.github.io/docs/#file-versioning).
+> For more details on file versioning support for each provider, please refer to the [File versioning documentation](https://openmobilehub.github.io/android-omh-storage/docs/#file-versioning).
 
 ### Download file version
 
@@ -269,7 +269,7 @@ val newPermission = omhStorageClient.createPermission(
 )
 ```
 
-> For more details on file permissions support for each provider, please refer to the [File permissions documentation](https://miniature-adventure-4gle9ye.pages.github.io/docs/#file-permissions).
+> For more details on file permissions support for each provider, please refer to the [File permissions documentation](https://openmobilehub.github.io/android-omh-storage/docs/#file-permissions).
 
 ### Update file permission
 
@@ -304,7 +304,7 @@ val webUrl = omhStorageClient.getWebUrl(fileId = "fileId")
 
 ---
 
-For a more in depth view on the available methods, access the [Reference API](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client).
+For a more in depth view on the available methods, access the [Reference API](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client).
 
 ## Sample app
 

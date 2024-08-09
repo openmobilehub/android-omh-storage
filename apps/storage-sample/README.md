@@ -11,9 +11,9 @@ We recommend that anyone interested in contributing to this library use this sam
 
 Each storage provider requires specific secrets for configuration. Please follow the individual storage provider configuration guides:
 
-- [Google Drive](https://miniature-adventure-4gle9ye.pages.github.io/docs/plugin-googledrive-gms/#configuration)
-- [OneDrive](https://miniature-adventure-4gle9ye.pages.github.io/docs/plugin-onedrive/#configuration)
-- [Dropbox](https://miniature-adventure-4gle9ye.pages.github.io/docs/plugin-dropbox/#configuration)
+- [Google Drive](https://openmobilehub.github.io/android-omh-storage/docs/plugin-googledrive-gms/#configuration)
+- [OneDrive](https://openmobilehub.github.io/android-omh-storage/docs/plugin-onedrive/#configuration)
+- [Dropbox](https://openmobilehub.github.io/android-omh-storage/docs/plugin-dropbox/#configuration)
 
 ## Dependencies setup
 
