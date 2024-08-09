@@ -90,5 +90,13 @@
     <string name="permission_label_send_notification_email">Send notification email</string>
     <string name="permission_email_required_error">A valid email is required.</string>
     <string name="permission_domain_required_error">Domain is required.</string>
+    <string name="permission_caveats_label">Caveats</string>
+    <string name="permission_caveats_dropbox">- Dropbox folders have two types: folder and shared folder.
+\n- A folder must be a shared folder for Dropbox to provide permissions, including providing <i>OWNER</i> permission.
+\n- Adding permission will make a folder a shared folder.
+\n- <i>GET URL</i> only provides links for shared folders.
+\n- Dropbox does not support granting a <i>WRITER</i> role to uploaded files. An exception will be thrown with user message: `You don’t have permission to perform this action.`.
+\n- Dropbox does not support deleting inherited permissions.
+    </string>
 
 </resources>
