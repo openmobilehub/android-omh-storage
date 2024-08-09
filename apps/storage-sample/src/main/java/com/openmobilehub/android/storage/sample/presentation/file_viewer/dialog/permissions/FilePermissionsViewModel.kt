@@ -70,7 +70,6 @@ class FilePermissionsViewModel @Inject constructor(
             StorageAuthProvider.MICROSOFT -> false
         }
 
-
     @StringRes val permissionCaveats: Int? =
         when (storageAuthProvider) {
             StorageAuthProvider.GOOGLE -> null
