@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://miniature-adventure-4gle9ye.pages.github.io/docs/">
+  <a href="https://openmobilehub.github.io/android-omh-storage/docs/">
     <img width="500px" src="https://openmobilehub.org/wp-content/uploads/sites/13/2024/06/OpenMobileHub-horizontal-color.svg"/><br/>
   </a>
   <h2 align="center">Android OMH Storage</h2>
@@ -39,8 +39,8 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 
 ## Documentation
 
-- [Getting Started](https://miniature-adventure-4gle9ye.pages.github.io/docs/getting-started)
-- [Reference API](https://miniature-adventure-4gle9ye.pages.github.io/api)
+- [Getting Started](https://openmobilehub.github.io/android-omh-storage/docs/getting-started)
+- [Reference API](https://openmobilehub.github.io/android-omh-storage/api)
 
 ## Supported functionality
 
@@ -73,7 +73,7 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 
 <summary>Show details</summary>
 
-[`OmhStorageEntity.OmhFile`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-storage-entity/-omh-file)
+[`OmhStorageEntity.OmhFile`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-storage-entity/-omh-file)
 
 | Property     | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
 | ------------ | :----------------: | :--------------------: | :------: | :-----: |
@@ -86,7 +86,7 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 | extension    |         ✅         |           ✅           |    ✅    |   ✅    |
 | size         |         ✅         |           ✅           |    ✅    |   ✅    |
 
-[`OmhStorageEntity.OmhFolder`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-storage-entity/-omh-folder)
+[`OmhStorageEntity.OmhFolder`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-storage-entity/-omh-folder)
 
 | Property     | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
 | ------------ | :----------------: | :--------------------: | :------: | :-----: |
@@ -96,7 +96,7 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 | modifiedTime |         ✅         |           ✅           |    ✅    |   ❌    |
 | parentId     |         ✅         |           ✅           |    ✅    |   ✅    |
 
-[`OmhStorageMetadata.originalMetadata`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-storage-metadata/original-metadata.html)
+[`OmhStorageMetadata.originalMetadata`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-storage-metadata/original-metadata.html)
 
 | Storage provider       | Type                                                                                                                                                                                 |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -113,7 +113,7 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 
 <summary>Show details</summary>
 
-[`OmhFileVersion`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-file-version)
+[`OmhFileVersion`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-file-version)
 
 | Property     | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
 | ------------ | :----------------: | :--------------------: | :------: | :-----: |
@@ -129,7 +129,7 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 
 <summary>Show details</summary>
 
-[`OmhPermission.IdentityPermission`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-permission/-identity-permission)
+[`OmhPermission.IdentityPermission`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-permission/-identity-permission)
 
 | Property    | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
 |-------------|:------------------:|:----------------------:|:--------:|:-------:|
@@ -141,7 +141,7 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 > Google Drive: `isInherited` is present only for shared drive items.
 > Dropbox: `id` equals to underlying identity ID.
 
-[`OmhIdentity`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-identity)
+[`OmhIdentity`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-identity)
 
 | Type        | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
 |-------------|:------------------:|:----------------------:|:--------:|:-------:|
@@ -152,7 +152,7 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 | Device      |         ❌         |           ❌           |    ✅    |    ❌   |
 | Application |         ❌         |           ❌           |    ✅    |    ❌   |
 
-[`OmhIdentity.User`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-identity/-user)
+[`OmhIdentity.User`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-identity/-user)
 
 | Property       | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
 |----------------|:------------------:|:----------------------:|:--------:|:-------:|
@@ -166,7 +166,7 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 
 > Dropbox: Invited users without a Dropbox account will not have a `displayName`.
 
-[`OmhIdentity.Group`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-identity/-group)
+[`OmhIdentity.Group`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-identity/-group)
 
 | Property       | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
 |----------------|:------------------:|:----------------------:|:--------:|:-------:|
@@ -176,7 +176,7 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 | expirationTime |         ✅         |           ✅           |    ✅    |    ❌   |
 | deleted        |         ✅         |           ✅           |    ❌    |    ❌   |
 
-[`OmhPermissionRole`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-permission-role)
+[`OmhPermissionRole`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-permission-role)
 
 | Role      | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
 |-----------|:------------------:|:----------------------:|:--------:|:-------:|
@@ -191,7 +191,7 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 > - Dropbox does not support granting a `WRITER` role to uploaded files. An exception will be thrown
 > with user message: `You don’t have permission to perform this action.`.
 
-[`OmhPermissionRecipient`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-permission-recipient)
+[`OmhPermissionRecipient`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-permission-recipient)
 
 | Type         | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
 |--------------|:------------------:|:----------------------:|:--------:|:-------:|
@@ -204,16 +204,16 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 
 > Dropbox: to invite Group, use WithObjectId and provide group ID
 
-[`OmhStorageClient.createPermission`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client)
+[`OmhStorageClient.createPermission`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client)
 > Dropbox: this method returns null when permission is successfully created.
 
-[`OmhStorageClient.updatePermission`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client)
+[`OmhStorageClient.updatePermission`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client)
 > Dropbox: this method returns null when permission is successfully updated.
 
-[`OmhStorageClient.getWebUrl`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client)
+[`OmhStorageClient.getWebUrl`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client)
 > Dropbox: a folder needs to be a shared folder to return web URL.
 
-[`OmhStorageClient.getFilePermissions`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client)
+[`OmhStorageClient.getFilePermissions`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client)
 > Dropbox: a folder needs to be a shared folder to return any permissions, including OWNER permission.
 
 </details>

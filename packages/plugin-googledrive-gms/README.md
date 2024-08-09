@@ -1,7 +1,7 @@
 Module plugin-googledrive-gms
 
 <p align="center">
-  <a href="https://miniature-adventure-4gle9ye.pages.github.io/docs/">
+  <a href="https://openmobilehub.github.io/android-omh-storage/docs/">
     <img width="500px" src="https://openmobilehub.org/wp-content/uploads/sites/13/2024/06/OpenMobileHub-horizontal-color.svg"/><br/>
   </a>
   <h2 align="center">Android OMH Storage - Google Drive (GMS)</h2>
@@ -23,7 +23,7 @@ Module plugin-googledrive-gms
 
 Ensure you have the following packages installed before proceeding with the integration:
 
-- [`com.openmobilehub.android.storage:core:2.0.0`](https://miniature-adventure-4gle9ye.pages.github.io/docs/core)
+- [`com.openmobilehub.android.storage:core:2.0.0`](https://openmobilehub.github.io/android-omh-storage/docs/core)
 - [`com.openmobilehub.android.auth:core:2.0.2`](https://github.com/openmobilehub/android-omh-auth)
 
 ## Installation
@@ -103,7 +103,7 @@ val omhStorageClient = OmhStorageProvider.Builder()
 
 ### Other methods
 
-Interacting with the Google Drive storage provider follows the same pattern as other storage providers since they all implement the [`OmhStorageClient`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client) interface. This uniformity ensures consistent functionality across different storage providers, so you won’t need to learn new methods regardless of the storage provider you choose! For a comprehensive list of available methods, refer to the [Getting Started](https://miniature-adventure-4gle9ye.pages.github.io/docs/getting-started) guide.
+Interacting with the Google Drive storage provider follows the same pattern as other storage providers since they all implement the [`OmhStorageClient`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client) interface. This uniformity ensures consistent functionality across different storage providers, so you won’t need to learn new methods regardless of the storage provider you choose! For a comprehensive list of available methods, refer to the [Getting Started](https://openmobilehub.github.io/android-omh-storage/docs/getting-started) guide.
 
 #### Caveats
 
