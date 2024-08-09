@@ -90,7 +90,7 @@ dependencies {
 
 ### 2. Implement the `OmhStorageClient` class
 
-To implement the [`OmhStorageClient`](https://miniature-adventure-4gle9ye.pages.github.io/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client) class, you will need to provide implementations for various functionalities specific to your storage provider. Use the existing plugins as references to guide you in developing your own plugin.
+To implement the [`OmhStorageClient`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client) class, you will need to provide implementations for various functionalities specific to your storage provider. Use the existing plugins as references to guide you in developing your own plugin.
 
 Here are some examples to help structure your implementation and integrate with different storage providers:
 
