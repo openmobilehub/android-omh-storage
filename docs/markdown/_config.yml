@@ -1,8 +1,8 @@
 title: Android OMH Storage
 email: contact@openmobilehub.com
 description: Android OMH Storage Official Documentation
-baseurl: "/docs"
-url: "https://miniature-adventure-4gle9ye.pages.github.io"
+baseurl: "/android-omh-storage/docs"
+url: "https://openmobilehub.github.io"
 github_username: openmobilehub
 
 theme: just-the-docs
