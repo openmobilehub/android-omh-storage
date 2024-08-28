@@ -26,7 +26,6 @@ import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
-import com.openmobilehub.android.storage.core.utils.toInputStream
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemResponseToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.ExceptionMapper
@@ -64,7 +63,13 @@ internal class OneDriveFileRepository(
 
     fun uploadFile(localFileToUpload: File, parentId: String): OmhStorageEntity? = try {
         val path = "$parentId:/${localFileToUpload.name}:"
-        val driveItem = apiService.uploadFile(localFileToUpload, path)
+
+        val driveItem = if (localFileToUpload.length() < 1) {
+            apiService.uploadFile(localFileToUpload, path)
+            apiService.getFile(path)
+        } else {
+            apiService.resumableUploadFile(localFileToUpload, path)
+        }
 
         driveItem?.let { driveItemToOmhStorageEntity(it) }
     } catch (exception: ApiException) {
@@ -190,10 +195,12 @@ internal class OneDriveFileRepository(
         val tempFile = File.createTempFile("tempFile", extension)
 
         try {
-            val inputStream = tempFile.toInputStream()
             val fullFileName = "$name.$extension"
+            val path = "$parentId:/$fullFileName:"
 
-            val driveItem = apiService.createNewFile(fullFileName, parentId, inputStream)
+            apiService.uploadFile(tempFile, path)
+
+            val driveItem = apiService.getFile(path)
 
             return driveItem?.let { driveItemToOmhStorageEntity(it) }
                 ?: throw OmhStorageException.ApiException(
@@ -227,10 +234,14 @@ internal class OneDriveFileRepository(
 
     fun updateFile(localFileToUpload: File, fileId: String): OmhStorageEntity {
         try {
-            apiService.uploadFile(localFileToUpload, fileId, "replace")
+            if (localFileToUpload.length() < 1) {
+                apiService.uploadFile(localFileToUpload, fileId, "replace")
+                apiService.getFile(fileId)
+            } else {
+                apiService.resumableUploadFile(localFileToUpload, fileId, "replace")
+            }
             // By default, the file name is not updated when uploading a new file version.
-            val res = renameFile(fileId, localFileToUpload.name, true)
-            return res
+            return renameFile(fileId, localFileToUpload.name, true)
         } catch (exception: ApiException) {
             throw ExceptionMapper.toOmhApiException(exception)
         }

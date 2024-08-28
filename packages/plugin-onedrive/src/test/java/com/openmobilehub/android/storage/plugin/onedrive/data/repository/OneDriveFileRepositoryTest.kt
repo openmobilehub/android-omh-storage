@@ -60,8 +60,9 @@ import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockk
+import io.mockk.just
 import io.mockk.mockkStatic
+import io.mockk.runs
 import io.mockk.slot
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -110,6 +111,9 @@ class OneDriveFileRepositoryTest {
     @MockK(relaxed = true)
     private lateinit var file: File
 
+    @MockK(relaxed = true)
+    private lateinit var emptyFile: File
+
     @MockK
     private lateinit var inputStream: InputStream
 
@@ -151,6 +155,9 @@ class OneDriveFileRepositoryTest {
             driveItemToOmhStorageEntity,
             driveItemResponseToOmhStorageEntity
         )
+
+        every { file.length() } returns 100
+        every { emptyFile.length() } returns 0
     }
 
     @After
@@ -189,11 +196,25 @@ class OneDriveFileRepositoryTest {
     @Test
     fun `given an api service returns DriveItem, when uploading the file, then returns OmhFile`() {
         // Arrange
-        every { apiService.uploadFile(any(), any()) } returns mockk<DriveItem>()
+        every { apiService.resumableUploadFile(any(), any()) } returns driveItem
         every { driveItemToOmhStorageEntity(any()) } returns omhStorageEntity
 
         // Act
         val result = repository.uploadFile(file, TEST_FILE_PARENT_ID)
+
+        // Assert
+        assertEquals(omhStorageEntity, result)
+    }
+
+    @Test
+    fun `given an api service returns DriveItem, when uploading empty the file, then returns OmhFile`() {
+        // Arrange
+        every { apiService.uploadFile(any(), any()) } just runs
+        every { apiService.getFile(any()) } returns driveItem
+        every { driveItemToOmhStorageEntity(any()) } returns omhStorageEntity
+
+        // Act
+        val result = repository.uploadFile(emptyFile, TEST_FILE_PARENT_ID)
 
         // Assert
         assertEquals(omhStorageEntity, result)
@@ -464,9 +485,10 @@ class OneDriveFileRepositoryTest {
     }
 
     @Test
-    fun `given an apiService returns a drive item, when creating a file, then return an OmhStorageEntity`() {
+    fun `given an apiService returns a drive item, when getting a file after creation, then return an OmhStorageEntity`() {
         // Arrange
-        every { apiService.createNewFile(any(), any(), any()) } returns driveItem
+        every { apiService.uploadFile(any(), any(), any()) } just runs
+        every { apiService.getFile(any()) } returns driveItem
         every { driveItemToOmhStorageEntity(any()) } returns omhStorageEntity
 
         // Act
@@ -477,9 +499,10 @@ class OneDriveFileRepositoryTest {
     }
 
     @Test(expected = OmhStorageException.ApiException::class)
-    fun `given an apiService returns null, when creating a file, then an ApiException is thrown`() {
+    fun `given an apiService returns null, when getting a file after creation, then an ApiException is thrown`() {
         // Arrange
-        every { apiService.createNewFile(any(), any(), any()) } returns null
+        every { apiService.uploadFile(any(), any(), any()) } just runs
+        every { apiService.getFile(any()) } returns null
 
         // Act & Assert
         repository.createFile(TEST_FILE_NAME, TEST_FILE_EXTENSION, TEST_FILE_PARENT_ID)
@@ -488,7 +511,7 @@ class OneDriveFileRepositoryTest {
     @Test(expected = OmhStorageException.ApiException::class)
     fun `given an apiService throws an exception, when creating a file, then an ApiException is thrown`() {
         // Arrange
-        every { apiService.createNewFile(any(), any(), any()) } throws OmhStorageException.ApiException()
+        every { apiService.uploadFile(any(), any(), any()) } throws OmhStorageException.ApiException()
 
         // Act & Assert
         repository.createFile(TEST_FILE_NAME, TEST_FILE_EXTENSION, TEST_FILE_PARENT_ID)
@@ -531,7 +554,7 @@ class OneDriveFileRepositoryTest {
     @Test
     fun `given an apiService uploads and renames file, when updating the file, then return an OmhStorageEntity`() {
         // Arrange
-        every { apiService.uploadFile(any(), any(), any()) } returns driveItem
+        every { apiService.resumableUploadFile(any(), any(), any()) } returns driveItem
         every { apiService.updateFileMetadata(any(), any()) } returns driveItem
         every { driveItemToOmhStorageEntity(any()) } returns omhStorageEntity
 
@@ -542,19 +565,43 @@ class OneDriveFileRepositoryTest {
         assertEquals(omhStorageEntity, result)
     }
 
+    @Test
+    fun `given an apiService uploads and renames file, when updating the empty file, then return an OmhStorageEntity`() {
+        // Arrange
+        every { apiService.uploadFile(any(), any(), any()) } just runs
+        every { apiService.getFile(any()) } returns driveItem
+        every { apiService.updateFileMetadata(any(), any()) } returns driveItem
+        every { driveItemToOmhStorageEntity(any()) } returns omhStorageEntity
+
+        // Act
+        val result = repository.updateFile(emptyFile, TEST_FILE_ID)
+
+        // Assert
+        assertEquals(omhStorageEntity, result)
+    }
+
     @Test(expected = OmhStorageException.ApiException::class)
     fun `given an apiService throws an exception, when uploading a file, then an ApiException is thrown`() {
         // Arrange
-        every { apiService.uploadFile(any(), any(), any()) } throws apiException
+        every { apiService.resumableUploadFile(any(), any(), any()) } throws apiException
 
         // Act & Assert
         repository.updateFile(file, TEST_FILE_ID)
     }
 
     @Test(expected = OmhStorageException.ApiException::class)
+    fun `given an apiService throws an exception, when uploading a empty file, then an ApiException is thrown`() {
+        // Arrange
+        every { apiService.uploadFile(any(), any(), any()) } throws apiException
+
+        // Act & Assert
+        repository.updateFile(emptyFile, TEST_FILE_ID)
+    }
+
+    @Test(expected = OmhStorageException.ApiException::class)
     fun `given an apiService throws an exception, when updating a file metadata, then an ApiException is thrown`() {
         // Arrange
-        every { apiService.uploadFile(any(), any(), any()) } returns driveItem
+        every { apiService.resumableUploadFile(any(), any(), any()) } returns driveItem
         every { apiService.updateFileMetadata(any(), any()) } throws apiException
 
         // Act & Assert
@@ -565,7 +612,7 @@ class OneDriveFileRepositoryTest {
     fun `given an apiService throws 412 exceptions when updating a file metadata, then the call is retried`() {
         // Arrange
         every { apiException.responseStatusCode } returns 412
-        every { apiService.uploadFile(any(), any(), any()) } returns driveItem
+        every { apiService.resumableUploadFile(any(), any(), any()) } returns driveItem
         every { apiService.updateFileMetadata(any(), any()) } throws apiException
 
         // Act
@@ -579,7 +626,7 @@ class OneDriveFileRepositoryTest {
     fun `given an apiService return drive Item from retried call, when updating the file, then return an OmhStorageEntity`() {
         // Arrange
         every { apiException.responseStatusCode } returns 412
-        every { apiService.uploadFile(any(), any(), any()) } returns driveItem
+        every { apiService.resumableUploadFile(any(), any(), any()) } returns driveItem
         every { apiService.updateFileMetadata(any(), any()) } throws apiException andThen driveItem
         every { driveItemToOmhStorageEntity(any()) } returns omhStorageEntity
 

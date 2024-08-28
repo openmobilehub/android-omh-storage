@@ -25,6 +25,8 @@ import com.microsoft.graph.models.DriveItemVersionCollectionResponse
 import com.microsoft.graph.models.Permission
 import com.microsoft.graph.models.UploadSession
 import com.microsoft.kiota.ApiException
+import com.microsoft.kiota.RequestAdapter
+import com.microsoft.kiota.RequestInformation
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.utils.toInputStream
 import com.openmobilehub.android.storage.plugin.onedrive.OneDriveConstants.WRITE_ROLE
@@ -64,9 +66,6 @@ class OneDriveRestApiServiceTest {
     private lateinit var file: File
 
     @MockK
-    private lateinit var fileInputStream: FileInputStream
-
-    @MockK
     private lateinit var uploadSession: UploadSession
 
     @MockK
@@ -80,6 +79,12 @@ class OneDriveRestApiServiceTest {
 
     @MockK
     private lateinit var permission: Permission
+
+    @MockK(relaxed = true)
+    private lateinit var requestInformation: RequestInformation
+
+    @MockK(relaxed = true)
+    private lateinit var requestAdapter: RequestAdapter
 
     private lateinit var apiService: OneDriveApiService
 
@@ -134,7 +139,7 @@ class OneDriveRestApiServiceTest {
         every { apiClient.uploadFile(any(), any(), any()) } returns uploadResult
 
         // Act
-        val result = apiService.uploadFile(file, TEST_FILE_PARENT_ID)
+        val result = apiService.resumableUploadFile(file, TEST_FILE_PARENT_ID)
 
         // Assert
         Assert.assertNull(result)
@@ -154,7 +159,7 @@ class OneDriveRestApiServiceTest {
         every { apiClient.uploadFile(any(), any(), any()) } returns uploadResult
 
         // Act
-        val result = apiService.uploadFile(file, TEST_FILE_PARENT_ID)
+        val result = apiService.resumableUploadFile(file, TEST_FILE_PARENT_ID)
 
         // Assert
         Assert.assertEquals(driveItem, result)
@@ -366,24 +371,22 @@ class OneDriveRestApiServiceTest {
     }
 
     @Test
-    fun `given apiClient, when creating a new file, then return drive item`() {
+    fun `given apiClient, when uploading a new file, `() {
         // Arrange
         every {
-            apiClient.graphServiceClient.drives()
-                .byDriveId(any())
-                .items()
-                .byDriveItemId(any())
-                .children()
-                .byDriveItemId1(any())
-                .content()
-                .put(any())
-        } returns driveItem
+            apiClient.graphServiceClient.drives().byDriveId(any()).items().byDriveItemId(any()).content().toPutRequestInformation(
+                any()
+            )
+        } returns requestInformation
+        every { requestInformation.uri } returns URI("test-uri")
+        every { apiClient.graphServiceClient.requestAdapter } returns requestAdapter
+        every { requestAdapter.sendPrimitive<InputStream>(any(), any(), any()) } returns mockk()
 
         // Act
-        val result = apiService.createNewFile(TEST_FILE_NAME, TEST_FILE_PARENT_ID, fileInputStream)
+        apiService.uploadFile(file, "$TEST_FILE_PARENT_ID:/$TEST_FILE_NAME:")
 
         // Assert
-        Assert.assertEquals(driveItem, result)
+        verify { requestAdapter.sendPrimitive(any(), any(), InputStream::class.java) }
     }
 
     @Test
