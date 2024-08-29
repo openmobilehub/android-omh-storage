@@ -207,7 +207,7 @@ class OneDriveFileRepositoryTest {
     }
 
     @Test
-    fun `given an api service returns DriveItem, when uploading empty the file, then returns OmhFile`() {
+    fun `given an api service returns DriveItem, when uploading the empty file, then returns OmhFile`() {
         // Arrange
         every { apiService.uploadFile(any(), any()) } just runs
         every { apiService.getFile(any()) } returns driveItem

@@ -167,6 +167,7 @@ internal class OneDriveApiService(private val apiClient: OneDriveApiClient) {
         path: String,
         conflictBehavior: String = "rename"
     ) {
+        // https://github.com/microsoftgraph/msgraph-sdk-java/blob/beae78c1ffc0c67a6a97651060c23a1287973997/docs/upgrade-to-v6.md#upload-a-small-file-with-conflictbehavior-set
         val inputStream = file.toInputStream()
 
         val requestInformation = apiClient.graphServiceClient.drives()

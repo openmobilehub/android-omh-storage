@@ -371,7 +371,7 @@ class OneDriveRestApiServiceTest {
     }
 
     @Test
-    fun `given apiClient, when uploading a new file, `() {
+    fun `given apiClient, when uploading a file, sendPrimitive is called `() {
         // Arrange
         every {
             apiClient.graphServiceClient.drives().byDriveId(any()).items().byDriveItemId(any()).content().toPutRequestInformation(
