@@ -205,6 +205,30 @@ internal class NonGmsFileRepositoryTest {
         }
 
     @Test
+    fun `given a File and a fileId, when initializeResumableUpdate is success and location header is present, then a upload url is returned`() =
+        runTest {
+            val localFileUpload: File = mockk()
+            every { localFileUpload.name } returns TEST_FILE_NAME
+            every { localFileUpload.path } returns FILE_PATH
+            val headers = Headers.Builder().add("Location", UPLOAD_URL).build()
+
+            coEvery {
+                googleStorageApiService.putResumableUpload(
+                    any(),
+                    any()
+                )
+            } returns Response.success(
+                responseBody,
+                headers
+            )
+
+            val result =
+                fileRepositoryImpl.initializeResumableUpdate(localFileUpload, TEST_FILE_ID)
+
+            assertEquals(UPLOAD_URL, result)
+        }
+
+    @Test
     fun `given valid uploadUrl and 1mb file, when uploadFile is called, then returns OmhStorageEntity`() =
         runTest {
             val fileSize = 1 * 1024 * 1024
@@ -224,7 +248,7 @@ internal class NonGmsFileRepositoryTest {
                 testFileRemote
             )
 
-            val result = fileRepositoryImpl.uploadFile(UPLOAD_URL, file)
+            val result = fileRepositoryImpl.uploadFileChunks(UPLOAD_URL, file)
 
             assertEquals(testOmhFile, result)
             coVerify(exactly = 1) {
@@ -270,7 +294,7 @@ internal class NonGmsFileRepositoryTest {
                 )
             )
 
-            val result = fileRepositoryImpl.uploadFile(UPLOAD_URL, file)
+            val result = fileRepositoryImpl.uploadFileChunks(UPLOAD_URL, file)
 
             assertEquals(testOmhFile, result)
             coVerify(exactly = 2) {
@@ -323,27 +347,6 @@ internal class NonGmsFileRepositoryTest {
 
             assertEquals(expectedResult, result)
             coVerify { googleStorageApiService.exportFile(any(), any()) }
-        }
-
-    @Test
-    fun `given a File and a file id, when updateFile is success, then a OmhStorageEntity is returned`() =
-        runTest {
-            coEvery { googleStorageApiService.updateFile(any(), any()) } returns Response.success(
-                testFileRemote
-            )
-            coEvery {
-                googleStorageApiService.updateMetaData(
-                    any(),
-                    any()
-                )
-            } returns Response.success(
-                testFileRemote
-            )
-
-            val result = fileRepositoryImpl.updateFile(File(FILE_PATH), TEST_FILE_ID)
-
-            assertEquals(testOmhFile, result)
-            coVerify { googleStorageApiService.updateFile(any(), any()) }
         }
 
     @Test(expected = OmhStorageException.ApiException::class)
@@ -432,6 +435,45 @@ internal class NonGmsFileRepositoryTest {
         }
 
     @Test(expected = OmhStorageException.ApiException::class)
+    fun `given a File and a fileId, when initializeResumableUpdate is success, but location header is not present, then an OmhApiException is thrown`() =
+        runTest {
+            val localFileUpload: File = mockk()
+            every { localFileUpload.name } returns TEST_FILE_NAME
+            every { localFileUpload.path } returns FILE_PATH
+
+            val headers = Headers.Builder().build() // No location header
+
+            coEvery {
+                googleStorageApiService.putResumableUpload(
+                    any(),
+                    any()
+                )
+            } returns Response.success(
+                responseBody,
+                headers
+            )
+
+            fileRepositoryImpl.initializeResumableUpdate(localFileUpload, TEST_FILE_ID)
+        }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given a File and a fileId, when initializeResumableUpdate fails, then an OmhApiException is thrown`() =
+        runTest {
+            val localFileUpload: File = mockk()
+            every { localFileUpload.name } returns TEST_FILE_NAME
+            every { localFileUpload.path } returns FILE_PATH
+
+            coEvery {
+                googleStorageApiService.putResumableUpload(
+                    any(),
+                    any()
+                )
+            } returns Response.error(500, responseBody)
+
+            fileRepositoryImpl.initializeResumableUpdate(localFileUpload, TEST_FILE_ID)
+        }
+
+    @Test(expected = OmhStorageException.ApiException::class)
     fun `given valid uploadUrl and 1mb file, when uploadFile is success, but response cannot be parsed to OmhStorageEntity, then an OmhApiException is thrown`() =
         runTest {
             val fileSize = 1 * 1024 * 1024
@@ -451,7 +493,7 @@ internal class NonGmsFileRepositoryTest {
                 null
             )
 
-            fileRepositoryImpl.uploadFile(UPLOAD_URL, file)
+            fileRepositoryImpl.uploadFileChunks(UPLOAD_URL, file)
         }
 
     @Test(expected = OmhStorageException.ApiException::class)
@@ -475,7 +517,7 @@ internal class NonGmsFileRepositoryTest {
                 responseBody
             )
 
-            fileRepositoryImpl.uploadFile(UPLOAD_URL, file)
+            fileRepositoryImpl.uploadFileChunks(UPLOAD_URL, file)
         }
 
     @Test(expected = OmhStorageException.ApiException::class)
@@ -508,23 +550,6 @@ internal class NonGmsFileRepositoryTest {
             )
 
             fileRepositoryImpl.exportFile(TEST_FILE_ID, TEST_FILE_MIME_TYPE)
-        }
-
-    @Test(expected = OmhStorageException.ApiException::class)
-    fun `given a File and a file id, when updateFile fails, then a UpdateException is thrown`() =
-        runTest {
-            val localFileUpload = File(FILE_PATH)
-            coEvery {
-                googleStorageApiService.updateFile(
-                    any(),
-                    any()
-                )
-            } returns Response.error(
-                500,
-                responseBody
-            )
-
-            fileRepositoryImpl.updateFile(localFileUpload, TEST_FILE_ID)
         }
 
     @Test
@@ -919,5 +944,97 @@ internal class NonGmsFileRepositoryTest {
             )
 
             fileRepositoryImpl.getWebUrl(TEST_VERSION_FILE_ID)
+        }
+
+    @Test
+    fun `given an empty file and parent Id, when simplyUploadFile is success, then return OmhStorageEntity`() =
+        runTest {
+            val fileSize = 0
+            every { file.length() } returns fileSize.toLong()
+
+            every { file.toInputStream() } returns fileInputStream
+            every { fileInputStream.read(any(), any(), any()) } returns fileSize
+
+            coEvery {
+                googleStorageApiService.uploadFile(
+                    any(),
+                    any()
+                )
+            } returns Response.success(
+                testFileRemote
+            )
+
+            val result = fileRepositoryImpl.simplyUploadFile(file, TEST_FILE_PARENT_ID)
+
+            assertEquals(testOmhFile, result)
+        }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given an empty file and parent Id, when simplyUploadFile fails, then ApiException is thrown`() =
+        runTest {
+            val fileSize = 0
+            every { file.length() } returns fileSize.toLong()
+
+            every { file.toInputStream() } returns fileInputStream
+            every { fileInputStream.read(any(), any(), any()) } returns fileSize
+
+            coEvery {
+                googleStorageApiService.uploadFile(
+                    any(),
+                    any()
+                )
+            } returns Response.error(
+                500,
+                responseBody
+            )
+
+            fileRepositoryImpl.simplyUploadFile(file, TEST_FILE_PARENT_ID)
+        }
+
+    @Test
+    fun `given an empty file and parent Id, when simplyUpdateFile is success, then return OmhStorageEntity`() =
+        runTest {
+            val fileSize = 0
+            every { file.length() } returns fileSize.toLong()
+
+            every { file.toInputStream() } returns fileInputStream
+            every { fileInputStream.read(any(), any(), any()) } returns fileSize
+
+            coEvery {
+                googleStorageApiService.updateFile(
+                    any(),
+                    any(),
+                    any()
+                )
+            } returns Response.success(
+                testFileRemote
+            )
+
+            val result = fileRepositoryImpl.simplyUpdateFile(file, TEST_FILE_ID)
+
+            assertEquals(testOmhFile, result)
+        }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `given an empty file and parent Id, when simplyUpdateFile fails, then ApiException is thrown`() =
+        runTest {
+            val fileSize = 0
+            every { file.length() } returns fileSize.toLong()
+
+            every { file.toInputStream() } returns fileInputStream
+            every { fileInputStream.read(any(), any(), any()) } returns fileSize
+
+            coEvery {
+                googleStorageApiService.updateFile(
+                    any(),
+                    any(),
+                    any()
+                )
+            } returns Response.error(
+                500,
+                responseBody
+            )
+
+            fileRepositoryImpl.simplyUploadFile(file, TEST_FILE_ID)
         }
 }

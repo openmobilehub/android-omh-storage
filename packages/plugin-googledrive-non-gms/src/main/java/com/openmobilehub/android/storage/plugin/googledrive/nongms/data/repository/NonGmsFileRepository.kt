@@ -42,6 +42,7 @@ import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.to
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.toByteArrayOutputStream
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.toOmhStorageEntityMetadata
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
@@ -57,6 +58,7 @@ internal class NonGmsFileRepository(
 
     companion object {
         private const val FILE_NAME_KEY = "name"
+        private const val MIME_TYPE_KEY = "mimeType"
         private const val FILE_PARENTS_KEY = "parents"
         private const val FILE_TRASHED_KEY = "trashed"
         private const val MEDIA = "media"
@@ -144,8 +146,24 @@ internal class NonGmsFileRepository(
         localFileToUpload: File,
         parentId: String?
     ): OmhStorageEntity? {
-        val uploadUrl = initializeResumableUpload(localFileToUpload, parentId)
-        return uploadFile(uploadUrl, localFileToUpload)
+        if (localFileToUpload.length() < 1) {
+            return simplyUploadFile(localFileToUpload, parentId)
+        } else {
+            val uploadUrl = initializeResumableUpload(localFileToUpload, parentId)
+            return uploadFileChunks(uploadUrl, localFileToUpload)
+        }
+    }
+
+    suspend fun updateFile(
+        localFileToUpload: File,
+        fileId: String
+    ): OmhStorageEntity.OmhFile {
+        if (localFileToUpload.length() < 1) {
+            return simplyUpdateFile(localFileToUpload, fileId) as OmhStorageEntity.OmhFile
+        } else {
+            val uploadUrl = initializeResumableUpdate(localFileToUpload, fileId)
+            return uploadFileChunks(uploadUrl, localFileToUpload) as OmhStorageEntity.OmhFile
+        }
     }
 
     @VisibleForTesting
@@ -182,7 +200,33 @@ internal class NonGmsFileRepository(
     }
 
     @VisibleForTesting
-    suspend fun uploadFile(
+    suspend fun initializeResumableUpdate(
+        localFileToUpload: File,
+        fileId: String
+    ): String {
+        val jsonMetaData = JSONObject().apply {
+            put(FILE_NAME_KEY, localFileToUpload.name)
+            put(MIME_TYPE_KEY, localFileToMimeType(localFileToUpload) ?: DEFAULT_UPLOAD_MIME_TYPE)
+        }
+
+        val jsonRequestBody = jsonMetaData.toString().toRequestBody(JSON_MIME_TYPE)
+
+        val response = retrofitImpl
+            .getGoogleStorageApiService()
+            .putResumableUpload(fileId = fileId, body = jsonRequestBody)
+
+        if (!response.isSuccessful) {
+            throw response.toApiException()
+        }
+
+        return response.headers()[LOCATION_HEADER]
+            ?: throw OmhStorageException.ApiException(
+                message = "Location header is missing from the response"
+            )
+    }
+
+    @VisibleForTesting
+    suspend fun uploadFileChunks(
         uploadUrl: String,
         file: File,
     ): OmhStorageEntity? {
@@ -236,6 +280,78 @@ internal class NonGmsFileRepository(
         return null
     }
 
+    @VisibleForTesting
+    suspend fun simplyUploadFile(
+        localFileToUpload: File,
+        parentId: String?
+    ): OmhStorageEntity? {
+        val mimeType = localFileToMimeType(localFileToUpload) ?: DEFAULT_UPLOAD_MIME_TYPE
+
+        val parentsList = if (parentId.isNullOrBlank()) {
+            emptyList()
+        } else {
+            listOf(parentId)
+        }
+        val parentsListAsJson = JSONArray(parentsList)
+
+        val jsonMetaData = JSONObject().apply {
+            put(FILE_NAME_KEY, localFileToUpload.name)
+            put(FILE_PARENTS_KEY, parentsListAsJson)
+        }
+
+        val jsonRequestBody = jsonMetaData.toString().toRequestBody(JSON_MIME_TYPE)
+        val metadataPart = MultipartBody.Part.createFormData("metadata", null, jsonRequestBody)
+
+        val fileRequestBody = localFileToUpload.asRequestBody(mimeType.toMediaTypeOrNull())
+        val filePart = MultipartBody.Part.createFormData("media", localFileToUpload.name, fileRequestBody)
+
+        val response = retrofitImpl
+            .getGoogleStorageApiService()
+            .uploadFile(
+                metadata = metadataPart,
+                file = filePart
+            )
+
+        return if (response.isSuccessful) {
+            response.body()?.toOmhStorageEntity()
+        } else {
+            throw response.toApiException()
+        }
+    }
+
+    @VisibleForTesting
+    suspend fun simplyUpdateFile(
+        localFileToUpload: File,
+        fileId: String
+    ): OmhStorageEntity? {
+        val mimeType = localFileToMimeType(localFileToUpload) ?: DEFAULT_UPLOAD_MIME_TYPE
+
+        val jsonMetaData = JSONObject().apply {
+            put(FILE_NAME_KEY, localFileToUpload.name)
+            put(MIME_TYPE_KEY, mimeType)
+        }
+
+        val jsonRequestBody = jsonMetaData.toString().toRequestBody(JSON_MIME_TYPE)
+        val metadataPart = MultipartBody.Part.createFormData("metadata", null, jsonRequestBody)
+
+        val fileRequestBody = localFileToUpload.asRequestBody(mimeType.toMediaTypeOrNull())
+        val filePart = MultipartBody.Part.createFormData("media", localFileToUpload.name, fileRequestBody)
+
+        val response = retrofitImpl
+            .getGoogleStorageApiService()
+            .updateFile(
+                fileId = fileId,
+                metadata = metadataPart,
+                file = filePart
+            )
+
+        return if (response.isSuccessful) {
+            response.body()?.toOmhStorageEntity()
+        } else {
+            throw response.toApiException()
+        }
+    }
+
     suspend fun downloadFile(fileId: String): ByteArrayOutputStream {
         val response = retrofitImpl
             .getGoogleStorageApiService()
@@ -255,50 +371,6 @@ internal class NonGmsFileRepository(
 
         return if (response.isSuccessful) {
             response.body().toByteArrayOutputStream()
-        } else {
-            throw response.toApiException()
-        }
-    }
-
-    suspend fun updateFile(
-        localFileToUpload: File,
-        fileId: String
-    ): OmhStorageEntity.OmhFile? {
-        val jsonMetaData = JSONObject().apply {
-            put(FILE_NAME_KEY, localFileToUpload.name)
-        }
-
-        val jsonRequestBody = jsonMetaData.toString().toRequestBody(JSON_MIME_TYPE)
-        val response = retrofitImpl
-            .getGoogleStorageApiService()
-            .updateMetaData(jsonRequestBody, fileId)
-
-        return if (response.isSuccessful) {
-            val omhStorageEntity = response.body()?.toOmhStorageEntity() ?: return null
-            updateMediaFile(localFileToUpload, omhStorageEntity)
-        } else {
-            throw response.toApiException()
-        }
-    }
-
-    private suspend fun updateMediaFile(
-        localFileToUpload: File,
-        omhStorageEntity: OmhStorageEntity
-    ): OmhStorageEntity.OmhFile? {
-        val mimeType =
-            if (omhStorageEntity is OmhStorageEntity.OmhFile) {
-                omhStorageEntity.mimeType?.toMediaTypeOrNull()
-            } else {
-                null
-            }
-        val requestFile = localFileToUpload.asRequestBody(mimeType)
-
-        val response = retrofitImpl
-            .getGoogleStorageApiService()
-            .updateFile(requestFile, omhStorageEntity.id)
-
-        return if (response.isSuccessful) {
-            response.body()?.toOmhStorageEntity() as? OmhStorageEntity.OmhFile
         } else {
             throw response.toApiException()
         }

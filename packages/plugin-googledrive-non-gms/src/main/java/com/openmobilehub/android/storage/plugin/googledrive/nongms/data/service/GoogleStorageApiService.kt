@@ -25,6 +25,7 @@ import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.PermissionsListResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.RevisionListRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.WebUrlResponse
+import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -32,9 +33,11 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 import retrofit2.http.Url
@@ -111,10 +114,22 @@ internal interface GoogleStorageApiService {
         @Query(QUERY_MIME_TYPE) mimeType: String
     ): Response<ResponseBody>
 
+    @Multipart
+    @POST(UPLOAD_FILES_PARTICLE)
+    suspend fun uploadFile(
+        @Part metadata: MultipartBody.Part,
+        @Part file: MultipartBody.Part,
+        @Query("uploadType") uploadType: String = "multipart",
+        @Query(QUERY_FIELDS) fields: String = QUERY_REQUESTED_FIELDS,
+    ): Response<FileRemoteResponse>
+
+    @Multipart
     @PATCH("$UPLOAD_FILES_PARTICLE/{$FILE_ID}")
     suspend fun updateFile(
-        @Body filePart: RequestBody,
         @Path(FILE_ID) fileId: String,
+        @Part metadata: MultipartBody.Part,
+        @Part file: MultipartBody.Part,
+        @Query("uploadType") uploadType: String = "multipart",
         @Query(QUERY_FIELDS) fields: String = QUERY_REQUESTED_FIELDS,
     ): Response<FileRemoteResponse>
 
@@ -178,6 +193,14 @@ internal interface GoogleStorageApiService {
 
     @POST(UPLOAD_FILES_PARTICLE)
     suspend fun postResumableUpload(
+        @Body body: RequestBody,
+        @Query(QUERY_UPLOAD_TYPE) uploadType: String = "resumable",
+        @Query(QUERY_FIELDS) fields: String = QUERY_REQUESTED_FIELDS,
+    ): Response<ResponseBody>
+
+    @PUT("$UPLOAD_FILES_PARTICLE/{$FILE_ID}")
+    suspend fun putResumableUpload(
+        @Path(FILE_ID) fileId: String,
         @Body body: RequestBody,
         @Query(QUERY_UPLOAD_TYPE) uploadType: String = "resumable",
         @Query(QUERY_FIELDS) fields: String = QUERY_REQUESTED_FIELDS,
