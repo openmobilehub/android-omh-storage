@@ -29,8 +29,8 @@ import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.utils.toInputStream
 import com.openmobilehub.android.storage.plugin.onedrive.OneDriveConstants
 import java.io.File
-import java.io.FileInputStream
 import java.io.InputStream
+import java.net.URI
 import javax.net.ssl.HttpsURLConnection.HTTP_UNAUTHORIZED
 
 @Suppress("TooManyFunctions")
@@ -43,7 +43,11 @@ internal class OneDriveApiService(private val apiClient: OneDriveApiClient) {
             .byDriveItemId(parentId).children().get().value
     }
 
-    fun uploadFile(file: File, path: String, conflictBehavior: String = "rename"): DriveItem? {
+    fun resumableUploadFile(
+        file: File,
+        path: String,
+        conflictBehavior: String = "rename"
+    ): DriveItem? {
         val fileStream = file.toInputStream()
 
         val uploadSessionRequest = CreateUploadSessionPostRequestBody().apply {
@@ -158,19 +162,27 @@ internal class OneDriveApiService(private val apiClient: OneDriveApiClient) {
             )
     }
 
-    fun createNewFile(
-        fileName: String,
-        parentId: String,
-        inputStream: FileInputStream
-    ): DriveItem? {
-        return apiClient.graphServiceClient.drives()
+    fun uploadFile(
+        file: File,
+        path: String,
+        conflictBehavior: String = "rename"
+    ) {
+        // https://github.com/microsoftgraph/msgraph-sdk-java/blob/beae78c1ffc0c67a6a97651060c23a1287973997/docs/upgrade-to-v6.md#upload-a-small-file-with-conflictbehavior-set
+        val inputStream = file.toInputStream()
+
+        val requestInformation = apiClient.graphServiceClient.drives()
             .byDriveId(driveId)
             .items()
-            .byDriveItemId(parentId)
-            .children()
-            .byDriveItemId1(fileName)
+            .byDriveItemId(path)
             .content()
-            .put(inputStream)
+            .toPutRequestInformation(inputStream)
+
+        val uriIncludesConflictBehavior =
+            URI(requestInformation.uri.toString() + "?@microsoft.graph.conflictBehavior=$conflictBehavior")
+        requestInformation.uri = uriIncludesConflictBehavior
+
+        apiClient.graphServiceClient.requestAdapter
+            .sendPrimitive(requestInformation, null, InputStream::class.java)
     }
 
     fun updateFileMetadata(fileId: String, driveItem: DriveItem): DriveItem {
