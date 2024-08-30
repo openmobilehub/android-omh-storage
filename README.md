@@ -17,7 +17,7 @@
 
 ---
 
-**Android OMH Storage** streamlines the integration of various cloud storage providers into your Android application by offering a unified API for different storage providers. It supports both Google Mobile Services (GMS) and non-GMS configurations, making it easy to incorporate Google Drive, OneDrive, Dropbox, and other supported third-party storage providers.
+**Android OMH Storage** streamlines the integration of various cloud storage providers into your Android application by offering a unified API for different storage providers. It supports both Google Mobile Services (GMS) and non-GMS configurations, making it easy to incorporate Google Drive, OneDrive and Dropbox storage providers.
 
 ## Features
 
@@ -31,11 +31,11 @@
 
 This is the main directory of the mono-repo for Android OMH Storage. If you're searching for a particular package, please click on the corresponding package link below.
 
-- [Core](https://github.com/openmobilehub/android-omh-storage/blob/main/packages/core/README.md)
-- [Google Drive (GMS)](https://github.com/openmobilehub/android-omh-storage/blob/main/packages/plugin-googledrive-gms/README.md)
-- [Google Drive (non-GMS)](https://github.com/openmobilehub/android-omh-storage/blob/main/packages/plugin-googledrive-non-gms/README.md)
-- [OneDrive](https://github.com/openmobilehub/android-omh-storage/blob/main/packages/plugin-onedrive/README.md)
-- [Dropbox](https://github.com/openmobilehub/android-omh-storage/blob/main/packages/plugin-dropbox/README.md)
+- [Core](https://openmobilehub.github.io/android-omh-storage/docs/core)
+- [Google Drive (GMS)](https://openmobilehub.github.io/android-omh-storage/docs/plugin-googledrive-gms)
+- [Google Drive (non-GMS)](https://openmobilehub.github.io/android-omh-storage/docs/plugin-googledrive-non-gms)
+- [OneDrive](https://openmobilehub.github.io/android-omh-storage/docs/plugin-onedrive)
+- [Dropbox](https://openmobilehub.github.io/android-omh-storage/docs/plugin-dropbox)
 
 ## Documentation
 
@@ -49,23 +49,22 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 - ❌ - not supported
 
 | Features                     | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
-|------------------------------|:------------------:|:----------------------:|:--------:|:-------:|
-| File listing                 |         ✅          |           ✅          |    ✅    |    ✅   |
-| File searching               |         ✅          |           ✅          |    🟨    |    ✅   |
-| Folder creation              |         ✅          |           ✅          |    ✅    |    ✅   |
-| File creation (by mime type) |         ✅          |           ✅          |    ❌    |    ❌   |
-| File creation (by extension) |         ❌          |           ❌          |    ✅    |    ✅   |
-| File update                  |         ✅          |           ✅          |    ✅    |    ✅   |
-| File deletion                |         ✅          |           ✅          |    ✅    |    ✅   |
-| File permanent deletion      |         ✅          |           ✅          |    ❌    |    ❌   |
-| File upload                  |         ✅          |           ✅          |    ✅    |    ✅   |
-| File download                |         ✅          |           ✅          |    ✅    |    ✅   |
-| File export                  |         ✅          |           ✅          |    ❌    |    ❌   |
-| File metadata                |         ✅          |           ✅          |    🟨    |    🟨   |
-| File versioning              |         ✅          |           ✅          |    ✅    |    ✅   |
-| File permissions             |         🟨          |           🟨          |    🟨    |    🟨   |
-| File URL                     |         ✅          |           ✅          |    ✅    |    ✅   |
-
+| ---------------------------- | :----------------: | :--------------------: | :------: | :-----: |
+| File listing                 |         ✅         |           ✅           |    ✅    |   ✅    |
+| File searching               |         ✅         |           ✅           |    ✅    |   ✅    |
+| Folder creation              |         ✅         |           ✅           |    ✅    |   ✅    |
+| File creation (by mime type) |         ✅         |           ✅           |    ❌    |   ❌    |
+| File creation (by extension) |         ❌         |           ❌           |    ✅    |   ✅    |
+| File update                  |         ✅         |           ✅           |    ✅    |   ✅    |
+| File deletion                |         ✅         |           ✅           |    ✅    |   ✅    |
+| File permanent deletion      |         ✅         |           ✅           |    ❌    |   ❌    |
+| File upload                  |         ✅         |           ✅           |    ✅    |   ✅    |
+| File download                |         ✅         |           ✅           |    ✅    |   ✅    |
+| File export                  |         ✅         |           ✅           |    ❌    |   ❌    |
+| File metadata                |         ✅         |           ✅           |    🟨    |   🟨    |
+| File versioning              |         ✅         |           ✅           |    ✅    |   ✅    |
+| File permissions             |         🟨         |           🟨           |    🟨    |   🟨    |
+| File URL                     |         ✅         |           ✅           |    ✅    |   ✅    |
 
 ### File metadata
 
@@ -107,22 +106,6 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 
 </details>
 
-### File versioning
-
-<details markdown=1>
-
-<summary>Show details</summary>
-
-[`OmhFileVersion`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-file-version)
-
-| Property     | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
-| ------------ | :----------------: | :--------------------: | :------: | :-----: |
-| fieldId      |         ✅         |           ✅           |    ✅    |   ✅    |
-| versionId    |         ✅         |           ✅           |    ✅    |   ✅    |
-| lastModified |         ✅         |           ✅           |    ✅    |   ✅    |
-
-</details>
-
 ### File permissions
 
 <details markdown=1>
@@ -132,89 +115,77 @@ This is the main directory of the mono-repo for Android OMH Storage. If you're s
 [`OmhPermission.IdentityPermission`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-permission/-identity-permission)
 
 | Property    | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
-|-------------|:------------------:|:----------------------:|:--------:|:-------:|
-| id          |         ✅         |           ✅           |    ✅    |    🟨   |
-| role        |         ✅         |           ✅           |    ✅    |    ✅   |
-| isInherited |         🟨         |           🟨           |    ✅    |    ✅   |
-| identity    |         ✅         |           ✅           |    ✅    |    ✅   |
+| ----------- | :----------------: | :--------------------: | :------: | :-----: |
+| id          |         ✅         |           ✅           |    ✅    |   🟨    |
+| role        |         ✅         |           ✅           |    ✅    |   ✅    |
+| isInherited |         🟨         |           🟨           |    ✅    |   ✅    |
+| identity    |         ✅         |           ✅           |    ✅    |   ✅    |
 
-> Google Drive: `isInherited` is present only for shared drive items.
-> Dropbox: `id` equals to underlying identity ID.
+> **Google Drive**: The `isInherited` property is available only for items in shared drives.
+
+> **Dropbox**: The `id` corresponds to the underlying identity ID.
 
 [`OmhIdentity`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-identity)
 
 | Type        | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
-|-------------|:------------------:|:----------------------:|:--------:|:-------:|
-| User        |         ✅         |           ✅           |    ✅    |    ✅   |
-| Group       |         ✅         |           ✅           |    ✅    |    ✅   |
-| Domain      |         ✅         |           ✅           |    ❌    |    ❌   |
-| Anyone      |         ✅         |           ✅           |    ❌    |    ❌   |
-| Device      |         ❌         |           ❌           |    ✅    |    ❌   |
-| Application |         ❌         |           ❌           |    ✅    |    ❌   |
+| ----------- | :----------------: | :--------------------: | :------: | :-----: |
+| User        |         ✅         |           ✅           |    ✅    |   ✅    |
+| Group       |         ✅         |           ✅           |    ✅    |   ✅    |
+| Domain      |         ✅         |           ✅           |    ❌    |   ❌    |
+| Anyone      |         ✅         |           ✅           |    ❌    |   ❌    |
+| Device      |         ❌         |           ❌           |    ✅    |   ❌    |
+| Application |         ❌         |           ❌           |    ✅    |   ❌    |
 
 [`OmhIdentity.User`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-identity/-user)
 
 | Property       | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
-|----------------|:------------------:|:----------------------:|:--------:|:-------:|
-| id             |         ❌         |           ❌           |    ✅    |    ✅   |
-| displayName    |         ✅         |           ✅           |    ✅    |    🟨   |
-| emailAddress   |         ✅         |           ✅           |    ❌    |    ✅   |
-| expirationTime |         ✅         |           ✅           |    ✅    |    ❌   |
-| deleted        |         ✅         |           ✅           |    ❌    |    ❌   |
-| photoLink      |         ✅         |           ✅           |    ❌    |    ❌   |
-| pendingOwner   |         ❌         |           ✅           |    ❌    |    ❌   |
+| -------------- | :----------------: | :--------------------: | :------: | :-----: |
+| id             |         ❌         |           ❌           |    ✅    |   ✅    |
+| displayName    |         ✅         |           ✅           |    ✅    |   🟨    |
+| emailAddress   |         ✅         |           ✅           |    ❌    |   ✅    |
+| expirationTime |         ✅         |           ✅           |    ✅    |   ❌    |
+| deleted        |         ✅         |           ✅           |    ❌    |   ❌    |
+| photoLink      |         ✅         |           ✅           |    ❌    |   ❌    |
+| pendingOwner   |         ❌         |           ✅           |    ❌    |   ❌    |
 
-> Dropbox: Invited users without a Dropbox account will not have a `displayName`.
+> **Dropbox**: Invited users who do not have a Dropbox account will not have a `displayName`.
 
 [`OmhIdentity.Group`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-identity/-group)
 
 | Property       | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
-|----------------|:------------------:|:----------------------:|:--------:|:-------:|
-| id             |         ❌         |           ❌           |    ✅    |    ✅   |
-| displayName    |         ✅         |           ✅           |    ✅    |    ✅   |
-| emailAddress   |         ✅         |           ✅           |    ❌    |    ❌   |
-| expirationTime |         ✅         |           ✅           |    ✅    |    ❌   |
-| deleted        |         ✅         |           ✅           |    ❌    |    ❌   |
+| -------------- | :----------------: | :--------------------: | :------: | :-----: |
+| id             |         ❌         |           ❌           |    ✅    |   ✅    |
+| displayName    |         ✅         |           ✅           |    ✅    |   ✅    |
+| emailAddress   |         ✅         |           ✅           |    ❌    |   ❌    |
+| expirationTime |         ✅         |           ✅           |    ✅    |   ❌    |
+| deleted        |         ✅         |           ✅           |    ❌    |   ❌    |
 
 [`OmhPermissionRole`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-permission-role)
 
 | Role      | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
-|-----------|:------------------:|:----------------------:|:--------:|:-------:|
-| OWNER     |         ✅         |           ✅           |    ✅    |    ✅   |
-| WRITER    |         ✅         |           ✅           |    ✅    |    🟨   |
-| COMMENTER |         ✅         |           ✅           |    ❌    |    ✅   |
-| READER    |         ✅         |           ✅           |    ✅    |    🟨   |
+| --------- | :----------------: | :--------------------: | :------: | :-----: |
+| OWNER     |         ✅         |           ✅           |    ✅    |   ✅    |
+| WRITER    |         ✅         |           ✅           |    ✅    |   🟨    |
+| COMMENTER |         ✅         |           ✅           |    ❌    |   ✅    |
+| READER    |         ✅         |           ✅           |    ✅    |   🟨    |
 
-> Dropbox:
-> - Dropbox does not support granting a `READER` role, although it is documented as available in the 
-> API. An exception will be thrown with user message: `viewer_no_comment isn’t yet supported`
-> - Dropbox does not support granting a `WRITER` role to uploaded files. An exception will be thrown
-> with user message: `You don’t have permission to perform this action.`.
+> **Dropbox**:
+>
+> - While the `READER` role is documented in the API, Dropbox does not support granting this role. Attempting to do so will throw an exception with the user message: `viewer_no_comment isn’t yet supported`.
+> - Dropbox also does not support granting the `WRITER` role for uploaded files. Any attempt will result in an exception with the user message: `You don’t have permission to perform this action`.
 
 [`OmhPermissionRecipient`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core.model/-omh-permission-recipient)
 
 | Type         | Google Drive (GMS) | Google Drive (non-GMS) | OneDrive | Dropbox |
-|--------------|:------------------:|:----------------------:|:--------:|:-------:|
-| User         |         ✅         |           ✅           |    ✅    |    ✅   |
-| Group        |         ✅         |           ✅           |    ✅    |    ❌   |
-| Domain       |         ✅         |           ✅           |    ❌    |    ❌   |
-| Anyone       |         ✅         |           ✅           |    ❌    |    ❌   |
-| WithObjectId |         ❌         |           ❌           |    ✅    |    ✅   |
-| WithAlias    |         ❌         |           ❌           |    ✅    |    ❌   |
+| ------------ | :----------------: | :--------------------: | :------: | :-----: |
+| User         |         ✅         |           ✅           |    ✅    |   ✅    |
+| Group        |         ✅         |           ✅           |    ✅    |   ❌    |
+| Domain       |         ✅         |           ✅           |    ❌    |   ❌    |
+| Anyone       |         ✅         |           ✅           |    ❌    |   ❌    |
+| WithObjectId |         ❌         |           ❌           |    ✅    |   ✅    |
+| WithAlias    |         ❌         |           ❌           |    ✅    |   ❌    |
 
-> Dropbox: to invite Group, use WithObjectId and provide group ID
-
-[`OmhStorageClient.createPermission`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client)
-> Dropbox: this method returns null when permission is successfully created.
-
-[`OmhStorageClient.updatePermission`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client)
-> Dropbox: this method returns null when permission is successfully updated.
-
-[`OmhStorageClient.getWebUrl`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client)
-> Dropbox: a folder needs to be a shared folder to return web URL.
-
-[`OmhStorageClient.getFilePermissions`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client)
-> Dropbox: a folder needs to be a shared folder to return any permissions, including OWNER permission.
+> **Dropbox**: To invite a group, use `WithObjectId` and provide the group ID.
 
 </details>
 

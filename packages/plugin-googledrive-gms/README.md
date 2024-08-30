@@ -23,8 +23,8 @@ Module plugin-googledrive-gms
 
 Ensure you have the following packages installed before proceeding with the integration:
 
-- [`com.openmobilehub.android.storage:core:2.0.0`](https://openmobilehub.github.io/android-omh-storage/docs/core)
-- [`com.openmobilehub.android.auth:core:2.0.2`](https://github.com/openmobilehub/android-omh-auth)
+- [`com.openmobilehub.android.storage:core:<version>`](https://openmobilehub.github.io/android-omh-storage/docs/core)
+- [`com.openmobilehub.android.auth:core:<version>`](https://github.com/openmobilehub/android-omh-auth)
 
 ## Installation
 
@@ -48,8 +48,8 @@ Add the dependency for the Google Drive storage provider to your project's **bui
 
 ```gradle
 dependencies {
-  implementation("com.openmobilehub.android.storage:plugin-googledrive-gms:2.0.0")
-  implementation("com.openmobilehub.android.storage:plugin-googledrive-non-gms:2.0.0")
+  implementation("com.openmobilehub.android.storage:plugin-googledrive-gms:<version>")
+  implementation("com.openmobilehub.android.storage:plugin-googledrive-non-gms:<version>")
 }
 ```
 
@@ -103,7 +103,7 @@ val omhStorageClient = OmhStorageProvider.Builder()
 
 ### Other methods
 
-Interacting with the Google Drive storage provider follows the same pattern as other storage providers since they all implement the [`OmhStorageClient`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client) interface. This uniformity ensures consistent functionality across different storage providers, so you won’t need to learn new methods regardless of the storage provider you choose! For a comprehensive list of available methods, refer to the [Getting Started](https://openmobilehub.github.io/android-omh-storage/docs/getting-started) guide.
+Interacting with the Google Drive storage provider follows the same pattern as other storage providers since they all implement the [`OmhStorageClient`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client) interface. This uniformity ensures consistent functionality across different storage providers, so you won’t need to learn new methods regardless of the storage provider you choose! For a comprehensive list of available methods, refer to the [Getting Started](https://openmobilehub.github.io/android-omh-storage/docs/getting-started#usage) guide.
 
 #### Caveats
 
