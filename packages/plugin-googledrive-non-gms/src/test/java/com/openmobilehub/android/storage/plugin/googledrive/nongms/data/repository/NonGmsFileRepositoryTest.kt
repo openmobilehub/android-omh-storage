@@ -947,7 +947,7 @@ internal class NonGmsFileRepositoryTest {
         }
 
     @Test
-    fun `given an empty file and parentId, when simplyUploadFile is success, then return OmhStorageEntity`() =
+    fun `given an empty file and parentId, when smallUploadFile is success, then return OmhStorageEntity`() =
         runTest {
             val fileSize = 0
             every { file.length() } returns fileSize.toLong()
@@ -964,13 +964,13 @@ internal class NonGmsFileRepositoryTest {
                 testFileRemote
             )
 
-            val result = fileRepositoryImpl.simplyUploadFile(file, TEST_FILE_PARENT_ID)
+            val result = fileRepositoryImpl.smallUploadFile(file, TEST_FILE_PARENT_ID)
 
             assertEquals(testOmhFile, result)
         }
 
     @Test(expected = OmhStorageException.ApiException::class)
-    fun `given an empty file and parentId, when simplyUploadFile fails, then ApiException is thrown`() =
+    fun `given an empty file and parentId, when smallUploadFile fails, then ApiException is thrown`() =
         runTest {
             val fileSize = 0
             every { file.length() } returns fileSize.toLong()
@@ -988,7 +988,7 @@ internal class NonGmsFileRepositoryTest {
                 responseBody
             )
 
-            fileRepositoryImpl.simplyUploadFile(file, TEST_FILE_PARENT_ID)
+            fileRepositoryImpl.smallUploadFile(file, TEST_FILE_PARENT_ID)
         }
 
     @Test
@@ -1035,6 +1035,6 @@ internal class NonGmsFileRepositoryTest {
                 responseBody
             )
 
-            fileRepositoryImpl.simplyUploadFile(file, TEST_FILE_ID)
+            fileRepositoryImpl.smallUploadFile(file, TEST_FILE_ID)
         }
 }

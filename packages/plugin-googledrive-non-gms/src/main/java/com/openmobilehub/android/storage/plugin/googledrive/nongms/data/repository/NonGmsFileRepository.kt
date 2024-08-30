@@ -147,7 +147,7 @@ internal class NonGmsFileRepository(
         parentId: String?
     ): OmhStorageEntity? {
         if (localFileToUpload.length() < 1) {
-            return simplyUploadFile(localFileToUpload, parentId)
+            return smallUploadFile(localFileToUpload, parentId)
         } else {
             val uploadUrl = initializeResumableUpload(localFileToUpload, parentId)
             return uploadFileChunks(uploadUrl, localFileToUpload)
@@ -281,7 +281,7 @@ internal class NonGmsFileRepository(
     }
 
     @VisibleForTesting
-    suspend fun simplyUploadFile(
+    suspend fun smallUploadFile(
         localFileToUpload: File,
         parentId: String?
     ): OmhStorageEntity? {
