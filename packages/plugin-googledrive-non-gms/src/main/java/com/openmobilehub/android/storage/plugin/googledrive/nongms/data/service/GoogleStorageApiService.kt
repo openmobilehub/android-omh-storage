@@ -19,6 +19,7 @@ package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body.CreateFileRequestBody
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body.CreatePermissionRequestBody
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body.UpdatePermissionRequestBody
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.AboutResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileListRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.PermissionResponse
@@ -46,6 +47,7 @@ import retrofit2.http.Url
 internal interface GoogleStorageApiService {
 
     companion object {
+        private const val ABOUT = "drive/v3/about"
         private const val FILES_PARTICLE = "drive/v3/files"
         private const val UPLOAD_FILES_PARTICLE = "upload/drive/v3/files"
 
@@ -213,4 +215,7 @@ internal interface GoogleStorageApiService {
         @Header("Content-Range") contentRange: String,
         @Body fileChunk: RequestBody,
     ): Response<FileRemoteResponse>
+
+    @GET(ABOUT)
+    suspend fun about(): Response<AboutResponse>
 }

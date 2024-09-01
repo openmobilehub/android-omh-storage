@@ -177,4 +177,12 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
 
     override fun getProviderSdk(): GraphServiceClient =
         repository.apiService.apiClient.graphServiceClient
+
+    override suspend fun getStorageUsage(): Long {
+        return repository.getStorageUsage()
+    }
+
+    override suspend fun getStorageQuota(): Long {
+        return repository.getStorageQuota()
+    }
 }

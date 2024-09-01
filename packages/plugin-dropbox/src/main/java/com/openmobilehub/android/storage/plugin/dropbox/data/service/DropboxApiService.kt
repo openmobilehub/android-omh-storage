@@ -38,6 +38,7 @@ import com.dropbox.core.v2.sharing.ShareFolderJobStatus
 import com.dropbox.core.v2.sharing.ShareFolderLaunch
 import com.dropbox.core.v2.sharing.SharedFileMembers
 import com.dropbox.core.v2.sharing.SharedFolderMembers
+import com.dropbox.core.v2.users.SpaceUsage
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 
@@ -223,5 +224,9 @@ internal class DropboxApiService(internal val apiClient: DropboxApiClient) {
                 memberSelector,
                 accessLevel
             )
+    }
+
+    fun getSpaceUsage(): SpaceUsage {
+        return apiClient.dropboxApiService.users().spaceUsage
     }
 }

@@ -254,4 +254,16 @@ internal class OneDriveFileRepository(
     } catch (exception: ApiException) {
         throw ExceptionMapper.toOmhApiException(exception)
     }
+
+    fun getStorageUsage(): Long = try {
+        apiService.getDrive().quota.used ?: -1L
+    } catch (exception: ApiException) {
+        throw ExceptionMapper.toOmhApiException(exception)
+    }
+
+    fun getStorageQuota(): Long = try {
+        apiService.getDrive().quota.total ?: -1L
+    } catch (exception: ApiException) {
+        throw ExceptionMapper.toOmhApiException(exception)
+    }
 }
