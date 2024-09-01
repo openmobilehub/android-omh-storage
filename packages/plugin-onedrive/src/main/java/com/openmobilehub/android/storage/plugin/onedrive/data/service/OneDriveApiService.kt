@@ -20,6 +20,7 @@ import androidx.annotation.VisibleForTesting
 import com.microsoft.graph.drives.item.items.item.createuploadsession.CreateUploadSessionPostRequestBody
 import com.microsoft.graph.drives.item.items.item.invite.InvitePostRequestBody
 import com.microsoft.graph.drives.item.items.item.searchwithq.SearchWithQGetResponse
+import com.microsoft.graph.models.Drive
 import com.microsoft.graph.models.DriveItem
 import com.microsoft.graph.models.DriveItemUploadableProperties
 import com.microsoft.graph.models.DriveItemVersionCollectionResponse
@@ -191,6 +192,10 @@ internal class OneDriveApiService(internal val apiClient: OneDriveApiClient) {
             .items()
             .byDriveItemId(fileId)
             .patch(driveItem)
+    }
+
+    fun getDrive(): Drive {
+        return apiClient.graphServiceClient.drives().byDriveId(driveId).get()
     }
 
     @VisibleForTesting

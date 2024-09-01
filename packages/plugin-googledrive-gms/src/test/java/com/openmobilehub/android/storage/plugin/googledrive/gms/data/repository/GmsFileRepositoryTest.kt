@@ -21,6 +21,7 @@ package com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository
 import android.webkit.MimeTypeMap
 import com.google.api.client.http.HttpResponseException
 import com.google.api.services.drive.Drive
+import com.google.api.services.drive.model.About
 import com.google.api.services.drive.model.FileList
 import com.google.api.services.drive.model.Permission
 import com.google.api.services.drive.model.PermissionList
@@ -40,6 +41,8 @@ import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.TEST
 import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.TEST_VERSION_FILE_ID
 import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.TEST_VERSION_ID
 import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.setUpMock
+import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.setupQuotaAvailableMock
+import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.setupQuotaUnlimitedMock
 import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.testOmhCreatePermission
 import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.testOmhFile
 import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.testOmhPermission
@@ -121,6 +124,9 @@ internal class GmsFileRepositoryTest {
     private lateinit var drivePermissionsCreateRequest: Drive.Permissions.Create
 
     @MockK(relaxed = true)
+    private lateinit var aboutRequest: Drive.About.Get
+
+    @MockK(relaxed = true)
     private lateinit var permissionList: PermissionList
 
     @MockK(relaxed = true)
@@ -128,6 +134,9 @@ internal class GmsFileRepositoryTest {
 
     @MockK(relaxed = true)
     private lateinit var responseException: HttpResponseException
+
+    @MockK(relaxed = true)
+    private lateinit var about: About
 
     private lateinit var fileRepositoryImpl: GmsFileRepository
 
@@ -570,5 +579,32 @@ internal class GmsFileRepositoryTest {
         every { apiService.getWebUrl(any()) } returns driveFilesGetRequest
 
         fileRepositoryImpl.getWebUrl(TEST_VERSION_FILE_ID)
+    }
+
+    @Test
+    fun `test getStorageQuota() and getStorageUsage() requests`() {
+        about.setupQuotaAvailableMock()
+        every { aboutRequest.execute() } returns about
+        every { apiService.about() } returns aboutRequest
+
+        assertEquals(100L, fileRepositoryImpl.getStorageUsage())
+        assertEquals(104857600L, fileRepositoryImpl.getStorageQuota())
+    }
+
+    @Test
+    fun `test getStorageQuota() requests with unlimited quota`() {
+        about.setupQuotaUnlimitedMock()
+        every { aboutRequest.execute() } returns about
+        every { apiService.about() } returns aboutRequest
+
+        assertEquals(-1L, fileRepositoryImpl.getStorageQuota())
+    }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `scenario when about request fails, ApiException is thrown`() {
+        every { apiService.about() }.throws(responseException)
+
+        fileRepositoryImpl.getStorageQuota()
+        fileRepositoryImpl.getStorageUsage()
     }
 }

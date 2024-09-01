@@ -20,11 +20,13 @@ package com.openmobilehub.android.storage.plugin.onedrive.data.repository
 
 import com.microsoft.graph.drives.item.items.item.invite.InvitePostRequestBody
 import com.microsoft.graph.drives.item.items.item.searchwithq.SearchWithQGetResponse
+import com.microsoft.graph.models.Drive
 import com.microsoft.graph.models.DriveItem
 import com.microsoft.graph.models.DriveItemVersion
 import com.microsoft.graph.models.DriveItemVersionCollectionResponse
 import com.microsoft.graph.models.DriveRecipient
 import com.microsoft.graph.models.Permission
+import com.microsoft.graph.models.Quota
 import com.microsoft.kiota.ApiException
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
@@ -53,6 +55,8 @@ import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_PERMIS
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_VERSION_FILE_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_VERSION_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.createWriterPermission
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.setupMock
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.setupNullReturnValueMock
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.testOmhPermission
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.testOmhVersion
 import io.mockk.MockKAnnotations
@@ -131,6 +135,12 @@ class OneDriveFileRepositoryTest {
 
     @MockK
     private lateinit var permission: Permission
+
+    @MockK(relaxed = true)
+    private lateinit var drive: Drive
+
+    @MockK(relaxed = true)
+    private lateinit var quota: Quota
 
     @MockK(relaxed = true)
     private lateinit var driveRecipient: DriveRecipient
@@ -636,5 +646,33 @@ class OneDriveFileRepositoryTest {
         // Assert
         assertEquals(omhStorageEntity, result)
         verify(exactly = 2) { apiService.updateFileMetadata(any(), any()) }
+    }
+
+    @Test
+    fun `test getStorageQuota() and getStorageUsage() requests`() {
+        quota.setupMock()
+        every { apiService.getDrive() } returns drive
+        every { drive.quota } returns quota
+
+        assertEquals(100L, repository.getStorageUsage())
+        assertEquals(104857600L, repository.getStorageQuota())
+    }
+
+    @Test
+    fun `test getStorageQuota() and getStorageUsage() requests with null reply`() {
+        quota.setupNullReturnValueMock()
+        every { apiService.getDrive() } returns drive
+        every { drive.quota } returns quota
+
+        assertEquals(-1L, repository.getStorageQuota())
+        assertEquals(-1L, repository.getStorageUsage())
+    }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `scenario when about request fails, ApiException is thrown`() {
+        every { apiService.getDrive() }.throws(apiException)
+
+        repository.getStorageQuota()
+        repository.getStorageUsage()
     }
 }

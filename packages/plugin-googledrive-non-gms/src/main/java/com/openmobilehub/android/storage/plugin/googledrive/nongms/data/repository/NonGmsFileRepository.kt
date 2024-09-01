@@ -506,4 +506,24 @@ internal class NonGmsFileRepository(
             throw response.toApiException()
         }
     }
+
+    suspend fun getStorageUsage(): Long {
+        val response = retrofitImpl.getGoogleStorageApiService().about()
+
+        return if (response.isSuccessful) {
+            response.body()!!.storageQuota.usageInDrive
+        } else {
+            throw response.toApiException()
+        }
+    }
+
+    suspend fun getStorageQuota(): Long {
+        val response = retrofitImpl.getGoogleStorageApiService().about()
+
+        return if (response.isSuccessful) {
+            response.body()!!.storageQuota.limit
+        } else {
+            throw response.toApiException()
+        }
+    }
 }

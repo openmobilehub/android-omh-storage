@@ -180,4 +180,12 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
     }
 
     override fun getProviderSdk(): DbxClientV2 = repository.apiService.apiClient.dropboxApiService
+
+    override suspend fun getStorageUsage(): Long {
+        return repository.getStorageUsage()
+    }
+
+    override suspend fun getStorageQuota(): Long {
+        return repository.getStorageQuota()
+    }
 }

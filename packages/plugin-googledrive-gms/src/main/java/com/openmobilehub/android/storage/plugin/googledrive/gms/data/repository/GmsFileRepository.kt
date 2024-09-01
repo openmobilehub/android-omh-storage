@@ -261,4 +261,17 @@ internal class GmsFileRepository(
     } catch (exception: HttpResponseException) {
         throw ExceptionMapper.toOmhApiException(exception)
     }
+
+    fun getStorageUsage(): Long = try {
+        apiService.about().execute().storageQuota.usageInDrive
+    } catch (exception: HttpResponseException) {
+        throw ExceptionMapper.toOmhApiException(exception)
+    }
+
+    fun getStorageQuota(): Long = try {
+        val retval: Long? = apiService.about().execute().storageQuota.limit
+        retval ?: -1L
+    } catch (exception: HttpResponseException) {
+        throw ExceptionMapper.toOmhApiException(exception)
+    }
 }
