@@ -17,7 +17,7 @@ Before integrating any storage provider into your Android project, ensure you me
 
 ## Installation
 
-To integrate a storage provider into your React Native project, follow the specific steps for each provider:
+To integrate a storage provider into your Android project, follow the specific steps for each provider:
 
 - [Google Drive](https://openmobilehub.github.io/android-omh-storage/docs/plugin-googledrive-gms)
 - [OneDrive](https://openmobilehub.github.io/android-omh-storage/docs/plugin-onedrive)
