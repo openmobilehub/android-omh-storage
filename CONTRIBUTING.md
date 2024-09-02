@@ -84,7 +84,7 @@ Add the dependency for the Core package to your plugin's **build.gradle** file:
 
 ```gradle
 dependencies {
-  implementation("com.openmobilehub.android.storage:core:2.0.0")
+  implementation("com.openmobilehub.android.storage:core:<version>")
 }
 ```
 

@@ -23,8 +23,8 @@ Module plugin-onedrive
 
 Ensure you have the following packages installed before proceeding with the integration:
 
-- [`com.openmobilehub.android.storage:core:2.0.0`](https://openmobilehub.github.io/android-omh-storage/docs/core)
-- [`com.openmobilehub.android.auth:core:2.0.2`](https://github.com/openmobilehub/android-omh-auth)
+- [`com.openmobilehub.android.storage:core:<version>`](https://openmobilehub.github.io/android-omh-storage/docs/core)
+- [`com.openmobilehub.android.auth:core:<version>`](https://github.com/openmobilehub/android-omh-auth)
 
 ## Installation
 
@@ -48,7 +48,7 @@ Add the dependency for the OneDrive storage provider to your project's **build.g
 
 ```gradle
 dependencies {
-  implementation("com.openmobilehub.android.storage:plugin-onedrive-gms:2.0.0")
+  implementation("com.openmobilehub.android.storage:plugin-onedrive-gms:<version>")
 }
 ```
 
@@ -89,11 +89,14 @@ val omhStorageClient = OneDriveOmhStorageFactory().getStorageClient(omhAuthClien
 
 ### Other methods
 
-Interacting with the OneDrive storage provider follows the same pattern as other storage providers since they all implement the [`OmhStorageClient`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client) interface. This uniformity ensures consistent functionality across different storage providers, so you won’t need to learn new methods regardless of the storage provider you choose! For a comprehensive list of available methods, refer to the [Getting Started](https://openmobilehub.github.io/android-omh-storage/docs/getting-started) guide.
+Interacting with the OneDrive storage provider follows the same pattern as other storage providers since they all implement the [`OmhStorageClient`](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client) interface. This uniformity ensures consistent functionality across different storage providers, so you won’t need to learn new methods regardless of the storage provider you choose! For a comprehensive list of available methods, refer to the [Getting Started](https://openmobilehub.github.io/android-omh-storage/docs/getting-started#usage) guide.
 
 #### Caveats
 
+> When updating a file, if the new file has a different name than the updated file, two additional versions might sometimes appear in the system. One version comes from updating the content of the file, and the other comes from updating the file name. However, this behavior is non-deterministic, and sometimes only one new version is added. This is why it is listed under the Caveats section.
+
 > The [Sharing Links](https://learn.microsoft.com/en-us/graph/api/resources/permission?view=graph-rest-1.0#sharing-links) permissions are not supported.
+
 > The [search](https://learn.microsoft.com/en-us/graph/api/driveitem-search?view=graph-rest-1.0&tabs=java) query takes several fields including filename, metadata, and file content when searching.
 
 ## License
