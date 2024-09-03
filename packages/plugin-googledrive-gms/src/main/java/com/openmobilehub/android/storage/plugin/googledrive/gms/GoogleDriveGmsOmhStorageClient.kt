@@ -16,6 +16,7 @@
 
 package com.openmobilehub.android.storage.plugin.googledrive.gms
 
+import com.google.api.services.drive.Drive
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.auth.plugin.google.gms.GmsCredentials
 import com.openmobilehub.android.storage.core.OmhStorageClient
@@ -176,4 +177,6 @@ internal class GoogleDriveGmsOmhStorageClient private constructor(
     override suspend fun getWebUrl(fileId: String): String? {
         return fileRepository.getWebUrl(fileId)
     }
+
+    override suspend fun getProviderSdk(): Drive = fileRepository.apiService.apiProvider.googleDriveApiService
 }

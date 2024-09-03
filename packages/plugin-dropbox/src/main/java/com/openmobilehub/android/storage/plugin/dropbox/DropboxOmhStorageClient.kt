@@ -18,6 +18,7 @@ package com.openmobilehub.android.storage.plugin.dropbox
 
 import android.webkit.MimeTypeMap
 import androidx.annotation.VisibleForTesting
+import com.dropbox.core.v2.DbxClientV2
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
@@ -177,4 +178,6 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         // Dropbox does not return updated permission as a result
         return null
     }
+
+    override suspend fun getProviderSdk(): DbxClientV2 = repository.apiService.apiClient.dropboxApiService
 }

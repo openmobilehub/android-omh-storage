@@ -18,6 +18,7 @@ package com.openmobilehub.android.storage.plugin.onedrive
 
 import android.webkit.MimeTypeMap
 import androidx.annotation.VisibleForTesting
+import com.microsoft.graph.serviceclient.GraphServiceClient
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
@@ -50,7 +51,8 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
             val apiService = OneDriveApiService(apiClient)
             val driveItemToOmhStorageEntity =
                 DriveItemToOmhStorageEntity(MimeTypeMap.getSingleton())
-            val driveItemResponseToOmhStorageEntity = DriveItemResponseToOmhStorageEntity(MimeTypeMap.getSingleton())
+            val driveItemResponseToOmhStorageEntity =
+                DriveItemResponseToOmhStorageEntity(MimeTypeMap.getSingleton())
 
             val oneDriveRestApiServiceProvider = OneDriveRestApiServiceProvider(authClient)
 
@@ -172,4 +174,7 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
     override suspend fun getWebUrl(fileId: String): String? {
         return repository.getWebUrl(fileId)
     }
+
+    override suspend fun getProviderSdk(): GraphServiceClient =
+        repository.apiService.apiClient.graphServiceClient
 }

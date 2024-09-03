@@ -22,7 +22,7 @@ import com.google.api.services.drive.model.File
 import com.google.api.services.drive.model.Permission
 
 @Suppress("TooManyFunctions")
-internal class GoogleDriveApiService(private val apiProvider: GoogleDriveApiProvider) {
+internal class GoogleDriveApiService(internal val apiProvider: GoogleDriveApiProvider) {
 
     companion object {
         private const val QUERY_REQUESTED_FIELDS =

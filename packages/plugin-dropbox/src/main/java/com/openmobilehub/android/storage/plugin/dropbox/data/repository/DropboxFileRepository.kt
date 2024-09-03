@@ -46,7 +46,7 @@ import java.io.File
 
 @SuppressWarnings("TooManyFunctions")
 internal class DropboxFileRepository(
-    private val apiService: DropboxApiService,
+    internal val apiService: DropboxApiService,
     private val metadataToOmhStorageEntity: MetadataToOmhStorageEntity
 ) {
 
