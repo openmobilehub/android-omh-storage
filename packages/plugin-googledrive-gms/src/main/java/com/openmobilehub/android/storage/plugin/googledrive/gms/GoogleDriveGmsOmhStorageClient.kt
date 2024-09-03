@@ -178,5 +178,5 @@ internal class GoogleDriveGmsOmhStorageClient private constructor(
         return fileRepository.getWebUrl(fileId)
     }
 
-    override suspend fun getProviderSdk(): Drive = fileRepository.apiService.apiProvider.googleDriveApiService
+    override fun getProviderSdk(): Drive = fileRepository.apiService.apiProvider.googleDriveApiService
 }

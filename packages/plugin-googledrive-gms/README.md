@@ -111,6 +111,18 @@ Interacting with the Google Drive storage provider follows the same pattern as o
 
 > The method `createPermission` will override `sendNotificationEmail` parameter to `true` when creating permission with `OWNER` role.
 
+#### Escape Hatch
+
+This plugin provides an escape hatch to access the native Google Drive Android SDK. This allows developers to use the underlying provider's API directly, should they need to access a feature of the provider that is not supported by the OMH plugin.
+
+You can obtain the Drive client instances by casting the result of `getProviderSdk` to `Drive`:
+
+```kotlin
+import com.google.api.services.drive.Drive
+...
+omhStorageClient.getProviderSdk() as Drive
+```
+
 ## License
 
 - See [LICENSE](https://github.com/openmobilehub/android-omh-storage/blob/main/LICENSE)

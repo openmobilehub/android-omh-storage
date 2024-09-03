@@ -175,6 +175,6 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
         return repository.getWebUrl(fileId)
     }
 
-    override suspend fun getProviderSdk(): GraphServiceClient =
+    override fun getProviderSdk(): GraphServiceClient =
         repository.apiService.apiClient.graphServiceClient
 }

@@ -19,6 +19,14 @@ Module plugin-googledrive-non-gms
 
 ---
 
+## Usage
+
+### Escape Hatch
+
+This plugin does not provides an escape hatch to access the native Google Drive Android SDK, as it uses REST API instead. If needed, you can use credentials from OmhAuthClient to authorise your own REST API client.  
+
+---
+
 For further instructions, please refer to the [Google Drive (GMS) documentation](https://github.com/openmobilehub/android-omh-storage/blob/main/packages/plugin-googledrive-gms/README.md), as it shares a similar setup and behavior.
 
 ## License

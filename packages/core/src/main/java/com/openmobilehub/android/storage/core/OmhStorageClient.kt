@@ -284,5 +284,5 @@ abstract class OmhStorageClient protected constructor(
      *
      * @return Provider SDK instance that should be type casted to access underlying provider's API
      */
-    abstract suspend fun getProviderSdk(): Any
+    abstract fun getProviderSdk(): Any
 }

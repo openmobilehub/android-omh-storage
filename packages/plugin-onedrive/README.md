@@ -99,6 +99,18 @@ Interacting with the OneDrive storage provider follows the same pattern as other
 
 > The [search](https://learn.microsoft.com/en-us/graph/api/driveitem-search?view=graph-rest-1.0&tabs=java) query takes several fields including filename, metadata, and file content when searching.
 
+#### Escape Hatch
+
+This plugin provides an escape hatch to access the native OneDrive Android SDK. This allows developers to use the underlying provider's API directly, should they need to access a feature of the provider that is not supported by the OMH plugin.
+
+You can obtain the OneDrive client instances by casting the result of `getProviderSdk` to `GraphServiceClient`:
+
+```kotlin
+import com.microsoft.graph.serviceclient.GraphServiceClient
+...
+omhStorageClient.getProviderSdk() as GraphServiceClient
+```
+
 ## License
 
 - See [LICENSE](https://github.com/openmobilehub/android-omh-storage/blob/main/LICENSE)
