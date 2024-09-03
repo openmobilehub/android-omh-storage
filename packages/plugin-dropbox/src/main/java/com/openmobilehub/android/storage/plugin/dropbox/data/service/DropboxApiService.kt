@@ -42,7 +42,7 @@ import java.io.ByteArrayOutputStream
 import java.io.InputStream
 
 @Suppress("TooManyFunctions")
-internal class DropboxApiService(private val apiClient: DropboxApiClient) {
+internal class DropboxApiService(internal val apiClient: DropboxApiClient) {
 
     fun getFilesList(parentId: String): ListFolderResult {
         return apiClient.dropboxApiService.files().listFolder(parentId)

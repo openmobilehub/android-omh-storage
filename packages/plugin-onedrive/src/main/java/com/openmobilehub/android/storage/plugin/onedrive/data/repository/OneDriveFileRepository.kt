@@ -43,7 +43,7 @@ import java.io.File
 
 @Suppress("TooManyFunctions")
 internal class OneDriveFileRepository(
-    private val apiService: OneDriveApiService,
+    internal val apiService: OneDriveApiService,
     private val retrofitImpl: OneDriveRestApiServiceProvider,
     private val driveItemToOmhStorageEntity: DriveItemToOmhStorageEntity,
     private val driveItemResponseToOmhStorageEntity: DriveItemResponseToOmhStorageEntity

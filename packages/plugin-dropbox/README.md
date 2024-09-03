@@ -101,6 +101,18 @@ The `getWebUrl` method requires the folder to be a shared folder to return a web
 
 The `getFilePermissions` method requires the folder to be a shared folder to retrieve any permissions, including `owner` permission.
 
+#### Escape Hatch
+
+This plugin provides an escape hatch to access the native Dropbox Android SDK. This allows developers to use the underlying provider's API directly, should they need to access a feature of the provider that is not supported by the OMH plugin.
+
+You can obtain the Dropbox client instances by casting the result of `getProviderSdk` to `DbxClientV2`:
+
+```kotlin
+import com.dropbox.core.v2.DbxClientV2
+...
+omhStorageClient.getProviderSdk() as DbxClientV2
+```
+
 ## License
 
 - See [LICENSE](https://github.com/openmobilehub/android-omh-storage/blob/main/LICENSE)

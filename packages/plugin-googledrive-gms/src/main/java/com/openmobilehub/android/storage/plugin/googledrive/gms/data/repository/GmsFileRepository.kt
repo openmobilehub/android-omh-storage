@@ -41,7 +41,7 @@ import com.google.api.services.drive.model.File as GoogleDriveFile
 
 @Suppress("TooManyFunctions")
 internal class GmsFileRepository(
-    private val apiService: GoogleDriveApiService
+    internal val apiService: GoogleDriveApiService
 ) {
     companion object {
         private const val ANY_MIME_TYPE = "*/*"

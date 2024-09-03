@@ -34,7 +34,7 @@ import java.net.URI
 import javax.net.ssl.HttpsURLConnection.HTTP_UNAUTHORIZED
 
 @Suppress("TooManyFunctions")
-internal class OneDriveApiService(private val apiClient: OneDriveApiClient) {
+internal class OneDriveApiService(internal val apiClient: OneDriveApiClient) {
     private val driveIdCache = DriveIdCache(apiClient)
     internal val driveId get() = driveIdCache.driveId
 

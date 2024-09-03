@@ -275,4 +275,14 @@ abstract class OmhStorageClient protected constructor(
     abstract suspend fun getWebUrl(
         fileId: String,
     ): String?
+
+    /**
+     * This method provides an escape hatch to access the provider native SDK. This allows developers
+     * to use the underlying provider's API directly, should they need to access a feature of the
+     * provider that is not supported by the OMH plugin. Refer to the plugin's advanced documentation
+     * for type to which to cast the instance.
+     *
+     * @return Provider SDK instance that should be type casted to access underlying provider's API
+     */
+    abstract fun getProviderSdk(): Any
 }
