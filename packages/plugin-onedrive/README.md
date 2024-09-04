@@ -97,6 +97,8 @@ Interacting with the OneDrive storage provider follows the same pattern as other
 
 > The [Sharing Links](https://learn.microsoft.com/en-us/graph/api/resources/permission?view=graph-rest-1.0#sharing-links) permissions are not supported.
 
+> When creating permission for a user with a given email address, there has to be a Microsoft Account assigned to this email. Otherwise, an exception will be thrown with the user message: "Some users in the request cannot be invited securely". This is caused by `requireSignIn` flag being set to true in the invitation request. The library does that as the [Sharing Links](https://learn.microsoft.com/en-us/graph/api/resources/permission?view=graph-rest-1.0#sharing-links) are not yet supported, and for some accounts, when inviting users without a Microsoft Account, a sharing link will be created instead of permission. 
+
 > The [search](https://learn.microsoft.com/en-us/graph/api/driveitem-search?view=graph-rest-1.0&tabs=java) query takes several fields including filename, metadata, and file content when searching.
 
 #### Escape Hatch
