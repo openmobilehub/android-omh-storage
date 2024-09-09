@@ -52,14 +52,17 @@ internal class DropboxApiService(internal val apiClient: DropboxApiClient) {
         inputStream: InputStream,
         path: String,
         withAutorename: Boolean = true,
-        writeMode: WriteMode = WriteMode.ADD
+        writeMode: WriteMode = WriteMode.ADD,
+        withStrictConflict: Boolean = true
     ): FileMetadata {
         // withAutorename(true) is used to avoid conflicts with existing files
         // by renaming the uploaded file. It matches the Google Drive API behavior.
+        // withStrictConflict(true) is used to rename the file even if the content is the same.
 
         return apiClient.dropboxApiService.files().uploadBuilder(path)
             .withAutorename(withAutorename)
             .withMode(writeMode)
+            .withStrictConflict(withStrictConflict)
             .uploadAndFinish(inputStream)
     }
 

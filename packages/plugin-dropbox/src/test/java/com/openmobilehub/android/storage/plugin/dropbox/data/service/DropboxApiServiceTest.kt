@@ -109,6 +109,7 @@ class DropboxApiServiceTest {
             apiClient.dropboxApiService.files().uploadBuilder(any())
                 .withAutorename(any())
                 .withMode(any())
+                .withStrictConflict(any())
                 .uploadAndFinish(inputStream)
         } returns metadata
 
