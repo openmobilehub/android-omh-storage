@@ -51,6 +51,7 @@ internal class OneDriveFileRepository(
 
     companion object {
         private const val PRECONDITION_ERROR_STATUS_CODE = 412
+        private const val SMALL_FILE_SIZE = 1024 * 1024 // 1MB
     }
 
     fun getFilesList(parentId: String): List<OmhStorageEntity> = try {
@@ -64,7 +65,7 @@ internal class OneDriveFileRepository(
     fun uploadFile(localFileToUpload: File, parentId: String): OmhStorageEntity? = try {
         val path = "$parentId:/${localFileToUpload.name}:"
 
-        val driveItem = if (localFileToUpload.length() < 1) {
+        val driveItem = if (localFileToUpload.length() < SMALL_FILE_SIZE) {
             apiService.uploadFile(localFileToUpload, path)
             apiService.getFile(path)
         } else {
@@ -234,7 +235,7 @@ internal class OneDriveFileRepository(
 
     fun updateFile(localFileToUpload: File, fileId: String): OmhStorageEntity {
         try {
-            if (localFileToUpload.length() < 1) {
+            if (localFileToUpload.length() < SMALL_FILE_SIZE) {
                 apiService.uploadFile(localFileToUpload, fileId, "replace")
                 apiService.getFile(fileId)
             } else {
