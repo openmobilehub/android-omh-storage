@@ -111,6 +111,8 @@ Interacting with the Google Drive storage provider follows the same pattern as o
 
 > The method `createPermission` will override `sendNotificationEmail` parameter to `true` when creating permission with `OWNER` role.
 
+> The method `updateFile` does not support [Google Workspace documents](https://developers.google.com/drive/api/guides/about-files#types:~:text=Google%20Workspace%20document,MIME%20types). It throws an error for Google Sheets and Slides and for Google Docs, it does not update the metadata (apart from file name) which can lead to unexpected behavior.
+
 #### Escape Hatch
 
 This plugin provides an escape hatch to access the native Google Drive Android SDK. This allows developers to use the underlying provider's API directly, should they need to access a feature of the provider that is not supported by the OMH plugin.
