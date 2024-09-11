@@ -144,11 +144,11 @@ dependencies {
         implementation(project(":packages:plugin-onedrive"))
         implementation(project(":packages:plugin-dropbox"))
     } else {
-        implementation("com.openmobilehub.android.storage:core:2.0.4-alpha")
-        implementation("com.openmobilehub.android.storage:plugin-googledrive-gms:2.0.4-alpha")
-        implementation("com.openmobilehub.android.storage:plugin-googledrive-non-gms:2.0.4-alpha")
-        implementation("com.openmobilehub.android.storage:plugin-onedrive:2.0.4-alpha")
-        implementation("com.openmobilehub.android.storage:plugin-dropbox:2.0.4-alpha")
+        implementation("com.openmobilehub.android.storage:core:2.0.5-alpha")
+        implementation("com.openmobilehub.android.storage:plugin-googledrive-gms:2.0.5-alpha")
+        implementation("com.openmobilehub.android.storage:plugin-googledrive-non-gms:2.0.5-alpha")
+        implementation("com.openmobilehub.android.storage:plugin-onedrive:2.0.5-alpha")
+        implementation("com.openmobilehub.android.storage:plugin-dropbox:2.0.5-alpha")
     }
 
     testImplementation(Libs.junit)
