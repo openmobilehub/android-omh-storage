@@ -445,12 +445,24 @@ class FileViewerViewModel @Inject constructor(
     }
 
     private fun updateFileClickEvent(event: FileViewerViewEvent.UpdateFileClicked) {
-        if (event.file.isFile() || isFolderUpdateSupported) {
-            lastFileClicked = event.file
-            setState(FileViewerViewState.ShowUpdateFilePicker)
-        } else {
+        if (event.file.isFolder() && !isFolderUpdateSupported) {
             toastMessage.postValue("Updating folders is not supported by provider")
+            return
         }
+
+        if (event.file.isFile()) {
+            val file = event.file as OmhStorageEntity.OmhFile
+            val isGoogleWorkspaceFile =
+                file.mimeType?.startsWith("application/vnd.google-apps") == true
+
+            if (isGoogleWorkspaceFile) {
+                toastMessage.postValue("Updating Google Workspace files is not supported")
+                return
+            }
+        }
+
+        lastFileClicked = event.file
+        setState(FileViewerViewState.ShowUpdateFilePicker)
     }
 
     private fun updateSearchQuery(event: FileViewerViewEvent.UpdateSearchQuery) {
