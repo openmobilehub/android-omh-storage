@@ -156,7 +156,7 @@ class OneDriveFileRepositoryTest {
             driveItemResponseToOmhStorageEntity
         )
 
-        every { file.length() } returns 100
+        every { file.length() } returns 2 * 1024 * 1024 // 2MB
         every { emptyFile.length() } returns 0
     }
 

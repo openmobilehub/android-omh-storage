@@ -68,6 +68,7 @@ internal class NonGmsFileRepository(
         private val JSON_MIME_TYPE = "application/json".toMediaTypeOrNull()
 
         private const val UPLOAD_CHUNK_SIZE = 1024 * 1024 * 10 // 10MB
+        private const val SMALL_FILE_SIZE = 1024 * 1024 // 1MB
         private const val DEFAULT_UPLOAD_MIME_TYPE = "application/octet-stream"
         private const val RESUME_INCOMPLETE_STATUS_CODE = 308
     }
@@ -146,7 +147,7 @@ internal class NonGmsFileRepository(
         localFileToUpload: File,
         parentId: String?
     ): OmhStorageEntity? {
-        if (localFileToUpload.length() < 1) {
+        if (localFileToUpload.length() < SMALL_FILE_SIZE) {
             return uploadSmallFile(localFileToUpload, parentId)
         } else {
             val uploadUrl = initializeResumableUpload(localFileToUpload, parentId)
@@ -158,7 +159,7 @@ internal class NonGmsFileRepository(
         localFileToUpload: File,
         fileId: String
     ): OmhStorageEntity.OmhFile {
-        if (localFileToUpload.length() < 1) {
+        if (localFileToUpload.length() < SMALL_FILE_SIZE) {
             return smallFileUpdate(localFileToUpload, fileId) as OmhStorageEntity.OmhFile
         } else {
             val uploadUrl = initializeResumableUpdate(localFileToUpload, fileId)
