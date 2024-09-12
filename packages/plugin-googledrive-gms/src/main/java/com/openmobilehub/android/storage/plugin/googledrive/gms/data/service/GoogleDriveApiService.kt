@@ -79,6 +79,9 @@ internal class GoogleDriveApiService(internal val apiProvider: GoogleDriveApiPro
         .googleDriveApiService
         .files()
         .get(fileId)
+        .apply {
+            fields = QUERY_REQUESTED_FIELDS
+        }
 
     fun getPermission(fileId: String): Drive.Permissions.List = apiProvider
         .googleDriveApiService
