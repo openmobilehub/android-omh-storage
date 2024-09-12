@@ -48,13 +48,16 @@ import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.just
 import io.mockk.mockkStatic
+import io.mockk.runs
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import java.io.ByteArrayInputStream
 import java.io.File
 import kotlin.test.assertEquals
 import com.google.api.services.drive.model.File as GoogleDriveFile
@@ -210,13 +213,30 @@ internal class GmsFileRepositoryTest {
         }
 
     @Test
-    fun `given a file id, when downloadFile is success, then getFile is called`() =
+    fun `given a file id, when downloadFile non-empty is success, then executeMediaAndDownloadTo is called`() =
         runTest {
-            every { apiService.getFile(TEST_FILE_ID) } returns driveFilesGetRequest
+            every { googleDriveFile.getSize() } returns 1024L
+            every { apiService.getFile(TEST_FILE_ID).execute() } returns googleDriveFile
+
+            every { apiService.getFile(TEST_FILE_ID).executeMediaAndDownloadTo(any()) } just runs
 
             fileRepositoryImpl.downloadFile(TEST_FILE_ID)
 
-            verify { apiService.getFile(TEST_FILE_ID) }
+            verify { apiService.getFile(TEST_FILE_ID).executeMediaAndDownloadTo(any()) }
+        }
+
+    @Test
+    fun `given a file id, when downloadFile empty is success, then executeMediaAsInputStream is called`() =
+        runTest {
+            every { googleDriveFile.getSize() } returns 0L
+            every { apiService.getFile(TEST_FILE_ID).execute() } returns googleDriveFile
+
+            val emptyInputStream = ByteArrayInputStream("".toByteArray())
+            every { apiService.getFile(TEST_FILE_ID).executeMediaAsInputStream() } returns emptyInputStream
+
+            fileRepositoryImpl.downloadFile(TEST_FILE_ID)
+
+            verify { apiService.getFile(TEST_FILE_ID).executeMediaAsInputStream() }
         }
 
     @Test

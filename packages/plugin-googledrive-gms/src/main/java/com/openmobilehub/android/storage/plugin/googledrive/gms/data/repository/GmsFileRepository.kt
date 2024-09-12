@@ -130,7 +130,17 @@ internal class GmsFileRepository(
     fun downloadFile(fileId: String): ByteArrayOutputStream = try {
         val outputStream = ByteArrayOutputStream()
 
-        apiService.getFile(fileId).executeMediaAndDownloadTo(outputStream)
+        val file = apiService.getFile(fileId).execute()
+
+        // executeMediaAndDownloadTo does not handle empty files correctly
+        if (file.getSize() == 0L) {
+            apiService.getFile(fileId).executeMediaAsInputStream().use {
+                it.copyTo(outputStream)
+            }
+        } else {
+            apiService.getFile(fileId).executeMediaAndDownloadTo(outputStream)
+        }
+
         outputStream
     } catch (exception: HttpResponseException) {
         throw ExceptionMapper.toOmhApiException(exception)
