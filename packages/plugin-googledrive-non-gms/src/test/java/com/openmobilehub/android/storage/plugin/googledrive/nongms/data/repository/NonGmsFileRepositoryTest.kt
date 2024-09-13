@@ -36,6 +36,8 @@ import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.T
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.TEST_PERMISSION_ID
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.TEST_VERSION_FILE_ID
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.TEST_VERSION_ID
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.aboutResponseWithQuotaImposed
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.aboutResponseWithUnlimitedQuota
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.commenterUpdatePermission
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.createCommenterPermission
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.createCommenterPermissionRequestBody
@@ -1036,5 +1038,46 @@ internal class NonGmsFileRepositoryTest {
             )
 
             fileRepositoryImpl.uploadSmallFile(file, TEST_FILE_ID)
+        }
+
+    @Test
+    fun `test getStorageQuota() and getStorageUsage() requests`() =
+        runTest {
+            coEvery {
+                googleStorageApiService.about()
+            } returns Response.success(
+                200,
+                aboutResponseWithQuotaImposed
+            )
+
+            assertEquals(100L, fileRepositoryImpl.getStorageUsage())
+            assertEquals(104857600L, fileRepositoryImpl.getStorageQuota())
+        }
+
+    @Test
+    fun `test getStorageQuota() requests with unlimited quota`() =
+        runTest {
+            coEvery {
+                googleStorageApiService.about()
+            } returns Response.success(
+                200,
+                aboutResponseWithUnlimitedQuota
+            )
+
+            assertEquals(-1L, fileRepositoryImpl.getStorageQuota())
+        }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `scenario when about request fails, ApiException is thrown`() =
+        runTest {
+            coEvery {
+                googleStorageApiService.about()
+            } returns Response.error(
+                500,
+                responseBody
+            )
+
+            fileRepositoryImpl.getStorageQuota()
+            fileRepositoryImpl.getStorageUsage()
         }
 }

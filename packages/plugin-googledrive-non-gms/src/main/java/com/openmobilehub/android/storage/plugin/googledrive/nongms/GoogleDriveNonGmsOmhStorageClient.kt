@@ -163,4 +163,12 @@ internal class GoogleDriveNonGmsOmhStorageClient private constructor(
     override fun getProviderSdk(): Any = throw throw UnsupportedOperationException(
         "Google Drive non-gms implementation uses REST API underneath."
     )
+
+    override suspend fun getStorageUsage(): Long {
+        return fileRepository.getStorageUsage()
+    }
+
+    override suspend fun getStorageQuota(): Long {
+        return fileRepository.getStorageQuota()
+    }
 }

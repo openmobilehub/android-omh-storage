@@ -408,6 +408,29 @@ internal class DropboxFileRepository(
         }
     }
 
+    fun getStorageUsage(): Long {
+        try {
+            return apiService.getSpaceUsage().used
+        } catch (exception: DbxException) {
+            throw ExceptionMapper.toOmhApiException(exception)
+        }
+    }
+
+    fun getStorageQuota(): Long {
+        try {
+            val spaceAllocation = apiService.getSpaceUsage().allocation
+            return if (spaceAllocation.isIndividual) {
+                spaceAllocation.individualValue.allocated
+            } else if (spaceAllocation.isTeam) {
+                spaceAllocation.teamValue.allocated
+            } else {
+                -1L // For OTHER
+            }
+        } catch (exception: DbxException) {
+            throw ExceptionMapper.toOmhApiException(exception)
+        }
+    }
+
     private fun getFilePermissions(fileId: String): List<OmhPermission> {
         val result = apiService.getFilePermissions(fileId)
 

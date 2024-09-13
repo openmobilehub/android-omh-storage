@@ -285,4 +285,18 @@ abstract class OmhStorageClient protected constructor(
      * @return Provider SDK instance that should be type casted to access underlying provider's API
      */
     abstract fun getProviderSdk(): Any
+
+    /**
+     * This method returns the total size used at the storage provider.
+     *
+     * @return total file sizes reported by the storage provider
+     */
+    abstract suspend fun getStorageUsage(): Long
+
+    /**
+     * This method returns the storage quota available at the storage provider.
+     *
+     * @return storage quota available, or -1 if unlimited
+     */
+    abstract suspend fun getStorageQuota(): Long
 }
