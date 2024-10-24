@@ -24,6 +24,7 @@ import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
+import com.openmobilehub.android.storage.core.utils.splitPathToParts
 import com.openmobilehub.android.storage.core.utils.toInputStream
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.LocalFileToMimeType
@@ -525,5 +526,20 @@ internal class NonGmsFileRepository(
         } else {
             throw response.toApiException()
         }
+    }
+
+    suspend fun resolvePath(path: String): OmhStorageEntity? {
+        val parts = path.splitPathToParts()
+        var parentId = GoogleDriveNonGmsConstants.ROOT_FOLDER
+        for (nodeName in parts) {
+            val entries = getFiles("'$parentId' in parents and name='$nodeName'")
+            if (entries.isEmpty()) {
+                return null
+            } else {
+                parentId = entries.first().id
+            }
+        }
+
+        return retrofitImpl.getGoogleStorageApiService().getFile(parentId).body()?.toOmhStorageEntity()
     }
 }

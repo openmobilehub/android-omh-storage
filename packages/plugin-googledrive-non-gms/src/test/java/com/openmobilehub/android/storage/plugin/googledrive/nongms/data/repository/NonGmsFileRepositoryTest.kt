@@ -25,6 +25,7 @@ import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.core.utils.toInputStream
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.LocalFileToMimeType
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.GoogleStorageApiService
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileListRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit.GoogleStorageApiServiceProvider
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.toByteArrayOutputStream
@@ -44,6 +45,7 @@ import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.c
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.createOwnerPermission
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.createOwnerPermissionRequestBody
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.ownerUpdatePermission
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.testFileJpg
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.testFileListRemote
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.testFileRemote
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.testOmhFile
@@ -51,6 +53,11 @@ import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.t
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.testOmhVersion
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.testPermissionResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.testPermissionsListResponse
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.testQueryFolder1
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.testQueryFolder2
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.testQueryFolder3
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.testQueryFolderRsx
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.testQueryRootFolder
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.testVersionListRemote
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.testWebUrlResponse
 import io.mockk.MockKAnnotations
@@ -67,6 +74,8 @@ import okhttp3.Headers
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody
 import org.junit.After
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import retrofit2.Response
@@ -1079,5 +1088,45 @@ internal class NonGmsFileRepositoryTest {
 
             fileRepositoryImpl.getStorageQuota()
             fileRepositoryImpl.getStorageUsage()
+        }
+
+    @Test
+    fun `test resolve path of non-existent file`() =
+        runTest {
+            coEvery { googleStorageApiService.getFilesList(any(), any()) } returns Response.success(
+                FileListRemoteResponse(emptyList())
+            )
+            assertNull(fileRepositoryImpl.resolvePath("/foo/bar"))
+
+            coVerify {
+                googleStorageApiService.getFilesList("'root' in parents and name='foo'")
+            }
+        }
+
+    @Test
+    fun `test resolve path of an existing file`() =
+        runTest {
+            coEvery {
+                googleStorageApiService.getFilesList("'root' in parents and name='RSX'")
+            } returns testQueryRootFolder
+            coEvery {
+                googleStorageApiService.getFilesList("'id of folder /RSX' in parents and name='1'")
+            } returns testQueryFolderRsx
+            coEvery {
+                googleStorageApiService.getFilesList("'id of folder /RSX/1' in parents and name='2'")
+            } returns testQueryFolder1
+            coEvery {
+                googleStorageApiService.getFilesList("'id of folder /RSX/1/2' in parents and name='3'")
+            } returns testQueryFolder2
+            coEvery {
+                googleStorageApiService.getFilesList("'id of folder /RSX/1/2/3' in parents and name='testfile.jpg'")
+            } returns testQueryFolder3
+            coEvery {
+                googleStorageApiService.getFile("id of file /RSX/1/2/3/testfile.jpg")
+            } returns Response.success(testFileJpg)
+
+            val result = fileRepositoryImpl.resolvePath("/RSX/1/2/3/testfile.jpg")
+            assertNotNull(result)
+            assertEquals("id of file /RSX/1/2/3/testfile.jpg", result?.id)
         }
 }

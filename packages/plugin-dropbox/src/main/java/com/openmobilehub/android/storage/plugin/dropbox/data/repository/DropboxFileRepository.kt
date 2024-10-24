@@ -450,4 +450,11 @@ internal class DropboxFileRepository(
     private fun isFolder(fileId: String): FolderMetadata? {
         return apiService.getFile(fileId) as? FolderMetadata
     }
+
+    fun resolvePath(path: String): OmhStorageEntity? {
+        val nodeId = apiService.queryNodeIdHaving(path)
+        return nodeId?.let {
+            metadataToOmhStorageEntity(apiService.getFile(it))
+        }
+    }
 }

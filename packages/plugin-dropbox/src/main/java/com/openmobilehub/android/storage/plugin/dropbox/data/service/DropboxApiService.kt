@@ -20,6 +20,7 @@ import com.dropbox.core.v2.async.LaunchResultBase
 import com.dropbox.core.v2.files.CreateFolderResult
 import com.dropbox.core.v2.files.DeleteResult
 import com.dropbox.core.v2.files.FileMetadata
+import com.dropbox.core.v2.files.FolderMetadata
 import com.dropbox.core.v2.files.ListFolderResult
 import com.dropbox.core.v2.files.ListRevisionsMode
 import com.dropbox.core.v2.files.ListRevisionsResult
@@ -39,6 +40,7 @@ import com.dropbox.core.v2.sharing.ShareFolderLaunch
 import com.dropbox.core.v2.sharing.SharedFileMembers
 import com.dropbox.core.v2.sharing.SharedFolderMembers
 import com.dropbox.core.v2.users.SpaceUsage
+import com.openmobilehub.android.storage.core.utils.splitPathToParts
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 
@@ -232,4 +234,39 @@ internal class DropboxApiService(internal val apiClient: DropboxApiClient) {
     fun getSpaceUsage(): SpaceUsage {
         return apiClient.dropboxApiService.users().spaceUsage
     }
+
+    fun queryNodeIdHaving(path: String): String? {
+        val parts = path.splitPathToParts()
+
+        var currentPath = ""
+        var node: Metadata? = null
+
+        parts.forEachIndexed { index, part ->
+            val entries = listFilesAt(currentPath).entries
+            var found = false
+
+            for (entry in entries) {
+                if (entry.name == part && if (index < parts.size - 1) {
+                    entry is FolderMetadata
+                } else {
+                        true
+                    }
+                ) {
+                    currentPath += "/$part"
+                    node = entry
+                    found = true
+                    break
+                }
+            }
+
+            if (!found) {
+                return null
+            }
+        }
+
+        return (node as? FolderMetadata)?.id ?: (node as FileMetadata).id
+    }
+
+    private fun listFilesAt(path: String): ListFolderResult =
+        apiClient.dropboxApiService.files().listFolder(path)
 }

@@ -30,6 +30,7 @@ import com.google.api.services.drive.model.RevisionList
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
+import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.service.GoogleDriveApiService
 import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.TEST_EMAIL_MESSAGE
 import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.TEST_FILE_ID
@@ -43,21 +44,30 @@ import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.TEST
 import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.setUpMock
 import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.setupQuotaAvailableMock
 import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.setupQuotaUnlimitedMock
+import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.testFileJpg
 import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.testOmhCreatePermission
 import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.testOmhFile
 import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.testOmhPermission
 import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.testOmhVersion
+import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.testQueryFolder1
+import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.testQueryFolder2
+import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.testQueryFolder3
+import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.testQueryFolderRsx
+import com.openmobilehub.android.storage.plugin.googledrive.gms.testdoubles.testQueryRootFolder
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.just
+import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.runs
 import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import java.io.ByteArrayInputStream
@@ -626,5 +636,77 @@ internal class GmsFileRepositoryTest {
 
         fileRepositoryImpl.getStorageQuota()
         fileRepositoryImpl.getStorageUsage()
+    }
+
+    @Test
+    fun `test resolve path of non-existent file`() {
+        every { apiService.queryNodeIdHaving(any()) } answers { callOriginal() }
+        assertNull(fileRepositoryImpl.resolvePath("/foo/bar"))
+
+        verify {
+            apiService invoke "createQueryForNodeId" withArguments listOf(
+                GoogleDriveGmsConstants.ROOT_FOLDER,
+                "foo"
+            )
+        }
+    }
+
+    @Test
+    fun `test resolve path of an existing file`() {
+        every {
+            apiService invoke "createQueryForNodeId" withArguments
+                listOf(GoogleDriveGmsConstants.ROOT_FOLDER, "RSX")
+        } returns testQueryRootFolder
+        every {
+            apiService invoke "createQueryForNodeId" withArguments
+                listOf("id of folder /RSX", "1")
+        } returns testQueryFolderRsx
+        every {
+            apiService invoke "createQueryForNodeId" withArguments
+                listOf("id of folder /RSX/1", "2")
+        } returns testQueryFolder1
+        every {
+            apiService invoke "createQueryForNodeId" withArguments
+                listOf("id of folder /RSX/1/2", "3")
+        } returns testQueryFolder2
+        every {
+            apiService invoke "createQueryForNodeId" withArguments
+                listOf("id of folder /RSX/1/2/3", "testfile.jpg")
+        } returns testQueryFolder3
+        every { apiService.getFile("id of file /RSX/1/2/3/testfile.jpg") } returns
+            mockk<Drive.Files.Get>(relaxed = true).also {
+                every { it.execute() } returns testFileJpg()
+            }
+        every { apiService.queryNodeIdHaving(any()) } answers { callOriginal() }
+
+        val result = fileRepositoryImpl.resolvePath("/RSX/1/2/3/testfile.jpg")
+        assertNotNull(result)
+        assertEquals("id of file /RSX/1/2/3/testfile.jpg", result?.id)
+
+        verify {
+            apiService invoke "createQueryForNodeId" withArguments listOf(
+                GoogleDriveGmsConstants.ROOT_FOLDER,
+                "RSX"
+            )
+        }
+        verify {
+            apiService invoke "createQueryForNodeId" withArguments listOf(
+                "id of folder /RSX",
+                "1"
+            )
+        }
+        verify {
+            apiService invoke "createQueryForNodeId" withArguments
+                listOf("id of folder /RSX/1", "2")
+        }
+        verify {
+            apiService invoke "createQueryForNodeId" withArguments
+                listOf("id of folder /RSX/1/2", "3")
+        }
+        verify {
+            apiService invoke "createQueryForNodeId" withArguments
+                listOf("id of folder /RSX/1/2/3", "testfile.jpg")
+        }
+        verify { apiService.getFile("id of file /RSX/1/2/3/testfile.jpg") }
     }
 }
