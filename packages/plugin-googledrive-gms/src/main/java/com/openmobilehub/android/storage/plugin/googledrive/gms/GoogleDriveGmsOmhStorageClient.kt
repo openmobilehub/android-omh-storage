@@ -178,6 +178,10 @@ internal class GoogleDriveGmsOmhStorageClient private constructor(
         return fileRepository.getWebUrl(fileId)
     }
 
+    override suspend fun resolvePath(path: String): OmhStorageEntity? {
+        return fileRepository.resolvePath(path)
+    }
+
     override fun getProviderSdk(): Drive = fileRepository.apiService.apiProvider.googleDriveApiService
 
     override suspend fun getStorageUsage(): Long {

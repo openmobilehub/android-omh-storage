@@ -40,3 +40,15 @@ fun String.fromRFC3339StringToDate(): Date? {
         null
     }
 }
+
+fun String.splitPathToParts(): List<String> {
+    return if (!contains('/')) {
+        listOf(this)
+    } else {
+        if (endsWith("/")) {
+            substringBeforeLast("/").split("/")
+        } else {
+            split("/")
+        }.filter { it.isNotBlank() && it.isNotEmpty() }
+    }
+}

@@ -160,6 +160,10 @@ internal class GoogleDriveNonGmsOmhStorageClient private constructor(
         return fileRepository.getFileMetadata(fileId)
     }
 
+    override suspend fun resolvePath(path: String): OmhStorageEntity? {
+        return fileRepository.resolvePath(path)
+    }
+
     override fun getProviderSdk(): Any = throw throw UnsupportedOperationException(
         "Google Drive non-gms implementation uses REST API underneath."
     )

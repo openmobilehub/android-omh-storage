@@ -49,6 +49,7 @@ import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_I
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_NAME
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_PARENT_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FILE_WEB_URL
+import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FIRST_JUNE_2024_MILLIS
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FOLDER_NAME
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_FOLDER_PARENT_ID
 import com.openmobilehub.android.storage.plugin.onedrive.testdoubles.TEST_PERMISSION_ID
@@ -75,12 +76,17 @@ import okhttp3.ResponseBody
 import org.junit.After
 import org.junit.Assert
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import retrofit2.Response
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.InputStream
+import java.time.Instant
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class OneDriveFileRepositoryTest {
@@ -674,5 +680,31 @@ class OneDriveFileRepositoryTest {
 
         repository.getStorageQuota()
         repository.getStorageUsage()
+    }
+
+    @Test
+    fun `test resolve path of non-existent file`() {
+        every { apiService.resolvePath(any()) } returns null
+        assertNull(repository.resolvePath("/foo/bar"))
+
+        verify {
+            apiService.resolvePath("/foo/bar")
+        }
+    }
+
+    @Test
+    fun `test resolve path of an existing file`() {
+        val instant = Instant.ofEpochMilli(TEST_FIRST_JUNE_2024_MILLIS)
+        every { driveItem.lastModifiedDateTime } returns OffsetDateTime.ofInstant(
+            instant,
+            ZoneOffset.UTC
+        )
+        every { driveItem.folder } returns null
+        every { driveItem.id } returns "id of file /RSX/1/2/3/testfile.jpg"
+        every { driveItem.size } returns 12345
+        every { apiService.resolvePath("/RSX/1/2/3/testfile.jpg") } returns driveItem
+        every { driveItemToOmhStorageEntity(any()) } returns omhStorageEntity
+
+        assertNotNull(repository.resolvePath("/RSX/1/2/3/testfile.jpg"))
     }
 }
