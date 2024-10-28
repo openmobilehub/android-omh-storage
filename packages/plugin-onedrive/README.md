@@ -26,6 +26,8 @@ Ensure you have the following packages installed before proceeding with the inte
 - [`com.openmobilehub.android.storage:core:<version>`](https://openmobilehub.github.io/android-omh-storage/docs/core)
 - [`com.openmobilehub.android.auth:core:<version>`](https://github.com/openmobilehub/android-omh-auth)
 
+(Replace `<version>` with the latest version number shown in the Maven Central badge above)
+
 ## Installation
 
 To integrate the OneDrive storage provider into your Android project, follow these steps:
