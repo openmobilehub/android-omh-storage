@@ -45,9 +45,9 @@ provider implementations.
 
 <div align="center">
 
-| Google Drive (GMS)                                                                                                            | Google Drive (non-GMS)                                                                                                            | Dropbox                                                                                                                    | OneDrive                                                                                                                    |
-|-------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
-| File listing                                                                                                                  |
+| Google Drive (GMS) | Google Drive (non-GMS) | Dropbox | OneDrive |
+| --- | --- | --- | ---|
+| File listing |
 | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_google_gms_1.gif"> | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_google_non_gms_1.gif"> | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_dropbox_1.gif"> | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_onedrive_1.gif"> |
 
 </div>
@@ -56,25 +56,25 @@ provider implementations.
 
 <div align="center">
 
-| Google Drive (GMS)                                                                                                             | Google Drive (non-GMS)                                                                                                             | Dropbox                                                                                                                     | OneDrive                                                                                                                     |
-|--------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------|
-| File searching                                                                                                                 |
+| Google Drive (GMS) | Google Drive (non-GMS) | Dropbox | OneDrive |
+| --- | --- | --- | --- |
+| File searching |
 | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_google_gms_2.gif">  | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_google_non_gms_2.gif">  | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_dropbox_2.gif">  | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_onedrive_2.gif">  |
-| File creation                                                                                                                  |
+| File creation |
 | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_google_gms_3.gif">  | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_google_non_gms_3.gif">  | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_dropbox_3.gif">  | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_onedrive_3.gif">  |
-| File update                                                                                                                    |
+| File update |
 | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_google_gms_4.gif">  | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_google_non_gms_4.gif">  | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_dropbox_4.gif">  | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_onedrive_4.gif">  |
-| File deletion                                                                                                                  |
+| File deletion |
 | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_google_gms_5.gif">  | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_google_non_gms_5.gif">  | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_dropbox_5.gif">  | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_onedrive_5.gif">  |
-| File upload                                                                                                                    |
+| File upload |
 | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_google_gms_6.gif">  | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_google_non_gms_6.gif">  | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_dropbox_6.gif">  | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_onedrive_6.gif">  |
-| File download                                                                                                                  |
+| File download |
 | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_google_gms_7.gif">  | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_google_non_gms_7.gif">  | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_dropbox_7.gif">  | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_onedrive_7.gif">  |
-| File metadata                                                                                                                  |
+| File metadata |
 | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_google_gms_8.gif">  | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_google_non_gms_8.gif">  | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_dropbox_8.gif">  | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_onedrive_8.gif">  |
-| File versioning                                                                                                                |
+| File versioning |
 | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_google_gms_9.gif">  | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_google_non_gms_9.gif">  | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_dropbox_9.gif">  | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_onedrive_9.gif">  |
-| File permissions                                                                                                               |
+| File permissions |
 | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_google_gms_10.gif"> | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_google_non_gms_10.gif"> | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_dropbox_10.gif"> | <img src="https://raw.githubusercontent.com/openmobilehub/omh-assets/main/android-omh-storage/demo/storage_onedrive_10.gif"> |
 
 </div>
