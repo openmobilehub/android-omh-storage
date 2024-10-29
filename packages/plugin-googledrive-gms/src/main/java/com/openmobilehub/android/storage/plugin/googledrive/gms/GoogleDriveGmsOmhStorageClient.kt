@@ -179,4 +179,12 @@ internal class GoogleDriveGmsOmhStorageClient private constructor(
     }
 
     override fun getProviderSdk(): Drive = fileRepository.apiService.apiProvider.googleDriveApiService
+
+    override suspend fun getStorageUsage(): Long {
+        return fileRepository.getStorageUsage()
+    }
+
+    override suspend fun getStorageQuota(): Long {
+        return fileRepository.getStorageQuota()
+    }
 }

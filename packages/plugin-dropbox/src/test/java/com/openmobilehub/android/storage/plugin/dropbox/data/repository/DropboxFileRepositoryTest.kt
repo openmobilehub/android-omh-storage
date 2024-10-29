@@ -46,6 +46,7 @@ import com.dropbox.core.v2.sharing.SharedFolderMembers
 import com.dropbox.core.v2.sharing.SharedFolderMetadata
 import com.dropbox.core.v2.sharing.UserFileMembershipInfo
 import com.dropbox.core.v2.sharing.UserInfo
+import com.dropbox.core.v2.users.SpaceUsage
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
@@ -74,6 +75,9 @@ import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.createUserPe
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.dropboxIdMemberSelector
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.emailMemberSelector
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.setUpMock
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.setUpMockForPersonalAccount
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.setupMockForOtherAccount
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.setupMockForTeamAccount
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testInvitedOmhPermission
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhFolder
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhGroupPermission
@@ -192,6 +196,9 @@ class DropboxFileRepositoryTest {
 
     @MockK
     private lateinit var searchMatch: SearchMatchV2
+
+    @MockK(relaxed = true)
+    private lateinit var spaceUsage: SpaceUsage
 
     @MockK(relaxed = true)
     private lateinit var dbxApiException: DbxApiException
@@ -1044,5 +1051,40 @@ class DropboxFileRepositoryTest {
                 AccessLevel.EDITOR
             )
         }
+    }
+
+    @Test
+    fun `scenario when user is personal account`() {
+        spaceUsage.setUpMockForPersonalAccount()
+        every { apiService.getSpaceUsage() } returns spaceUsage
+
+        assertEquals(100L, repository.getStorageUsage())
+        assertEquals(104857600L, repository.getStorageQuota())
+    }
+
+    @Test
+    fun `scenario when user is team account`() {
+        spaceUsage.setupMockForTeamAccount()
+        every { apiService.getSpaceUsage() } returns spaceUsage
+
+        assertEquals(1000L, repository.getStorageUsage())
+        assertEquals(1048576000L, repository.getStorageQuota())
+    }
+
+    @Test
+    fun `scenario when user is OTHER account`() {
+        spaceUsage.setupMockForOtherAccount()
+        every { apiService.getSpaceUsage() } returns spaceUsage
+
+        assertEquals(10000L, repository.getStorageUsage())
+        assertEquals(-1L, repository.getStorageQuota())
+    }
+
+    @Test(expected = OmhStorageException.ApiException::class)
+    fun `scenario when about request fails, DbxApiException is thrown`() {
+        every { apiService.getSpaceUsage() }.throws(dbxApiException)
+
+        repository.getStorageQuota()
+        repository.getStorageUsage()
     }
 }

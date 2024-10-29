@@ -173,4 +173,6 @@ internal class GoogleDriveApiService(internal val apiProvider: GoogleDriveApiPro
         .apply {
             fields = WEB_URL_FIELD
         }
+
+    fun about(): Drive.About.Get = apiProvider.googleDriveApiService.about().get()
 }
