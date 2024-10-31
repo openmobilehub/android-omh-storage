@@ -32,7 +32,7 @@ sealed class FileViewerViewState : ViewState {
         override fun getName() = "FileViewerViewState.Loading"
     }
 
-    data class Content(val files: List<OmhStorageEntity>, val isSearching: Boolean) :
+    data class Content(val files: List<OmhStorageEntity>, val isSearching: Boolean, val quotaAllocated: Long, val quotaUsed: Long) :
         FileViewerViewState() {
 
         override fun getName() = "FileViewerViewState.Content"

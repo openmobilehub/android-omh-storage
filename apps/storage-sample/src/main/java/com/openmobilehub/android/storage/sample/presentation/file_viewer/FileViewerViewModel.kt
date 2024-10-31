@@ -18,12 +18,14 @@ package com.openmobilehub.android.storage.sample.presentation.file_viewer
 
 import android.content.Context
 import android.net.Uri
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
+import com.openmobilehub.android.storage.core.utils.folderSize
 import com.openmobilehub.android.storage.sample.domain.model.FileType
 import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
 import com.openmobilehub.android.storage.sample.domain.repository.SessionRepository
@@ -105,6 +107,10 @@ class FileViewerViewModel @Inject constructor(
     private val parentId = StackWithFlow(omhStorageClient.rootFolder)
     private var searchQuery: MutableStateFlow<String?> = MutableStateFlow(null)
     private var forceRefresh: MutableStateFlow<Int> = MutableStateFlow(0)
+    private var quotaAllocated: MutableStateFlow<Long> = MutableStateFlow(0L)
+    private var quotaUsed: MutableStateFlow<Long> = MutableStateFlow(0L)
+
+    val folderSize: MutableLiveData<Long> = MutableLiveData(-1L)
 
     private val isPermanentlyDeleteSupported: Boolean =
         when (storageAuthProvider) {
@@ -126,8 +132,10 @@ class FileViewerViewModel @Inject constructor(
                 parentId.peekFlow,
                 searchQuery
                     .debounce(SEARCH_QUERY_DEBOUNCE_MILLIS),
-                forceRefresh
-            ) { parentId, searchQuery, _ ->
+                forceRefresh,
+                quotaAllocated,
+                quotaUsed
+            ) { parentId, searchQuery, _, _, _ ->
                 setState(FileViewerViewState.Loading)
 
                 val files = if (searchQuery.isNullOrBlank()) {
@@ -136,21 +144,35 @@ class FileViewerViewModel @Inject constructor(
                     omhStorageClient.search(searchQuery)
                 }
 
-                return@combine files.sortedWith(
-                    compareBy<OmhStorageEntity> { it is OmhStorageEntity.OmhFile }
+                val quotaAllocated = omhStorageClient.getStorageQuota()
+                val quotaUsed = omhStorageClient.getStorageUsage()
+
+                return@combine FileViewerViewState.Content(
+                    files.sortedWith(compareBy<OmhStorageEntity> { it is OmhStorageEntity.OmhFile }
                         .thenBy { (it as? OmhStorageEntity.OmhFile)?.mimeType }
                         .thenBy { it.name }
-                )
+                    ),
+                    !searchQuery.isNullOrEmpty(),
+                    quotaAllocated,
+                    quotaUsed)
             }
                 .catch {
                     handleException(it)
-                    emit(emptyList())
+                    emit(FileViewerViewState.Content(emptyList(), false, 0L, 0L))
                 }
                 .onEach {
-                    setState(FileViewerViewState.Content(it, !searchQuery.value.isNullOrEmpty()))
+                    setState(FileViewerViewState.Content(
+                            it.files,
+                            !searchQuery.value.isNullOrEmpty(),
+                            it.quotaAllocated,
+                            it.quotaUsed
+                        )
+                    )
                 }
                 .flowOn(Dispatchers.IO)
-                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+                .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), FileViewerViewState.Content(
+                    emptyList(), false, 0L, 0L
+                ))
                 .collect {
                     // we use onEach to update state, even it the result is the same
                 }
@@ -187,6 +209,7 @@ class FileViewerViewModel @Inject constructor(
             is FileViewerViewEvent.FilePermissionsClicked -> onFilePermissions(event)
             is FileViewerViewEvent.FileVersionsClicked -> onFileVersions(event)
             is FileViewerViewEvent.MoreOptionsClicked -> onMoreOptions(event)
+            is FileViewerViewEvent.GetFolderSize -> onGetFolderSize(event)
         }
     }
 
@@ -507,6 +530,13 @@ class FileViewerViewModel @Inject constructor(
         lastFileClicked = event.file
         viewModelScope.launch {
             _action.send(FileViewerViewAction.ShowMoreOptions)
+        }
+    }
+
+    private fun onGetFolderSize(event: FileViewerViewEvent.GetFolderSize) {
+        viewModelScope.launch(Dispatchers.IO) {
+            folderSize.postValue(-1L)
+            folderSize.postValue(omhStorageClient.folderSize(event.folder.id))
         }
     }
 
