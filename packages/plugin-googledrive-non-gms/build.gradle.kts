@@ -24,7 +24,7 @@ dependencies {
     if (useLocalProjects) {
         api(project(":packages:core"))
     } else {
-        api("com.openmobilehub.android.storage:core:2.0.6-alpha")
+        api("com.openmobilehub.android.storage:core:2.1.0-alpha")
     }
 
     // Omh Auth
