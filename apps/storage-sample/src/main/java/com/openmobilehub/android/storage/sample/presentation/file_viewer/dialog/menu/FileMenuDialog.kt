@@ -18,17 +18,21 @@ package com.openmobilehub.android.storage.sample.presentation.file_viewer.dialog
 
 import android.graphics.Color
 import android.os.Bundle
+import android.text.format.Formatter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.DialogFileMenuBinding
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.FileViewerViewModel
 import com.openmobilehub.android.storage.sample.presentation.file_viewer.model.FileViewerViewEvent
 import com.openmobilehub.android.storage.sample.util.isFile
+import com.openmobilehub.android.storage.sample.util.isFolder
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -54,6 +58,31 @@ class FileMenuDialog : BottomSheetDialogFragment() {
 
     private fun setupBinding() = with(binding) {
         val file = requireNotNull(viewModel.lastFileClicked)
+
+        viewModel.folderSize.observe(viewLifecycleOwner) {
+            header.fileSize.text = resources.getString(
+                if (file.isFile()) {
+                    R.string.file_size
+                } else {
+                    R.string.folder_size
+                },
+                if (file.isFile()) {
+                    Formatter.formatFileSize(
+                        requireContext(),
+                        (file as OmhStorageEntity.OmhFile).size?.toLong() ?: 0L
+                    )
+                } else {
+                    viewModel.folderSize.value.let {
+                        if (it == null || it < 0) {
+                            ""
+                        } else {
+                            Formatter.formatFileSize(requireContext(), it)
+                        }
+                    }
+                }
+            )
+        }
+
         header.title.text = resources.getString(R.string.text_options)
         header.fileName.text = file.name
 
@@ -100,6 +129,10 @@ class FileMenuDialog : BottomSheetDialogFragment() {
         permanentlyDelete.root.setOnClickListener {
             dismiss()
             viewModel.dispatchEvent(FileViewerViewEvent.PermanentlyDeleteFileClicked(file))
+        }
+
+        if (file.isFolder()) {
+            viewModel.dispatchEvent(FileViewerViewEvent.GetFolderSize(file as OmhStorageEntity.OmhFolder))
         }
     }
 }

@@ -37,6 +37,7 @@
     <string name="text_delete_dialog_title">Are you sure?</string>
     <string name="text_delete_dialog_message">This action cannot be undone. If you want to move file to trash, use regular delete.</string>
     <string name="text_show_original_metadata">Show original metadata</string>
+    <string name="text_quota">Quota allocated: %s, used: %s</string>
 
     <string name="error_dialog_title">Something went wrong</string>
     <string name="error_dialog_message">Error detail:\n\n%s</string>
@@ -49,6 +50,7 @@
     <string name="file_mime_type">Mime Type: %s</string>
     <string name="file_extension">Extension: %s</string>
     <string name="file_size">File Size: %s</string>
+    <string name="folder_size">Folder Size: %s</string>
 
     <string name="versions_get_error">Couldn\'t get versions</string>
     <string name="metadata_get_error">Couldn\'t get metadata</string>

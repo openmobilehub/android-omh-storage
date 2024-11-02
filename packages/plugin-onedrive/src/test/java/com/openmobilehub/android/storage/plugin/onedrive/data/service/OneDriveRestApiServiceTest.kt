@@ -25,6 +25,7 @@ import com.microsoft.graph.models.DriveItemVersionCollectionResponse
 import com.microsoft.graph.models.Permission
 import com.microsoft.graph.models.UploadSession
 import com.microsoft.kiota.ApiException
+import com.microsoft.kiota.ApiExceptionBuilder
 import com.microsoft.kiota.RequestAdapter
 import com.microsoft.kiota.RequestInformation
 import com.openmobilehub.android.storage.core.model.OmhStorageException
@@ -47,6 +48,8 @@ import io.mockk.slot
 import io.mockk.verify
 import org.junit.After
 import org.junit.Assert
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import java.io.File
@@ -419,6 +422,44 @@ class OneDriveRestApiServiceTest {
 
         // Assert
         Assert.assertEquals(searchWithQGetResponse, result)
+    }
+
+    @Test
+    fun `test resolve path of non-existent file`() {
+        every {
+            apiClient.graphServiceClient.drives().byDriveId(any()).items().byDriveItemId(any())
+        } throws ApiExceptionBuilder().withMessage("The resource could not be found.").build()
+
+        try {
+            apiService.resolvePath("/foo/bar")
+            fail("Exception not thrown")
+        } catch (_: ApiException) {
+            verify {
+                apiClient.graphServiceClient.drives().byDriveId(any()).items().byDriveItemId("root:/foo/bar")
+            }
+        }
+    }
+
+    @Test
+    fun `test resolve path of an existing file`() {
+        every {
+            apiClient.graphServiceClient
+                .drives()
+                .byDriveId(any())
+                .items()
+                .byDriveItemId(any())
+                .get()
+        } returns driveItem
+
+        assertNotNull(apiService.resolvePath("/RSX/1/2/3/testfile.jpg"))
+
+        verify {
+            apiClient.graphServiceClient
+                .drives()
+                .byDriveId(any())
+                .items()
+                .byDriveItemId("root:/RSX/1/2/3/testfile.jpg")
+        }
     }
 }
 

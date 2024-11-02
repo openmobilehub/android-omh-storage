@@ -89,4 +89,13 @@ class StringExtensionsTest {
         // Assert
         assertNull(result)
     }
+
+    @Test
+    fun `test splitPathToParts`() {
+        assertEquals(listOf("abc"), "abc".splitPathToParts())
+        assertEquals(listOf(""), "".splitPathToParts())
+        assertEquals(listOf(" "), " ".splitPathToParts())
+        assertEquals(listOf("a", "b", "c"), "/a/b/c".splitPathToParts())
+        assertEquals(listOf("a", "b", "c"), "/a/b/c/".splitPathToParts())
+    }
 }

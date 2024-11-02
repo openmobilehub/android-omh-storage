@@ -277,6 +277,15 @@ abstract class OmhStorageClient protected constructor(
     ): String?
 
     /**
+     * This method retrieves the storage entity at specified path.
+     *
+     * @param path The path of the storage entity
+     *
+     * @return [OmhStorageEntity] or null if not found
+     */
+    abstract suspend fun resolvePath(path: String): OmhStorageEntity?
+
+    /**
      * This method provides an escape hatch to access the provider native SDK. This allows developers
      * to use the underlying provider's API directly, should they need to access a feature of the
      * provider that is not supported by the OMH plugin. Refer to the plugin's advanced documentation

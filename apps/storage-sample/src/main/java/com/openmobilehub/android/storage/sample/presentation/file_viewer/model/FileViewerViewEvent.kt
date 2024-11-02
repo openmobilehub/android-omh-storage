@@ -138,4 +138,8 @@ sealed class FileViewerViewEvent : ViewEvent {
 
         override fun getEventName() = "FileViewerViewEvent.UpdateSearchQuery"
     }
+
+    class GetFolderSize(val folder: OmhStorageEntity.OmhFolder): FileViewerViewEvent() {
+        override fun getEventName(): String = "FileViewerViewEvent.GetFolderSize"
+    }
 }

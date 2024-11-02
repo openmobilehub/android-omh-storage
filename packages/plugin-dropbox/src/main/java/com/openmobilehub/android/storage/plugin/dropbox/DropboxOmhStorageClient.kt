@@ -179,6 +179,10 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         return null
     }
 
+    override suspend fun resolvePath(path: String): OmhStorageEntity? {
+        return repository.resolvePath(path)
+    }
+
     override fun getProviderSdk(): DbxClientV2 = repository.apiService.apiClient.dropboxApiService
 
     override suspend fun getStorageUsage(): Long {

@@ -284,4 +284,11 @@ internal class GmsFileRepository(
     } catch (exception: HttpResponseException) {
         throw ExceptionMapper.toOmhApiException(exception)
     }
+
+    fun resolvePath(path: String): OmhStorageEntity? {
+        val nodeId = apiService.queryNodeIdHaving(path)
+        return nodeId?.let {
+            apiService.getFile(it).execute().toOmhStorageEntity()
+        }
+    }
 }

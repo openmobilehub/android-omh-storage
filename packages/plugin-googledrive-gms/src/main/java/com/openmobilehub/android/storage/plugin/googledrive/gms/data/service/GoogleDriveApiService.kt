@@ -19,7 +19,10 @@ package com.openmobilehub.android.storage.plugin.googledrive.gms.data.service
 import com.google.api.client.http.FileContent
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.model.File
+import com.google.api.services.drive.model.FileList
 import com.google.api.services.drive.model.Permission
+import com.openmobilehub.android.storage.core.utils.splitPathToParts
+import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants
 
 @Suppress("TooManyFunctions")
 internal class GoogleDriveApiService(internal val apiProvider: GoogleDriveApiProvider) {
@@ -175,4 +178,25 @@ internal class GoogleDriveApiService(internal val apiProvider: GoogleDriveApiPro
         }
 
     fun about(): Drive.About.Get = apiProvider.googleDriveApiService.about().get()
+
+    fun queryNodeIdHaving(path: String): String? {
+        val parts = path.splitPathToParts()
+        var parentId = GoogleDriveGmsConstants.ROOT_FOLDER
+        for (nodeName in parts) {
+            val query = createQueryForNodeId(parentId, nodeName)
+            val files = query.files
+            if (files == null || files.isEmpty()) {
+                return null
+            } else {
+                parentId = files.first().id
+            }
+        }
+        return parentId
+    }
+
+    private fun createQueryForNodeId(parentId: String, nodeName: String): FileList =
+        apiProvider.googleDriveApiService
+            .files()
+            .list()
+            .setQ("'$parentId' in parents and name='$nodeName'").execute()
 }

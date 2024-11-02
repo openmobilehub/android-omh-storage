@@ -233,6 +233,14 @@ Retrieves the file URL.
 val webUrl = omhStorageClient.getWebUrl(fileId = "fileId")
 ```
 
+### Resolve path of a file or folder
+
+Retrieves the ID of the file/folder at specified path on the cloud storage (which the user has access to).
+
+```kotlin
+val fileOrFolderId = omhStorageClient.resolvePath("path/to/the/fileorfolder")
+```
+
 ---
 
 For a more in depth view on the available methods, access the [Reference API](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client).

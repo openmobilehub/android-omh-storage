@@ -70,17 +70,31 @@
     <LinearLayout
             android:id="@+id/topPanel"
             android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:orientation="horizontal"
+            android:layout_height="70dp"
+            android:orientation="vertical"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
         <TextView
+                android:id="@+id/quota"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:clickable="false"
+                android:drawablePadding="7dp"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/sortByName" />
+
+        <TextView
                 android:id="@+id/sortByName"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="35dp"
                 android:clickable="true"
                 android:drawablePadding="7dp"
                 android:focusable="true"
@@ -89,7 +103,10 @@
                 android:paddingEnd="16dp"
                 android:text="@string/text_name"
                 app:drawableEndCompat="@android:drawable/arrow_up_float"
-                app:drawableTint="@color/black" />
+                app:drawableTint="@color/black"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/quota" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView

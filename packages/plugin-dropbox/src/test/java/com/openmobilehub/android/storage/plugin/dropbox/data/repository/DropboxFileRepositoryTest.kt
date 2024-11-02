@@ -60,6 +60,7 @@ import com.openmobilehub.android.storage.plugin.dropbox.data.service.DropboxApiS
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_EMAIL_MESSAGE
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_EXTENSION
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_ID
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_MODIFIED_TIME
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_NAME
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_PARENT_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_PATH
@@ -78,11 +79,17 @@ import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.setUpMock
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.setUpMockForPersonalAccount
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.setupMockForOtherAccount
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.setupMockForTeamAccount
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testFileJpg
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testInvitedOmhPermission
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhFolder
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhGroupPermission
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhUserPermission
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhVersion
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testQueryFolder1
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testQueryFolder2
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testQueryFolder3
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testQueryFolderRsx
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testQueryRootFolder
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -1086,5 +1093,76 @@ class DropboxFileRepositoryTest {
 
         repository.getStorageQuota()
         repository.getStorageUsage()
+    }
+
+    @Test
+    fun `test resolve path of non-existent file`() {
+        every { apiService.queryNodeIdHaving(any()) } answers { callOriginal() }
+        assertNull(repository.resolvePath("/foo/bar"))
+
+        verify {
+            apiService invoke "listFilesAt" withArguments listOf(
+                "" // Root
+            )
+        }
+    }
+
+    @Test
+    fun `test resolve path of an existing file`() {
+        every {
+            apiService invoke "listFilesAt" withArguments
+                listOf("")
+        } returns testQueryRootFolder
+        every {
+            apiService invoke "listFilesAt" withArguments
+                listOf("/RSX")
+        } returns testQueryFolderRsx
+        every {
+            apiService invoke "listFilesAt" withArguments
+                listOf("/RSX/1")
+        } returns testQueryFolder1
+        every {
+            apiService invoke "listFilesAt" withArguments
+                listOf("/RSX/1/2")
+        } returns testQueryFolder2
+        every {
+            apiService invoke "listFilesAt" withArguments
+                listOf("/RSX/1/2/3")
+        } returns testQueryFolder3
+        every { apiService.getFile("id of file /RSX/1/2/3/testfile.jpg") } returns
+            testFileJpg()
+
+        every { apiService.queryNodeIdHaving(any()) } answers { callOriginal() }
+        every { metadataToOmhStorageEntity(testFileJpg()) } returns OmhStorageEntity.OmhFile(
+            id = "id of file /RSX/1/2/3/testfile.jpg",
+            name = "testfile.jpg",
+            createdTime = TEST_FILE_MODIFIED_TIME,
+            modifiedTime = TEST_FILE_MODIFIED_TIME,
+            parentId = "id of folder /RSX/1/2/3",
+            mimeType = "image/jpeg",
+            extension = "jpg",
+            size = 12345
+        )
+
+        val result = repository.resolvePath("/RSX/1/2/3/testfile.jpg")
+        assertNotNull(result)
+        assertEquals("id of file /RSX/1/2/3/testfile.jpg", result?.id)
+
+        verify {
+            apiService invoke "listFilesAt" withArguments listOf("")
+        }
+        verify {
+            apiService invoke "listFilesAt" withArguments listOf("/RSX")
+        }
+        verify {
+            apiService invoke "listFilesAt" withArguments listOf("/RSX/1")
+        }
+        verify {
+            apiService invoke "listFilesAt" withArguments listOf("/RSX/1/2")
+        }
+        verify {
+            apiService invoke "listFilesAt" withArguments listOf("/RSX/1/2/3")
+        }
+        verify { apiService.getFile("id of file /RSX/1/2/3/testfile.jpg") }
     }
 }
