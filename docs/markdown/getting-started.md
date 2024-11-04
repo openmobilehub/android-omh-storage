@@ -233,6 +233,30 @@ Retrieves the file URL.
 val webUrl = omhStorageClient.getWebUrl(fileId = "fileId")
 ```
 
+### Get folder size
+
+Recursively calculates the total size of files in the specified folder, in bytes.
+
+```kotlin
+val totalFolderSize = omhStorageClient.folderSize(folderId = "folderId")
+```
+
+### Get storage quota
+
+Retrieves the storage quota allocated by the storage provider, in bytes. It is entirely depends on storage provider's calculations, so actual figures may differ.
+
+```kotlin
+val quotaAllocated = omhStorageClient.getStorageQuota()
+```
+
+### Get storage usage
+
+Retrieves the storage quota currently in use, in bytes. It is entirely depends on storage provider's calculations, so actual figures may differ.
+
+```kotlin
+val quotaUsed = omhStorageClient.getStorageUsage()
+```
+
 ---
 
 For a more in depth view on the available methods, access the [Reference API](https://openmobilehub.github.io/android-omh-storage/api/packages/core/com.openmobilehub.android.storage.core/-omh-storage-client).

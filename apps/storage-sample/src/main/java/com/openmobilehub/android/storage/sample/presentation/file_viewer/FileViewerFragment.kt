@@ -25,6 +25,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.text.format.Formatter
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -347,6 +348,11 @@ class FileViewerFragment :
             )
             topPanel.visibility = recyclerVisibility
             filesRecyclerView.visibility = recyclerVisibility
+            quota.text = resources.getString(
+                R.string.text_quota,
+                Formatter.formatFileSize(requireContext(), state.quotaAllocated),
+                Formatter.formatFileSize(requireContext(), state.quotaUsed)
+            )
         }
 
         filesAdapter?.submitList(files)
