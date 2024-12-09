@@ -45,6 +45,7 @@ internal class GmsFileRepository(
 ) {
     companion object {
         private const val ANY_MIME_TYPE = "*/*"
+        private const val QUERY_REQUEST_STORAGE_QUOTA = "storageQuota"
     }
 
     internal interface Builder {
@@ -273,13 +274,13 @@ internal class GmsFileRepository(
     }
 
     fun getStorageUsage(): Long = try {
-        apiService.about().execute().storageQuota.usageInDrive
+        apiService.about(QUERY_REQUEST_STORAGE_QUOTA).execute().storageQuota.usageInDrive
     } catch (exception: HttpResponseException) {
         throw ExceptionMapper.toOmhApiException(exception)
     }
 
     fun getStorageQuota(): Long = try {
-        val retval: Long? = apiService.about().execute().storageQuota.limit
+        val retval: Long? = apiService.about(QUERY_REQUEST_STORAGE_QUOTA).execute().storageQuota.limit
         retval ?: -1L
     } catch (exception: HttpResponseException) {
         throw ExceptionMapper.toOmhApiException(exception)

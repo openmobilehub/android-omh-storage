@@ -1044,7 +1044,7 @@ internal class NonGmsFileRepositoryTest {
     fun `test getStorageQuota() and getStorageUsage() requests`() =
         runTest {
             coEvery {
-                googleStorageApiService.about()
+                googleStorageApiService.about("storageQuota")
             } returns Response.success(
                 200,
                 aboutResponseWithQuotaImposed
@@ -1052,26 +1052,30 @@ internal class NonGmsFileRepositoryTest {
 
             assertEquals(100L, fileRepositoryImpl.getStorageUsage())
             assertEquals(104857600L, fileRepositoryImpl.getStorageQuota())
+
+            coVerify { googleStorageApiService.about(fields = "storageQuota") }
         }
 
     @Test
     fun `test getStorageQuota() requests with unlimited quota`() =
         runTest {
             coEvery {
-                googleStorageApiService.about()
+                googleStorageApiService.about("storageQuota")
             } returns Response.success(
                 200,
                 aboutResponseWithUnlimitedQuota
             )
 
             assertEquals(-1L, fileRepositoryImpl.getStorageQuota())
+
+            coVerify { googleStorageApiService.about(fields = "storageQuota") }
         }
 
     @Test(expected = OmhStorageException.ApiException::class)
     fun `scenario when about request fails, ApiException is thrown`() =
         runTest {
             coEvery {
-                googleStorageApiService.about()
+                googleStorageApiService.about(any())
             } returns Response.error(
                 500,
                 responseBody
@@ -1079,5 +1083,7 @@ internal class NonGmsFileRepositoryTest {
 
             fileRepositoryImpl.getStorageQuota()
             fileRepositoryImpl.getStorageUsage()
+
+            coVerify { googleStorageApiService.about(fields = "storageQuota") }
         }
 }

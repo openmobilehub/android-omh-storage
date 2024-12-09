@@ -174,5 +174,10 @@ internal class GoogleDriveApiService(internal val apiProvider: GoogleDriveApiPro
             fields = WEB_URL_FIELD
         }
 
-    fun about(): Drive.About.Get = apiProvider.googleDriveApiService.about().get()
+    fun about(queryFields: String? = null): Drive.About.Get =
+        apiProvider.googleDriveApiService.about().get().also {
+            if (!queryFields.isNullOrEmpty()) {
+                it.setFields(queryFields)
+            }
+        }
 }
