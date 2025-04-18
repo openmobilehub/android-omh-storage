@@ -24,6 +24,7 @@ import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.core.utils.toInputStream
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.LocalFileToMimeType
+import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.NonGmsFileRepository.Companion.STORAGE_QUOTA
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.GoogleStorageApiService
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit.GoogleStorageApiServiceProvider
@@ -1044,7 +1045,7 @@ internal class NonGmsFileRepositoryTest {
     fun `test getStorageQuota() and getStorageUsage() requests`() =
         runTest {
             coEvery {
-                googleStorageApiService.about("storageQuota")
+                googleStorageApiService.about(STORAGE_QUOTA)
             } returns Response.success(
                 200,
                 aboutResponseWithQuotaImposed
@@ -1053,14 +1054,14 @@ internal class NonGmsFileRepositoryTest {
             assertEquals(100L, fileRepositoryImpl.getStorageUsage())
             assertEquals(104857600L, fileRepositoryImpl.getStorageQuota())
 
-            coVerify { googleStorageApiService.about(fields = "storageQuota") }
+            coVerify { googleStorageApiService.about(fields = STORAGE_QUOTA) }
         }
 
     @Test
     fun `test getStorageQuota() requests with unlimited quota`() =
         runTest {
             coEvery {
-                googleStorageApiService.about("storageQuota")
+                googleStorageApiService.about(STORAGE_QUOTA)
             } returns Response.success(
                 200,
                 aboutResponseWithUnlimitedQuota
@@ -1068,7 +1069,7 @@ internal class NonGmsFileRepositoryTest {
 
             assertEquals(-1L, fileRepositoryImpl.getStorageQuota())
 
-            coVerify { googleStorageApiService.about(fields = "storageQuota") }
+            coVerify { googleStorageApiService.about(fields = STORAGE_QUOTA) }
         }
 
     @Test(expected = OmhStorageException.ApiException::class)
@@ -1084,6 +1085,6 @@ internal class NonGmsFileRepositoryTest {
             fileRepositoryImpl.getStorageQuota()
             fileRepositoryImpl.getStorageUsage()
 
-            coVerify { googleStorageApiService.about(fields = "storageQuota") }
+            coVerify { googleStorageApiService.about(fields = STORAGE_QUOTA) }
         }
 }

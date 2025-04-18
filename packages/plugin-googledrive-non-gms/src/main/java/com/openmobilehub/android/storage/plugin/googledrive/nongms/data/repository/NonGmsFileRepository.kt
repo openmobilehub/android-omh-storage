@@ -57,11 +57,13 @@ internal class NonGmsFileRepository(
 ) {
 
     companion object {
+        @VisibleForTesting
+        const val STORAGE_QUOTA = "storageQuota"
+
         private const val FILE_NAME_KEY = "name"
         private const val MIME_TYPE_KEY = "mimeType"
         private const val FILE_PARENTS_KEY = "parents"
         private const val FILE_TRASHED_KEY = "trashed"
-        private const val STORAGE_QUOTA = "storageQuota"
         private const val MEDIA = "media"
 
         private const val LOCATION_HEADER = "Location"
