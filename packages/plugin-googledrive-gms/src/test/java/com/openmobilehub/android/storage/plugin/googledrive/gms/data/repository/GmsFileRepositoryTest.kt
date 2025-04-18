@@ -605,24 +605,28 @@ internal class GmsFileRepositoryTest {
     fun `test getStorageQuota() and getStorageUsage() requests`() {
         about.setupQuotaAvailableMock()
         every { aboutRequest.execute() } returns about
-        every { apiService.about() } returns aboutRequest
+        every { apiService.about(queryFields = "storageQuota") } returns aboutRequest
 
         assertEquals(100L, fileRepositoryImpl.getStorageUsage())
         assertEquals(104857600L, fileRepositoryImpl.getStorageQuota())
+
+        verify { apiService.about(queryFields = "storageQuota") }
     }
 
     @Test
     fun `test getStorageQuota() requests with unlimited quota`() {
         about.setupQuotaUnlimitedMock()
         every { aboutRequest.execute() } returns about
-        every { apiService.about() } returns aboutRequest
+        every { apiService.about(queryFields = "storageQuota") } returns aboutRequest
 
         assertEquals(-1L, fileRepositoryImpl.getStorageQuota())
+
+        verify { apiService.about(queryFields = "storageQuota") }
     }
 
     @Test(expected = OmhStorageException.ApiException::class)
     fun `scenario when about request fails, ApiException is thrown`() {
-        every { apiService.about() }.throws(responseException)
+        every { apiService.about(any()) }.throws(responseException)
 
         fileRepositoryImpl.getStorageQuota()
         fileRepositoryImpl.getStorageUsage()

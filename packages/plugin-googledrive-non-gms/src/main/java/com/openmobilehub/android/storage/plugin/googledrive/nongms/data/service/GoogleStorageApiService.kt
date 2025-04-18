@@ -217,5 +217,7 @@ internal interface GoogleStorageApiService {
     ): Response<FileRemoteResponse>
 
     @GET(ABOUT)
-    suspend fun about(): Response<AboutResponse>
+    suspend fun about(
+        @Query(QUERY_FIELDS) fields: String? = null
+    ): Response<AboutResponse>
 }

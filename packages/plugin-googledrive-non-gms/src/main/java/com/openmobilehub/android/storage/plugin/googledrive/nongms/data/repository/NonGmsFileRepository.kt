@@ -57,6 +57,9 @@ internal class NonGmsFileRepository(
 ) {
 
     companion object {
+        @VisibleForTesting
+        const val STORAGE_QUOTA = "storageQuota"
+
         private const val FILE_NAME_KEY = "name"
         private const val MIME_TYPE_KEY = "mimeType"
         private const val FILE_PARENTS_KEY = "parents"
@@ -508,7 +511,7 @@ internal class NonGmsFileRepository(
     }
 
     suspend fun getStorageUsage(): Long {
-        val response = retrofitImpl.getGoogleStorageApiService().about()
+        val response = retrofitImpl.getGoogleStorageApiService().about(fields = STORAGE_QUOTA)
 
         return if (response.isSuccessful) {
             response.body()!!.storageQuota.usageInDrive
@@ -518,7 +521,7 @@ internal class NonGmsFileRepository(
     }
 
     suspend fun getStorageQuota(): Long {
-        val response = retrofitImpl.getGoogleStorageApiService().about()
+        val response = retrofitImpl.getGoogleStorageApiService().about(fields = STORAGE_QUOTA)
 
         return if (response.isSuccessful) {
             response.body()!!.storageQuota.limit
