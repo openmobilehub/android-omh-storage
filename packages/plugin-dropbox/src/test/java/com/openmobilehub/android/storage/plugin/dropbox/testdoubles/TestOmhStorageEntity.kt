@@ -23,7 +23,7 @@ import java.util.Date
 const val TEST_FILE_ID = "123"
 const val TEST_FILE_NAME = "fileName.txt"
 val TEST_FILE_CREATED_TIME = null
-val TEST_FILE_MODIFIED_TIME = TEST_FIRST_JUNE_2024_RFC_3339.fromRFC3339StringToDate()
+val TEST_FILE_MODIFIED_TIME = TEST_FIRST_JUNE_2024_RFC_3339.fromRFC3339StringToDate()!!
 const val TEST_FILE_PARENT_ID = "parentId"
 const val TEST_FILE_MIME_TYPE = "test/mime-type"
 const val TEST_FILE_EXTENSION = "txt"

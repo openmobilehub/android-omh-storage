@@ -198,6 +198,13 @@ internal class OneDriveApiService(internal val apiClient: OneDriveApiClient) {
         return apiClient.graphServiceClient.drives().byDriveId(driveId).get()
     }
 
+    fun resolvePath(path: String): DriveItem? {
+        return apiClient.graphServiceClient.drives()
+            .byDriveId(driveId)
+            .items()
+            .byDriveItemId("root:$path").get()
+    }
+
     @VisibleForTesting
     internal class DriveIdCache(private val apiClient: OneDriveApiClient) {
         private var cachedDriveId: String? = null
