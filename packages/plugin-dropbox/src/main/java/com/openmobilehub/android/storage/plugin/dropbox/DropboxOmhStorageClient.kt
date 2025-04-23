@@ -18,6 +18,7 @@ package com.openmobilehub.android.storage.plugin.dropbox
 
 import android.webkit.MimeTypeMap
 import androidx.annotation.VisibleForTesting
+import com.dropbox.core.DbxException
 import com.dropbox.core.v2.DbxClientV2
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
@@ -28,6 +29,7 @@ import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
+import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.ExceptionMapper
 import com.openmobilehub.android.storage.plugin.dropbox.data.mapper.MetadataToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.dropbox.data.repository.DropboxFileRepository
 import com.openmobilehub.android.storage.plugin.dropbox.data.service.DropboxApiClient
@@ -177,6 +179,27 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         repository.updatePermission(fileId, permissionId, role)
         // Dropbox does not return updated permission as a result
         return null
+    }
+
+    override suspend fun resolvePath(path: String): OmhStorageEntity? {
+        val startTime = System.currentTimeMillis()
+        try {
+            val retval = repository.resolvePath(path)
+            if (logger.isDebugEnabled && retval != null) {
+                logger.debug("resolvePath: \"$path\" -> $retval")
+            } else {
+                logger.debug("resolvePath: \"$path\" not found")
+            }
+            return retval
+        } catch (e: DbxException) {
+            logger.error("resolvePath failed: $path", e)
+            throw ExceptionMapper.toOmhApiException(e)
+        } finally {
+            val endTime = System.currentTimeMillis()
+            if (logger.isDebugEnabled) {
+                logger.debug("resolvePath took ${endTime - startTime} ms")
+            }
+        }
     }
 
     override fun getProviderSdk(): DbxClientV2 = repository.apiService.apiClient.dropboxApiService

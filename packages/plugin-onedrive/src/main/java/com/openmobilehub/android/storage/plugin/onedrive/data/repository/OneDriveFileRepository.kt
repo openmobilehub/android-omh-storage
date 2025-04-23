@@ -267,4 +267,12 @@ internal class OneDriveFileRepository(
     } catch (exception: ApiException) {
         throw ExceptionMapper.toOmhApiException(exception)
     }
+
+    fun resolvePath(path: String): OmhStorageEntity? = kotlin.runCatching {
+        apiService.resolvePath(path)?.let {
+            driveItemToOmhStorageEntity(it)
+        }
+    }.onFailure { exception: Throwable ->
+        throw ExceptionMapper.toOmhApiException(exception as ApiException)
+    }.getOrNull()
 }

@@ -82,4 +82,8 @@ object Libs {
 
     // Datastore
     val dataStore by lazy { "androidx.datastore:datastore-preferences:${Versions.dataStore}" }
+
+    // SLF4J
+    val slf4jApi by lazy { "org.slf4j:slf4j-api:${Versions.slf4j}" }
+    val slf4jAndroid by lazy { "uk.uuid.slf4j:slf4j-android:${Versions.slf4jAndroid}" }
 }

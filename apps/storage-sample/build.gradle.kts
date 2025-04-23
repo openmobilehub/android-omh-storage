@@ -122,6 +122,7 @@ dependencies {
     implementation(Libs.dataStore)
     implementation(Libs.hiltAndroid)
     implementation(Libs.activityKtx)
+    implementation(Libs.slf4jAndroid)
     kapt(Libs.hiltCompiler)
     kapt(Libs.glideCompiler)
 

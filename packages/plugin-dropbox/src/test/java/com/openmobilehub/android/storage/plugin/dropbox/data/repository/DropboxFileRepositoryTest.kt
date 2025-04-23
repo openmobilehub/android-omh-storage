@@ -60,6 +60,7 @@ import com.openmobilehub.android.storage.plugin.dropbox.data.service.DropboxApiS
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_EMAIL_MESSAGE
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_EXTENSION
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_ID
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_MODIFIED_TIME
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_NAME
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_PARENT_ID
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.TEST_FILE_PATH
@@ -78,6 +79,7 @@ import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.setUpMock
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.setUpMockForPersonalAccount
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.setupMockForOtherAccount
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.setupMockForTeamAccount
+import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testFileJpg
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testInvitedOmhPermission
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhFolder
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhGroupPermission
@@ -1086,5 +1088,41 @@ class DropboxFileRepositoryTest {
 
         repository.getStorageQuota()
         repository.getStorageUsage()
+    }
+
+    @Test
+    fun `test resolve path of non-existent file`() {
+        every { apiService.queryNodeIdHaving(any()) } returns null
+        assertNull(repository.resolvePath("/foo/bar"))
+
+        verify {
+            apiService.queryNodeIdHaving("/foo/bar")
+        }
+    }
+
+    @Test
+    fun `test resolve path of an existing file`() {
+        every { apiService.queryNodeIdHaving("/RSX/1/2/3/testfile.jpg") } returns
+            testFileJpg().id
+        every { apiService.getFile("id of file /RSX/1/2/3/testfile.jpg") } returns
+            testFileJpg()
+
+        every { metadataToOmhStorageEntity(testFileJpg()) } returns OmhStorageEntity.OmhFile(
+            id = "id of file /RSX/1/2/3/testfile.jpg",
+            name = "testfile.jpg",
+            createdTime = TEST_FILE_MODIFIED_TIME,
+            modifiedTime = TEST_FILE_MODIFIED_TIME,
+            parentId = "id of folder /RSX/1/2/3",
+            mimeType = "image/jpeg",
+            extension = "jpg",
+            size = 12345
+        )
+
+        val result = repository.resolvePath("/RSX/1/2/3/testfile.jpg")
+        assertNotNull(result)
+        assertEquals("id of file /RSX/1/2/3/testfile.jpg", result?.id)
+
+        verify { apiService.queryNodeIdHaving("/RSX/1/2/3/testfile.jpg") }
+        verify { apiService.getFile("id of file /RSX/1/2/3/testfile.jpg") }
     }
 }

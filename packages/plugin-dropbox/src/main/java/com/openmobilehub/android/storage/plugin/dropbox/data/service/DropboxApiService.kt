@@ -20,6 +20,7 @@ import com.dropbox.core.v2.async.LaunchResultBase
 import com.dropbox.core.v2.files.CreateFolderResult
 import com.dropbox.core.v2.files.DeleteResult
 import com.dropbox.core.v2.files.FileMetadata
+import com.dropbox.core.v2.files.FolderMetadata
 import com.dropbox.core.v2.files.ListFolderResult
 import com.dropbox.core.v2.files.ListRevisionsMode
 import com.dropbox.core.v2.files.ListRevisionsResult
@@ -231,5 +232,10 @@ internal class DropboxApiService(internal val apiClient: DropboxApiClient) {
 
     fun getSpaceUsage(): SpaceUsage {
         return apiClient.dropboxApiService.users().spaceUsage
+    }
+
+    fun queryNodeIdHaving(path: String): String? {
+        val node: Metadata = apiClient.dropboxApiService.files().getMetadata(path) ?: return null
+        return (node as? FolderMetadata)?.id ?: (node as FileMetadata).id
     }
 }

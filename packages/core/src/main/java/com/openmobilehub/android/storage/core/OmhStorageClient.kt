@@ -39,6 +39,8 @@ import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.io.ByteArrayOutputStream
 import java.io.File
 
@@ -46,6 +48,8 @@ import java.io.File
 abstract class OmhStorageClient protected constructor(
     protected val authClient: OmhAuthClient
 ) {
+
+    protected val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     interface Builder {
 
@@ -275,6 +279,28 @@ abstract class OmhStorageClient protected constructor(
     abstract suspend fun getWebUrl(
         fileId: String,
     ): String?
+
+    /**
+     * This method tries resolve the storage entity at specified path.
+     *
+     * Example usage:
+     *
+     * ```
+     * val path = "/path/to/file.txt"
+     * val entity = storageClient.resolvePath(path)
+     * if (entity != null) {
+     *   Log.d("StorageClient", "Entity ${path} resolves to: ${entity.id}")
+     *   // Do something else with the entity
+     * } else {
+     *   Log.w("StorageClient", "Entity ${path} not found")
+     * }
+     * ```
+     *
+     * @param path The path of the storage entity
+     *
+     * @return [OmhStorageEntity] or null if not found
+     */
+    abstract suspend fun resolvePath(path: String): OmhStorageEntity?
 
     /**
      * This method provides an escape hatch to access the provider native SDK. This allows developers

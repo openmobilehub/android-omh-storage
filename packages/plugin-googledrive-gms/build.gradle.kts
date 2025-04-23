@@ -35,6 +35,9 @@ dependencies {
     // Omh Auth
     api(Libs.omhGoogleGmsAuthLibrary)
 
+    // slf4j
+    implementation(Libs.slf4jApi)
+
     // GMS
     implementation(Libs.googlePlayServicesAuth)
     implementation(Libs.googleJacksonClient)
@@ -52,4 +55,5 @@ dependencies {
     testImplementation(Libs.junit)
     testImplementation(Libs.mockk)
     testImplementation(Libs.coroutineTesting)
+    testImplementation(Libs.slf4jAndroid)
 }

@@ -24,6 +24,7 @@ import com.openmobilehub.android.storage.core.model.OmhFileVersion
 import com.openmobilehub.android.storage.core.model.OmhPermission
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
+import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.LocalFileToMimeType
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.NonGmsFileRepository
@@ -158,6 +159,27 @@ internal class GoogleDriveNonGmsOmhStorageClient private constructor(
 
     override suspend fun getFileMetadata(fileId: String): OmhStorageMetadata {
         return fileRepository.getFileMetadata(fileId)
+    }
+
+    override suspend fun resolvePath(path: String): OmhStorageEntity? {
+        val startTime = System.currentTimeMillis()
+        try {
+            val retval = fileRepository.resolvePath(path)
+            if (logger.isDebugEnabled && retval != null) {
+                logger.debug("resolvePath: \"$path\" -> $retval")
+            } else {
+                logger.debug("resolvePath: \"$path\" not found")
+            }
+            return retval
+        } catch (e: OmhStorageException.ApiException) {
+            logger.error("resolvePath failed: $path", e)
+            throw e
+        } finally {
+            val endTime = System.currentTimeMillis()
+            if (logger.isDebugEnabled) {
+                logger.debug("resolvePath took ${endTime - startTime} ms")
+            }
+        }
     }
 
     override fun getProviderSdk(): Any = throw throw UnsupportedOperationException(

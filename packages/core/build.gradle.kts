@@ -20,9 +20,13 @@ dependencies {
     // Play services
     implementation(Libs.googlePlayBase)
 
+    // Logging
+    implementation(Libs.slf4jApi)
+
     // Test
     testImplementation(Libs.junit)
     androidTestImplementation(Libs.androidJunit)
     testImplementation(Libs.mockk)
     testImplementation(Libs.coroutineTesting)
+    testImplementation(Libs.slf4jAndroid)
 }

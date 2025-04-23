@@ -81,6 +81,11 @@ internal interface GoogleStorageApiService {
         private const val PERMISSION_ID = "permissionId"
     }
 
+    @GET("$FILES_PARTICLE/{$FILE_ID}")
+    suspend fun getFile(
+        @Path(FILE_ID) fileId: String
+    ): Response<FileRemoteResponse>
+
     @GET(FILES_PARTICLE)
     suspend fun getFilesList(
         @Query(QUERY_Q) query: String,
