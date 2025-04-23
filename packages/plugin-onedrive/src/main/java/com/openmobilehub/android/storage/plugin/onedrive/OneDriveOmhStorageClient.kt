@@ -19,6 +19,7 @@ package com.openmobilehub.android.storage.plugin.onedrive
 import android.webkit.MimeTypeMap
 import androidx.annotation.VisibleForTesting
 import com.microsoft.graph.serviceclient.GraphServiceClient
+import com.microsoft.kiota.ApiException
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.model.OmhCreatePermission
@@ -29,6 +30,7 @@ import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemResponseToOmhStorageEntity
 import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.DriveItemToOmhStorageEntity
+import com.openmobilehub.android.storage.plugin.onedrive.data.mapper.ExceptionMapper
 import com.openmobilehub.android.storage.plugin.onedrive.data.repository.OneDriveFileRepository
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiClient
 import com.openmobilehub.android.storage.plugin.onedrive.data.service.OneDriveApiService
@@ -176,7 +178,24 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
     }
 
     override suspend fun resolvePath(path: String): OmhStorageEntity? {
-        return repository.resolvePath(path)
+        val startTime = System.currentTimeMillis()
+        try {
+            val retval = repository.resolvePath(path)
+            if (logger.isDebugEnabled && retval != null) {
+                logger.debug("resolvePath: $path -> $retval")
+            } else {
+                logger.debug("resolvePath: \"$path\" not found")
+            }
+            return retval
+        } catch (e: ApiException) {
+            logger.error("resolvePath failed: $path", e)
+            throw ExceptionMapper.toOmhApiException(e)
+        } finally {
+            val endTime = System.currentTimeMillis()
+            if (logger.isDebugEnabled) {
+                logger.debug("resolvePath took ${endTime - startTime} ms")
+            }
+        }
     }
 
     override fun getProviderSdk(): GraphServiceClient =

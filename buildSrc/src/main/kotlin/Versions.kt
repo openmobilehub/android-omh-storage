@@ -73,4 +73,8 @@ object Versions {
 
     // DataStore
     const val dataStore = "1.1.1"
+
+    // slf4j
+    const val slf4j = "2.0.17"
+    const val slf4jAndroid = "2.0.17-0"
 }

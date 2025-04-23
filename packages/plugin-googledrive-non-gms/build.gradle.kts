@@ -30,6 +30,9 @@ dependencies {
     // Omh Auth
     api(Libs.omhGoogleNonGmsAuthLibrary)
 
+    // slf4j
+    implementation(Libs.slf4jApi)
+
     // Retrofit setup
     implementation(Libs.retrofit)
     implementation(Libs.retrofitJacksonConverter)
@@ -42,4 +45,5 @@ dependencies {
     testImplementation(Libs.mockk)
     testImplementation(Libs.coroutineTesting)
     testImplementation(Libs.json)
+    testImplementation(Libs.slf4jAndroid)
 }

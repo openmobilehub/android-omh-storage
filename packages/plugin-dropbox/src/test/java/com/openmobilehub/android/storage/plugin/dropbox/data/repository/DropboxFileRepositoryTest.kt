@@ -85,11 +85,6 @@ import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhFolde
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhGroupPermission
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhUserPermission
 import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testOmhVersion
-import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testQueryFolder1
-import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testQueryFolder2
-import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testQueryFolder3
-import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testQueryFolderRsx
-import com.openmobilehub.android.storage.plugin.dropbox.testdoubles.testQueryRootFolder
 import io.mockk.MockKAnnotations
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -1097,42 +1092,21 @@ class DropboxFileRepositoryTest {
 
     @Test
     fun `test resolve path of non-existent file`() {
-        every { apiService.queryNodeIdHaving(any()) } answers { callOriginal() }
+        every { apiService.queryNodeIdHaving(any()) } returns null
         assertNull(repository.resolvePath("/foo/bar"))
 
         verify {
-            apiService invoke "listFilesAt" withArguments listOf(
-                "" // Root
-            )
+            apiService.queryNodeIdHaving("/foo/bar")
         }
     }
 
     @Test
     fun `test resolve path of an existing file`() {
-        every {
-            apiService invoke "listFilesAt" withArguments
-                listOf("")
-        } returns testQueryRootFolder
-        every {
-            apiService invoke "listFilesAt" withArguments
-                listOf("/RSX")
-        } returns testQueryFolderRsx
-        every {
-            apiService invoke "listFilesAt" withArguments
-                listOf("/RSX/1")
-        } returns testQueryFolder1
-        every {
-            apiService invoke "listFilesAt" withArguments
-                listOf("/RSX/1/2")
-        } returns testQueryFolder2
-        every {
-            apiService invoke "listFilesAt" withArguments
-                listOf("/RSX/1/2/3")
-        } returns testQueryFolder3
+        every { apiService.queryNodeIdHaving("/RSX/1/2/3/testfile.jpg") } returns
+            testFileJpg().id
         every { apiService.getFile("id of file /RSX/1/2/3/testfile.jpg") } returns
             testFileJpg()
 
-        every { apiService.queryNodeIdHaving(any()) } answers { callOriginal() }
         every { metadataToOmhStorageEntity(testFileJpg()) } returns OmhStorageEntity.OmhFile(
             id = "id of file /RSX/1/2/3/testfile.jpg",
             name = "testfile.jpg",
@@ -1148,21 +1122,7 @@ class DropboxFileRepositoryTest {
         assertNotNull(result)
         assertEquals("id of file /RSX/1/2/3/testfile.jpg", result?.id)
 
-        verify {
-            apiService invoke "listFilesAt" withArguments listOf("")
-        }
-        verify {
-            apiService invoke "listFilesAt" withArguments listOf("/RSX")
-        }
-        verify {
-            apiService invoke "listFilesAt" withArguments listOf("/RSX/1")
-        }
-        verify {
-            apiService invoke "listFilesAt" withArguments listOf("/RSX/1/2")
-        }
-        verify {
-            apiService invoke "listFilesAt" withArguments listOf("/RSX/1/2/3")
-        }
+        verify { apiService.queryNodeIdHaving("/RSX/1/2/3/testfile.jpg") }
         verify { apiService.getFile("id of file /RSX/1/2/3/testfile.jpg") }
     }
 }

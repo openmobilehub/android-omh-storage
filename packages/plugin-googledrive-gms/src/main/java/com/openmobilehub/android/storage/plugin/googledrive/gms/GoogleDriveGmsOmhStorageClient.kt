@@ -16,6 +16,7 @@
 
 package com.openmobilehub.android.storage.plugin.googledrive.gms
 
+import com.google.api.client.http.HttpResponseException
 import com.google.api.services.drive.Drive
 import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.auth.plugin.google.gms.GmsCredentials
@@ -27,6 +28,7 @@ import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
+import com.openmobilehub.android.storage.plugin.googledrive.gms.data.mapper.ExceptionMapper
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.repository.GmsFileRepository
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.service.GoogleDriveApiProvider
 import com.openmobilehub.android.storage.plugin.googledrive.gms.data.service.GoogleDriveApiService
@@ -179,7 +181,24 @@ internal class GoogleDriveGmsOmhStorageClient private constructor(
     }
 
     override suspend fun resolvePath(path: String): OmhStorageEntity? {
-        return fileRepository.resolvePath(path)
+        val startTime = System.currentTimeMillis()
+        try {
+            val retval = fileRepository.resolvePath(path)
+            if (logger.isDebugEnabled && retval != null) {
+                logger.debug("resolvePath: \"$path\" -> $retval")
+            } else {
+                logger.debug("resolvePath: \"$path\" not found")
+            }
+            return retval
+        } catch (e: HttpResponseException) {
+            logger.error("resolvePath failed: $path", e)
+            throw ExceptionMapper.toOmhApiException(e)
+        } finally {
+            val endTime = System.currentTimeMillis()
+            if (logger.isDebugEnabled) {
+                logger.debug("resolvePath took ${endTime - startTime} ms")
+            }
+        }
     }
 
     override fun getProviderSdk(): Drive = fileRepository.apiService.apiProvider.googleDriveApiService

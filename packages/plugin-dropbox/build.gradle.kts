@@ -22,9 +22,13 @@ dependencies {
     implementation(Libs.androidxAnnotation)
     implementation(Libs.coroutinesCore)
 
+    // slf4j
+    implementation(Libs.slf4jApi)
+
     // Test dependencies
     testImplementation(kotlin("test"))
     testImplementation(Libs.junit)
     testImplementation(Libs.mockk)
     testImplementation(Libs.coroutineTesting)
+    testImplementation(Libs.slf4jAndroid)
 }

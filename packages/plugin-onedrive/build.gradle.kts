@@ -26,6 +26,9 @@ dependencies {
     // MsGraph
     api(Libs.msGraph)
 
+    // slf4j
+    implementation(Libs.slf4jApi)
+
     // Retrofit setup
     implementation(Libs.retrofit)
     implementation(Libs.retrofitJacksonConverter)
@@ -40,4 +43,5 @@ dependencies {
     testImplementation(Libs.junit)
     testImplementation(Libs.mockk)
     testImplementation(Libs.coroutineTesting)
+    testImplementation(Libs.slf4jAndroid)
 }
