@@ -64,14 +64,14 @@ jobs:
           SAMPLE_APP_KEYSTORE_KEY_ALIAS: ${{ secrets.SAMPLE_APP_KEYSTORE_KEY_ALIAS }}
           SAMPLE_APP_KEYSTORE_KEY_PASSWORD: ${{ secrets.SAMPLE_APP_KEYSTORE_KEY_PASSWORD }}
 
-        # Publishes the app to App Center
-      - name: Publish app to App Center
-        uses: wzieba/AppCenter-Github-Action@v1
-        with:
-          appName: ${{ secrets.APP_CENTER_APP_NAME }}
-          group: ${{ secrets.APP_CENTER_GROUP }}
-          token: ${{ secrets.APP_CENTER_TOKEN }}
-          file: ${{ env.APK_PATH }}
-          notifyTesters: true
-          debug: true
-          gitReleaseNotes: true
+      #   # Publishes the app to App Center
+      # - name: Publish app to App Center
+      #   uses: wzieba/AppCenter-Github-Action@v1
+      #   with:
+      #     appName: ${{ secrets.APP_CENTER_APP_NAME }}
+      #     group: ${{ secrets.APP_CENTER_GROUP }}
+      #     token: ${{ secrets.APP_CENTER_TOKEN }}
+      #     file: ${{ env.APK_PATH }}
+      #     notifyTesters: true
+      #     debug: true
+      #     gitReleaseNotes: true
