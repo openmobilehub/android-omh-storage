@@ -536,7 +536,8 @@ class FileViewerViewModel @Inject constructor(
     private fun onGetFolderSize(event: FileViewerViewEvent.GetFolderSize) {
         viewModelScope.launch(Dispatchers.IO) {
             folderSize.postValue(-1L)
-            folderSize.postValue(omhStorageClient.folderSize(event.folder.id))
+            val size = omhStorageClient.folderSize(event.folder.id)
+            folderSize.postValue(size)
         }
     }
 
