@@ -101,6 +101,18 @@ internal class GmsFileRepository(
         throw ExceptionMapper.toOmhApiException(exception)
     }
 
+    fun rename(fileId: String, newName: String): OmhStorageEntity? = try {
+        val file = GoogleDriveFile().apply {
+            name = newName
+        }
+
+        val response: GoogleDriveFile = apiService.updateFile(fileId, file).execute()
+
+        response.toOmhStorageEntity()
+    } catch (exception: HttpResponseException) {
+        throw ExceptionMapper.toOmhApiException(exception)
+    }
+
     fun uploadFile(localFileToUpload: File, parentId: String?): OmhStorageEntity? = try {
         val localMimeType = getStringMimeTypeFromLocalFile(localFileToUpload)
 

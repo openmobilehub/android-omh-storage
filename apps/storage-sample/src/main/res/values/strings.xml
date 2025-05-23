@@ -23,6 +23,7 @@
     <string name="text_upload_file_title">Upload File</string>
     <string name="text_upload">Upload</string>
     <string name="text_update_file_title">Update File</string>
+    <string name="text_rename">Rename</string>
     <string name="text_update">Update</string>
     <string name="text_cancel">Cancel</string>
     <string name="text_create">Create</string>
@@ -42,6 +43,7 @@
     <string name="error_dialog_title">Something went wrong</string>
     <string name="error_dialog_message">Error detail:\n\n%s</string>
     <string name="error_dialog_ok">OK</string>
+    <string name="error_missing_file_name">Please enter file name</string>
     <string name="file_name">File Name: %s</string>
     <string name="file_id">ID: %s</string>
     <string name="file_created_time">Created Time: %s</string>

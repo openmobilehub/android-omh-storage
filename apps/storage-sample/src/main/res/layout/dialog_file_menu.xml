@@ -40,6 +40,10 @@
                     layout="@layout/row_menu" />
 
             <include
+                    android:id="@+id/rename"
+                    layout="@layout/row_menu" />
+
+            <include
                     android:id="@+id/update"
                     layout="@layout/row_menu" />
 

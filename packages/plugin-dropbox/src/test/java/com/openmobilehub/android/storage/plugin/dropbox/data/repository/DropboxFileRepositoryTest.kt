@@ -1125,4 +1125,19 @@ class DropboxFileRepositoryTest {
         verify { apiService.queryNodeIdHaving("/RSX/1/2/3/testfile.jpg") }
         verify { apiService.getFile("id of file /RSX/1/2/3/testfile.jpg") }
     }
+
+    @Test
+    fun `Test renaming a file`() {
+        // Arrange
+        val newName = "renamed_file.txt"
+        every { omhStorageEntity.name } returns newName
+        every { repository.rename(TEST_FILE_ID, newName) } returns omhStorageEntity
+
+        // Act
+        val result = repository.rename(TEST_FILE_ID, newName)
+
+        // Assert
+        assertEquals(omhStorageEntity, result)
+        verify { repository.rename(TEST_FILE_ID, newName) }
+    }
 }

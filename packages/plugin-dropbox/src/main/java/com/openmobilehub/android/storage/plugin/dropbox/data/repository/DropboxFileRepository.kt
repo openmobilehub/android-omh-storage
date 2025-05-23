@@ -205,6 +205,10 @@ internal class DropboxFileRepository(
         }
     }
 
+    fun rename(id: String, newName: String): OmhStorageEntity? {
+        return renameFile(id, newName)
+    }
+
     fun updateFile(newFile: File, fileId: String): OmhStorageEntity? = try {
         val inputStream = newFile.toInputStream()
 

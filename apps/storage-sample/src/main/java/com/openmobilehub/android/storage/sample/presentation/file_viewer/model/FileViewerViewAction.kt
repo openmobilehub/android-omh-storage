@@ -21,4 +21,5 @@ sealed class FileViewerViewAction {
     object ShowFilePermissions : FileViewerViewAction()
     object ShowFileVersions : FileViewerViewAction()
     object ShowFileMetadata : FileViewerViewAction()
+    object ShowRename: FileViewerViewAction()
 }

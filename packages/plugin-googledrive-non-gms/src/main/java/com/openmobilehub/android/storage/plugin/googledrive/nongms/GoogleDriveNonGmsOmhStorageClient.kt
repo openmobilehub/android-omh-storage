@@ -105,6 +105,10 @@ internal class GoogleDriveNonGmsOmhStorageClient private constructor(
         return fileRepository.exportFile(fileId, exportedMimeType)
     }
 
+    override suspend fun rename(id: String, newName: String): OmhStorageEntity? {
+        return fileRepository.rename(id, newName)
+    }
+
     override suspend fun updateFile(
         localFileToUpload: File,
         fileId: String

@@ -126,6 +126,10 @@ internal class OneDriveOmhStorageClient @VisibleForTesting internal constructor(
         throw UnsupportedOperationException("Exporting files is not supported in OneDrive.")
     }
 
+    override suspend fun rename(id: String, newName: String): OmhStorageEntity? {
+        return repository.rename(id, newName)
+    }
+
     override suspend fun updateFile(
         localFileToUpload: File,
         fileId: String

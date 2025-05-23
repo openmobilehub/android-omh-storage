@@ -99,6 +99,18 @@ val updatedFile = omhStorageClient.updateFile(
 )
 ```
 
+### Rename file
+
+Renames a file with the given file ID. Note however, no checking is done to ensure that the new
+name is unique within the folder, since some providers (e.g. Google) may allow duplicate names.
+
+```kotlin
+val renamedFile = omhStorageClient.renameFile(
+    id = "fileId",
+    newName = "newFileName"
+)
+```
+
 ### Delete file
 
 Moves a file with the given file ID in the trash.

@@ -173,6 +173,22 @@ abstract class OmhStorageClient protected constructor(
     abstract suspend fun exportFile(fileId: String, exportedMimeType: String): ByteArrayOutputStream
 
     /**
+     * This method rename a file/folder with a given id.
+     *
+     * Depending on the storage provider's implementation, this may or may not check for name
+     * conflicts. It is recommended to check for conflicts in your code before calling this method.
+     *
+     * @param id The id of the desired file/folder to be renamed
+     * @param newName The new name of the file/folder
+     *
+     * @return An OmhStorageEntity with the information of the renamed file/folder
+     */
+    abstract suspend fun rename(
+        id: String,
+        newName: String
+    ): OmhStorageEntity?
+
+    /**
      * This method update a remote file with the content of a local file
      *
      * @param localFileToUpload The local file to be uploaded

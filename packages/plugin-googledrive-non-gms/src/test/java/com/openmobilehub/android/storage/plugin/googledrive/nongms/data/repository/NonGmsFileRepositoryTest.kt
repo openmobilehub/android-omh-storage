@@ -1136,4 +1136,35 @@ internal class NonGmsFileRepositoryTest {
             assertNotNull(result)
             assertEquals("id of file /RSX/1/2/3/testfile.jpg", result?.id)
         }
+
+    @Test
+    fun `Test renaming a file`() = runTest {
+        // Given
+        val newName = "newFileName.txt"
+        coEvery {
+            googleStorageApiService.updateMetaData(
+                any(),
+                TEST_FILE_ID
+            )
+        } returns Response.success(
+            testFileRemote.copy(name = newName)
+        )
+
+        // When
+        val result = fileRepositoryImpl.rename(TEST_FILE_ID, newName)
+
+        // Then
+        assertEquals(newName, result?.name)
+        coVerify {
+            googleStorageApiService.updateMetaData(
+                match { requestBody ->
+                    val buffer = okio.Buffer()
+                    requestBody.writeTo(buffer)
+                    val bodyString = buffer.readUtf8()
+                    bodyString.contains("\"name\":\"$newName\"")
+                },
+                TEST_FILE_ID
+            )
+        }
+    }
 }

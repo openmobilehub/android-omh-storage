@@ -233,6 +233,10 @@ internal class OneDriveFileRepository(
         }
     }
 
+    fun rename(fileId: String, fileName: String): OmhStorageEntity {
+        return renameFile(fileId, fileName, true)
+    }
+
     fun updateFile(localFileToUpload: File, fileId: String): OmhStorageEntity {
         try {
             if (localFileToUpload.length() < SMALL_FILE_SIZE) {
