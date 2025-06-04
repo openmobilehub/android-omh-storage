@@ -130,6 +130,10 @@ internal class DropboxOmhStorageClient @VisibleForTesting internal constructor(
         return repository.getWebUrl(fileId)
     }
 
+    override suspend fun rename(id: String, newName: String): OmhStorageEntity? {
+        return repository.rename(id, newName)
+    }
+
     override suspend fun updateFile(
         localFileToUpload: File,
         fileId: String

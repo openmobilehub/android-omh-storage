@@ -159,6 +159,23 @@ internal class NonGmsFileRepository(
         }
     }
 
+    suspend fun rename(fileId: String, newName: String): OmhStorageEntity? {
+        val jsonMetaData = JSONObject().apply {
+            put(FILE_NAME_KEY, newName)
+        }
+        val jsonRequestBody = jsonMetaData.toString().toRequestBody(JSON_MIME_TYPE)
+
+        val response = retrofitImpl
+            .getGoogleStorageApiService()
+            .updateMetaData(jsonRequestBody, fileId)
+
+        return if (response.isSuccessful) {
+            response.body()?.toOmhStorageEntity()
+        } else {
+            throw response.toApiException()
+        }
+    }
+
     suspend fun updateFile(
         localFileToUpload: File,
         fileId: String

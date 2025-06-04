@@ -94,6 +94,11 @@ sealed class FileViewerViewEvent : ViewEvent {
         override fun getEventName() = "FileViewerViewEvent.PermanentlyDeleteFile"
     }
 
+    class RenameFile(val file: OmhStorageEntity, val newName: String) : FileViewerViewEvent() {
+
+        override fun getEventName() = "FileViewerViewEvent.RenameFile"
+    }
+
     class UploadFile(val context: Context, val uri: Uri, val fileName: String) : FileViewerViewEvent() {
 
         override fun getEventName() = "FileViewerViewEvent.UploadFile"
@@ -102,6 +107,11 @@ sealed class FileViewerViewEvent : ViewEvent {
     object SignOut : FileViewerViewEvent() {
 
         override fun getEventName() = "FileViewerViewEvent.SignOut"
+    }
+
+    class RenameFileClicked(val file: OmhStorageEntity) : FileViewerViewEvent() {
+
+        override fun getEventName() = "FileViewerViewEvent.RenameFileClicked"
     }
 
     class UpdateFileClicked(val file: OmhStorageEntity) : FileViewerViewEvent() {

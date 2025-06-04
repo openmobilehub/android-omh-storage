@@ -107,6 +107,13 @@ class FileMenuDialog : BottomSheetDialogFragment() {
             viewModel.dispatchEvent(FileViewerViewEvent.FileVersionsClicked(file))
         }
 
+        rename.icon.setImageResource(R.drawable.rename_outline)
+        rename.label.text = resources.getString(R.string.text_rename)
+        rename.root.setOnClickListener {
+            dismiss()
+            viewModel.dispatchEvent(FileViewerViewEvent.RenameFileClicked(file))
+        }
+
         update.icon.setImageResource(android.R.drawable.ic_menu_edit)
         update.label.text = resources.getString(R.string.text_update)
         update.root.setOnClickListener {

@@ -41,6 +41,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
+import androidx.core.widget.addTextChangedListener
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.viewModels
@@ -52,6 +53,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.sample.R
 import com.openmobilehub.android.storage.sample.databinding.DialogCreateFileBinding
+import com.openmobilehub.android.storage.sample.databinding.DialogRenameFileBinding
 import com.openmobilehub.android.storage.sample.databinding.DialogUploadFileBinding
 import com.openmobilehub.android.storage.sample.databinding.FragmentFileViewerBinding
 import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
@@ -163,6 +165,7 @@ class FileViewerFragment :
                         FileViewerViewAction.ShowFilePermissions -> showFilePermissions()
                         FileViewerViewAction.ShowFileVersions -> showFileVersions()
                         FileViewerViewAction.ShowMoreOptions -> showMoreOptions()
+                        FileViewerViewAction.ShowRename -> showRenameDialog()
                     }
                 }
             }
@@ -200,6 +203,29 @@ class FileViewerFragment :
         childFragmentManager,
         FILE_MENU_DIALOG_TAG
     )
+
+    private fun showRenameDialog() {
+        viewModel.lastFileClicked?.let { lastFileClicked ->
+            val view = DialogRenameFileBinding.inflate(layoutInflater)
+            view.fileName.setText(lastFileClicked.name)
+            val builder = AlertDialog.Builder(requireContext())
+                .setTitle(R.string.text_rename)
+                .setView(view.root)
+                .setPositiveButton(R.string.text_rename) { dialog, _ ->
+                    val fileName = view.fileName.text.toString()
+                    dispatchEvent(FileViewerViewEvent.RenameFile(lastFileClicked, fileName))
+                    dialog.dismiss()
+                }
+                .setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
+            val dialog = builder.show()
+            view.fileName.addTextChangedListener {
+                dialog.getButton(DialogInterface.BUTTON_POSITIVE).isEnabled = it.toString().isNotBlank()
+            }
+        } ?: run {
+            // Should not happen, but just in case
+            viewModel.toastMessage.postValue(getString(R.string.error_no_file_selected))
+        }
+    }
 
     override fun buildState(state: FileViewerViewState) = when (state) {
         FileViewerViewState.Initial -> buildInitialState()
@@ -590,6 +616,7 @@ class FileViewerFragment :
         const val FILE_VERSIONS_DIALOG_TAG = "file_versions_dialog_tag"
         const val FILE_METADATA_DIALOG_TAG = "file_metadata_dialog_tag"
         const val FILE_PERMISSIONS_DIALOG_TAG = "file_permissions_dialog_tag"
+        const val FILE_RENAME_DIALOG_TAG = "file_rename_dialog_tag"
     }
 
     inner class FileViewerMenuProvider(

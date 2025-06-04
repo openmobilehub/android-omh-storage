@@ -87,6 +87,7 @@ android {
             if (signingConfigs["release"].storeFile != null) {
                 signingConfig = signingConfigs.getByName("release")
             }
+
         }
     }
 

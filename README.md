@@ -99,6 +99,7 @@ provider implementations.
 | File creation (by mime type)    |         ✅         |           ✅           |    ❌    |   ❌    |
 | File creation (by extension)    |         ❌         |           ❌           |    ✅    |   ✅    |
 | File update                     |         ✅         |           ✅           |    ✅    |   ✅    |
+| File rename                     |         ✅         |           ✅           |    ✅    |   ✅    |
 | File deletion                   |         ✅         |           ✅           |    ✅    |   ✅    |
 | File permanent deletion         |         ✅         |           ✅           |    ❌    |   ❌    |
 | File upload                     |         ✅         |           ✅           |    ✅    |   ✅    |
