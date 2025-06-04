@@ -173,7 +173,7 @@ abstract class OmhStorageClient protected constructor(
     abstract suspend fun exportFile(fileId: String, exportedMimeType: String): ByteArrayOutputStream
 
     /**
-     * This method rename a file/folder with a given id.
+     * This method renames a file/folder with a given id.
      *
      * Depending on the storage provider's implementation, this may or may not check for name
      * conflicts. It is recommended to check for conflicts in your code before calling this method.

@@ -205,20 +205,25 @@ class FileViewerFragment :
     )
 
     private fun showRenameDialog() {
-        val view = DialogRenameFileBinding.inflate(layoutInflater)
-        view.fileName.setText(viewModel.lastFileClicked!!.name)
-        val builder = AlertDialog.Builder(requireContext())
-            .setTitle(R.string.text_rename)
-            .setView(view.root)
-            .setPositiveButton(R.string.text_rename) { dialog, _ ->
-                val fileName = view.fileName.text.toString()
-                dispatchEvent(FileViewerViewEvent.RenameFile(viewModel.lastFileClicked!!, fileName))
-                dialog.dismiss()
+        viewModel.lastFileClicked?.let { lastFileClicked ->
+            val view = DialogRenameFileBinding.inflate(layoutInflater)
+            view.fileName.setText(lastFileClicked.name)
+            val builder = AlertDialog.Builder(requireContext())
+                .setTitle(R.string.text_rename)
+                .setView(view.root)
+                .setPositiveButton(R.string.text_rename) { dialog, _ ->
+                    val fileName = view.fileName.text.toString()
+                    dispatchEvent(FileViewerViewEvent.RenameFile(lastFileClicked, fileName))
+                    dialog.dismiss()
+                }
+                .setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
+            val dialog = builder.show()
+            view.fileName.addTextChangedListener {
+                dialog.getButton(DialogInterface.BUTTON_POSITIVE).isEnabled = it.toString().isNotBlank()
             }
-            .setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
-        val dialog = builder.show()
-        view.fileName.addTextChangedListener {
-            dialog.getButton(DialogInterface.BUTTON_POSITIVE).isEnabled = it.toString().isNotBlank()
+        } ?: run {
+            // Should not happen, but just in case
+            viewModel.toastMessage.postValue(getString(R.string.error_no_file_selected))
         }
     }
 
