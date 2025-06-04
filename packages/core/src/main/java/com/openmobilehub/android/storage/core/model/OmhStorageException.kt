@@ -29,4 +29,14 @@ sealed class OmhStorageException(
 
     class ApiException(val statusCode: Int? = null, message: String? = null, cause: Throwable? = null) :
         OmhStorageException(message, cause)
+
+    class DownloadException(
+        override val message: String? = "Error downloading file",
+        override val cause: Throwable? = null
+    ) : OmhStorageException(message, cause)
+
+    class UpdateException(
+        override val message: String? = "Error updating file",
+        override val cause: Throwable?
+    ) : OmhStorageException(message, cause)
 }

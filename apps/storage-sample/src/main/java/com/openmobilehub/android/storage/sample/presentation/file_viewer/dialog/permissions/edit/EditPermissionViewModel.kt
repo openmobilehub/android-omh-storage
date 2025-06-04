@@ -36,16 +36,17 @@ class EditPermissionViewModel @Inject constructor(
     val roles = OmhPermissionRole.values().filter { it != OmhPermissionRole.OWNER }.toTypedArray()
     var role: OmhPermissionRole = when (storageAuthProvider) {
         StorageAuthProvider.GOOGLE -> OmhPermissionRole.READER
-        StorageAuthProvider.DROPBOX -> OmhPermissionRole.COMMENTER
-        StorageAuthProvider.MICROSOFT -> OmhPermissionRole.READER
+        StorageAuthProvider.DROPBOX, StorageAuthProvider.DROPBOX_RESTFUL
+             -> OmhPermissionRole.COMMENTER
+        StorageAuthProvider.MICROSOFT, StorageAuthProvider.MICROSOFT_RESTFUL
+             -> OmhPermissionRole.READER
     }
     val disabledRoles: Set<OmhPermissionRole> = when (storageAuthProvider) {
         StorageAuthProvider.GOOGLE -> emptySet()
-        StorageAuthProvider.DROPBOX -> setOf(
+        StorageAuthProvider.DROPBOX, StorageAuthProvider.DROPBOX_RESTFUL -> setOf(
             OmhPermissionRole.READER
         )
-
-        StorageAuthProvider.MICROSOFT -> setOf(
+        StorageAuthProvider.MICROSOFT, StorageAuthProvider.MICROSOFT_RESTFUL -> setOf(
             OmhPermissionRole.COMMENTER
         )
     }

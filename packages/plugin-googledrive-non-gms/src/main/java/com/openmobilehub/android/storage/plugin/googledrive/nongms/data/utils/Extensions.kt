@@ -16,31 +16,12 @@
 
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils
 
-import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
-import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
 import com.openmobilehub.android.storage.core.utils.fromRFC3339StringToDate
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants
 import okhttp3.ResponseBody
 import org.json.JSONObject
-import retrofit2.HttpException
-import retrofit2.Response
-import java.io.ByteArrayOutputStream
-
-fun ResponseBody?.toByteArrayOutputStream(): ByteArrayOutputStream {
-    val outputStream = ByteArrayOutputStream()
-
-    if (this == null) {
-        return outputStream
-    }
-
-    byteStream().use { inputStream ->
-        inputStream.copyTo(outputStream)
-    }
-
-    return outputStream
-}
 
 fun ResponseBody?.toOmhStorageEntityMetadata(): OmhStorageMetadata {
     val responseBody = this?.string().orEmpty()
@@ -86,12 +67,3 @@ fun ResponseBody?.toOmhStorageEntityMetadata(): OmhStorageMetadata {
 
     return OmhStorageMetadata(omhStorageEntity, responseBody)
 }
-
-fun <T> Response<T>.toApiException(): OmhStorageException.ApiException =
-    OmhStorageException.ApiException(code(), errorBody()?.string(), HttpException(this))
-
-val <T> Response<T>.isNotSuccessful: Boolean
-    get() = !isSuccessful
-
-val OmhAuthClient.accessToken: String?
-    get() = getCredentials().accessToken

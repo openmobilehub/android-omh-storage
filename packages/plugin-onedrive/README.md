@@ -50,7 +50,7 @@ Add the dependency for the OneDrive storage provider to your project's **build.g
 
 ```gradle
 dependencies {
-  implementation("com.openmobilehub.android.storage:plugin-onedrive-gms:<version>")
+  implementation("com.openmobilehub.android.storage:plugin-onedrive:<version>")
 }
 ```
 

@@ -30,15 +30,52 @@ fun String.removeSpecialCharacters(): String {
     return this.replace("[^a-zA-Z0-9.]".toRegex(), "_")
 }
 
-fun String.fromRFC3339StringToDate(): Date? {
-    val rfc3339Format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
-    rfc3339Format.timeZone = TimeZone.getTimeZone("UTC")
+@Suppress("MagicNumber")
+fun String.escapeUnicode(): String =
+    this.map {
+        if (it.code <= 127 || it == '/' || it == '.') {
+            it.toString()
+        } else {
+            "\\u%04x".format(it.code)
+        }
+    }.joinToString("")
 
-    return try {
-        rfc3339Format.parse(this)
-    } catch (e: ParseException) {
-        null
+@Suppress("MagicNumber")
+fun String.unescapeUnicode(): String {
+    val regex = Regex("""\\u([0-9a-fA-F]{4})""")
+    return regex.replace(this) { matchResult ->
+        val hexValue = matchResult.groupValues[1]
+        val intValue = hexValue.toInt(16)
+        intValue.toChar().toString()
     }
+}
+
+@Suppress("ReturnCount", "MagicNumber")
+fun String.fromRFC3339StringToDate(): Date? {
+    if (this.isEmpty()) return null
+
+    // Use regex to check if the given string has fractional seconds
+    val processed = this.replace(Regex("^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2})\\.(\\d+)(Z)$")) { mr ->
+        val prefix = mr.groupValues[1]
+        val fraction = mr.groupValues[2]
+        val suffix = mr.groupValues[3]
+        val truncated = if (fraction.length > 3) fraction.substring(0, 3) else fraction.padEnd(3, '0')
+        "$prefix.$truncated$suffix"
+    }
+    val patterns = listOf(
+        "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", // with fractional (normalized to 3)
+        "yyyy-MM-dd'T'HH:mm:ss'Z'" // without fractional
+    )
+    for (pattern in patterns) {
+        try {
+            val sdf = SimpleDateFormat(pattern, Locale.US)
+            sdf.timeZone = TimeZone.getTimeZone("UTC")
+            return sdf.parse(processed)
+        } catch (_: ParseException) {
+            // continue
+        }
+    }
+    return null
 }
 
 fun String.splitPathToParts(): List<String> {

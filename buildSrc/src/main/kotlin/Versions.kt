@@ -68,6 +68,9 @@ object Versions {
     // Json
     const val json = "20240303"
 
+    // Jackson
+    const val jacksonKotlin = "2.15.0"
+
     // Gson
     const val httpClientGson = "1.44.1"
 

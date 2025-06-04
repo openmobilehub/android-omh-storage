@@ -48,11 +48,11 @@ class CreatePermissionViewModel @Inject constructor(
     val roles = OmhPermissionRole.values().filter { it != OmhPermissionRole.OWNER }.toTypedArray()
     var disabledRoles: Set<OmhPermissionRole> = when (storageAuthProvider) {
         StorageAuthProvider.GOOGLE -> emptySet()
-        StorageAuthProvider.DROPBOX -> setOf(
+        StorageAuthProvider.DROPBOX, StorageAuthProvider.DROPBOX_RESTFUL -> setOf(
             OmhPermissionRole.READER
         )
 
-        StorageAuthProvider.MICROSOFT -> setOf(
+        StorageAuthProvider.MICROSOFT, StorageAuthProvider.MICROSOFT_RESTFUL -> setOf(
             OmhPermissionRole.COMMENTER
         )
     }
@@ -61,8 +61,10 @@ class CreatePermissionViewModel @Inject constructor(
         MutableStateFlow(
             when (storageAuthProvider) {
                 StorageAuthProvider.GOOGLE -> OmhPermissionRole.READER
-                StorageAuthProvider.DROPBOX -> OmhPermissionRole.COMMENTER
-                StorageAuthProvider.MICROSOFT -> OmhPermissionRole.READER
+                StorageAuthProvider.DROPBOX, StorageAuthProvider.DROPBOX_RESTFUL
+                     -> OmhPermissionRole.COMMENTER
+                StorageAuthProvider.MICROSOFT, StorageAuthProvider.MICROSOFT_RESTFUL
+                     -> OmhPermissionRole.READER
             }
         )
     val role: StateFlow<OmhPermissionRole> = _role
@@ -78,13 +80,13 @@ class CreatePermissionViewModel @Inject constructor(
     val types = PermissionType.values()
     val disabledTypes: Set<PermissionType> = when (storageAuthProvider) {
         StorageAuthProvider.GOOGLE -> emptySet()
-        StorageAuthProvider.DROPBOX -> setOf(
+        StorageAuthProvider.DROPBOX, StorageAuthProvider.DROPBOX_RESTFUL -> setOf(
             PermissionType.ANYONE,
             PermissionType.DOMAIN,
             PermissionType.GROUP,
         )
 
-        StorageAuthProvider.MICROSOFT -> setOf(
+        StorageAuthProvider.MICROSOFT, StorageAuthProvider.MICROSOFT_RESTFUL -> setOf(
             PermissionType.ANYONE,
             PermissionType.DOMAIN
         )

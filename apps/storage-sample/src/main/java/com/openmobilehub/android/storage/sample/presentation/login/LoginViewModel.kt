@@ -37,9 +37,16 @@ class LoginViewModel @Inject constructor(
     override fun processEvent(event: LoginViewEvent) {
         when (event) {
             LoginViewEvent.Initialize -> initializeEvent()
-            LoginViewEvent.LoginWithDropboxClicked -> loginClickedEvent(StorageAuthProvider.DROPBOX)
-            LoginViewEvent.LoginWithGoogleClicked -> loginClickedEvent(StorageAuthProvider.GOOGLE)
-            LoginViewEvent.LoginWithMicrosoftClicked -> loginClickedEvent(StorageAuthProvider.MICROSOFT)
+            LoginViewEvent.LoginWithDropboxClicked ->
+                loginClickedEvent(StorageAuthProvider.DROPBOX)
+            LoginViewEvent.LoginWithGoogleClicked ->
+                loginClickedEvent(StorageAuthProvider.GOOGLE)
+            LoginViewEvent.LoginWithMicrosoftClicked ->
+                loginClickedEvent(StorageAuthProvider.MICROSOFT)
+            LoginViewEvent.LoginWithDropboxRestfulClicked ->
+                loginClickedEvent(StorageAuthProvider.DROPBOX_RESTFUL)
+            LoginViewEvent.LoginWithMicrosoftRestfulClicked ->
+                loginClickedEvent(StorageAuthProvider.MICROSOFT_RESTFUL)
         }
     }
 

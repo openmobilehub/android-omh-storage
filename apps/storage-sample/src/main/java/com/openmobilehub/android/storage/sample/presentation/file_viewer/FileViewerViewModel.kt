@@ -115,15 +115,15 @@ class FileViewerViewModel @Inject constructor(
     private val isPermanentlyDeleteSupported: Boolean =
         when (storageAuthProvider) {
             StorageAuthProvider.GOOGLE -> true
-            StorageAuthProvider.DROPBOX -> false
-            StorageAuthProvider.MICROSOFT -> false
+            StorageAuthProvider.DROPBOX, StorageAuthProvider.DROPBOX_RESTFUL -> false
+            StorageAuthProvider.MICROSOFT, StorageAuthProvider.MICROSOFT_RESTFUL -> false
         }
 
     private val isFolderUpdateSupported: Boolean =
         when (storageAuthProvider) {
             StorageAuthProvider.GOOGLE -> true
-            StorageAuthProvider.DROPBOX -> false
-            StorageAuthProvider.MICROSOFT -> false
+            StorageAuthProvider.DROPBOX, StorageAuthProvider.DROPBOX_RESTFUL -> false
+            StorageAuthProvider.MICROSOFT, StorageAuthProvider.MICROSOFT_RESTFUL -> false
         }
 
     init {

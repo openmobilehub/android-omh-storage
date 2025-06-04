@@ -1,4 +1,4 @@
-package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper
+package com.openmobilehub.android.storage.core.restful.common.data.mapper
 
 import android.webkit.MimeTypeMap
 import java.io.File
