@@ -36,33 +36,54 @@
             app:layout_constraintTop_toBottomOf="@+id/header"
             app:layout_constraintVertical_bias="0.0">
 
-            <include
-                android:id="@+id/file_id"
-                layout="@layout/row_textview" />
+            <TextView
+                android:id="@+id/file_id_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="24dp"
+                android:layout_marginBottom="24dp" />
 
-            <include
-                android:id="@+id/file_created_time"
-                layout="@layout/row_textview" />
+            <TextView
+                android:id="@+id/file_created_time_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="24dp"
+                android:layout_marginBottom="24dp" />
 
-            <include
-                android:id="@+id/file_modified_time"
-                layout="@layout/row_textview" />
+            <TextView
+                android:id="@+id/file_modified_time_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="24dp"
+                android:layout_marginBottom="24dp" />
 
-            <include
-                android:id="@+id/file_parent_id"
-                layout="@layout/row_textview" />
+            <TextView
+                android:id="@+id/file_parent_id_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="24dp"
+                android:layout_marginBottom="24dp" />
 
-            <include
-                android:id="@+id/file_mime_type"
-                layout="@layout/row_textview" />
+            <TextView
+                android:id="@+id/file_mime_type_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="24dp"
+                android:layout_marginBottom="24dp" />
 
-            <include
-                android:id="@+id/file_extension"
-                layout="@layout/row_textview" />
+            <TextView
+                android:id="@+id/file_extension_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="24dp"
+                android:layout_marginBottom="24dp" />
 
-            <include
-                android:id="@+id/file_size"
-                layout="@layout/row_textview" />
+            <TextView
+                android:id="@+id/file_size_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="24dp"
+                android:layout_marginBottom="24dp" />
 
             <CheckBox
                 android:id="@+id/checkbox_show_original_metadata"
@@ -76,9 +97,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="200dp">
 
-                <include
+                <TextView
                     android:id="@+id/extra_metadata"
-                    layout="@layout/row_textview" />
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="24dp"
+                    android:layout_marginBottom="24dp" />
             </androidx.core.widget.NestedScrollView>
 
         </LinearLayout>

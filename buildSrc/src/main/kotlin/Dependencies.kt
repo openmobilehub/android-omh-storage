@@ -20,6 +20,9 @@ object Libs {
     val okHttp by lazy { "com.squareup.okhttp3:okhttp:${Versions.okhttp}" }
     val okHttpLoggingInterceptor by lazy { "com.squareup.okhttp3:logging-interceptor:${Versions.okhttp}" }
 
+    // Jackson (Kotlin module)
+    val jacksonKotlin by lazy { "com.fasterxml.jackson.module:jackson-module-kotlin:${Versions.jacksonKotlin}" }
+
     // Coroutines
     val coroutinesCore by lazy { "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}" }
     val coroutinesAndroid by lazy { "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutines}" }

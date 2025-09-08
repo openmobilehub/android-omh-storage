@@ -3,7 +3,9 @@
 
     <string name="login_google">Login with Google</string>
     <string name="login_dropbox">Login with Dropbox</string>
+    <string name="login_dropbox_restful">Login with Dropbox + REST API</string>
     <string name="login_microsoft">Login with Microsoft</string>
+    <string name="login_microsoft_restful">Login with Microsoft + REST API</string>
     <string name="login_error">Login failed. Result code: %1$d, error message: %1$s</string>
     <string name="login_title">Login</string>
 

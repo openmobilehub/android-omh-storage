@@ -140,16 +140,21 @@ dependencies {
     // Use local implementation instead of dependencies
     if (useLocalProjects) {
         implementation(project(":packages:core"))
+        implementation(project(":packages:core-restful-common"))
         implementation(project(":packages:plugin-googledrive-gms"))
         implementation(project(":packages:plugin-googledrive-non-gms"))
         implementation(project(":packages:plugin-onedrive"))
+        implementation(project(":packages:plugin-onedrive-restful"))
         implementation(project(":packages:plugin-dropbox"))
+        implementation(project(":packages:plugin-dropbox-restful"))
     } else {
         implementation("com.openmobilehub.android.storage:core:2.0.6-alpha")
         implementation("com.openmobilehub.android.storage:plugin-googledrive-gms:2.1.0-alpha")
         implementation("com.openmobilehub.android.storage:plugin-googledrive-non-gms:2.1.0-alpha")
         implementation("com.openmobilehub.android.storage:plugin-onedrive:2.1.0-alpha")
         implementation("com.openmobilehub.android.storage:plugin-dropbox:2.1.0-alpha")
+        implementation("com.openmobilehub.android.storage:plugin-onedrive-restful:2.1.0-alpha")
+        implementation("com.openmobilehub.android.storage:plugin-dropbox-restful:2.1.0-alpha")
     }
 
     testImplementation(Libs.junit)

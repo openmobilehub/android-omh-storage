@@ -15,7 +15,15 @@ jobs:
   publish:
     name: Publish Core Package
     uses: ./.github/workflows/build_and_publish_to_maven_remotely.yml
-    with:
-      package-name: :packages:core
-      destination-repository: ${{ github.event.inputs.destination-repository }}
     secrets: inherit
+    strategy:
+      matrix:
+        package-name:
+          [
+            "core",
+            "core-restful-common"
+          ]
+    with:
+      package-name: :packages:${{ matrix.package-name }}
+      destination-repository: ${{ github.event.inputs.destination-repository }}
+

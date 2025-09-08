@@ -17,9 +17,10 @@
 package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit
 
 import com.openmobilehub.android.auth.core.OmhAuthClient
+import com.openmobilehub.android.storage.core.restful.common.data.repository.StorageAuthenticator
+import com.openmobilehub.android.storage.core.restful.common.utils.accessToken
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.BuildConfig
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.GoogleStorageApiService
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.accessToken
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -43,7 +44,10 @@ internal class GoogleStorageApiServiceProvider(private val omhAuthClient: OmhAut
     }
 
     private fun createOkHttpClient(): OkHttpClient {
-        val authenticator = StorageAuthenticator(omhAuthClient)
+        val authenticator =
+            StorageAuthenticator(
+                omhAuthClient
+            )
         return OkHttpClient.Builder()
             .addInterceptor { chain ->
                 val request = setupRequestInterceptor(chain)

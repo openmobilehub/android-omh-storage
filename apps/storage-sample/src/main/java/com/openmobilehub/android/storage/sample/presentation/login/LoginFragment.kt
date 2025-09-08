@@ -67,9 +67,21 @@ class LoginFragment : BaseFragment<LoginViewModel, LoginViewState, LoginViewEven
     ): View {
         binding = FragmentLoginBinding.inflate(layoutInflater)
 
-        binding.btnLoginGoogle.setOnClickListener { dispatchEvent(LoginViewEvent.LoginWithGoogleClicked) }
-        binding.btnLoginDropbox.setOnClickListener { dispatchEvent(LoginViewEvent.LoginWithDropboxClicked) }
-        binding.btnLoginMicrosoft.setOnClickListener { dispatchEvent(LoginViewEvent.LoginWithMicrosoftClicked) }
+        binding.btnLoginGoogle.setOnClickListener {
+            dispatchEvent(LoginViewEvent.LoginWithGoogleClicked)
+        }
+        binding.btnLoginDropbox.setOnClickListener {
+            dispatchEvent(LoginViewEvent.LoginWithDropboxClicked)
+        }
+        binding.btnLoginMicrosoft.setOnClickListener {
+            dispatchEvent(LoginViewEvent.LoginWithMicrosoftClicked)
+        }
+        binding.btnLoginDropboxRestful.setOnClickListener {
+            dispatchEvent(LoginViewEvent.LoginWithDropboxRestfulClicked)
+        }
+        binding.btnLoginMicrosoftRestful.setOnClickListener {
+            dispatchEvent(LoginViewEvent.LoginWithMicrosoftRestfulClicked)
+        }
 
         return binding.root
     }

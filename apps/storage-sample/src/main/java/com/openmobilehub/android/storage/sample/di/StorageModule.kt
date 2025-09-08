@@ -21,9 +21,11 @@ import com.openmobilehub.android.auth.core.OmhAuthClient
 import com.openmobilehub.android.storage.core.OmhStorageClient
 import com.openmobilehub.android.storage.core.OmhStorageProvider
 import com.openmobilehub.android.storage.plugin.dropbox.DropboxOmhStorageFactory
+import com.openmobilehub.android.storage.plugin.dropbox.restful.DropboxRestfulOmhStorageClientFactory
 import com.openmobilehub.android.storage.plugin.googledrive.gms.GoogleDriveGmsConstants
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants
 import com.openmobilehub.android.storage.plugin.onedrive.OneDriveOmhStorageFactory
+import com.openmobilehub.android.storage.plugin.onedrive.restful.OneDriveRestfulOmhStorageClientFactory
 import com.openmobilehub.android.storage.sample.domain.model.StorageAuthProvider
 import com.openmobilehub.android.storage.sample.domain.repository.SessionRepository
 import dagger.Module
@@ -37,6 +39,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
+@Suppress("LongParameterList")
 class StorageModule {
 
     @Provides
@@ -44,12 +47,16 @@ class StorageModule {
         @Named("google") googleStorageClient: Provider<OmhStorageClient>,
         @Named("dropbox") dropboxStorageClient: Provider<OmhStorageClient>,
         @Named("microsoft") microsoftStorageClient: Provider<OmhStorageClient>,
+        @Named("dropbox_restful") dropboxRestfulStorageClient: Provider<OmhStorageClient>,
+        @Named("onedrive_restful") microsoftRestfulStorageClient: Provider<OmhStorageClient>,
         sessionRepository: SessionRepository
     ): OmhStorageClient {
         return when (sessionRepository.getStorageAuthProvider()) {
             StorageAuthProvider.GOOGLE -> googleStorageClient.get()
             StorageAuthProvider.DROPBOX -> dropboxStorageClient.get()
             StorageAuthProvider.MICROSOFT -> microsoftStorageClient.get()
+            StorageAuthProvider.DROPBOX_RESTFUL -> dropboxRestfulStorageClient.get()
+            StorageAuthProvider.MICROSOFT_RESTFUL -> microsoftRestfulStorageClient.get()
         }
     }
 
@@ -81,4 +88,17 @@ class StorageModule {
         return OneDriveOmhStorageFactory().getStorageClient(omhAuthClient)
     }
 
+    @Named("dropbox_restful")
+    @Provides
+    @Singleton
+    fun providesDropboxRestfulOmhStorageClient(omhAuthClient: OmhAuthClient): OmhStorageClient {
+        return DropboxRestfulOmhStorageClientFactory().getStorageClient(omhAuthClient)
+    }
+
+    @Named("onedrive_restful")
+    @Provides
+    @Singleton
+    fun providesOneDriveRestfulOmhStorageClient(omhAuthClient: OmhAuthClient): OmhStorageClient {
+        return OneDriveRestfulOmhStorageClientFactory().getStorageClient(omhAuthClient)
+    }
 }

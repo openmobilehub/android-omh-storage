@@ -14,25 +14,30 @@
  * limitations under the License.
  */
 
-package com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit
+package com.openmobilehub.android.storage.core.restful.common.data.repository
 
 import com.openmobilehub.android.auth.core.OmhAuthClient
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.accessToken
+import com.openmobilehub.android.storage.core.restful.common.utils.accessToken
 import okhttp3.Authenticator
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.Route
 
-internal class StorageAuthenticator(private val omhAuthClient: OmhAuthClient) : Authenticator {
+class StorageAuthenticator(private val omhAuthClient: OmhAuthClient) : Authenticator {
 
     override fun authenticate(route: Route?, response: Response): Request? {
         val refreshedToken = omhAuthClient.accessToken ?: return null
         return response.request
             .newBuilder()
             .header(
-                name = GoogleStorageApiServiceProvider.HEADER_AUTHORIZATION_NAME,
-                value = GoogleStorageApiServiceProvider.BEARER.format(refreshedToken)
+                name = HEADER_AUTHORIZATION_NAME,
+                value = BEARER.format(refreshedToken)
             )
             .build()
+    }
+
+    companion object {
+        const val HEADER_AUTHORIZATION_NAME = "Authorization"
+        const val BEARER = "Bearer %s"
     }
 }

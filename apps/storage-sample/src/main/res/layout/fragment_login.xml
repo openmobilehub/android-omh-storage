@@ -53,11 +53,25 @@
                 android:text="@string/login_dropbox" />
 
         <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_login_dropbox_restful"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/login_dropbox_restful" />
+
+        <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_login_microsoft"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:text="@string/login_microsoft" />
+
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_login_microsoft_restful"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="@string/login_microsoft_restful" />
 
     </LinearLayout>
 

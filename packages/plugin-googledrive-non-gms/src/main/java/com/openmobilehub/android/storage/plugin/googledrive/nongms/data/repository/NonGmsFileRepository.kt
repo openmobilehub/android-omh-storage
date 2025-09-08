@@ -24,10 +24,13 @@ import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageEntity
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
+import com.openmobilehub.android.storage.core.restful.common.data.mapper.LocalFileToMimeType
+import com.openmobilehub.android.storage.core.restful.common.utils.isNotSuccessful
+import com.openmobilehub.android.storage.core.restful.common.utils.toApiException
+import com.openmobilehub.android.storage.core.restful.common.utils.toByteArrayOutputStream
 import com.openmobilehub.android.storage.core.utils.splitPathToParts
 import com.openmobilehub.android.storage.core.utils.toInputStream
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.GoogleDriveNonGmsConstants
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.LocalFileToMimeType
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toCreateRequestBody
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toFileList
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.toOmhFileVersions
@@ -38,9 +41,6 @@ import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.t
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.GoogleStorageApiService
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.body.CreateFileRequestBody
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit.GoogleStorageApiServiceProvider
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.isNotSuccessful
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.toApiException
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.toByteArrayOutputStream
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.toOmhStorageEntityMetadata
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody

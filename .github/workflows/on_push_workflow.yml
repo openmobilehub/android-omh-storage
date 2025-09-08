@@ -39,11 +39,19 @@ jobs:
   storage-core-remote:
     needs: storage-core-local
     name: Publish Core Package to Sonatype
+    secrets: inherit
+    strategy:
+      matrix:
+        package-name:
+          [
+            "core",
+            "core-restful-common"
+          ]
     uses: ./.github/workflows/build_and_publish_to_maven_remotely.yml
     with:
-      package-name: :packages:core
+      package-name: :packages:${{ matrix.package-name }}
       destination-repository: snapshot
-    secrets: inherit
+
 
   # Build and publish snapshots of all plugins to Sonatype
   # this workflow uses local projects
@@ -58,7 +66,9 @@ jobs:
             "plugin-googledrive-gms",
             "plugin-googledrive-non-gms",
             "plugin-onedrive",
+            "plugin-onedrive-restful",
             "plugin-dropbox",
+            "plugin-dropbox-restful"
           ]
     uses: ./.github/workflows/build_and_publish_to_maven_remotely.yml
     with:

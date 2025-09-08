@@ -104,37 +104,37 @@ class FileMetadataDialog : BottomSheetDialogFragment() {
 
             header.fileName.text = getString(R.string.file_name, file.name)
 
-            fileId.label.text = getString(R.string.file_id, file.id)
-            fileCreatedTime.label.text =
+            fileIdLabel.text = getString(R.string.file_id, file.id)
+            fileCreatedTimeLabel.text =
                 getString(R.string.file_created_time, file.createdTime?.toRFC3339String())
-            fileModifiedTime.label.text =
+            fileModifiedTimeLabel.text =
                 getString(R.string.file_modified_time, file.modifiedTime?.toRFC3339String())
-            fileParentId.label.text = getString(R.string.file_parent_id, file.parentId)
-            fileMimeType.label.text = getString(R.string.file_mime_type, mimeType)
-            fileExtension.label.text = getString(R.string.file_extension, extension)
-            fileSize.label.text = getString(R.string.file_size, size.toString())
+            fileParentIdLabel.text = getString(R.string.file_parent_id, file.parentId)
+            fileMimeTypeLabel.text = getString(R.string.file_mime_type, mimeType)
+            fileExtensionLabel.text = getString(R.string.file_extension, extension)
+            fileSizeLabel.text = getString(R.string.file_size, size.toString())
 
             if (file.isFolder()) {
-                fileMimeType.label.visibility = View.GONE
-                fileExtension.label.visibility = View.GONE
-                fileSize.label.visibility = View.GONE
+                fileMimeTypeLabel.visibility = View.GONE
+                fileExtensionLabel.visibility = View.GONE
+                fileSizeLabel.visibility = View.GONE
             }
 
             when (originalMetadata) {
                 is GoogleDriveFile -> { // Google Drive GMS
-                    extraMetadata.label.text = originalMetadata.toString()
+                    extraMetadata.text = originalMetadata.toString()
                 }
 
                 is String -> { // Google Drive Non-GMS
-                    extraMetadata.label.text = originalMetadata
+                    extraMetadata.text = originalMetadata
                 }
 
                 is DriveItem -> { // OneDrive
-                    extraMetadata.label.text = originalMetadata.serializeToString()
+                    extraMetadata.text = originalMetadata.serializeToString()
                 }
 
                 is Metadata -> { // Dropbox
-                    extraMetadata.label.text = originalMetadata.toString()
+                    extraMetadata.text = originalMetadata.toString()
                 }
             }
         }
@@ -161,4 +161,3 @@ class FileMetadataDialog : BottomSheetDialogFragment() {
         }
     }
 }
-

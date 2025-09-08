@@ -66,15 +66,15 @@ class FilePermissionsViewModel @Inject constructor(
     private val isDeletingInheritedPermissionsSupported: Boolean =
         when (storageAuthProvider) {
             StorageAuthProvider.GOOGLE -> true
-            StorageAuthProvider.DROPBOX -> true
-            StorageAuthProvider.MICROSOFT -> false
+            StorageAuthProvider.DROPBOX, StorageAuthProvider.DROPBOX_RESTFUL -> true
+            StorageAuthProvider.MICROSOFT, StorageAuthProvider.MICROSOFT_RESTFUL -> false
         }
 
     @StringRes val permissionCaveats: Int? =
         when (storageAuthProvider) {
             StorageAuthProvider.GOOGLE -> null
-            StorageAuthProvider.DROPBOX -> R.string.permission_caveats_dropbox
-            StorageAuthProvider.MICROSOFT -> null
+            StorageAuthProvider.DROPBOX, StorageAuthProvider.DROPBOX_RESTFUL -> R.string.permission_caveats_dropbox
+            StorageAuthProvider.MICROSOFT, StorageAuthProvider.MICROSOFT_RESTFUL -> null
         }
 
     fun getPermissions(file: OmhStorageEntity) {

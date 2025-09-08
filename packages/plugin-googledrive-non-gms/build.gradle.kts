@@ -23,6 +23,7 @@ val useLocalProjects = project.rootProject.extra["useLocalProjects"] as Boolean
 dependencies {
     if (useLocalProjects) {
         api(project(":packages:core"))
+        implementation(project(":packages:core-restful-common"))
     } else {
         api("com.openmobilehub.android.storage:core:2.1.0-alpha")
     }

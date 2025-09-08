@@ -91,11 +91,92 @@ class StringExtensionsTest {
     }
 
     @Test
+    fun `given a string with escaped unicode characters, when unescaping unicode, then return string with actual unicode characters`() {
+        // Arrange
+        val input = "You don\\u2019t have permission to perform this action."
+        val expected = "You don’t have permission to perform this action."
+
+        // Act
+        val result = input.unescapeUnicode()
+
+        // Assert
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `given a string without escaped unicode, when unescaping unicode, then return original string`() {
+        // Arrange
+        val input = "Regular string without unicode"
+        val expected = "Regular string without unicode"
+
+        // Act
+        val result = input.unescapeUnicode()
+
+        // Assert
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `given a string with multiple escaped unicode characters, when unescaping unicode, then return string with all characters unescaped`() {
+        // Arrange
+        val input = "\\u0048\\u0065\\u006c\\u006c\\u006f \\u0057\\u006f\\u0072\\u006c\\u0064"
+        val expected = "Hello World"
+
+        // Act
+        val result = input.unescapeUnicode()
+
+        // Assert
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `test unescapeUnicode with multibyte characters`() {
+        val input = "\u3042\u3044\u3046\u3048\u304A"
+        val expected = "あいうえお"
+
+        // Act
+        val result = input.unescapeUnicode()
+
+        // Assert
+        assertEquals(expected, result)
+    }
+
+    @Test
     fun `test splitPathToParts`() {
         assertEquals(listOf("abc"), "abc".splitPathToParts())
         assertEquals(listOf(""), "".splitPathToParts())
         assertEquals(listOf(" "), " ".splitPathToParts())
         assertEquals(listOf("a", "b", "c"), "/a/b/c".splitPathToParts())
         assertEquals(listOf("a", "b", "c"), "/a/b/c/".splitPathToParts())
+    }
+
+    @Test
+    fun `given RFC3339 without fractional seconds, when converted to date, then return correct date`() {
+        val input = "2024-05-01T00:00:00Z"
+        val expected = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US).apply {
+            timeZone = java.util.TimeZone.getTimeZone("UTC")
+        }.parse(input)
+        val result = input.fromRFC3339StringToDate()
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `given RFC3339 with 7 fractional digits, when converted to date, then truncate to millis`() {
+        val input = "2024-05-01T00:00:00.1234567Z"
+        val expected = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.US).apply {
+            timeZone = java.util.TimeZone.getTimeZone("UTC")
+        }.parse("2024-05-01T00:00:00.123Z")
+        val result = input.fromRFC3339StringToDate()
+        assertEquals(expected, result)
+    }
+
+    @Test
+    fun `given RFC3339 with 2 fractional digits, when converted to date, then pad to millis`() {
+        val input = "2024-05-01T00:00:00.12Z"
+        val expected = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.US).apply {
+            timeZone = java.util.TimeZone.getTimeZone("UTC")
+        }.parse("2024-05-01T00:00:00.120Z")
+        val result = input.fromRFC3339StringToDate()
+        assertEquals(expected, result)
     }
 }

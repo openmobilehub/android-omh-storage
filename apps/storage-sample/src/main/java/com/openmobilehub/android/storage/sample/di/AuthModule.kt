@@ -46,8 +46,10 @@ class AuthModule {
     ): OmhAuthClient {
         return when (sessionRepository.getStorageAuthProvider()) {
             StorageAuthProvider.GOOGLE -> googleAuthClient.get()
-            StorageAuthProvider.DROPBOX -> dropboxAuthClient.get()
-            StorageAuthProvider.MICROSOFT -> microsoftAuthClient.get()
+            StorageAuthProvider.DROPBOX, StorageAuthProvider.DROPBOX_RESTFUL ->
+                dropboxAuthClient.get()
+            StorageAuthProvider.MICROSOFT, StorageAuthProvider.MICROSOFT_RESTFUL ->
+                microsoftAuthClient.get()
         }
     }
 

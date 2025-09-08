@@ -22,14 +22,14 @@ import android.webkit.MimeTypeMap
 import com.openmobilehub.android.storage.core.model.OmhPermissionRole
 import com.openmobilehub.android.storage.core.model.OmhStorageException
 import com.openmobilehub.android.storage.core.model.OmhStorageMetadata
+import com.openmobilehub.android.storage.core.restful.common.data.mapper.LocalFileToMimeType
+import com.openmobilehub.android.storage.core.restful.common.utils.toByteArrayOutputStream
 import com.openmobilehub.android.storage.core.utils.toInputStream
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.mapper.LocalFileToMimeType
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.repository.NonGmsFileRepository.Companion.STORAGE_QUOTA
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.GoogleStorageApiService
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileListRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.response.FileRemoteResponse
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.service.retrofit.GoogleStorageApiServiceProvider
-import com.openmobilehub.android.storage.plugin.googledrive.nongms.data.utils.toByteArrayOutputStream
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.TEST_EMAIL_MESSAGE
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.TEST_FILE_ID
 import com.openmobilehub.android.storage.plugin.googledrive.nongms.testdoubles.TEST_FILE_MIME_TYPE
