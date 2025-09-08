@@ -31,6 +31,7 @@ dependencies {
         implementation(project(":packages:core-restful-common"))
     } else {
         api("com.openmobilehub.android.storage:core:2.1.0-alpha")
+        implementation("com.openmobilehub.android.storage:core-restful-common:2.1.0-alpha")
     }
 
     // Omh Auth

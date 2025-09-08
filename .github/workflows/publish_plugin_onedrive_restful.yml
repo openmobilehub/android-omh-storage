@@ -1,4 +1,4 @@
-name: Publish Core Package
+name: Publish Onedrive Plugin
 
 on:
   workflow_dispatch:
@@ -13,17 +13,9 @@ on:
 
 jobs:
   publish:
-    name: Publish Core Package
+    name: Publish Onedrive Plugin
     uses: ./.github/workflows/build_and_publish_to_maven_remotely.yml
-    secrets: inherit
-    strategy:
-      matrix:
-        package-name:
-          [
-            "core",
-            "core-restful-common"
-          ]
     with:
-      package-name: :packages:${{ matrix.package-name }}
+      package-name: :packages:plugin-onedrive-restful
       destination-repository: ${{ github.event.inputs.destination-repository }}
-
+    secrets: inherit
